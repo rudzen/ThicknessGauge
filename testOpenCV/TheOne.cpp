@@ -139,7 +139,6 @@ int main(int argc, char** argv) {
 	ThicknessGauge c;
 
 	// settings from arguments.
-	// TODO Move to actual functionality where they are used.
 	c.setFrameCount(args.getArgument("frames", 25));
 	c.setShowWindows(args.getArgument("show", false));
 	c.setSaveVideo(args.getArgument("video", false));
@@ -165,6 +164,6 @@ int main(int argc, char** argv) {
 	} catch (CaptureFailException& e) {
 		cout << "Something happend.. but what?\n" << e.what() << endl;
 	}
-	return returnValue;
+	return returnValue ^true;
 
 }

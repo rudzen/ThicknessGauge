@@ -137,6 +137,8 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	auto size = frame.size();
 
+	vector<Point2d> test_subPix;
+
 	// configure output stuff
 	for (auto i = 0; i < m_FrameCount; ++i) {
 		pix_planarMap[i].reserve(size.width);
@@ -168,7 +170,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		if (m_ShowWindows) imshow(outputWindowName, frame);
 
 		// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
-		auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i]);
+		auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i], test_subPix);
 
 		if (!generateOk) {
 			cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(m_FrameCount) << endl;
