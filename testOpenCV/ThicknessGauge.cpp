@@ -137,6 +137,19 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	auto size = frame.size();
 
+	// test for video recording
+	if (m_SaveVideo) {
+		ImageSave is;
+		is.SetInformation(Information::Full);
+		is.SetSaveType(SaveType::Video);
+		is.SetCodec(VideoCodec::Mjpeg);
+		is.SetFPS(25.0f);
+		is.SetSize(frame.cols, frame.rows);
+		is.SetColour(VideoColour::Colour);
+		is.SetFileName("_testvideo");
+		is.OpenVideo();
+	}
+
 	vector<Point2d> test_subPix;
 
 	// configure output stuff
@@ -183,7 +196,6 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		//cout << pix_planarMap[i] << endl;
 
-
 	}
 
 	frame = Mat::zeros(size, CV_8UC1);
@@ -193,6 +205,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	for (auto i = 0; i < m_FrameCount; ++i) {
 		addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
 		add(outputs[i], frame, frame);
+		is.SaveVideoFrame(lines);
 	}
 
 	Mat output = Mat::zeros(size, CV_8UC1);
@@ -233,6 +246,9 @@ bool ThicknessGauge::generatePlanarImage() {
 		destroyWindow(line2WindowName);
 		destroyWindow(line3WindowName);
 	}
+
+	if (m_SaveVideo)
+		is.CloseVideo();
 
 	return true;
 }
