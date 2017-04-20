@@ -104,7 +104,7 @@ public:
 	bool saveData(string filename) const;
 
 	/* Converts pixels from an image to a singular line vector in X, where Y is the mean of all pixels located at that given X in the image */
-	bool generatePlanarPixels(Mat &input, Mat &output, vector<Point> &pixels) const;
+	bool generatePlanarPixels(Mat& input, Mat& output, vector<Point>& pixels, vector<Point2d>& gradientPixels) const;
 
 	bool generateGradientPlanarMap(Mat &image, vector<Point2d> planarPixels, vector<Vec3b> &gradientPixels);
 

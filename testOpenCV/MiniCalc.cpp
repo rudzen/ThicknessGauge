@@ -225,13 +225,15 @@ bool MiniCalc::saveData(string filename) const {
 	return true;
 }
 
-bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, std::vector<Point>& pixels) const {
+bool MiniCalc::generatePlanarPixels(Mat& input, Mat& output, vector<Point>& pixels, vector<Point2d>& gradientPixels) const {
 
 	vector<Point> pix;
 
 	pix.reserve(input.cols);
 
-	cv::findNonZero(input, pix);
+	findNonZero(input, pix);
+
+	gradientPixels.clear();
 
 	// sort the list in X
 	sort(pix.begin(), pix.end(), sortX);
@@ -241,14 +243,15 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, std::vector
 	auto ySum = 0;
 	auto totalYMean = 0.0;
 	auto gradientSum = 0.0;
-	bool found;
 	//unsigned char value = image.at<unsigned char>(y, x);
 
 	for (auto& p : pix) {
 		if (p.x != x) {
 			if (count > 0) {
-				pixels.push_back(Point(x, (round(ySum / static_cast<double>(count)))));
-				output.at<unsigned char>(pixels.back()) = static_cast<unsigned char>(round(gradientSum / count));
+				pixels.push_back(Point(x, static_cast<int>(round(ySum / static_cast<double>(count)))));
+				auto gradient = static_cast<unsigned char>(round(gradientSum / count));
+				output.at<unsigned char>(pixels.back()) = gradient;
+				gradientPixels.push_back(Point2d(static_cast<double>(x), gradient));
 				//pixels.push_back(Point(x, static_cast<int>(round(ySum / static_cast<double>(count)))));
 				//cout << "pixels back : " << pixels.back() << endl;
 			}
@@ -278,7 +281,7 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, std::vector
 	return true;
 }
 
-uchar MiniCalc::getGradientYValues(cv::Mat& image, int x, int y, int maxY, int minY) {
+uchar MiniCalc::getGradientYValues(Mat& image, int x, int y, int maxY, int minY) {
 
 	Scalar colour;
 	auto r = Rect(Point(x, y), Size(1, 1));
