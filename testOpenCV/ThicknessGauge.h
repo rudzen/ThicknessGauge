@@ -15,22 +15,22 @@ The main controller class
 class ThicknessGauge {
 
 public:
-	ThicknessGauge(): m_FrameTime(0), m_FrameCount(0), m_ShowWindows(false), m_SaveVideo(false), m_RightMean(0), m_LeftMean(0) {
+	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), rightMean_(0), leftMean_(0) {
 	}
 
 private:
 
 	map<WindowType, string> m_WindowNames = {{WindowType::Input, "Camera Input"},{WindowType::Output, "Output"},{WindowType::Temp, "Temp"}};
 
-	cv::Mat m_PlanarImage;
+	cv::Mat planarImage_;
 
 	// The pixels located in the image
-	vector<cv::Point2i> pixels;
+	vector<cv::Point2i> pixels_;
 
-	vector<cv::Point2d> m_AllPixels;
-	vector<cv::Point2d> m_MeasureLine;
-	vector<cv::Point2d> m_RightSideLine;
-	vector<cv::Point2d> m_LeftSideLine;
+	vector<cv::Point2d> allPixels_;
+	vector<cv::Point2d> measureLine_;
+	vector<cv::Point2d> rightSideLine_;
+	vector<cv::Point2d> leftSideLine_;
 
 public:
 	const vector<cv::Point2i>& getPixels() const;
@@ -39,9 +39,9 @@ public:
 	const vector<cv::Point2d>& getRightSideLine() const;
 	const vector<cv::Point2d>& getLeftSideLine() const;
 private:
-	uint64 m_FrameTime;
+	uint64 frameTime_;
 
-	int m_FrameCount;
+	int frameCount_;
 
 public:
 	int getFrameCount() const;
@@ -49,13 +49,13 @@ public:
 	uint64 getFrameTime() const;
 	void setFrameTime(uint64 uint64);
 private:
-	double const m_TickFrequency = cv::getTickFrequency();
+	double const tickFrequency_ = cv::getTickFrequency();
 
 public:
 	double getTickFrequency() const;
 private:
-	bool m_ShowWindows;
-	bool m_SaveVideo;
+	bool showWindows_;
+	bool saveVideo_;
 
 public:
 	bool isSaveVideo() const;
@@ -65,17 +65,17 @@ public:
 	cv::Mat& GetPlanarImage();
 	void setPlanarImage(const cv::Mat& mat);
 private:
-	double m_RightMean;
-	double m_LeftMean;
+	double rightMean_;
+	double leftMean_;
 
 	// laplace/sobel settings
-	int kernel_size = 3;
-	int scale = 1;
-	int delta = 0;
-	int ddepth = CV_16S;
+	int kernelSize_ = 3;
+	int scale_ = 1;
+	int delta_ = 0;
+	int ddepth_ = CV_16S;
 
-	const int m_PixelChunkCount = 16;
-	const int m_PixelChunk = 153; // lowest whole number from 2448 as (2448 >> 4 = 153)
+	const int pixelChunkCount_ = 16;
+	const int pixelChunkSize_ = 153; // lowest whole number from 2448 as (2448 >> 4 = 153)
 
 public: // opencv and misc settings objects
 

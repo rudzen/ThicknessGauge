@@ -13,14 +13,14 @@ class MiniCalc
 {
 
 private:
-	Point2i lowestPixel;
-	Point2i highestPixel;
+	Point2i lowestPixel_;
+	Point2i highestPixel_;
 
-	map<Quantile, double> quantileMap = { { Quantile::Q25 , 0.25 },{ Quantile::Q50, 0.5 },{ Quantile::Q75, 0.75 } };
+	map<Quantile, double> quantileMap_ = { { Quantile::Q25 , 0.25 },{ Quantile::Q50, 0.5 },{ Quantile::Q75, 0.75 } };
 
-	Point2d m_Mean;
+	Point2d mean_;
 
-	Point2d m_Variance;
+	Point2d variance_;
 
 public:
 

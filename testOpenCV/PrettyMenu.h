@@ -81,38 +81,38 @@ class PrettyMenu {
 	//const int TITLE_LEN = (int) (TITEL.length() + TITEL2.length());
 
 	//int port;
-	int pos = -1;
-	string version;
+	int pos_ = -1;
+	string version_;
 
-	vector<menuentry> menu;
+	vector<menuentry> menu_;
 
 	vector<string>& split(const string& s, char delim, vector<string>& elems) const;
 
 	vector<string> split(const string& s, char delim) const;
 
 	// trim from start
-	static std::string& ltrim(std::string& s) {
-		s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(static_cast<int(*)(int)>(isspace)))));
+	static string& ltrim(string& s) {
+		s.erase(s.begin(), find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(static_cast<int(*)(int)>(isspace)))));
 		return s;
 	}
 
 	// trim from end
-	static std::string& rtrim(std::string& s) {
-		s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(static_cast<int(*)(int)>(isspace)))).base(), s.end());
+	static string& rtrim(string& s) {
+		s.erase(find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(static_cast<int(*)(int)>(isspace)))).base(), s.end());
 		return s;
 	}
 
 	// trim from both ends
-	static std::string& trim(std::string& s) {
+	static string& trim(string& s) {
 		return ltrim(rtrim(s));
 	}
 
-	void init() {
+	void initialize() {
 		seperator_ = replicate(dot, MAX_LEN);
 		generateTop();
 		generateStatus();
 		generateButtom();
-		menu.shrink_to_fit();
+		menu_.shrink_to_fit();
 	}
 
 	string seperator_;
@@ -125,12 +125,12 @@ public:
 
 	vector<menuentry> data;
 
-	explicit PrettyMenu(const string& version) : version(version) {
-		init();
+	explicit PrettyMenu(const string& version) : version_(version) {
+		initialize();
 	}
 
 	PrettyMenu() {
-		init();
+		initialize();
 	}
 
 	/**
@@ -209,8 +209,8 @@ public:
 	//}
 
 	template<typename T, typename A>
-	static std::string replicate(T c, A amount) {
-		return std::string(amount, c);
+	static string replicate(T c, A amount) {
+		return string(amount, c);
 	}
 
 	/**

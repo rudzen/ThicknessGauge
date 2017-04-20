@@ -20,44 +20,44 @@ vector<string> PrettyMenu::split(const string& s, char delim) const {
 }
 
 void PrettyMenu::show() {
-	for (auto& me : menu)
+	for (auto& me : menu_)
 		std::cout << me.second << '\n';
 	std::cout << endl;
 }
 
 void PrettyMenu::generateTop() {
-	menu.push_back(menuentry(++pos, seperator_));
+	menu_.push_back(menuentry(++pos_, seperator_));
 	ostringstream ss;
-	ss << title_ << version;
-	menu.push_back(menuentry(++pos, makeFilledBorder(ss.str())));
-	menu.push_back(menuentry(++pos, makeFilledBorder(title2_)));
-	menu.push_back(menuentry(++pos, seperator_));
-	menu.push_back(menuentry(++pos, makeSingleBorderCentered(info_)));
+	ss << title_ << version_;
+	menu_.push_back(menuentry(++pos_, makeFilledBorder(ss.str())));
+	menu_.push_back(menuentry(++pos_, makeFilledBorder(title2_)));
+	menu_.push_back(menuentry(++pos_, seperator_));
+	menu_.push_back(menuentry(++pos_, makeSingleBorderCentered(info_)));
 }
 
 void PrettyMenu::generateStatus() {
 	ostringstream ss;
-	menu.push_back(menuentry(++pos, makeSingleBorderCentered("s133235@student.dtu")));
-	menu.push_back(menuentry(++pos, makeFilledBorder("Status")));
+	menu_.push_back(menuentry(++pos_, makeSingleBorderCentered("s133235@student.dtu")));
+	menu_.push_back(menuentry(++pos_, makeFilledBorder("Status")));
 	ss << " Date/Time build : ";
 	std::string data = __DATE__;
 	std::string time = __TIME__;
 	ss << trim(data) << " / " << trim(time);
-	menu.push_back(menuentry(++pos, makeFilledBorder(ss.str())));
+	menu_.push_back(menuentry(++pos_, makeFilledBorder(ss.str())));
 
 	ss.str(std::string());
 
 	ss << getOpenCVInfo();
-	menu.push_back(menuentry(++pos, makeFilledBorder(ss.str())));
+	menu_.push_back(menuentry(++pos_, makeFilledBorder(ss.str())));
 
-	menu.push_back(menuentry(++pos, dot + space(MAX_LEN - 2) + dot));
+	menu_.push_back(menuentry(++pos_, dot + space(MAX_LEN - 2) + dot));
 
 }
 
 void PrettyMenu::generateButtom() {
 	//while (pos < MAX_HEI)
 	//	menu.push_back(menuentry(++pos, dot + space(MAX_LEN - 2) + dot));
-	menu.push_back(menuentry(++pos, overwrite(seperator_, " < powered by con-dynmenu v0.4 by rudz > ", 30)));
+	menu_.push_back(menuentry(++pos_, overwrite(seperator_, " < powered by con-dynmenu v0.4 by rudz > ", 30)));
 }
 
 string PrettyMenu::makeFilledBorder(string s) const {

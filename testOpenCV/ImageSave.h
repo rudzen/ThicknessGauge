@@ -22,14 +22,14 @@ public:
 
 	ImageSave(std::string FileName, SaveType SaveType) : ImageSave(FileName, SaveType, Information::Basic) { }
 
-	ImageSave(ImageSave &imageSave) : ImageSave(imageSave.m_FileName, imageSave.m_SaveType, imageSave.m_Information) { }
+	ImageSave(ImageSave &imageSave) : ImageSave(imageSave.fileName_, imageSave.saveType_, imageSave.information_) { }
 
-	ImageSave(std::string FileName, SaveType save_type, Information information) : m_SaveType(save_type), m_Information(information), m_FileName(FileName) {
+	ImageSave(std::string FileName, SaveType save_type, Information information) : saveType_(save_type), information_(information), fileName_(FileName) {
 		UpdateTimeStamp();
 	}
 
 	~ImageSave() {
-		m_VideoWriter.~VideoWriter();
+		videoWriter_.~VideoWriter();
 	}
 
 	void SaveImage(cv::Mat *image) const;
@@ -56,17 +56,17 @@ public:
 
 private:
 
-	cv::VideoWriter m_VideoWriter;
+	cv::VideoWriter videoWriter_;
 
 	const std::map<SaveType, std::string> m_FileExtensions = { { SaveType::Image_Jpeg, "jpg" },{ SaveType::Image_Png, "png" },{ SaveType::Video, "avi" } };
 
-	SaveType m_SaveType;
+	SaveType saveType_;
 
-	Information m_Information;
+	Information information_;
 
-	std::string m_FileName;
+	std::string fileName_;
 
-	int64 m_TimeStamp;
+	int64 timeStamp_;
 
 };
 

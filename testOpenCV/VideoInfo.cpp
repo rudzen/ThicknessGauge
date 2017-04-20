@@ -1,39 +1,39 @@
 #include "VideoInfo.h"
 
 int VideoInfo::GetCodec() const {
-	return m_Codec;
+	return codec_;
 }
 
 double VideoInfo::GetFPS() const {
-	return m_FPS;
+	return Fps_;
 }
 
 void VideoInfo::SetCodec(VideoCodec codec) {
-	m_Codec = m_VideoCodecs.at(codec);
+	codec_ = m_VideoCodecs.at(codec);
 }
 
 void VideoInfo::SetFPS(float FPS) {
-	m_FPS = FPS;
+	Fps_ = FPS;
 }
 
 cv::Size VideoInfo::GetSize() const {
-	return m_VideoSize;
+	return videoSize_;
 }
 
 void VideoInfo::SetSize(int x, int y) {
-	m_VideoSize.width = x;
-	m_VideoSize.height = y;
+	videoSize_.width = x;
+	videoSize_.height = y;
 }
 
 void VideoInfo::SetSize(cv::Size size) {
-	m_VideoSize.width = size.width;
-	m_VideoSize.height = size.width;
+	videoSize_.width = size.width;
+	videoSize_.height = size.width;
 }
 
 bool VideoInfo::IsColour() const {
-	return m_Colour;
+	return colour_;
 }
 
 void VideoInfo::SetColour(VideoColour colour) {
-	m_Colour = m_VideoColour.at(colour);
+	colour_ = m_VideoColour.at(colour);
 }

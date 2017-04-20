@@ -8,29 +8,29 @@ MiniCalc::~MiniCalc() {
 }
 
 void MiniCalc::SetMean(Point2d newMean) {
-	m_Mean = newMean;
+	mean_ = newMean;
 }
 
 Point2d MiniCalc::GetMean() const {
-	return m_Mean;
+	return mean_;
 }
 
 void MiniCalc::AddMean(Point2d meanToAdd) {
-	m_Mean += meanToAdd;
-	m_Mean /= 2;
+	mean_ += meanToAdd;
+	mean_ /= 2;
 }
 
 void MiniCalc::SetVariance(Point2d newVariance) {
-	m_Variance = newVariance;
+	variance_ = newVariance;
 }
 
 Point2d MiniCalc::GetVariance() const {
-	return m_Variance;
+	return variance_;
 }
 
 void MiniCalc::AddVariance(Point2d varianceToAdd) {
-	m_Variance += varianceToAdd;
-	m_Variance /= 2;
+	variance_ += varianceToAdd;
+	variance_ /= 2;
 }
 
 Point2d MiniCalc::mean(vector<Point>& pixels) {
@@ -78,7 +78,7 @@ Point MiniCalc::quantileX(Quantile quant, vector<Point>& pixels) {
 
 	if (quant == Quantile::Q0) return pixels.front();
 	if (quant == Quantile::Q100) return pixels.back();
-	auto index = quantileMap[quant] * pixels.size();
+	auto index = quantileMap_[quant] * pixels.size();
 	auto pixSorted(pixels);
 	sort(pixSorted.begin(), pixSorted.end(), sortX);
 	return pixSorted.at(static_cast<int>(index));
@@ -87,7 +87,7 @@ Point MiniCalc::quantileX(Quantile quant, vector<Point>& pixels) {
 Point MiniCalc::quantileY(Quantile quant, vector<Point>& pixels) {
 	if (quant == Quantile::Q0) return pixels.front();
 	if (quant == Quantile::Q100) return pixels.back();
-	auto index = quantileMap[quant] * pixels.size();
+	auto index = quantileMap_[quant] * pixels.size();
 	auto pixSorted(pixels);
 	sort(pixSorted.begin(), pixSorted.end(), sortY);
 	return pixSorted.at(static_cast<int>(index));
@@ -216,8 +216,8 @@ bool MiniCalc::saveData(string filename) const {
 
 	fs << "Calculation_Time" << Util::getTime();
 
-	fs << "Mean" << m_Mean;
-	fs << "Variance" << m_Variance;
+	fs << "Mean" << mean_;
+	fs << "Variance" << variance_;
 	fs << "PlanarPixels" << m_PlanarPixels;
 
 	fs.release();

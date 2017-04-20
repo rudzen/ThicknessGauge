@@ -16,7 +16,7 @@ class VideoInfo {
 
 public:
 
-	VideoInfo(): m_FPS(25.0), m_Codec(0), m_Colour(false) {
+	VideoInfo(): Fps_(25.0), codec_(0), colour_(false) {
 	}
 
 	int GetCodec() const;
@@ -43,12 +43,12 @@ private:
 
 	const std::map<VideoColour, bool> m_VideoColour = { { VideoColour::Colour, true },{ VideoColour::Grey, false } };
 
-	cv::Size m_VideoSize;
+	cv::Size videoSize_;
 
-	double m_FPS;
+	double Fps_;
 
-	int m_Codec;
+	int codec_;
 
-	bool m_Colour;
+	bool colour_;
 
 };

@@ -1,8 +1,11 @@
 #include "ImageSave.h"
 #include "ThicknessGauge.h"
+#include "Stringtools.h"
+
+using namespace utils;
 
 void ImageSave::SaveImage(cv::Mat* image) const {
-	SaveImage(image, m_FileName);
+	SaveImage(image, fileName_);
 }
 
 void ImageSave::SaveImage(cv::Mat* image, string filename) const {
@@ -10,9 +13,9 @@ void ImageSave::SaveImage(cv::Mat* image, string filename) const {
 	replace(filename.begin(), filename.end(), ' ', '_');
 
 	// TODO check extension !!!
-	auto outFile = "./images/_" + to_string(m_TimeStamp) + '-' + filename + '.' + m_FileExtensions.at(m_SaveType);
+	auto outFile = "./images/_" + to_string(timeStamp_) + '-' + filename + '.' + (!StringTools::endsWith(filename, m_FileExtensions.at(saveType_)) ? m_FileExtensions.at(saveType_) : "");
 
-	if (m_Information == Information::None) {
+	if (information_ == Information::None) {
 		imwrite(outFile, *image);
 		return;
 	}
@@ -22,7 +25,7 @@ void ImageSave::SaveImage(cv::Mat* image, string filename) const {
 	info.append(" cols: ").append(to_string(image->cols));
 	putText(*image, info.c_str(), cvPoint(image->cols >> 3, image->rows >> 2), 1, 1.0, CV_RGB(0, 0, 0), 2);
 
-	if (m_Information == Information::Basic) {
+	if (information_ == Information::Basic) {
 		imwrite(outFile, *image);
 		return;
 	}
@@ -31,40 +34,40 @@ void ImageSave::SaveImage(cv::Mat* image, string filename) const {
 }
 
 void ImageSave::OpenVideo() {
-	m_VideoWriter.open("./images/" + m_FileName + '.' + m_FileExtensions.at(m_SaveType), GetCodec(), GetFPS(), GetSize(), IsColour());
+	videoWriter_.open("./images/" + fileName_ + '.' + m_FileExtensions.at(saveType_), GetCodec(), GetFPS(), GetSize(), IsColour());
 }
 
 void ImageSave::CloseVideo() {
-	cout << m_FileExtensions.at(m_SaveType) << GetCodec() << GetFPS() << GetSize() << IsColour();
-	m_VideoWriter.release();
+	cout << m_FileExtensions.at(saveType_) << GetCodec() << GetFPS() << GetSize() << IsColour();
+	videoWriter_.release();
 }
 
 void ImageSave::SaveVideoFrame(cv::Mat& image) {
-	m_VideoWriter.write(image);
+	videoWriter_.write(image);
 }
 
 void ImageSave::SetSaveType(const SaveType new_type) {
-	m_SaveType = new_type;
+	saveType_ = new_type;
 }
 
 SaveType ImageSave::GetSaveMode() const {
-	return m_SaveType;
+	return saveType_;
 }
 
 void ImageSave::SetInformation(const Information information) {
-	m_Information = information;
+	information_ = information;
 }
 
 Information ImageSave::GetInformation() const {
-	return m_Information;
+	return information_;
 }
 
 void ImageSave::UpdateTimeStamp() {
-	m_TimeStamp = cvGetTickCount();
+	timeStamp_ = cvGetTickCount();
 }
 
 void ImageSave::SetFileName(string FileName) {
-	m_FileName = FileName;
+	fileName_ = FileName;
 }
 
 

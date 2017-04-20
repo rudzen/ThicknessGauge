@@ -6,26 +6,26 @@
 #include "CaptureFailException.h"
 
 void ThicknessGauge::gatherPixels(Mat& image) {
-	findNonZero(image, pixels);
+	findNonZero(image, pixels_);
 
-	for (auto& pixel_point : pixels) {
+	for (auto& pixel_point : pixels_) {
 		if (pixel_point.x < 50 && IsPixel(image, pixel_point)) {
-			m_RightSideLine.push_back(pixel_point);
+			rightSideLine_.push_back(pixel_point);
 		}
 		else if (pixel_point.x <= image.cols - 50 && IsPixel(image, pixel_point)) {
-			m_LeftSideLine.push_back(pixel_point);
+			leftSideLine_.push_back(pixel_point);
 		}
 	}
 }
 
 void ThicknessGauge::laplace(Mat& image) const {
 	Mat tmp;
-	Laplacian(image, tmp, ddepth, kernel_size); // , scale, delta, BORDER_DEFAULT);
+	Laplacian(image, tmp, ddepth_, kernelSize_); // , scale, delta, BORDER_DEFAULT);
 	convertScaleAbs(tmp, image);
 }
 
 void ThicknessGauge::sobel(Mat& image) const {
-	Sobel(image, image, -1, 1, 1, kernel_size, scale, delta, BORDER_DEFAULT);
+	Sobel(image, image, -1, 1, 1, kernelSize_, scale_, delta_, BORDER_DEFAULT);
 }
 
 void ThicknessGauge::imageSkeleton(Mat& image) {
@@ -89,7 +89,6 @@ bool ThicknessGauge::generatePlanarImage() {
 	auto const max_ed_kernel_size = 21;
 	/* end */
 
-
 	MiniCalc miniCalc;
 
 	ImageSave is("pic_x", SaveType::Image_Png, Information::Basic);
@@ -102,7 +101,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	const string cornerWindowName = "GC2450 Corner View";
 	const string erodeWindowName = "Erosion";
 	const string dilationWindowName = "Dilation";
-	if (m_ShowWindows) {
+	if (showWindows_) {
 		namedWindow(inputWindowName, WINDOW_FREERATIO);
 
 		namedWindow(outputWindowName, WINDOW_FREERATIO);
@@ -138,8 +137,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	auto size = frame.size();
 
 	// test for video recording
-	if (m_SaveVideo) {
-		ImageSave is;
+	if (saveVideo_) {
 		is.SetInformation(Information::Full);
 		is.SetSaveType(SaveType::Video);
 		is.SetCodec(VideoCodec::Mjpeg);
@@ -153,7 +151,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	vector<Point2d> test_subPix;
 
 	// configure output stuff
-	for (auto i = 0; i < m_FrameCount; ++i) {
+	for (auto i = 0; i < frameCount_; ++i) {
 		pix_planarMap[i].reserve(size.width);
 	}
 
@@ -161,7 +159,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	uint64 time_begin = getTickCount();
 
-	for (auto i = 0; i < m_FrameCount; ++i) {
+	for (auto i = 0; i < frameCount_; ++i) {
 
 		outputs[i] = Mat::zeros(size, CV_8UC1);
 		pix_planarMap[i].clear();
@@ -169,7 +167,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		cap >> frame;
 
 		// show default input image (always shown live!)
-		if (m_ShowWindows) imshow(inputWindowName, frame);
+		if (showWindows_) imshow(inputWindowName, frame);
 
 		// do basic in-place binary threshold
 		threshold(frame, frame, thres, 255, CV_THRESH_BINARY);
@@ -180,19 +178,19 @@ bool ThicknessGauge::generatePlanarImage() {
 		// perform some stuff
 		laplace(frame);
 		//c.Sobel(frame);
-		if (m_ShowWindows) imshow(outputWindowName, frame);
+		if (showWindows_) imshow(outputWindowName, frame);
 
 		// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
 		auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i], test_subPix);
 
 		if (!generateOk) {
-			cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(m_FrameCount) << endl;
+			cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
 			break;
 		}
 
-		if (m_ShowWindows) imshow(line1WindowName, outputs[i]);
+		if (showWindows_) imshow(line1WindowName, outputs[i]);
 
-		if (m_ShowWindows) if (waitKey(25) >= 0) break;
+		if (showWindows_) if (waitKey(25) >= 0) break;
 
 		//cout << pix_planarMap[i] << endl;
 
@@ -202,7 +200,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	Mat lines = Mat::zeros(size, CV_8UC1);
 
 	// merge the images to target
-	for (auto i = 0; i < m_FrameCount; ++i) {
+	for (auto i = 0; i < frameCount_; ++i) {
 		addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
 		add(outputs[i], frame, frame);
 		is.SaveVideoFrame(lines);
@@ -212,17 +210,17 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	bilateralFilter(frame, output, 1, 80, 20);
 
-	if (m_ShowWindows) imshow(line2WindowName, output);
-	if (m_ShowWindows) imshow(line3WindowName, lines);
+	if (showWindows_) imshow(line2WindowName, output);
+	if (showWindows_) imshow(line3WindowName, lines);
 	is.UpdateTimeStamp();
 	is.SaveImage(&output);
 
 	auto corner_image = cornerHarris_test(lines, 200);
-	if (m_ShowWindows) imshow(cornerWindowName, corner_image);
+	if (showWindows_) imshow(cornerWindowName, corner_image);
 
 	auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
 	resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
-	if (m_ShowWindows) imshow(erodeWindowName, frame);
+	if (showWindows_) imshow(erodeWindowName, frame);
 
 	// test for highest pixel for eroded image
 	cout << "Highest Y in eroded line : " << frame.rows - getHighestYpixel(frame) << endl;
@@ -230,16 +228,19 @@ bool ThicknessGauge::generatePlanarImage() {
 	//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
 	//imshow(dilationWindowName, dilation);
 
-	//if (show_windows) if (waitKey(25) >= 0) break;
-
 	vector<Point> eroded_pixels;
 	findNonZero(frame, eroded_pixels);
 
-	m_FrameTime = getTickCount() - time_begin;
+	frameTime_ = getTickCount() - time_begin;
+
+	cout << "Saving image...\n";
+	is.SaveImage(&frame, "_testoutput" + to_string(frameCount_));
 
 	savePlanarImageData("_testoutput", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
 
-	if (m_ShowWindows) {
+
+
+	if (showWindows_) {
 		destroyWindow(inputWindowName);
 		destroyWindow(outputWindowName);
 		destroyWindow(line1WindowName);
@@ -247,14 +248,14 @@ bool ThicknessGauge::generatePlanarImage() {
 		destroyWindow(line3WindowName);
 	}
 
-	if (m_SaveVideo)
+	if (saveVideo_)
 		is.CloseVideo();
 
 	return true;
 }
 
 bool ThicknessGauge::savePlanarImageData(string filename, vector<Point>& pixels, Mat& image, int highestY) const {
-	FileStorage fs(filename + to_string(m_FrameCount) + ".json", FileStorage::WRITE_BASE64);
+	FileStorage fs(filename + to_string(frameCount_) + ".json", FileStorage::WRITE_BASE64);
 
 	if (!fs.isOpened()) {
 		cerr << "Error while opening " << filename << " for output." << endl;
@@ -263,13 +264,14 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<Point>& pixels,
 
 	ostringstream oss;
 	oss << Util::getTime();
-	cout << "Saving data [frames: " << m_FrameCount << "] [time:" << oss.str() << "] [pixels:" << pixels.size() << ']' << endl;
+	cout << "Saving data [frames: " << frameCount_ << "] [time:" << oss.str() << "] [pixels:" << pixels.size() << ']' << endl;
 
 	fs << "Original filename" << filename;
 	fs << "Saved time" << Util::getTime();
-	fs << "Seconds for computation" << static_cast<long>(m_FrameTime / m_TickFrequency);
+	fs << "Seconds for computation" << static_cast<long>(frameTime_ / tickFrequency_);
 	fs << "Highest Y" << highestY;
 
+	fs << "Eroded pixel count" << static_cast<int>(pixels.size());
 	fs << "Eroded pixels" << pixels;
 	fs << "Eroded image" << image;
 
@@ -282,19 +284,19 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<Point>& pixels,
 }
 
 void ThicknessGauge::setRightMean(double mean) {
-	m_RightMean = mean;
+	rightMean_ = mean;
 }
 
 double ThicknessGauge::getRightMean() const {
-	return m_RightMean;
+	return rightMean_;
 }
 
 void ThicknessGauge::setLeftMean(double mean) {
-	m_LeftMean = mean;
+	leftMean_ = mean;
 }
 
 double ThicknessGauge::getLeftMean() const {
-	return m_LeftMean;
+	return leftMean_;
 }
 
 void ThicknessGauge::drawText(Mat* image, const string text, TextDrawPosition position) {
@@ -467,65 +469,65 @@ Mat ThicknessGauge::dilation(Mat& input, int dilation, int size) const {
 }
 
 const vector<Point2i>& ThicknessGauge::getPixels() const {
-	return pixels;
+	return pixels_;
 }
 
 const vector<Point2d>& ThicknessGauge::getAllPixels() const {
-	return m_AllPixels;
+	return allPixels_;
 }
 
 const vector<Point2d>& ThicknessGauge::getMeasureLine() const {
-	return m_MeasureLine;
+	return measureLine_;
 }
 
 const vector<Point2d>& ThicknessGauge::getRightSideLine() const {
-	return m_RightSideLine;
+	return rightSideLine_;
 }
 
 const vector<Point2d>& ThicknessGauge::getLeftSideLine() const {
-	return m_LeftSideLine;
+	return leftSideLine_;
 }
 
 int ThicknessGauge::getFrameCount() const {
-	return m_FrameCount;
+	return frameCount_;
 }
 
 void ThicknessGauge::setFrameCount(int frameCount) {
-	m_FrameCount = frameCount;
+	frameCount_ = frameCount;
 }
 
 uint64 ThicknessGauge::getFrameTime() const {
-	return m_FrameTime;
+	return frameTime_;
 }
 
 void ThicknessGauge::setFrameTime(uint64 uint64) {
-	m_FrameTime = uint64;
+	frameTime_ = uint64;
 }
 
 double ThicknessGauge::getTickFrequency() const {
-	return m_TickFrequency;
+	return tickFrequency_;
 }
 
 bool ThicknessGauge::isSaveVideo() const {
-	return m_SaveVideo;
+	return saveVideo_;
 }
 
 void ThicknessGauge::setSaveVideo(bool saveVideo) {
-	m_SaveVideo = saveVideo;
+	saveVideo_ = saveVideo;
 }
 
 bool ThicknessGauge::isShowWindows() const {
-	return m_ShowWindows;
+	return showWindows_;
 }
 
 void ThicknessGauge::setShowWindows(bool showWindows) {
-	m_ShowWindows = showWindows;
+	showWindows_ = showWindows;
 }
 
 Mat& ThicknessGauge::GetPlanarImage() {
-	return m_PlanarImage;
+	return planarImage_;
 }
 
 void ThicknessGauge::setPlanarImage(const Mat& mat) {
-	m_PlanarImage = mat;
+	planarImage_ = mat;
 }

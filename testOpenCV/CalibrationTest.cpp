@@ -141,9 +141,10 @@ public:
 		if (inputCapture.isOpened()) {
 			Mat view0;
 			inputCapture >> view0;
-			view0.copyTo(result);
+			return view0;
+			//view0.copyTo(result);
 		}
-		else if (atImageList < static_cast<int>(imageList.size()))
+		if (atImageList < static_cast<int>(imageList.size()))
 			result = imread(imageList[atImageList++], CV_LOAD_IMAGE_COLOR);
 
 		return result;
@@ -237,7 +238,7 @@ public:
 	                      const vector<Mat>& rvecs, const vector<Mat>& tvecs,
 	                      const vector<float>& reprojErrs, const vector<vector<Point2f>>& imagePoints,
 	                      double totalAvgErr) const {
-		FileStorage fs(s.outputFileName, FileStorage::WRITE);
+		FileStorage fs(s.outputFileName, FileStorage::WRITE_BASE64);
 
 		fs << "calibration_Time" << Util::getTime();
 
@@ -371,7 +372,8 @@ public:
 	}
 
 	bool runCalibrationAndSave(Settings& s, Size imageSize, Mat& cameraMatrix, Mat& distCoeffs, vector<vector<Point2f>> imagePoints) const {
-		vector<Mat> rvecs, tvecs;
+		vector<Mat> rvecs;
+		vector<Mat> tvecs;
 		vector<float> reprojErrs;
 		double totalAvgErr = 0;
 
@@ -380,8 +382,8 @@ public:
 			<< ". avg re projection error = " << totalAvgErr;
 
 		if (ok)
-			saveCameraParams(s, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, reprojErrs,
-			                 imagePoints, totalAvgErr);
+			saveCameraParams(s, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, reprojErrs, imagePoints, totalAvgErr);
+
 		return ok;
 	}
 
