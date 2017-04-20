@@ -145,4 +145,9 @@
     <Xml Include="testConfig.xml" />
     <Xml Include="VID5.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="_run_test.bat">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

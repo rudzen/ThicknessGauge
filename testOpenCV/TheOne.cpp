@@ -141,8 +141,8 @@ int main(int argc, char** argv) {
 	// settings from arguments.
 	// TODO Move to actual functionality where they are used.
 	c.setFrameCount(args.getArgument("frames", 25));
-	c.setShowWindows(args.getArgument("show", true));
-	auto video_record = args.getArgument("video", false);
+	c.setShowWindows(args.getArgument("show", false));
+	c.setSaveVideo(args.getArgument("video", false));
 
 	auto camera_calibration_file = args.getArgument("settings", default_camera_calibration_file);
 

@@ -252,11 +252,9 @@ bool MiniCalc::generatePlanarPixels(Mat& input, Mat& output, vector<Point>& pixe
 				auto gradient = static_cast<unsigned char>(round(gradientSum / count));
 				output.at<unsigned char>(pixels.back()) = gradient;
 				gradientPixels.push_back(Point2d(static_cast<double>(x), gradient));
-				//pixels.push_back(Point(x, static_cast<int>(round(ySum / static_cast<double>(count)))));
-				//cout << "pixels back : " << pixels.back() << endl;
+				count = 0;
 			}
 			ySum = 0;
-			count = 0;
 		}
 		x = p.x;
 		ySum += p.y;

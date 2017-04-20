@@ -181,6 +181,9 @@
     <Xml Include="testConfig.xml" />
     <Xml Include="VID5.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="_run_test.bat" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

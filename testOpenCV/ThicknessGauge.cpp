@@ -488,6 +488,14 @@ double ThicknessGauge::getTickFrequency() const {
 	return m_TickFrequency;
 }
 
+bool ThicknessGauge::isSaveVideo() const {
+	return m_SaveVideo;
+}
+
+void ThicknessGauge::setSaveVideo(bool saveVideo) {
+	m_SaveVideo = saveVideo;
+}
+
 bool ThicknessGauge::isShowWindows() const {
 	return m_ShowWindows;
 }

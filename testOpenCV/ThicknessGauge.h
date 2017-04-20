@@ -15,7 +15,7 @@ The main controller class
 class ThicknessGauge {
 
 public:
-	ThicknessGauge(): m_FrameTime(0), m_ShowWindows(false), m_RightMean(0), m_LeftMean(0) {
+	ThicknessGauge(): m_FrameTime(0), m_FrameCount(0), m_ShowWindows(false), m_SaveVideo(false), m_RightMean(0), m_LeftMean(0) {
 	}
 
 private:
@@ -55,8 +55,11 @@ public:
 	double getTickFrequency() const;
 private:
 	bool m_ShowWindows;
+	bool m_SaveVideo;
 
 public:
+	bool isSaveVideo() const;
+	void setSaveVideo(bool saveVideo);
 	bool isShowWindows() const;
 	void setShowWindows(bool showWindows);
 	cv::Mat& GetPlanarImage();
@@ -64,7 +67,6 @@ public:
 private:
 	double m_RightMean;
 	double m_LeftMean;
-
 
 	// laplace/sobel settings
 	int kernel_size = 3;
