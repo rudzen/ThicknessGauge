@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\File">
+      <UniqueIdentifier>{6304f0dd-32f8-4b54-a18f-9ac68cb007cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\File">
+      <UniqueIdentifier>{30169a90-9ec3-477f-88a0-630b31f178c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Exceptions">
+      <UniqueIdentifier>{e84ccd83-8c07-415a-a7c0-dce295bf50f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CV">
+      <UniqueIdentifier>{f0dc63c9-4c11-4138-8359-c8d224d081c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CV">
+      <UniqueIdentifier>{7da82c7a-d8f2-420c-8e67-9567b2daf328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Namespaces">
+      <UniqueIdentifier>{b9e27e47-7924-41d8-85b0-d0d6772062b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Camera">
+      <UniqueIdentifier>{f3e7d420-4dc3-4ce5-948c-f0dae0e49d9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Camera">
+      <UniqueIdentifier>{6863f62f-bde4-4157-9959-9dc3cb3302bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Camera\Calibrate">
+      <UniqueIdentifier>{42023152-ca82-40f0-83e0-e165001625cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Camera\Calibrate">
+      <UniqueIdentifier>{0301527b-b7ed-4baf-80e9-faa79432ca41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Args">
+      <UniqueIdentifier>{c440676d-d810-4ec4-abc8-02bb21192320}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{982653c9-ce35-4eca-8b1b-689159973b37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{5f07639a-e7d5-46fa-9a70-5a3242e3a9a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Menu">
+      <UniqueIdentifier>{b5df08a4-69da-4183-8eb3-4f68b16e444a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Menu">
+      <UniqueIdentifier>{d3942e94-74c6-437c-9e07-0f877dd9b000}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TheOne.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageSave.cpp">
+      <Filter>Source Files\File</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoInfo.cpp">
+      <Filter>Source Files\File</Filter>
+    </ClCompile>
+    <ClCompile Include="GC2450MCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniCalc.cpp">
+      <Filter>Source Files\CV</Filter>
+    </ClCompile>
+    <ClCompile Include="CalibrationSettings.cpp">
+      <Filter>Source Files\Camera\Calibrate</Filter>
+    </ClCompile>
+    <ClCompile Include="CalibrationTest.cpp">
+      <Filter>Source Files\Camera\Calibrate</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PrettyMenu.cpp">
+      <Filter>Source Files\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="ThicknessGauge.cpp">
+      <Filter>Source Files\CV</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ImageSave.h">
+      <Filter>Header Files\File</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageDimensionException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoInfo.h">
+      <Filter>Header Files\File</Filter>
+    </ClInclude>
+    <ClInclude Include="_cv.h">
+      <Filter>Header Files\Namespaces</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidMeanException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="GC2450MCamera.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniCalc.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Compute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CalibrationSettings.h">
+      <Filter>Header Files\Camera\Calibrate</Filter>
+    </ClInclude>
+    <ClInclude Include="CaptureFailException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="args.h">
+      <Filter>Header Files\Args</Filter>
+    </ClInclude>
+    <ClInclude Include="getopt.h">
+      <Filter>Header Files\Args</Filter>
+    </ClInclude>
+    <ClInclude Include="Stringtools.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PrettyMenu.h">
+      <Filter>Header Files\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="ThicknessGauge.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="testConfig.xml" />
+    <Xml Include="VID5.xml" />
+  </ItemGroup>
+</Project>
