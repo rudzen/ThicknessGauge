@@ -93,6 +93,9 @@
     <ClCompile Include="ThicknessGauge.cpp">
       <Filter>Source Files\CV</Filter>
     </ClCompile>
+    <ClCompile Include="IsValidFileName.cpp">
+      <Filter>Source Files\File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageSave.h">
@@ -148,6 +151,12 @@
     </ClInclude>
     <ClInclude Include="Q.h">
       <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="IsValidFileName.h">
+      <Filter>Header Files\File</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidFileException.h">
+      <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

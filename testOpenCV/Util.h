@@ -2,6 +2,8 @@
 #include <opencv2/core/mat.hpp>
 #include <iostream>
 #include <fstream>
+#include "Stringtools.h"
+#include "IsValidFileName.h"
 
 // generic utility functions...
 
@@ -137,5 +139,11 @@ public:
 	static int round(double d) {
 		return static_cast<int>(floor(d + 0.5));
 	}
+
+
+	static bool validFileName(const std::string& filename) {
+		return IsValidFileName(filename.c_str());
+	}
+
 };
 

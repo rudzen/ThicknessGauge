@@ -7,15 +7,14 @@ class InvalidMeanException : public std::exception {
 
 public:
 
-	explicit InvalidMeanException(std::string message) : m_message(message) { }
+	explicit InvalidMeanException(std::string message) : message_(message) { }
 
-	const char* what() const throw() override
-	{
-		return m_message.c_str();
+	const char* what() const throw() override {
+		return message_.c_str();
 	}
 
 private:
 
-	std::string m_message;
+	std::string message_;
 
 };

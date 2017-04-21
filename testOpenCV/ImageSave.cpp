@@ -1,6 +1,8 @@
 #include "ImageSave.h"
 #include "ThicknessGauge.h"
 #include "Stringtools.h"
+#include "Util.h"
+#include "InvalidFileException.h"
 
 using namespace utils;
 
@@ -12,8 +14,11 @@ void ImageSave::SaveImage(cv::Mat* image, string filename) const {
 
 	replace(filename.begin(), filename.end(), ' ', '_');
 
-	// TODO check extension !!!
 	auto outFile = "./images/_" + to_string(timeStamp_) + '-' + filename + '.' + (!StringTools::endsWith(filename, m_FileExtensions.at(saveType_)) ? m_FileExtensions.at(saveType_) : "");
+
+	if (!Util::validFileName(outFile)) {
+		throw InvalidFileException("Invalid filename for " + outFile);
+	}
 
 	if (information_ == Information::None) {
 		imwrite(outFile, *image);

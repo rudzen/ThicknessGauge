@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="CalibrationSettings.cpp" />
     <ClCompile Include="CalibrationTest.cpp" />
+    <ClCompile Include="IsValidFileName.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
     <ClCompile Include="GC2450MCamera.cpp" />
     <ClCompile Include="ImageSave.cpp" />
@@ -164,6 +165,8 @@
     <ClInclude Include="CalibrationSettings.h" />
     <ClInclude Include="CaptureFailException.h" />
     <ClInclude Include="Compute.h" />
+    <ClInclude Include="InvalidFileException.h" />
+    <ClInclude Include="IsValidFileName.h" />
     <ClInclude Include="Q.h" />
     <ClInclude Include="ThicknessGauge.h" />
     <ClInclude Include="GC2450MCamera.h" />
