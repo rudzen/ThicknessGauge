@@ -58,6 +58,9 @@
     <Filter Include="Header Files\Menu">
       <UniqueIdentifier>{d3942e94-74c6-437c-9e07-0f877dd9b000}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\CV\Data">
+      <UniqueIdentifier>{47ce9c4e-698e-4206-9702-1a8e72b79918}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TheOne.cpp">
@@ -139,6 +142,12 @@
     </ClInclude>
     <ClInclude Include="ThicknessGauge.h">
       <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Vec.h">
+      <Filter>Header Files\CV\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Q.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

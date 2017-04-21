@@ -163,6 +163,7 @@
     <ClInclude Include="CalibrationSettings.h" />
     <ClInclude Include="CaptureFailException.h" />
     <ClInclude Include="Compute.h" />
+    <ClInclude Include="Q.h" />
     <ClInclude Include="ThicknessGauge.h" />
     <ClInclude Include="GC2450MCamera.h" />
     <ClInclude Include="args.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="PrettyMenu.h" />
     <ClInclude Include="Stringtools.h" />
     <ClInclude Include="Util.h" />
+    <ClInclude Include="Vec.h" />
     <ClInclude Include="VideoInfo.h" />
     <ClInclude Include="_cv.h" />
   </ItemGroup>

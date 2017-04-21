@@ -455,7 +455,7 @@ extern "C" {
 				nonopt_start = nonopt_end = -1;
 				return (-1);
 			}
-			if (*(place = nargv[optind]) != '-' || 
+			if (*(place = nargv[optind]) != '-' ||
 				(place[1] == '\0' && strchr(options, '-') == nullptr)) {
 				place = EMSG; /* found non-option */
 				if (flags & FLAG_ALLARGS) {
