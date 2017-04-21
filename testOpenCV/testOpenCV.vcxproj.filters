@@ -158,6 +158,9 @@
     <ClInclude Include="InvalidFileException.h">
       <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="PointData.h">
+      <Filter>Header Files\CV\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

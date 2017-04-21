@@ -167,6 +167,7 @@
     <ClInclude Include="Compute.h" />
     <ClInclude Include="InvalidFileException.h" />
     <ClInclude Include="IsValidFileName.h" />
+    <ClInclude Include="PointData.h" />
     <ClInclude Include="Q.h" />
     <ClInclude Include="ThicknessGauge.h" />
     <ClInclude Include="GC2450MCamera.h" />

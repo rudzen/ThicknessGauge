@@ -1,6 +1,11 @@
 #pragma once
+#include "Vec.h"
 
 namespace _cv {
+
+	typedef v2<double> p;
+	typedef std::vector<cv::Point2d> vd;
+	typedef std::vector<cv::Point2i> vi;
 
 	enum class Quantile { Q0, Q25, Q50, Q75, Q100 };
 

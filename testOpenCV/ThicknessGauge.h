@@ -5,6 +5,7 @@
 #include <vector>
 #include "_cv.h"
 #include "CalibrationSettings.h"
+#include "Vec.h"
 
 using namespace std;
 using namespace _cv;
@@ -25,19 +26,23 @@ private:
 	cv::Mat planarImage_;
 
 	// The pixels located in the image
-	vector<cv::Point2i> pixels_;
+	vi pixels_;
 
-	vector<cv::Point2d> allPixels_;
-	vector<cv::Point2d> measureLine_;
-	vector<cv::Point2d> rightSideLine_;
-	vector<cv::Point2d> leftSideLine_;
+	vd allPixels_;
+	vd measureLine_;
+	vd rightSideLine_;
+	vd leftSideLine_;
+
+	vector<p> lines_;
+	p center_;
 
 public:
-	const vector<cv::Point2i>& getPixels() const;
-	const vector<cv::Point2d>& getAllPixels() const;
-	const vector<cv::Point2d>& getMeasureLine() const;
-	const vector<cv::Point2d>& getRightSideLine() const;
-	const vector<cv::Point2d>& getLeftSideLine() const;
+	const vi& getPixels() const;
+	const vd& getAllPixels() const;
+	const vd& getMeasureLine() const;
+	const vd& getRightSideLine() const;
+	const vd& getLeftSideLine() const;
+
 private:
 	uint64 frameTime_;
 
@@ -65,6 +70,9 @@ public:
 	cv::Mat& GetPlanarImage();
 	void setPlanarImage(const cv::Mat& mat);
 private:
+
+	cv::Size imageSize_;
+
 	double rightMean_;
 	double leftMean_;
 
@@ -161,5 +169,23 @@ private: // generic helper methods
 		return image.at<uchar>(pixel) < 255;
 	}
 
+	void setImageSize(cv::Size size) {
+		imageSize_ = size;
+	}
+
+	void generateVectors(vi& pix) {
+
+		// make center		
+		center_.x = imageSize_.width >> 1;
+		center_.y = imageSize_.height;
+
+		lines_.clear();
+		lines_.reserve(pix.size());
+		
+		// populate lines
+		for (auto& p : pix)
+			lines_.push_back(_cv::p(center_.x, p.y));
+
+	}
 
 };

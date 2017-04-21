@@ -128,13 +128,13 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	Mat frame;
 	Mat outputs[1024];
-	vector<Point> pix_planarMap[1024]; // shit c++11 ->
-	vector<Point> nonZero;
+	vi pix_planarMap[1024]; // shit c++11 ->
+	vi nonZero;
 
 	// capture first frame
 	cap >> frame;
 
-	auto size = frame.size();
+	setImageSize(frame.size());
 
 	// test for video recording
 	if (saveVideo_) {
@@ -152,7 +152,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	// configure output stuff
 	for (auto i = 0; i < frameCount_; ++i) {
-		pix_planarMap[i].reserve(size.width);
+		pix_planarMap[i].reserve(imageSize_.width);
 	}
 
 	// start the process of gathering information for set frame count
@@ -161,7 +161,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	for (auto i = 0; i < frameCount_; ++i) {
 
-		outputs[i] = Mat::zeros(size, CV_8UC1);
+		outputs[i] = Mat::zeros(imageSize_, CV_8UC1);
 		pix_planarMap[i].clear();
 
 		cap >> frame;
@@ -196,8 +196,8 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	}
 
-	frame = Mat::zeros(size, CV_8UC1);
-	Mat lines = Mat::zeros(size, CV_8UC1);
+	frame = Mat::zeros(imageSize_, CV_8UC1);
+	Mat lines = Mat::zeros(imageSize_, CV_8UC1);
 
 	// merge the images to target
 	for (auto i = 0; i < frameCount_; ++i) {
@@ -206,7 +206,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		is.SaveVideoFrame(lines);
 	}
 
-	Mat output = Mat::zeros(size, CV_8UC1);
+	Mat output = Mat::zeros(imageSize_, CV_8UC1);
 
 	bilateralFilter(frame, output, 1, 80, 20);
 
@@ -218,6 +218,8 @@ bool ThicknessGauge::generatePlanarImage() {
 	auto corner_image = cornerHarris_test(lines, 200);
 	if (showWindows_) imshow(cornerWindowName, corner_image);
 
+	equalizeHist(lines, lines);
+
 	auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
 	resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
 	if (showWindows_) imshow(erodeWindowName, frame);
@@ -228,8 +230,10 @@ bool ThicknessGauge::generatePlanarImage() {
 	//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
 	//imshow(dilationWindowName, dilation);
 
-	vector<Point> eroded_pixels;
+	vi eroded_pixels;
 	findNonZero(frame, eroded_pixels);
+
+	generateVectors(eroded_pixels);
 
 	frameTime_ = getTickCount() - time_begin;
 
@@ -237,8 +241,6 @@ bool ThicknessGauge::generatePlanarImage() {
 	is.SaveImage(&frame, "_testoutput" + to_string(frameCount_));
 
 	savePlanarImageData("_testoutput", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
-
-
 
 	if (showWindows_) {
 		destroyWindow(inputWindowName);
@@ -352,7 +354,6 @@ void ThicknessGauge::FitQuad(Mat* image, Point2f* inputQuad, Point2f* outputQuad
 	Matx33f M = getPerspectiveTransform(inputQuad, outputQuad);
 
 	// calculate warped position of all corners
-
 	auto a = M.inv() * Point3f(0.0f, 0.0f, 1.0f);
 	auto b = M.inv() * Point3f(0.0f, static_cast<float>(image->rows), 1.0f);
 	auto c = M.inv() * Point3f(static_cast<float>(image->cols), static_cast<float>(image->rows), 1.0f);
@@ -372,7 +373,7 @@ void ThicknessGauge::FitQuad(Mat* image, Point2f* inputQuad, Point2f* outputQuad
 	auto height = ceil(abs(std::max(std::max(a.y, b.y), std::max(c.y, d.y)))) + y;
 
 	// adjust target points accordingly
-	for (int i = 0; i < 4; i++) {
+	for (auto i = 0; i < 4; i++) {
 		inputQuad[i] += Point2f(x, y);
 	}
 
@@ -468,23 +469,23 @@ Mat ThicknessGauge::dilation(Mat& input, int dilation, int size) const {
 	return dilation_dst;
 }
 
-const vector<Point2i>& ThicknessGauge::getPixels() const {
+const vi& ThicknessGauge::getPixels() const {
 	return pixels_;
 }
 
-const vector<Point2d>& ThicknessGauge::getAllPixels() const {
+const vd& ThicknessGauge::getAllPixels() const {
 	return allPixels_;
 }
 
-const vector<Point2d>& ThicknessGauge::getMeasureLine() const {
+const vd& ThicknessGauge::getMeasureLine() const {
 	return measureLine_;
 }
 
-const vector<Point2d>& ThicknessGauge::getRightSideLine() const {
+const vd& ThicknessGauge::getRightSideLine() const {
 	return rightSideLine_;
 }
 
-const vector<Point2d>& ThicknessGauge::getLeftSideLine() const {
+const vd& ThicknessGauge::getLeftSideLine() const {
 	return leftSideLine_;
 }
 

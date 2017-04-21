@@ -22,7 +22,7 @@
 * THE SOFTWARE.
 */
 //
-// Class: Full 2d & 2d vector classes.
+// Class: Full v2 & v3 classes.
 // Description : With ..
 // - Functionality.
 // - Operational overload.
@@ -32,9 +32,6 @@
 //
 #ifndef VEC_H
 #define VEC_H
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "OCUnusedStructInspection"
-#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #include <ostream>
 
 using namespace std;
@@ -43,6 +40,13 @@ template<class T>
 class v2 {
 public:
 	virtual ~v2() = default;
+
+	friend std::size_t hash_value(const v2& obj) {
+		std::size_t seed = 0x379D1D39;
+		seed ^= (seed << 6) + (seed >> 2) + 0x6689D690 + hash_value(obj.x);
+		seed ^= (seed << 6) + (seed >> 2) + 0x4ABF5DE9 + hash_value(obj.y);
+		return seed;
+	}
 
 	v2(T x1, T y1, T x2, T y2) {
 		x = x2 - x1;
@@ -169,6 +173,13 @@ public:
 
 	T z;
 
+	friend std::size_t hash_value(const v3& obj) {
+		std::size_t seed = 0x021F39B2;
+		seed ^= (seed << 6) + (seed >> 2) + 0x0AB3178C + hash_value(static_cast<const v2<T>&>(obj));
+		seed ^= (seed << 6) + (seed >> 2) + 0x41691B84 + hash_value(obj.z);
+		return seed;
+	}
+
 	v3 operator+(const v3 &that) {
 		return v3<T>(this->x + that.x, this->y + that.y, this->z + that.z);
 	}
@@ -212,5 +223,3 @@ ostream &operator<<(ostream &stream, v3<T> v) {
 
 
 #endif //VEC_H
-
-#pragma clang diagnostic pop
