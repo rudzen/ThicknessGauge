@@ -377,9 +377,8 @@ void ThicknessGauge::FitQuad(Mat* image, Point2f* inputQuad, Point2f* outputQuad
 	auto height = ceil(abs(std::max(std::max(a.y, b.y), std::max(c.y, d.y)))) + y;
 
 	// adjust target points accordingly
-	for (auto i = 0; i < 4; i++) {
+	for (auto i = 0; i < 4; i++)
 		inputQuad[i] += Point2f(x, y);
-	}
 
 	// recalculate transformation
 	M = getPerspectiveTransform(inputQuad, outputQuad);
@@ -435,16 +434,15 @@ Mat ThicknessGauge::cornerHarris_test(Mat& image, int threshold) const {
 }
 
 Mat ThicknessGauge::erosion(Mat& input, int element, int size) const {
-	auto erosion_type = 0;
-	if (element == 0) {
+	MorphShapes erosion_type;
+	if (element == 0)
 		erosion_type = MORPH_RECT;
-	}
-	else if (element == 1) {
+	else if (element == 1)
 		erosion_type = MORPH_CROSS;
-	}
-	else if (element == 2) {
+	else if (element == 2)
 		erosion_type = MORPH_ELLIPSE;
-	}
+	else
+		erosion_type = MORPH_RECT;
 
 	auto input_element = getStructuringElement(erosion_type, Size(2 * size + 1, 2 * size + 1), Point(size, size));
 
@@ -454,16 +452,15 @@ Mat ThicknessGauge::erosion(Mat& input, int element, int size) const {
 }
 
 Mat ThicknessGauge::dilation(Mat& input, int dilation, int size) const {
-	auto dilation_type = 0;
-	if (dilation == 0) {
+	MorphShapes dilation_type;
+	if (dilation == 0)
 		dilation_type = MORPH_RECT;
-	}
-	else if (dilation == 1) {
+	else if (dilation == 1)
 		dilation_type = MORPH_CROSS;
-	}
-	else if (dilation == 2) {
+	else if (dilation == 2)
 		dilation_type = MORPH_ELLIPSE;
-	}
+	else
+		dilation_type = MORPH_RECT;
 
 	auto element = getStructuringElement(dilation_type, Size(2 * size + 1, 2 * size + 1), Point(size, size));
 	Mat dilation_dst = Mat::zeros(input.size(), input.type());
