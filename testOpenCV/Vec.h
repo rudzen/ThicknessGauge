@@ -91,7 +91,7 @@ public:
 		return v2<T>(x, y) * that;
 	}
 
-	v2 operator*=(const T &k) {
+	v2 operator*=(const double k) {
 		return v2<T>(x, y) * k;
 	}
 
@@ -170,28 +170,28 @@ public:
 	T z;
 
 	v3 operator+(const v3 &that) {
-		return v3<T>(this->x + that.x, this->y + that.y, z + that.z);
+		return v3<T>(this->x + that.x, this->y + that.y, this->z + that.z);
 	}
 
 	v3 operator-(const v3 &that) {
-		return v3<T>(this->x - that.x, this->y - that.y, z - that.z);
+		return v3<T>(this->x - that.x, this->y - that.y, this->z - that.z);
 	}
 
 	// Operator : Scalarproduct (dotproduct)
 	T operator*(const v3 &that) override {
-		return (this->x * that.x) + (this->y * that.y) + (z * that.z);
+		return (this->x * that.x) + (this->y * that.y) + (this->z * that.z);
 	}
 
-	v3 operator*(T *__restrict__ k) {
-		return v3<T>(*k * this->x, *k * this->y, *k * z);
+	v3 operator*(const double k) {
+		return v3<T>(k * this->x, k * this->y, k * this->z);
 	}
 
 	T len() const override {
-		return abs(sqrt(this->x * this->x + this->y * this->y + z * z));
+		return abs(sqrt(this->x * this->x + this->y * this->y + this->z * this->z));
 	}
 
 	v3 cross(const v3 &that) {
-		return v3<T>(this->y * that.z - z * this->y, z * that.x - this->x * that.z, this->x * that.y - that.y - this->x);
+		return v3<T>(this->y * that.z - this->z * this->y, this->z * that.x - this->x * that.z, this->x * that.y - that.y - this->x);
 	}
 
 	T parallelogram_area(const v3 &that) {
@@ -199,7 +199,7 @@ public:
 	}
 
 	T angle(const v3 &that) {
-		return v3<T>(this->x, this->y, z) * that / (len() * that.len());
+		return v3<T>(this->x, this->y, this->z) * that / (len() * that.len());
 	}
 
 };
