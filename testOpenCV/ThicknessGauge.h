@@ -6,6 +6,8 @@
 #include "_cv.h"
 #include "CalibrationSettings.h"
 #include "Vec.h"
+#include "Util.h"
+#include "MiniCalc.h"
 
 using namespace std;
 using namespace _cv;
@@ -90,6 +92,8 @@ public: // opencv and misc settings objects
 	cv::VideoCapture cap;
 	CalibrationSettings cs;
 
+	MiniCalc miniCalc;
+
 	void initVideoCapture() {
 		cap.open(CV_CAP_PVAPI);
 	}
@@ -102,7 +106,7 @@ public: // basic stuff to extract information
 
 	void gatherPixels(cv::Mat& image);
 
-	void Blur(cv::Mat& image, cv::Size size) const {
+	static void Blur(cv::Mat& image, cv::Size size) {
 		GaussianBlur(image, image, size, 1.5, 1.5);
 	}
 
@@ -181,11 +185,22 @@ private: // generic helper methods
 
 		lines_.clear();
 		lines_.reserve(pix.size());
-		
-		// populate lines
-		for (auto& p : pix)
-			lines_.push_back(_cv::p(center_.x, p.y));
 
+		//cout << "Center : " << center_ << endl;
+
+		sort(pix.begin(), pix.end(), this->miniCalc.sortY);
+
+		// populate lines
+		for (auto& p : pix) {
+
+			// TODO : Get the center Y point of each X position
+			lines_.push_back(_cv::p(center_.x, p.y));
+			//cout << "line : " << lines_.back() << endl;
+			//cout << "Manhattan : " << Util::dist_manhattan(center_.x, p.x, center_.y, p.y) << '\n';
+		}
+
+
+		
 	}
 
 };

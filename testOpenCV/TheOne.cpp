@@ -139,8 +139,8 @@ int main(int argc, char** argv) {
 	ThicknessGauge c;
 
 	// settings from arguments.
-	c.setFrameCount(args.getArgument("frames", 25));
-	c.setShowWindows(args.getArgument("show", false));
+	c.setFrameCount(args.getArgument("frames", 50));
+	c.setShowWindows(args.getArgument("show", true));
 	c.setSaveVideo(args.getArgument("video", false));
 
 	auto camera_calibration_file = args.getArgument("settings", default_camera_calibration_file);

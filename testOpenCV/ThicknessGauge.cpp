@@ -89,8 +89,6 @@ bool ThicknessGauge::generatePlanarImage() {
 	auto const max_ed_kernel_size = 21;
 	/* end */
 
-	MiniCalc miniCalc;
-
 	ImageSave is("pic_x", SaveType::Image_Png, Information::Basic);
 
 	const string inputWindowName = "GC2450 feed";
@@ -157,91 +155,97 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	// start the process of gathering information for set frame count
 
-	uint64 time_begin = getTickCount();
+	while (true) {
 
-	for (auto i = 0; i < frameCount_; ++i) {
+		uint64 time_begin = getTickCount();
 
-		outputs[i] = Mat::zeros(imageSize_, CV_8UC1);
-		pix_planarMap[i].clear();
+		for (auto i = 0; i < frameCount_; ++i) {
 
-		cap >> frame;
 
-		// show default input image (always shown live!)
-		if (showWindows_) imshow(inputWindowName, frame);
+			outputs[i] = Mat::zeros(imageSize_, CV_8UC1);
+			pix_planarMap[i].clear();
 
-		// do basic in-place binary threshold
-		threshold(frame, frame, thres, 255, CV_THRESH_BINARY);
+			cap >> frame;
 
-		// blur in-place
-		GaussianBlur(frame, frame, blurSize, 0, 0, BORDER_DEFAULT);
+			// show default input image (always shown live!)
+			if (showWindows_) imshow(inputWindowName, frame);
 
-		// perform some stuff
-		laplace(frame);
-		//c.Sobel(frame);
-		if (showWindows_) imshow(outputWindowName, frame);
+			// do basic in-place binary threshold
+			threshold(frame, frame, thres, 255, CV_THRESH_BINARY);
 
-		// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
-		auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i], test_subPix);
+			// blur in-place
+			GaussianBlur(frame, frame, blurSize, 0, 0, BORDER_DEFAULT);
 
-		if (!generateOk) {
-			cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
-			break;
+			// perform some stuff
+			laplace(frame);
+			//c.Sobel(frame);
+
+			if (showWindows_) imshow(outputWindowName, frame);
+
+			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
+			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i], test_subPix);
+
+			if (!generateOk) {
+				cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
+				break;
+			}
+
+			if (showWindows_) imshow(line1WindowName, outputs[i]);
+
+			//cout << pix_planarMap[i] << endl;
+
 		}
 
-		if (showWindows_) imshow(line1WindowName, outputs[i]);
+		frame = Mat::zeros(imageSize_, CV_8UC1);
+		Mat lines = Mat::zeros(imageSize_, CV_8UC1);
+
+		// merge the images to target
+		for (auto i = 0; i < frameCount_; ++i) {
+			addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
+			add(outputs[i], frame, frame);
+			is.SaveVideoFrame(lines);
+		}
+
+		Mat output = Mat::zeros(imageSize_, CV_8UC1);
+
+		bilateralFilter(frame, output, 1, 80, 20);
+
+		if (showWindows_) imshow(line2WindowName, output);
+		if (showWindows_) imshow(line3WindowName, lines);
+		is.UpdateTimeStamp();
+		is.SaveImage(&output);
+
+		auto corner_image = cornerHarris_test(lines, 200);
+		if (showWindows_) imshow(cornerWindowName, corner_image);
+
+		equalizeHist(lines, lines);
+
+		auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
+		resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
+		if (showWindows_) imshow(erodeWindowName, frame);
+
+		// test for highest pixel for eroded image
+		cout << "Highest Y in eroded line : " << frame.rows - getHighestYpixel(frame) << endl;
+
+		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
+		//imshow(dilationWindowName, dilation);
+
+		vi eroded_pixels;
+		findNonZero(frame, eroded_pixels);
+
+		// generate the solar ray vectors..
+		generateVectors(eroded_pixels);
+
+		frameTime_ = getTickCount() - time_begin;
+
+		cout << "Saving image...\n";
+		is.SaveImage(&frame, "_testoutput" + to_string(frameCount_));
+
+		savePlanarImageData("_testoutput", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
 
 		if (showWindows_) if (waitKey(25) >= 0) break;
 
-		//cout << pix_planarMap[i] << endl;
-
 	}
-
-	frame = Mat::zeros(imageSize_, CV_8UC1);
-	Mat lines = Mat::zeros(imageSize_, CV_8UC1);
-
-	// merge the images to target
-	for (auto i = 0; i < frameCount_; ++i) {
-		addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
-		add(outputs[i], frame, frame);
-		is.SaveVideoFrame(lines);
-	}
-
-	Mat output = Mat::zeros(imageSize_, CV_8UC1);
-
-	bilateralFilter(frame, output, 1, 80, 20);
-
-	if (showWindows_) imshow(line2WindowName, output);
-	if (showWindows_) imshow(line3WindowName, lines);
-	is.UpdateTimeStamp();
-	is.SaveImage(&output);
-
-	auto corner_image = cornerHarris_test(lines, 200);
-	if (showWindows_) imshow(cornerWindowName, corner_image);
-
-	equalizeHist(lines, lines);
-
-	auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
-	resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
-	if (showWindows_) imshow(erodeWindowName, frame);
-
-	// test for highest pixel for eroded image
-	cout << "Highest Y in eroded line : " << frame.rows - getHighestYpixel(frame) << endl;
-
-	//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
-	//imshow(dilationWindowName, dilation);
-
-	vi eroded_pixels;
-	findNonZero(frame, eroded_pixels);
-
-	generateVectors(eroded_pixels);
-
-	frameTime_ = getTickCount() - time_begin;
-
-	cout << "Saving image...\n";
-	is.SaveImage(&frame, "_testoutput" + to_string(frameCount_));
-
-	savePlanarImageData("_testoutput", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
-
 	if (showWindows_) {
 		destroyWindow(inputWindowName);
 		destroyWindow(outputWindowName);
@@ -423,9 +427,8 @@ Mat ThicknessGauge::cornerHarris_test(Mat& image, int threshold) const {
 	/// Drawing a circle around corners
 	for (auto j = 0; j < dst_norm.rows; j++) {
 		for (auto i = 0; i < dst_norm.cols; i++) {
-			if (static_cast<int>(dst_norm.at<float>(j, i)) > threshold) {
+			if (static_cast<int>(dst_norm.at<float>(j, i)) > threshold)
 				circle(dst_norm_scaled, Point(i, j), 5, Scalar(0), 2, 8, 0);
-			}
 		}
 	}
 	return dst_norm_scaled;
