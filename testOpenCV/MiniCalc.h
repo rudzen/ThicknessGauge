@@ -81,15 +81,15 @@ public:
 
 	double varianceY(double mean, vector<Point2i> &pixels) const;
 
-	Point2d sd(vector<Point2i> &pixels) {
+	Point2d sd(vector<Point2i> &pixels) const {
 		return Point2d(sqrt(varianceX(pixels)), sqrt(varianceY(pixels)));
 	}
 
-	double sdX(vector<Point2i> &pixels) {
+	double sdX(vector<Point2i> &pixels) const {
 		return sqrt(varianceX(pixels));
 	}
 
-	double sdY(vector<Point2i> &pixels) {
+	double sdY(vector<Point2i> &pixels) const {
 		return sqrt(varianceY(pixels));
 	}
 

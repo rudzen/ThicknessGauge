@@ -57,6 +57,7 @@ int ThicknessGauge::getHighestYpixel(Mat& image) {
 	auto highest = image.rows;
 	vector<Point> pix;
 	findNonZero(image, pix);
+
 	for (auto& p : pix) {
 		if (p.y < highest)
 			highest = p.y;
@@ -79,8 +80,8 @@ bool ThicknessGauge::generatePlanarImage() {
 	auto line_thickness = 1;
 
 	/* erosion and dilation trackbar settings */
-	auto erosion_type = 0;
-	auto erosion_size = 1;
+	auto erosion_type = 1;
+	auto erosion_size = 3;
 
 	auto dilation_type = 0;
 	auto dilation_size = 1;
@@ -167,6 +168,8 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			cap >> frame;
 
+			equalizeHist(frame, frame);
+
 			// show default input image (always shown live!)
 			if (showWindows_) imshow(inputWindowName, frame);
 
@@ -217,8 +220,6 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		auto corner_image = cornerHarris_test(lines, 200);
 		if (showWindows_) imshow(cornerWindowName, corner_image);
-
-		equalizeHist(lines, lines);
 
 		auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
 		resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
@@ -447,7 +448,7 @@ Mat ThicknessGauge::erosion(Mat& input, int element, int size) const {
 	auto input_element = getStructuringElement(erosion_type, Size(2 * size + 1, 2 * size + 1), Point(size, size));
 
 	Mat erosion_dst = Mat::zeros(input.size(), input.type());
-	erode(input, erosion_dst, element);
+	erode(input, erosion_dst, element, Point(-1, -1), 1, BORDER_DEFAULT);
 	return erosion_dst;
 }
 

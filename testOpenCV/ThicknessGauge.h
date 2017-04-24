@@ -38,40 +38,14 @@ private:
 	vector<p> lines_;
 	p center_;
 
-public:
-	const vi& getPixels() const;
-	const vd& getAllPixels() const;
-	const vd& getMeasureLine() const;
-	const vd& getRightSideLine() const;
-	const vd& getLeftSideLine() const;
-
-private:
 	uint64 frameTime_;
 
 	int frameCount_;
 
-public:
-	int getFrameCount() const;
-	void setFrameCount(int frameCount);
-	uint64 getFrameTime() const;
-	void setFrameTime(uint64 uint64);
-private:
 	double const tickFrequency_ = cv::getTickFrequency();
 
-public:
-	double getTickFrequency() const;
-private:
 	bool showWindows_;
 	bool saveVideo_;
-
-public:
-	bool isSaveVideo() const;
-	void setSaveVideo(bool saveVideo);
-	bool isShowWindows() const;
-	void setShowWindows(bool showWindows);
-	cv::Mat& GetPlanarImage();
-	void setPlanarImage(const cv::Mat& mat);
-private:
 
 	cv::Size imageSize_;
 
@@ -86,6 +60,8 @@ private:
 
 	const int pixelChunkCount_ = 16;
 	const int pixelChunkSize_ = 153; // lowest whole number from 2448 as (2448 >> 4 = 153)
+
+public:
 
 public: // opencv and misc settings objects
 
@@ -130,6 +106,34 @@ public: // basic stuff to extract information
 
 public: // getters and setters
 
+
+	const vi& getPixels() const;
+	const vd& getAllPixels() const;
+	const vd& getMeasureLine() const;
+	const vd& getRightSideLine() const;
+	const vd& getLeftSideLine() const;
+
+	int getFrameCount() const;
+
+	void setFrameCount(int frameCount);
+
+	uint64 getFrameTime() const;
+
+	void setFrameTime(uint64 uint64);
+
+	double getTickFrequency() const;
+
+	bool isSaveVideo() const;
+
+	void setSaveVideo(bool saveVideo);
+
+	bool isShowWindows() const;
+
+	void setShowWindows(bool showWindows);
+
+	cv::Mat& GetPlanarImage();
+
+	void setPlanarImage(const cv::Mat& mat);
 
 	void setRightMean(double mean);
 

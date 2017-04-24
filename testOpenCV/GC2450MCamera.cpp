@@ -27,9 +27,8 @@ GC2450MCamera::GC2450MCamera(
 
 // Category /Acquisition
 VmbErrorType GC2450MCamera::AcquisitionAbort() {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionAbortFeature(pFeature);
+	VmbErrorType result = GetAcquisitionAbortFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->RunCommand();
@@ -38,8 +37,7 @@ VmbErrorType GC2450MCamera::AcquisitionAbort() {
 
 VmbErrorType GC2450MCamera::GetAcquisitionAbortFeature(AVT::VmbAPI::FeaturePtr& feature) {
 	if (m_AcquisitionAbortFeature.get() == nullptr) {
-		VmbErrorType result;
-		result = GetFeatureByName("AcquisitionAbort", m_AcquisitionAbortFeature);
+		VmbErrorType result = GetFeatureByName("AcquisitionAbort", m_AcquisitionAbortFeature);
 		if (result != VmbErrorSuccess) {
 			m_AcquisitionAbortFeature.reset();
 			return result;
@@ -50,9 +48,8 @@ VmbErrorType GC2450MCamera::GetAcquisitionAbortFeature(AVT::VmbAPI::FeaturePtr& 
 }
 
 VmbErrorType GC2450MCamera::GetAcquisitionFrameCount(VmbInt64_t& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionFrameCountFeature(pFeature);
+	VmbErrorType result = GetAcquisitionFrameCountFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -60,9 +57,8 @@ VmbErrorType GC2450MCamera::GetAcquisitionFrameCount(VmbInt64_t& value) {
 }
 
 VmbErrorType GC2450MCamera::SetAcquisitionFrameCount(VmbInt64_t value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionFrameCountFeature(pFeature);
+	VmbErrorType result = GetAcquisitionFrameCountFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -71,8 +67,7 @@ VmbErrorType GC2450MCamera::SetAcquisitionFrameCount(VmbInt64_t value) {
 
 VmbErrorType GC2450MCamera::GetAcquisitionFrameCountFeature(AVT::VmbAPI::FeaturePtr& feature) {
 	if (m_AcquisitionFrameCountFeature.get() == nullptr) {
-		VmbErrorType result;
-		result = GetFeatureByName("AcquisitionFrameCount", m_AcquisitionFrameCountFeature);
+		VmbErrorType result = GetFeatureByName("AcquisitionFrameCount", m_AcquisitionFrameCountFeature);
 		if (result != VmbErrorSuccess) {
 			m_AcquisitionFrameCountFeature.reset();
 			return result;
@@ -83,9 +78,8 @@ VmbErrorType GC2450MCamera::GetAcquisitionFrameCountFeature(AVT::VmbAPI::Feature
 }
 
 VmbErrorType GC2450MCamera::GetAcquisitionFrameRateAbs(double& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionFrameRateAbsFeature(pFeature);
+	VmbErrorType result = GetAcquisitionFrameRateAbsFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -93,9 +87,8 @@ VmbErrorType GC2450MCamera::GetAcquisitionFrameRateAbs(double& value) {
 }
 
 VmbErrorType GC2450MCamera::SetAcquisitionFrameRateAbs(double value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionFrameRateAbsFeature(pFeature);
+	VmbErrorType result = GetAcquisitionFrameRateAbsFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -104,8 +97,7 @@ VmbErrorType GC2450MCamera::SetAcquisitionFrameRateAbs(double value) {
 
 VmbErrorType GC2450MCamera::GetAcquisitionFrameRateAbsFeature(AVT::VmbAPI::FeaturePtr& feature) {
 	if (m_AcquisitionFrameRateAbsFeature.get() == nullptr) {
-		VmbErrorType result;
-		result = GetFeatureByName("AcquisitionFrameRateAbs", m_AcquisitionFrameRateAbsFeature);
+		VmbErrorType result = GetFeatureByName("AcquisitionFrameRateAbs", m_AcquisitionFrameRateAbsFeature);
 		if (result != VmbErrorSuccess) {
 			m_AcquisitionFrameRateAbsFeature.reset();
 			return result;
@@ -116,9 +108,8 @@ VmbErrorType GC2450MCamera::GetAcquisitionFrameRateAbsFeature(AVT::VmbAPI::Featu
 }
 
 VmbErrorType GC2450MCamera::GetAcquisitionFrameRateLimit(double& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionFrameRateLimitFeature(pFeature);
+	VmbErrorType result = GetAcquisitionFrameRateLimitFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -127,8 +118,7 @@ VmbErrorType GC2450MCamera::GetAcquisitionFrameRateLimit(double& value) {
 
 VmbErrorType GC2450MCamera::GetAcquisitionFrameRateLimitFeature(AVT::VmbAPI::FeaturePtr& feature) {
 	if (m_AcquisitionFrameRateLimitFeature.get() == nullptr) {
-		VmbErrorType result;
-		result = GetFeatureByName("AcquisitionFrameRateLimit", m_AcquisitionFrameRateLimitFeature);
+		VmbErrorType result = GetFeatureByName("AcquisitionFrameRateLimit", m_AcquisitionFrameRateLimitFeature);
 		if (result != VmbErrorSuccess) {
 			m_AcquisitionFrameRateLimitFeature.reset();
 			return result;
@@ -139,14 +129,13 @@ VmbErrorType GC2450MCamera::GetAcquisitionFrameRateLimitFeature(AVT::VmbAPI::Fea
 }
 
 VmbErrorType GC2450MCamera::GetAcquisitionMode(AcquisitionModeEnum& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionModeFeature(pFeature);
+	VmbErrorType result = GetAcquisitionModeFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	VmbInt64_t nValue;
 	result = pFeature->GetValue(nValue);
-	value = (AcquisitionModeEnum)nValue;
+	value = static_cast<AcquisitionModeEnum>(nValue);
 	return result;
 }
 

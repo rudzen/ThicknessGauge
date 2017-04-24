@@ -140,6 +140,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -169,6 +170,7 @@
     <ClInclude Include="IsValidFileName.h" />
     <ClInclude Include="PointData.h" />
     <ClInclude Include="Q.h" />
+    <ClInclude Include="Specs.h" />
     <ClInclude Include="ThicknessGauge.h" />
     <ClInclude Include="GC2450MCamera.h" />
     <ClInclude Include="args.h" />
