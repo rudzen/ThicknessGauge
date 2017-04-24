@@ -10,7 +10,8 @@ public:
 
 private:
 
-	const double pixMm_ = 3.45 * 0.001;
+	const double pixMm_ = 3.45 / 100; // *0.1;
+	//const double pixMm_ = 3.45 * 0.001;
 
 	const int defaultHeight_ = 2448;
 
@@ -26,6 +27,20 @@ private:
 	offset offset_;
 
 
-
-
+public:
+	double PixMm() const;
+	int DefaultHeight() const;
+	int DefaultWidth() const;
 };
+
+inline double Specs::PixMm() const {
+	return pixMm_;
+}
+
+inline int Specs::DefaultHeight() const {
+	return defaultHeight_;
+}
+
+inline int Specs::DefaultWidth() const {
+	return defaultWidth_;
+}

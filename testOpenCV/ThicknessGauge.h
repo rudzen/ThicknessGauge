@@ -18,7 +18,7 @@ The main controller class
 class ThicknessGauge {
 
 public:
-	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), rightMean_(0), leftMean_(0) {
+	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), rightMean_(0), leftMean_(0), binaryThreshold_(35), baseLine_(40) {
 	}
 
 private:
@@ -61,34 +61,31 @@ private:
 	const int pixelChunkCount_ = 16;
 	const int pixelChunkSize_ = 153; // lowest whole number from 2448 as (2448 >> 4 = 153)
 
-public:
+	int binaryThreshold_;
 
-public: // opencv and misc settings objects
+	int baseLine_;
+
+public:
+	int getBaseLine() const;
+	void setBaseLine(int baseLine);
+	// opencv and misc settings objects
 
 	cv::VideoCapture cap;
 	CalibrationSettings cs;
 
 	MiniCalc miniCalc;
 
-	void initVideoCapture() {
-		cap.open(CV_CAP_PVAPI);
-	}
+	void initVideoCapture();
 
-	void initCalibrationSettings(string fileName) {
-		cs.readSettings(fileName);
-	}
+	void initCalibrationSettings(string fileName);
 
 public: // basic stuff to extract information
 
 	void gatherPixels(cv::Mat& image);
 
-	static void Blur(cv::Mat& image, cv::Size size) {
-		GaussianBlur(image, image, size, 1.5, 1.5);
-	}
+	static void Blur(cv::Mat& image, cv::Size size);
 
-	static void MeanReduction(cv::Mat& image) {
-		MeanReduction(image);
-	}
+	static void MeanReduction(cv::Mat& image);
 
 	void laplace(cv::Mat& image) const;
 
@@ -147,17 +144,33 @@ public: // getters and setters
 
 	//vector<cv::Point2i>& GetLeftSideLine();
 
+	int getBinaryThreshold() const;
+
+	void setBinaryThreshold(int binaryThreshold);
+
 public: // draw functions
 
 	static void drawText(cv::Mat* image, const string text, TextDrawPosition position);
+
+	static void drawBaseLine(cv::Mat* image, unsigned int pos);
 
 	static void drawCenterAxisLines(cv::Mat* image);
 
 public: // generate meta stuff
 
+	/**
+	* \brief Auto generate binary threshold cutoff based on pixel limit
+	* \param pixelLimit The pixel limit to apply to the algorithm
+	* \return The binary threshold that was generated
+	*/
+	int autoBinaryThreshold(unsigned int pixelLimit);
+
+
+
 	static void GenerateInputQuad(cv::Mat* image, cv::Point2f* quad);
 
 	static void GenerateOutputQuad(cv::Mat* image, cv::Point2f* quad);
+
 
 public: // misc quad temp stuff
 
@@ -204,7 +217,6 @@ private: // generic helper methods
 		}
 
 
-		
 	}
 
 };

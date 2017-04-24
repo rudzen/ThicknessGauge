@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
 	ThicknessGauge c;
 
 	// settings from arguments.
-	c.setFrameCount(args.getArgument("frames", 50));
+	c.setFrameCount(args.getArgument("frames", 25));
 	c.setShowWindows(args.getArgument("show", true));
 	c.setSaveVideo(args.getArgument("video", false));
 
@@ -156,7 +156,12 @@ int main(int argc, char** argv) {
 	c.initVideoCapture();
 
 	auto returnValue = false;
+	auto bThreshold = 0;
 	try {
+		//bThreshold = c.autoBinaryThreshold(25000);
+		//cout << "generating threshold : " << bThreshold << endl;
+		//returnValue = bThreshold != 0;
+
 		returnValue = c.generatePlanarImage();
 		if (returnValue) {
 			cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
@@ -164,6 +169,7 @@ int main(int argc, char** argv) {
 	} catch (CaptureFailException& e) {
 		cout << "Something happend.. but what?\n" << e.what() << endl;
 	}
+
 	return returnValue ^true;
 
 }

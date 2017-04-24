@@ -38,6 +38,8 @@ public:
 	MiniCalc();
 	~MiniCalc();
 
+	static double calculatePixelToMm(int pixels);
+
 	// means of all Y values for each X
 	vector<Point> m_PlanarPixels;
 

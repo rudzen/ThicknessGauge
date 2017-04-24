@@ -5,6 +5,22 @@
 #include "ImageSave.h"
 #include "CaptureFailException.h"
 
+int ThicknessGauge::getBaseLine() const {
+	return baseLine_;
+}
+
+void ThicknessGauge::setBaseLine(int baseLine) {
+	baseLine_ = baseLine;
+}
+
+void ThicknessGauge::initVideoCapture() {
+	cap.open(CV_CAP_PVAPI);
+}
+
+void ThicknessGauge::initCalibrationSettings(string fileName) {
+	cs.readSettings(fileName);
+}
+
 void ThicknessGauge::gatherPixels(Mat& image) {
 	findNonZero(image, pixels_);
 
@@ -16,6 +32,14 @@ void ThicknessGauge::gatherPixels(Mat& image) {
 			leftSideLine_.push_back(pixel_point);
 		}
 	}
+}
+
+void ThicknessGauge::Blur(cv::Mat& image, cv::Size size) {
+	GaussianBlur(image, image, size, 1.5, 1.5);
+}
+
+void ThicknessGauge::MeanReduction(cv::Mat& image) {
+	MeanReduction(image);
 }
 
 void ThicknessGauge::laplace(Mat& image) const {
@@ -75,7 +99,9 @@ bool ThicknessGauge::generatePlanarImage() {
 	const auto alpha = 0.2;
 	const auto beta = 1.0 - alpha;
 
-	auto thres = 254;
+	auto thres = binaryThreshold_; // default threshold.
+	auto baseLine = baseLine_; // baseline default.
+
 	auto line_fraction = 0;
 	auto line_thickness = 1;
 
@@ -92,6 +118,16 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	ImageSave is("pic_x", SaveType::Image_Png, Information::Basic);
 
+	Mat frame;
+	Mat outputs[1024];
+	vi pix_planarMap[1024]; // shit c++11 ->
+	vi nonZero;
+
+	// capture first frame
+	cap >> frame;
+
+	setImageSize(frame.size());
+
 	const string inputWindowName = "GC2450 feed";
 	const string outputWindowName = "GC2450 manipulated";
 	const string line1WindowName = "GC2450 singular frame mean intensity";
@@ -101,16 +137,17 @@ bool ThicknessGauge::generatePlanarImage() {
 	const string erodeWindowName = "Erosion";
 	const string dilationWindowName = "Dilation";
 	if (showWindows_) {
-		namedWindow(inputWindowName, WINDOW_FREERATIO);
+		namedWindow(inputWindowName, WINDOW_AUTOSIZE);
+		createTrackbar("Threshold", inputWindowName, &thres, 254);
+		createTrackbar("Base Line", inputWindowName, &baseLine, imageSize_.height - 1);
 
-		namedWindow(outputWindowName, WINDOW_FREERATIO);
-		createTrackbar("Threshold", outputWindowName, &thres, 254);
+		namedWindow(outputWindowName, WINDOW_AUTOSIZE);
 
-		namedWindow(line1WindowName, WINDOW_FREERATIO);
+		namedWindow(line1WindowName);
 		createTrackbar("Frac", line1WindowName, &line_fraction, 4);
 		createTrackbar("Thick", line1WindowName, &line_thickness, 5);
 
-		namedWindow(line2WindowName, WINDOW_FREERATIO);
+		namedWindow(line2WindowName, WINDOW_AUTOSIZE);
 
 		namedWindow(line3WindowName, WINDOW_FREERATIO);
 
@@ -125,15 +162,6 @@ bool ThicknessGauge::generatePlanarImage() {
 		createTrackbar("Kernel size:\n 2n +1", dilationWindowName, &dilation_size, max_ed_kernel_size);
 	}
 
-	Mat frame;
-	Mat outputs[1024];
-	vi pix_planarMap[1024]; // shit c++11 ->
-	vi nonZero;
-
-	// capture first frame
-	cap >> frame;
-
-	setImageSize(frame.size());
 
 	// test for video recording
 	if (saveVideo_) {
@@ -168,7 +196,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			cap >> frame;
 
-			equalizeHist(frame, frame);
+			//equalizeHist(frame, frame);
 
 			// show default input image (always shown live!)
 			if (showWindows_) imshow(inputWindowName, frame);
@@ -223,10 +251,10 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
 		resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
-		if (showWindows_) imshow(erodeWindowName, frame);
 
 		// test for highest pixel for eroded image
-		cout << "Highest Y in eroded line : " << frame.rows - getHighestYpixel(frame) << endl;
+		double highestPixel = frame.rows - getHighestYpixel(frame) - baseLine;
+		cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
 
 		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
 		//imshow(dilationWindowName, dilation);
@@ -236,6 +264,9 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		// generate the solar ray vectors..
 		generateVectors(eroded_pixels);
+
+		drawBaseLine(&frame, baseLine);
+		if (showWindows_) imshow(erodeWindowName, frame);
 
 		frameTime_ = getTickCount() - time_begin;
 
@@ -306,6 +337,14 @@ double ThicknessGauge::getLeftMean() const {
 	return leftMean_;
 }
 
+int ThicknessGauge::getBinaryThreshold() const {
+	return binaryThreshold_;
+}
+
+void ThicknessGauge::setBinaryThreshold(int binaryThreshold) {
+	binaryThreshold_ = binaryThreshold;
+}
+
 void ThicknessGauge::drawText(Mat* image, const string text, TextDrawPosition position) {
 	Point pos;
 	switch (position) {
@@ -330,6 +369,10 @@ void ThicknessGauge::drawText(Mat* image, const string text, TextDrawPosition po
 		break;
 	}
 	putText(*image, text, pos, 1, 1.0, CV_RGB(0, 0, 0), 2);
+}
+
+void ThicknessGauge::drawBaseLine(cv::Mat * image, unsigned int pos) {
+	line(*image, Point(0, image->rows - pos), Point(image->cols, image->rows - pos), CV_RGB(255, 255, 255));
 }
 
 void ThicknessGauge::drawCenterAxisLines(Mat* image) {
@@ -468,6 +511,145 @@ Mat ThicknessGauge::dilation(Mat& input, int dilation, int size) const {
 
 	dilate(input, dilation_dst, element);
 	return dilation_dst;
+}
+
+int ThicknessGauge::autoBinaryThreshold(unsigned int pixelLimit) {
+
+	if (!cap.isOpened()) // check if we succeeded
+		throw CaptureFailException("Error while attempting to open capture device.");
+
+	MiniCalc miniCalc;
+
+	auto targetReached = false;
+	auto currentThreshold = 1;
+
+	const auto maxValue = 254;
+
+	const Size blurSize(5, 5);
+	const auto alpha = 0.2;
+	const auto beta = 1.0 - alpha;
+
+	auto thres = 250;
+	auto line_fraction = 0;
+	auto line_thickness = 1;
+
+	/* erosion and dilation trackbar settings */
+	auto erosion_type = 1;
+	auto erosion_size = 3;
+
+	auto dilation_type = 0;
+	auto dilation_size = 1;
+
+	auto const max_ed_elem = 2;
+	auto const max_ed_kernel_size = 21;
+	/* end */
+
+	//cvvNamedWindow("auto threshold");
+
+	ImageSave is("pic_x", SaveType::Image_Png, Information::Basic);
+
+	Mat frame;
+	Mat outputs[1024];
+	vi pix_planarMap[1024]; // shit c++11 ->
+	vi nonZero;
+
+	// capture first frame
+	cap >> frame;
+
+	vector<Point2d> test_subPix;
+
+	auto frameSize(frame.size());
+	setImageSize(frame.size());
+
+	// configure output stuff
+	for (auto i = 0; i < frameCount_; ++i)
+		pix_planarMap[i].reserve(frameSize.width);
+
+	// start the process of gathering information for set frame count
+
+	uint64 time_begin = getTickCount();
+
+	while (!targetReached) {
+
+		for (auto i = 0; i < frameCount_; ++i) {
+
+			outputs[i] = Mat::zeros(imageSize_, CV_8UC1);
+			pix_planarMap[i].clear();
+
+			cap >> frame;
+
+			//equalizeHist(frame, frame);
+
+			// do basic in-place binary threshold
+			threshold(frame, frame, currentThreshold, 255, CV_THRESH_BINARY);
+
+			// blur in-place
+			GaussianBlur(frame, frame, blurSize, 0, 0, BORDER_DEFAULT);
+
+			// perform some stuff
+			laplace(frame);
+			//c.Sobel(frame);
+
+			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
+			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i], test_subPix);
+
+			if (!generateOk) {
+				std::cout << "autoBinaryThreshold() : Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
+				break;
+			}
+
+		}
+
+		frame = Mat::zeros(imageSize_, CV_8UC1);
+		Mat lines = Mat::zeros(imageSize_, CV_8UC1);
+
+		// merge the images to target
+		for (auto i = 0; i < frameCount_; ++i) {
+			addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
+			add(outputs[i], frame, frame);
+			//is.SaveVideoFrame(lines);
+		}
+
+		Mat output = Mat::zeros(imageSize_, CV_8UC1);
+
+		bilateralFilter(frame, output, 1, 80, 20);
+
+		//auto corner_image = cornerHarris_test(lines, 200);
+
+		auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
+		resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
+
+		// test for highest pixel for eroded image
+		auto highestPixel = frame.rows - getHighestYpixel(frame);
+		cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
+
+		//imshow("auto threshold", frame);
+
+		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
+		//imshow(dilationWindowName, dilation);
+
+		vi eroded_pixels;
+		findNonZero(frame, eroded_pixels);
+
+		// generate the solar ray vectors..
+		//generateVectors(eroded_pixels);
+
+		if (pixelLimit >= eroded_pixels.size()) {
+			targetReached = true;
+			//cout << "Saving image...\n";
+			//savePlanarImageData("_autogenerated", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
+		} else {
+			currentThreshold++;
+		}
+
+		//if (waitKey(1) >= 0) break;
+
+	}
+
+	frameTime_ = getTickCount() - time_begin;
+
+	setBinaryThreshold(currentThreshold);
+	return currentThreshold;
 }
 
 const vi& ThicknessGauge::getPixels() const {
