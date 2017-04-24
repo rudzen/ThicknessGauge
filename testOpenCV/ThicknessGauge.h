@@ -18,7 +18,7 @@ The main controller class
 class ThicknessGauge {
 
 public:
-	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), rightMean_(0), leftMean_(0), binaryThreshold_(35), baseLine_(40) {
+	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), rightMean_(0), leftMean_(0), binaryThreshold_(35), baseLine_(26) {
 	}
 
 private:
@@ -101,6 +101,11 @@ public: // basic stuff to extract information
 
 	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY) const;
 
+	double sumColumn(cv::Mat & image, int x);
+
+	void sumColumns(cv::Mat& image, cv::Mat& target);
+
+
 public: // getters and setters
 
 
@@ -152,7 +157,7 @@ public: // draw functions
 
 	static void drawText(cv::Mat* image, const string text, TextDrawPosition position);
 
-	static void drawBaseLine(cv::Mat* image, unsigned int pos);
+	static void drawHorizontalLine(cv::Mat* image, unsigned int pos);
 
 	static void drawCenterAxisLines(cv::Mat* image);
 

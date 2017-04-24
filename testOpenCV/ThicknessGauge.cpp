@@ -4,6 +4,7 @@
 #include "Util.h"
 #include "ImageSave.h"
 #include "CaptureFailException.h"
+#include "Specs.h"
 
 int ThicknessGauge::getBaseLine() const {
 	return baseLine_;
@@ -94,9 +95,9 @@ bool ThicknessGauge::generatePlanarImage() {
 		throw CaptureFailException("Error while attempting to open capture device.");
 
 	Point textPoint(100, 100);
-	Size blurSize(5, 5);
+	Size blurSize(7, 7);
 	const Scalar baseColour(255, 255, 255);
-	const auto alpha = 0.2;
+	const auto alpha = 1.0;
 	const auto beta = 1.0 - alpha;
 
 	auto thres = binaryThreshold_; // default threshold.
@@ -128,6 +129,9 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	setImageSize(frame.size());
 
+	auto heightLine = imageSize_.width / 2;
+
+
 	const string inputWindowName = "GC2450 feed";
 	const string outputWindowName = "GC2450 manipulated";
 	const string line1WindowName = "GC2450 singular frame mean intensity";
@@ -140,6 +144,8 @@ bool ThicknessGauge::generatePlanarImage() {
 		namedWindow(inputWindowName, WINDOW_AUTOSIZE);
 		createTrackbar("Threshold", inputWindowName, &thres, 254);
 		createTrackbar("Base Line", inputWindowName, &baseLine, imageSize_.height - 1);
+		createTrackbar("Height Line", inputWindowName, &heightLine, imageSize_.width - 1);
+
 
 		namedWindow(outputWindowName, WINDOW_AUTOSIZE);
 
@@ -149,17 +155,17 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		namedWindow(line2WindowName, WINDOW_AUTOSIZE);
 
-		namedWindow(line3WindowName, WINDOW_FREERATIO);
+		namedWindow(line3WindowName, WINDOW_AUTOSIZE);
 
-		namedWindow(cornerWindowName, WINDOW_FREERATIO);
+		namedWindow(cornerWindowName, WINDOW_AUTOSIZE);
 
-		namedWindow(erodeWindowName, CV_WINDOW_AUTOSIZE);
-		createTrackbar("Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", erodeWindowName, &erosion_type, max_ed_elem);
-		createTrackbar("Kernel size:\n 2n +1", erodeWindowName, &erosion_size, max_ed_kernel_size);
+		namedWindow(erodeWindowName, WINDOW_AUTOSIZE);
+		createTrackbar("Element:", erodeWindowName, &erosion_type, max_ed_elem);
+		createTrackbar("Kernel size: 2n +1", erodeWindowName, &erosion_size, max_ed_kernel_size);
 
-		namedWindow(dilationWindowName, CV_WINDOW_AUTOSIZE);
-		createTrackbar("Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", dilationWindowName, &dilation_type, max_ed_elem);
-		createTrackbar("Kernel size:\n 2n +1", dilationWindowName, &dilation_size, max_ed_kernel_size);
+		namedWindow(dilationWindowName, WINDOW_AUTOSIZE);
+		createTrackbar("Element:", dilationWindowName, &dilation_type, max_ed_elem);
+		createTrackbar("Kernel size: 2n +1", dilationWindowName, &dilation_size, max_ed_kernel_size);
 	}
 
 
@@ -190,7 +196,6 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		for (auto i = 0; i < frameCount_; ++i) {
 
-
 			outputs[i] = Mat::zeros(imageSize_, CV_8UC1);
 			pix_planarMap[i].clear();
 
@@ -209,7 +214,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			// perform some stuff
 			laplace(frame);
-			//c.Sobel(frame);
+			// c.Sobel(frame);
 
 			if (showWindows_) imshow(outputWindowName, frame);
 
@@ -250,6 +255,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		if (showWindows_) imshow(cornerWindowName, corner_image);
 
 		auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
+
 		resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
 
 		// test for highest pixel for eroded image
@@ -259,13 +265,27 @@ bool ThicknessGauge::generatePlanarImage() {
 		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
 		//imshow(dilationWindowName, dilation);
 
+
 		vi eroded_pixels;
 		findNonZero(frame, eroded_pixels);
 
-		// generate the solar ray vectors..
-		generateVectors(eroded_pixels);
 
-		drawBaseLine(&frame, baseLine);
+		//for (auto& ep : eroded_pixels)
+		//	cout << "Column avg [" << ep.x << "] : " << sumColumn(frame, ep.x) << endl;
+		//this->sumColumns(frame, lines);
+
+		// generate the solar ray vectors..
+		//generateVectors(eroded_pixels);
+		//for (auto& l : lines_)
+		//	cout << "Solar vector len : " << l.len() << endl;
+
+		Specs s;
+		s.getPixelStrengths(frame, eroded_pixels, frame.cols / 2);
+		auto lulu = s.getNonBaseLine(frame, baseLine_);
+		line(frame, Point(0, lulu), Point(frame.cols, lulu), CV_RGB(255, 255, 255));
+		line(frame, Point(heightLine, 0), Point(heightLine, imageSize_.height), CV_RGB(255, 255, 255));
+
+		drawHorizontalLine(&frame, baseLine);
 		if (showWindows_) imshow(erodeWindowName, frame);
 
 		frameTime_ = getTickCount() - time_begin;
@@ -321,6 +341,43 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<Point>& pixels,
 	return true;
 }
 
+double ThicknessGauge::sumColumn(cv::Mat& image, int x) {
+
+	auto sum = 0;
+	auto count = 0;
+
+	for (auto col = 0; col < image.cols; ++col) {
+		auto uc_pixel = image.data + x * image.step;
+		int intensity = uc_pixel[0];
+		if (intensity == 0)
+			continue;
+		sum += intensity;
+		count++;
+	}
+
+	return sum / static_cast<double>(count);
+	
+}
+
+void ThicknessGauge::sumColumns(cv::Mat& image, cv::Mat& target) {
+
+	// note: this function is not the fastest possible,
+	// but has security for non-continious image data in matrix
+
+	auto sum = 0;
+	for (auto row = 0; row < image.rows; ++row) {
+		auto uc_pixel = image.data + row * image.step;
+		for (auto col = 0; col < image.cols; ++col) {
+			int pixelIntensity = uc_pixel[0];
+			sum += pixelIntensity;
+			uc_pixel++;
+		}
+		cout << "sum [row] : " << row << "-> " << sum << "\n";
+	}
+
+
+}
+
 void ThicknessGauge::setRightMean(double mean) {
 	rightMean_ = mean;
 }
@@ -371,7 +428,7 @@ void ThicknessGauge::drawText(Mat* image, const string text, TextDrawPosition po
 	putText(*image, text, pos, 1, 1.0, CV_RGB(0, 0, 0), 2);
 }
 
-void ThicknessGauge::drawBaseLine(cv::Mat * image, unsigned int pos) {
+void ThicknessGauge::drawHorizontalLine(cv::Mat* image, unsigned int pos) {
 	line(*image, Point(0, image->rows - pos), Point(image->cols, image->rows - pos), CV_RGB(255, 255, 255));
 }
 
@@ -616,7 +673,7 @@ int ThicknessGauge::autoBinaryThreshold(unsigned int pixelLimit) {
 
 		//auto corner_image = cornerHarris_test(lines, 200);
 
-		auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
+		auto erosion_image = this->erosion(lines, /*TESTING, def = 0 */ 1, erosion_size);
 		resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
 
 		// test for highest pixel for eroded image
@@ -638,7 +695,8 @@ int ThicknessGauge::autoBinaryThreshold(unsigned int pixelLimit) {
 			targetReached = true;
 			//cout << "Saving image...\n";
 			//savePlanarImageData("_autogenerated", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
-		} else {
+		}
+		else {
 			currentThreshold++;
 		}
 
