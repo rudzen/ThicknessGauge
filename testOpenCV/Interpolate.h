@@ -44,19 +44,61 @@ class Interpolate {
 
 public:
 
+	/**
+	 * \brief Linear interpolation on 2 points
+	 * \param y1 First point
+	 * \param y2 Second point
+	 * \param mu mu
+	 * \return point
+	 */
 	static T Linear(T y1, T y2, T mu);
 
+	/**
+	 * \brief Cosine interpolation on 2 points
+	 * \param y1 First point
+	 * \param y2 Second point
+	 * \param mu mu
+	 * \return point
+	 */
 	T Cosine(T y1, T y2, T mu);
 
+	/**
+	 * \brief Performs a cubic interpolation on 4 points.
+	 * \param y0 First point
+	 * \param y1 Second point
+	 * \param y2 Third point
+	 * \param y3 Fourth point
+	 * \param mu mu
+	 * \return Cubic interpolated point
+	 */
 	T Cubic(T y0, T y1, T y2, T y3, T mu);
 
+	/**
+	 * \brief Performs a slightly smoother interpolation than regular Cubic() on 4 points by using Catmull-Rom splines.
+	 * \param y0 First point
+	 * \param y1 Second point
+	 * \param y2 Third point
+	 * \param y3 Fourth point
+	 * \param mu mu
+	 * \return Smoothed cubic point
+	 */
 	T CubicSmooth(T y0, T y1, T y2, T y3, T mu);
 
-	/*
-	Tension: 1 is high, 0 normal, -1 is low
-	Bias: 0 is even, positive is towards first segment, negative towards the other
-	*/
-	T HermiteInterpolate(T y0, T y1, T y2, T y3, T mu, T tension, T bias);
+	/**
+	 * \brief Performs hermite interpolation of 4 points with bias and tension
+	 * \param y0 First point
+	 * \param y1 Second point
+	 * \param y2 Third point
+	 * \param y3 Fourth point
+	 * \param mu mu
+	 * \param tension 1 = high, 0 = normal, -1 = low
+	 * \param bias 0 = even, > 0 = towards first segment, < 0 towards other segment
+	 * \return Hermite point
+	 */
+	T Hermite(T y0, T y1, T y2, T y3, T mu, int tension, double bias);
+
+
+
 };
 
 template <typename T>
@@ -91,7 +133,7 @@ T Interpolate<T>::CubicSmooth(T y0, T y1, T y2, T y3, T mu) {
 }
 
 template <typename T>
-T Interpolate<T>::HermiteInterpolate(T y0, T y1, T y2, T y3, T mu, T tension, T bias) {
+T Interpolate<T>::Hermite(T y0, T y1, T y2, T y3, T mu, int tension, double bias) {
 	auto mu2 = mu * mu;
 	auto mu3 = mu2 * mu;
 	auto m0 = (y1 - y0) * (1 + bias) * (1 - tension) / 2;
