@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include "_cv.h"
+#include "Interpolate.h"
 
 using namespace std;
 using namespace _cv;
@@ -23,6 +24,8 @@ private:
 
 	Point2d variance_;
 
+	Interpolate<double> interpolate_;
+	
 public:
 
 	struct pixelYsort {

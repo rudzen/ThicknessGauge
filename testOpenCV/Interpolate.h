@@ -37,47 +37,41 @@ The first part of the answer tells you how to do that. I hope this helps!
 #pragma once
 #include <cmath>
 
+template <typename T>
 class Interpolate {
 
 	const long double PI = 3.141592653589793238L;
 
 public:
 
-	template <typename T>
 	static T Linear(T y1, T y2, T mu);
 
-	template <typename T>
 	T Cosine(T y1, T y2, T mu);
 
-	template <typename T>
 	T Cubic(T y0, T y1, T y2, T y3, T mu);
 
-	template <typename T>
 	T CubicSmooth(T y0, T y1, T y2, T y3, T mu);
 
 	/*
 	Tension: 1 is high, 0 normal, -1 is low
 	Bias: 0 is even, positive is towards first segment, negative towards the other
 	*/
-	template <typename T>
 	T HermiteInterpolate(T y0, T y1, T y2, T y3, T mu, T tension, T bias);
-
-
 };
 
 template <typename T>
-T Interpolate::Linear(T y1, T y2, T mu) {
+T Interpolate<T>::Linear(T y1, T y2, T mu) {
 	return (y1 * (1 - mu) + y2 * mu);
 }
 
 template <typename T>
-T Interpolate::Cosine(T y1, T y2, T mu) {
+T Interpolate<T>::Cosine(T y1, T y2, T mu) {
 	double mu2 = (1 - cos(mu * PI)) / 2;
 	return (y1 * (1 - mu2) + y2 * mu2);
 }
 
 template <typename T>
-T Interpolate::Cubic(T y0, T y1, T y2, T y3, T mu) {
+T Interpolate<T>::Cubic(T y0, T y1, T y2, T y3, T mu) {
 	auto mu2 = mu * mu;
 	auto a0 = y3 - y2 - y0 + y1;
 	auto a1 = y0 - y1 - a0;
@@ -87,7 +81,7 @@ T Interpolate::Cubic(T y0, T y1, T y2, T y3, T mu) {
 }
 
 template <typename T>
-T Interpolate::CubicSmooth(T y0, T y1, T y2, T y3, T mu) {
+T Interpolate<T>::CubicSmooth(T y0, T y1, T y2, T y3, T mu) {
 	auto mu2 = mu * mu;
 	auto a0 = -0.5 * y0 + 1.5 * y1 - 1.5 * y2 + 0.5 * y3;
 	auto a1 = y0 - 2.5 * y1 + 2 * y2 - 0.5 * y3;
@@ -97,7 +91,7 @@ T Interpolate::CubicSmooth(T y0, T y1, T y2, T y3, T mu) {
 }
 
 template <typename T>
-T Interpolate::HermiteInterpolate(T y0, T y1, T y2, T y3, T mu, T tension, T bias) {
+T Interpolate<T>::HermiteInterpolate(T y0, T y1, T y2, T y3, T mu, T tension, T bias) {
 	auto mu2 = mu * mu;
 	auto mu3 = mu2 * mu;
 	auto m0 = (y1 - y0) * (1 + bias) * (1 - tension) / 2;
