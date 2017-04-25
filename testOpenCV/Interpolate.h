@@ -114,32 +114,32 @@ T Interpolate<T>::Cosine(T y1, T y2, T mu) {
 
 template <typename T>
 T Interpolate<T>::Cubic(T y0, T y1, T y2, T y3, T mu) {
-	auto mu2 = mu * mu;
 	auto a0 = y3 - y2 - y0 + y1;
 	auto a1 = y0 - y1 - a0;
 	auto a2 = y2 - y0;
 	auto a3 = y1;
+	auto mu2 = mu * mu;
 	return (a0 * mu * mu2 + a1 * mu2 + a2 * mu + a3);
 }
 
 template <typename T>
 T Interpolate<T>::CubicSmooth(T y0, T y1, T y2, T y3, T mu) {
-	auto mu2 = mu * mu;
 	auto a0 = -0.5 * y0 + 1.5 * y1 - 1.5 * y2 + 0.5 * y3;
 	auto a1 = y0 - 2.5 * y1 + 2 * y2 - 0.5 * y3;
 	auto a2 = -0.5 * y0 + 0.5 * y2;
 	auto a3 = y1;
+	auto mu2 = mu * mu;
 	return (a0 * mu * mu2 + a1 * mu2 + a2 * mu + a3);
 }
 
 template <typename T>
 T Interpolate<T>::Hermite(T y0, T y1, T y2, T y3, T mu, int tension, double bias) {
-	auto mu2 = mu * mu;
-	auto mu3 = mu2 * mu;
 	auto m0 = (y1 - y0) * (1 + bias) * (1 - tension) / 2;
 	m0 += (y2 - y1) * (1 - bias) * (1 - tension) / 2;
 	auto m1 = (y2 - y1) * (1 + bias) * (1 - tension) / 2;
 	m1 += (y3 - y2) * (1 - bias) * (1 - tension) / 2;
+	auto mu2 = mu * mu;
+	auto mu3 = mu2 * mu;
 	auto a0 = 2 * mu3 - 3 * mu2 + 1;
 	auto a1 = mu3 - 2 * mu2 + mu;
 	auto a2 = mu3 - mu2;
