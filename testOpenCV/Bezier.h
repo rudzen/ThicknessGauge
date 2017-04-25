@@ -64,7 +64,7 @@ v3<T> Bezier<T>::bezier(std::vector<v3<T>>& p, int n, double mu) {
 	for (auto k = 0; k <= n; k++) {
 		auto nn = n;
 		auto kn = k;
-		auto nkn = n - k;
+		auto nkn = nn - kn;
 		auto blend = muk * munk;
 		muk *= mu;
 		munk /= (1 - mu);
