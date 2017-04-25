@@ -5,6 +5,7 @@
 #include <vector>
 #include "_cv.h"
 #include "Interpolate.h"
+#include "Bezier.h"
 
 using namespace std;
 using namespace _cv;
@@ -13,7 +14,6 @@ using namespace cv;
 class MiniCalc {
 
 private:
-
 
 	Point2i lowestPixel_;
 	Point2i highestPixel_;
@@ -25,6 +25,8 @@ private:
 	Point2d variance_;
 
 	Interpolate<double> interpolate_;
+
+	Bezier<double> bezier_;
 	
 public:
 
