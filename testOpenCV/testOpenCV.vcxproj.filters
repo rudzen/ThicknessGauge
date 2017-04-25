@@ -72,9 +72,6 @@
     <ClCompile Include="VideoInfo.cpp">
       <Filter>Source Files\File</Filter>
     </ClCompile>
-    <ClCompile Include="GC2450MCamera.cpp">
-      <Filter>Source Files\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="MiniCalc.cpp">
       <Filter>Source Files\CV</Filter>
     </ClCompile>
@@ -112,9 +109,6 @@
     </ClInclude>
     <ClInclude Include="InvalidMeanException.h">
       <Filter>Header Files\Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="GC2450MCamera.h">
-      <Filter>Header Files\Camera</Filter>
     </ClInclude>
     <ClInclude Include="MiniCalc.h">
       <Filter>Header Files\CV</Filter>
@@ -163,6 +157,12 @@
     </ClInclude>
     <ClInclude Include="Specs.h">
       <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="ThicknessGaugeData.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Interpolate.h">
+      <Filter>Header Files\CV</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

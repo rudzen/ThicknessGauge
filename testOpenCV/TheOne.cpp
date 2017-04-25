@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define _USE_MATH_DEFINES
+
 RNG rng(12345);
 
 const string default_camera_calibration_file = "C2450.json";

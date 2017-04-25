@@ -35,25 +35,25 @@ void ThicknessGauge::gatherPixels(Mat& image) {
 	}
 }
 
-void ThicknessGauge::Blur(cv::Mat& image, cv::Size size) {
+void ThicknessGauge::Blur(Mat& image, Size size) {
 	GaussianBlur(image, image, size, 1.5, 1.5);
 }
 
-void ThicknessGauge::MeanReduction(cv::Mat& image) {
+void ThicknessGauge::MeanReduction(Mat& image) {
 	MeanReduction(image);
 }
 
 void ThicknessGauge::laplace(Mat& image) const {
 	Mat tmp;
-	Laplacian(image, tmp, ddepth_, kernelSize_); // , scale, delta, BORDER_DEFAULT);
+	Laplacian(image, tmp, settings.ddepth, settings.kernelSize); // , scale, delta, BORDER_DEFAULT);
 	convertScaleAbs(tmp, image);
 }
 
 void ThicknessGauge::sobel(Mat& image) const {
-	Sobel(image, image, -1, 1, 1, kernelSize_, scale_, delta_, BORDER_DEFAULT);
+	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, BORDER_DEFAULT);
 }
 
-void ThicknessGauge::imageSkeleton(Mat& image) {
+void ThicknessGauge::skeleton(Mat& image) {
 	//cv::threshold(image, image, 200, 255, cv::THRESH_BINARY);
 	Mat skel(image.size(), CV_8UC1, Scalar(0));
 	Mat temp;
@@ -68,7 +68,7 @@ void ThicknessGauge::imageSkeleton(Mat& image) {
 		bitwise_or(skel, temp, skel);
 		eroded.copyTo(image);
 
-		if (countNonZero(image) == 0)
+		if (countNonZero(image) < 25000)
 			break;
 	}
 
@@ -90,14 +90,66 @@ int ThicknessGauge::getHighestYpixel(Mat& image) {
 	return highest;
 }
 
+int ThicknessGauge::getHighestYpixel(Mat& image, int x) const {
+	auto highest = image.rows;
+	vector<Point> pix;
+	findNonZero(image, pix);
+
+	sort(pix.begin(), pix.end(), miniCalc.sortX);
+
+	for (auto& p : pix) {
+		if (p.x < x)
+			continue;
+		if (p.x > x)
+			break;
+		if (p.y < highest)
+			highest = p.y;
+	}
+	return highest;
+}
+
+int ThicknessGauge::getAllPixelSum(Mat& image) {
+
+	auto sum = 0;
+	auto uc_pixel = image.data;
+	for (auto row = 0; row < image.rows; ++row) {
+		uc_pixel = image.data + row * image.step;
+		for (auto col = 0; col < image.cols; ++col) {
+			int a = uc_pixel[0];
+			int b = uc_pixel[1];
+			int c = uc_pixel[2];
+			sum += a + b + c;
+			uc_pixel += 3;
+		}
+	}
+	return sum;
+}
+
+double ThicknessGauge::getYPixelsAvg(Mat& image, int x) {
+	auto sum = 0;
+	auto count = 0;
+	auto col = image.col(x);
+	auto uc_pixel = col.data;
+
+	for (auto i = 0; i < col.cols; ++i) {
+		sum += uc_pixel[0];
+		cout << "sum is now : " << sum << "\n";
+		count++;
+		uc_pixel++;
+	}
+
+	return sum / count;
+}
+
+
 bool ThicknessGauge::generatePlanarImage() {
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
 
 	Point textPoint(100, 100);
-	Size blurSize(7, 7);
-	const Scalar baseColour(255, 255, 255);
-	const auto alpha = 1.0;
+	Size blurSize(3, 3);
+
+	const auto alpha = 0.5;
 	const auto beta = 1.0 - alpha;
 
 	auto thres = binaryThreshold_; // default threshold.
@@ -129,8 +181,8 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	setImageSize(frame.size());
 
-	auto heightLine = imageSize_.width / 2;
 
+	auto heightLine = imageSize_.width;
 
 	const string inputWindowName = "GC2450 feed";
 	const string outputWindowName = "GC2450 manipulated";
@@ -143,29 +195,28 @@ bool ThicknessGauge::generatePlanarImage() {
 	if (showWindows_) {
 		namedWindow(inputWindowName, WINDOW_AUTOSIZE);
 		createTrackbar("Threshold", inputWindowName, &thres, 254);
-		createTrackbar("Base Line", inputWindowName, &baseLine, imageSize_.height - 1);
-		createTrackbar("Height Line", inputWindowName, &heightLine, imageSize_.width - 1);
-
+		createTrackbar("Base Line", inputWindowName, &baseLine, imageSize_.height);
+		createTrackbar("Height Line", inputWindowName, &heightLine, (imageSize_.width * 2) - 1);
 
 		namedWindow(outputWindowName, WINDOW_AUTOSIZE);
 
-		namedWindow(line1WindowName);
-		createTrackbar("Frac", line1WindowName, &line_fraction, 4);
-		createTrackbar("Thick", line1WindowName, &line_thickness, 5);
+		//namedWindow(line1WindowName);
+		////createTrackbar("Frac", line1WindowName, &line_fraction, 4);
+		////createTrackbar("Thick", line1WindowName, &line_thickness, 5);
 
-		namedWindow(line2WindowName, WINDOW_AUTOSIZE);
+		//namedWindow(line2WindowName, WINDOW_AUTOSIZE);
 
-		namedWindow(line3WindowName, WINDOW_AUTOSIZE);
+		//namedWindow(line3WindowName, WINDOW_AUTOSIZE);
 
-		namedWindow(cornerWindowName, WINDOW_AUTOSIZE);
+		//namedWindow(cornerWindowName, WINDOW_AUTOSIZE);
 
 		namedWindow(erodeWindowName, WINDOW_AUTOSIZE);
-		createTrackbar("Element:", erodeWindowName, &erosion_type, max_ed_elem);
-		createTrackbar("Kernel size: 2n +1", erodeWindowName, &erosion_size, max_ed_kernel_size);
+		//createTrackbar("Element:", erodeWindowName, &erosion_type, max_ed_elem);
+		//createTrackbar("Kernel size: 2n +1", erodeWindowName, &erosion_size, max_ed_kernel_size);
 
-		namedWindow(dilationWindowName, WINDOW_AUTOSIZE);
-		createTrackbar("Element:", dilationWindowName, &dilation_type, max_ed_elem);
-		createTrackbar("Kernel size: 2n +1", dilationWindowName, &dilation_size, max_ed_kernel_size);
+		//namedWindow(dilationWindowName, WINDOW_AUTOSIZE);
+		//createTrackbar("Element:", dilationWindowName, &dilation_type, max_ed_elem);
+		//createTrackbar("Kernel size: 2n +1", dilationWindowName, &dilation_size, max_ed_kernel_size);
 	}
 
 
@@ -201,19 +252,19 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			cap >> frame;
 
-			//equalizeHist(frame, frame);
-
 			// show default input image (always shown live!)
 			if (showWindows_) imshow(inputWindowName, frame);
 
 			// do basic in-place binary threshold
 			threshold(frame, frame, thres, 255, CV_THRESH_BINARY);
 
+			equalizeHist(frame, frame);
+
 			// blur in-place
-			GaussianBlur(frame, frame, blurSize, 0, 0, BORDER_DEFAULT);
+			GaussianBlur(frame, frame, Size(7,5), 10, 2, BORDER_DEFAULT);
 
 			// perform some stuff
-			laplace(frame);
+			//laplace(frame);
 			// c.Sobel(frame);
 
 			if (showWindows_) imshow(outputWindowName, frame);
@@ -228,8 +279,6 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			if (showWindows_) imshow(line1WindowName, outputs[i]);
 
-			//cout << pix_planarMap[i] << endl;
-
 		}
 
 		frame = Mat::zeros(imageSize_, CV_8UC1);
@@ -238,28 +287,38 @@ bool ThicknessGauge::generatePlanarImage() {
 		// merge the images to target
 		for (auto i = 0; i < frameCount_; ++i) {
 			addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
-			add(outputs[i], frame, frame);
-			is.SaveVideoFrame(lines);
+			//add(outputs[i], frame, frame);
+			if (saveVideo_) is.SaveVideoFrame(lines);
 		}
 
-		Mat output = Mat::zeros(imageSize_, CV_8UC1);
 
-		bilateralFilter(frame, output, 1, 80, 20);
+		Mat output = Mat::zeros(imageSize_, lines.type());
 
-		if (showWindows_) imshow(line2WindowName, output);
-		if (showWindows_) imshow(line3WindowName, lines);
-		is.UpdateTimeStamp();
-		is.SaveImage(&output);
+		//if (showWindows_) imshow(line2WindowName, output);
+		//if (showWindows_) imshow(line3WindowName, lines);
 
-		auto corner_image = cornerHarris_test(lines, 200);
-		if (showWindows_) imshow(cornerWindowName, corner_image);
+		//is.UpdateTimeStamp();
+		//is.SaveImage(&lines);
+
+		//auto corner_image = cornerHarris_test(lines, 200);
+		//if (showWindows_) imshow(cornerWindowName, corner_image);
+
+		/* test stuff for filtering out crap pixels */
+		addWeighted(lines, 1.5, lines, -0.5, 0, lines);
 
 		auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
+		bilateralFilter(erosion_image, output, 1, 80, 20);
 
-		resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
+		/* end test stuff */
+		
+		resize(output, frame, output.size() * 2, 0, 0, INTER_LANCZOS4);
+
+		GaussianBlur(frame, output, blurSize, 10, 10, BORDER_CONSTANT);
+
+		//resize(output, frame, frame.size() / 2, 0, 0, INTER_LANCZOS4);
 
 		// test for highest pixel for eroded image
-		double highestPixel = frame.rows - getHighestYpixel(frame) - baseLine;
+		double highestPixel = frame.rows - getHighestYpixel(frame, heightLine) - baseLine;
 		cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
 
 		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
@@ -270,33 +329,34 @@ bool ThicknessGauge::generatePlanarImage() {
 		findNonZero(frame, eroded_pixels);
 
 
-		//for (auto& ep : eroded_pixels)
-		//	cout << "Column avg [" << ep.x << "] : " << sumColumn(frame, ep.x) << endl;
-		//this->sumColumns(frame, lines);
 
-		// generate the solar ray vectors..
-		//generateVectors(eroded_pixels);
-		//for (auto& l : lines_)
-		//	cout << "Solar vector len : " << l.len() << endl;
 
-		Specs s;
-		s.getPixelStrengths(frame, eroded_pixels, frame.cols / 2);
-		auto lulu = s.getNonBaseLine(frame, baseLine_);
-		line(frame, Point(0, lulu), Point(frame.cols, lulu), CV_RGB(255, 255, 255));
-		line(frame, Point(heightLine, 0), Point(heightLine, imageSize_.height), CV_RGB(255, 255, 255));
+		if (showWindows_) {
+			Specs s;
+			s.getPixelStrengths(frame, eroded_pixels, heightLine);
+			auto lulu = s.getNonBaseLine(frame, baseLine_);
+			line(frame, Point(0, lulu), Point(frame.cols, lulu), baseColour_);
+			line(frame, Point(heightLine, 0), Point(heightLine, frame.rows), baseColour_);
 
-		drawHorizontalLine(&frame, baseLine);
+			drawHorizontalLine(&frame, baseLine, baseColour_);
+		}
+
 		if (showWindows_) imshow(erodeWindowName, frame);
 
 		frameTime_ = getTickCount() - time_begin;
 
-		cout << "Saving image...\n";
-		is.SaveImage(&frame, "_testoutput" + to_string(frameCount_));
+		//cout << "Y avr for heightline : " << getYPixelsAvg(frame, heightLine) << endl;
 
-		savePlanarImageData("_testoutput", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
 
-		if (showWindows_) if (waitKey(25) >= 0) break;
+		//cout << "Saving image...\n";
+		//is.SaveImage(&frame, "_testoutput" + to_string(frameCount_));
+		//savePlanarImageData("_testoutput", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
 
+		if (showWindows_) {
+			auto key = static_cast<char>(waitKey(1));
+			if (key == 27)
+				break; // esc
+		}
 	}
 	if (showWindows_) {
 		destroyWindow(inputWindowName);
@@ -341,7 +401,7 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<Point>& pixels,
 	return true;
 }
 
-double ThicknessGauge::sumColumn(cv::Mat& image, int x) {
+double ThicknessGauge::sumColumn(Mat& image, int x) {
 
 	auto sum = 0;
 	auto count = 0;
@@ -356,10 +416,10 @@ double ThicknessGauge::sumColumn(cv::Mat& image, int x) {
 	}
 
 	return sum / static_cast<double>(count);
-	
+
 }
 
-void ThicknessGauge::sumColumns(cv::Mat& image, cv::Mat& target) {
+void ThicknessGauge::sumColumns(Mat& image, Mat& target) {
 
 	// note: this function is not the fastest possible,
 	// but has security for non-continious image data in matrix
@@ -376,22 +436,6 @@ void ThicknessGauge::sumColumns(cv::Mat& image, cv::Mat& target) {
 	}
 
 
-}
-
-void ThicknessGauge::setRightMean(double mean) {
-	rightMean_ = mean;
-}
-
-double ThicknessGauge::getRightMean() const {
-	return rightMean_;
-}
-
-void ThicknessGauge::setLeftMean(double mean) {
-	leftMean_ = mean;
-}
-
-double ThicknessGauge::getLeftMean() const {
-	return leftMean_;
 }
 
 int ThicknessGauge::getBinaryThreshold() const {
@@ -428,13 +472,13 @@ void ThicknessGauge::drawText(Mat* image, const string text, TextDrawPosition po
 	putText(*image, text, pos, 1, 1.0, CV_RGB(0, 0, 0), 2);
 }
 
-void ThicknessGauge::drawHorizontalLine(cv::Mat* image, unsigned int pos) {
-	line(*image, Point(0, image->rows - pos), Point(image->cols, image->rows - pos), CV_RGB(255, 255, 255));
+void ThicknessGauge::drawHorizontalLine(Mat* image, unsigned int pos, Scalar colour) {
+	line(*image, Point(0, image->rows - pos), Point(image->cols, image->rows - pos), colour);
 }
 
-void ThicknessGauge::drawCenterAxisLines(Mat* image) {
-	line(*image, cvPoint(0, image->rows >> 1), cvPoint(image->cols, image->rows >> 1), CV_RGB(255, 255, 255));
-	line(*image, cvPoint(image->cols >> 1, 0), cvPoint(image->cols >> 1, image->rows), CV_RGB(255, 255, 255));
+void ThicknessGauge::drawCenterAxisLines(Mat* image, Scalar& colour) {
+	line(*image, cvPoint(0, image->rows >> 1), cvPoint(image->cols, image->rows >> 1), colour);
+	line(*image, cvPoint(image->cols >> 1, 0), cvPoint(image->cols >> 1, image->rows), colour);
 }
 
 void ThicknessGauge::GenerateInputQuad(Mat* image, Point2f* quad) {
@@ -651,7 +695,7 @@ int ThicknessGauge::autoBinaryThreshold(unsigned int pixelLimit) {
 			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i], test_subPix);
 
 			if (!generateOk) {
-				std::cout << "autoBinaryThreshold() : Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
+				cout << "autoBinaryThreshold() : Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
 				break;
 			}
 
@@ -710,26 +754,6 @@ int ThicknessGauge::autoBinaryThreshold(unsigned int pixelLimit) {
 	return currentThreshold;
 }
 
-const vi& ThicknessGauge::getPixels() const {
-	return pixels_;
-}
-
-const vd& ThicknessGauge::getAllPixels() const {
-	return allPixels_;
-}
-
-const vd& ThicknessGauge::getMeasureLine() const {
-	return measureLine_;
-}
-
-const vd& ThicknessGauge::getRightSideLine() const {
-	return rightSideLine_;
-}
-
-const vd& ThicknessGauge::getLeftSideLine() const {
-	return leftSideLine_;
-}
-
 int ThicknessGauge::getFrameCount() const {
 	return frameCount_;
 }
@@ -764,12 +788,4 @@ bool ThicknessGauge::isShowWindows() const {
 
 void ThicknessGauge::setShowWindows(bool showWindows) {
 	showWindows_ = showWindows;
-}
-
-Mat& ThicknessGauge::GetPlanarImage() {
-	return planarImage_;
-}
-
-void ThicknessGauge::setPlanarImage(const Mat& mat) {
-	planarImage_ = mat;
 }

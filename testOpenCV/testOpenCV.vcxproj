@@ -154,7 +154,6 @@
     <ClCompile Include="CalibrationTest.cpp" />
     <ClCompile Include="IsValidFileName.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
-    <ClCompile Include="GC2450MCamera.cpp" />
     <ClCompile Include="ImageSave.cpp" />
     <ClCompile Include="MiniCalc.cpp" />
     <ClCompile Include="PrettyMenu.cpp" />
@@ -166,13 +165,13 @@
     <ClInclude Include="CalibrationSettings.h" />
     <ClInclude Include="CaptureFailException.h" />
     <ClInclude Include="Compute.h" />
+    <ClInclude Include="Interpolate.h" />
     <ClInclude Include="InvalidFileException.h" />
     <ClInclude Include="IsValidFileName.h" />
     <ClInclude Include="PointData.h" />
     <ClInclude Include="Q.h" />
     <ClInclude Include="Specs.h" />
     <ClInclude Include="ThicknessGauge.h" />
-    <ClInclude Include="GC2450MCamera.h" />
     <ClInclude Include="args.h" />
     <ClInclude Include="getopt.h" />
     <ClInclude Include="ImageDimensionException.h" />
@@ -181,6 +180,7 @@
     <ClInclude Include="MiniCalc.h" />
     <ClInclude Include="PrettyMenu.h" />
     <ClInclude Include="Stringtools.h" />
+    <ClInclude Include="ThicknessGaugeData.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="Vec.h" />
     <ClInclude Include="VideoInfo.h" />

@@ -8,6 +8,7 @@
 #include "Vec.h"
 #include "Util.h"
 #include "MiniCalc.h"
+#include "ThicknessGaugeData.h"
 
 using namespace std;
 using namespace _cv;
@@ -15,28 +16,17 @@ using namespace _cv;
 /*
 The main controller class
 */
-class ThicknessGauge {
+class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
-	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), rightMean_(0), leftMean_(0), binaryThreshold_(35), baseLine_(26) {
+	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(75), baseLine_(32) {
+		baseColour_ = CV_RGB(255, 255, 255);
+		settings.ddepth = CV_8S;
 	}
 
 private:
 
 	map<WindowType, string> m_WindowNames = {{WindowType::Input, "Camera Input"},{WindowType::Output, "Output"},{WindowType::Temp, "Temp"}};
-
-	cv::Mat planarImage_;
-
-	// The pixels located in the image
-	vi pixels_;
-
-	vd allPixels_;
-	vd measureLine_;
-	vd rightSideLine_;
-	vd leftSideLine_;
-
-	vector<p> lines_;
-	p center_;
 
 	uint64 frameTime_;
 
@@ -47,23 +37,33 @@ private:
 	bool showWindows_;
 	bool saveVideo_;
 
-	cv::Size imageSize_;
+	typedef struct Settings {
+		int kernelSize:1;
+		int scale:1;
+		int delta:1;
+		int ddepth:1;
+		Settings() : kernelSize(3), scale(1), delta(0), ddepth(CV_16S) { }
+		Settings(int init_kernelSize, int init_scale, int init_delta, int init_ddepth) {
+			kernelSize = init_kernelSize;
+			scale = init_scale;
+			delta = init_delta;
+			ddepth = init_ddepth;
+		}
+	} Settings;
 
-	double rightMean_;
-	double leftMean_;
+	Settings settings;
 
 	// laplace/sobel settings
-	int kernelSize_ = 3;
-	int scale_ = 1;
-	int delta_ = 0;
-	int ddepth_ = CV_16S;
-
-	const int pixelChunkCount_ = 16;
-	const int pixelChunkSize_ = 153; // lowest whole number from 2448 as (2448 >> 4 = 153)
+	//int kernelSize_ = 3;
+	//int scale_ = 1;
+	//int delta_ = 0;
+	//int ddepth_ = CV_16S;
 
 	int binaryThreshold_;
 
 	int baseLine_;
+
+	Scalar baseColour_;
 
 public:
 	int getBaseLine() const;
@@ -91,11 +91,16 @@ public: // basic stuff to extract information
 
 	void sobel(cv::Mat& image) const;
 
-	static void imageSkeleton(cv::Mat& image);
+	static void skeleton(cv::Mat& image);
 
 	void drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const;
 
 	static int getHighestYpixel(cv::Mat& image);
+	int getHighestYpixel(Mat& image, int x) const;
+	int getAllPixelSum(Mat& image);
+	double getYPixelsAvg(Mat& image, int x);
+	int getAllPixelSum(Mat& image, int x);
+	int getHighestYPixel(Mat& image, int x);
 
 	bool generatePlanarImage();
 
@@ -105,15 +110,7 @@ public: // basic stuff to extract information
 
 	void sumColumns(cv::Mat& image, cv::Mat& target);
 
-
 public: // getters and setters
-
-
-	const vi& getPixels() const;
-	const vd& getAllPixels() const;
-	const vd& getMeasureLine() const;
-	const vd& getRightSideLine() const;
-	const vd& getLeftSideLine() const;
 
 	int getFrameCount() const;
 
@@ -133,22 +130,6 @@ public: // getters and setters
 
 	void setShowWindows(bool showWindows);
 
-	cv::Mat& GetPlanarImage();
-
-	void setPlanarImage(const cv::Mat& mat);
-
-	void setRightMean(double mean);
-
-	double getRightMean() const;
-
-	void setLeftMean(double mean);
-
-	double getLeftMean() const;
-
-	//vector<cv::Point2i>& GetRightSideLine();
-
-	//vector<cv::Point2i>& GetLeftSideLine();
-
 	int getBinaryThreshold() const;
 
 	void setBinaryThreshold(int binaryThreshold);
@@ -157,9 +138,9 @@ public: // draw functions
 
 	static void drawText(cv::Mat* image, const string text, TextDrawPosition position);
 
-	static void drawHorizontalLine(cv::Mat* image, unsigned int pos);
+	static void drawHorizontalLine(cv::Mat* image, unsigned int pos, cv::Scalar colour);
 
-	static void drawCenterAxisLines(cv::Mat* image);
+	static void drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour);
 
 public: // generate meta stuff
 
@@ -169,9 +150,7 @@ public: // generate meta stuff
 	* \return The binary threshold that was generated
 	*/
 	int autoBinaryThreshold(unsigned int pixelLimit);
-
-
-
+	
 	static void GenerateInputQuad(cv::Mat* image, cv::Point2f* quad);
 
 	static void GenerateOutputQuad(cv::Mat* image, cv::Point2f* quad);
@@ -193,10 +172,6 @@ private: // generic helper methods
 
 	static bool IsPixel(cv::Mat& image, cv::Point& pixel) {
 		return image.at<uchar>(pixel) < 255;
-	}
-
-	void setImageSize(cv::Size size) {
-		imageSize_ = size;
 	}
 
 	void generateVectors(vi& pix) {
