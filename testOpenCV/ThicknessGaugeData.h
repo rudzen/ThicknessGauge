@@ -11,9 +11,9 @@ protected:
 	vi pixels_;
 	vi allPixels_;
 	vi measureLine_;
-	vd rightSideLine_;
-	vd leftSideLine_;
-	vd intensity_;
+	vi rightSideLine_;
+	vi leftSideLine_;
+	vi intensity_;
 
 	vector<p> lines_;
 	p center_;
@@ -59,9 +59,9 @@ public:
 	const vi& getPixels() const;
 	const vi& getAllPixels() const;
 	const vi& getMeasureLine() const;
-	const vd& getRightSideLine() const;
-	const vd& getLeftSideLine() const;
-	const vd& getIntensity() const;
+	const vi& getRightSideLine() const;
+	const vi& getLeftSideLine() const;
+	const vi& getIntensity() const;
 
 	double getIntensity(int x) const;
 
@@ -107,15 +107,15 @@ inline const vi& ThicknessGaugeData::getMeasureLine() const {
 	return measureLine_;
 }
 
-inline const vd& ThicknessGaugeData::getRightSideLine() const {
+inline const vi& ThicknessGaugeData::getRightSideLine() const {
 	return rightSideLine_;
 }
 
-inline const vd& ThicknessGaugeData::getLeftSideLine() const {
+inline const vi& ThicknessGaugeData::getLeftSideLine() const {
 	return leftSideLine_;
 }
 
-inline const vd& ThicknessGaugeData::getIntensity() const {
+inline const vi& ThicknessGaugeData::getIntensity() const {
 	return intensity_;
 }
 

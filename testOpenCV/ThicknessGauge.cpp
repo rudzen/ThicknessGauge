@@ -186,7 +186,6 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	setImageSize(frame.size());
 
-
 	auto heightLine = imageSize_.width;
 
 	const string inputWindowName = "GC2450 feed";
