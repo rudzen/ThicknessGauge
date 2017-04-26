@@ -144,10 +144,53 @@ public:
 	 */
 	static bool computeSimpleLine(cv::Point& currentPoint, cv::Point& targetPoint, vi& result) {
 
+	}
 
+	static bool computeElementGab(cv::Point& currentPoint, vi& elements) {
+		
+	}
+
+	static double computeYSum(vi& elements) {
+		auto sum = 0.0;
+		for (auto& e : elements)
+			sum += e.y;
+		return sum;
+	}
+
+	double computeWeigthedY(vi& elements, int x) {
+
+		vi temp;
+
+		getElementsX(elements, temp, x);
+
+		if (temp.empty())
+			return 0.0;
+
+		return computeYSum(temp) / static_cast<double>(temp.size());
 
 	}
 
+	double computeWeigthedIntensity(vi& elements, int x, int y) {
+		return 0.0;
+	}
+
+	double computeWeigthedIntensity(vi& elements, Point point) {
+		return computeWeigthedIntensity(elements, point.x, point.y);
+	}
+
+	static void getElementsX(vi& input, vi& output, int x) {
+		for (auto& e : input) {
+			if (e.x == x)
+				output.push_back(e);
+		}
+	}
+
+	static void getElementsY(vi& input, vi& output, int y) {
+		for (auto& e : input) {
+			if (e.y == y)
+				output.push_back(e);
+		}
+	}
 
 	/**
 	 * \brief Computes a line from a vector of pixels points
