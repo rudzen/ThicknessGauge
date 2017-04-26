@@ -25,21 +25,21 @@ int testBazier() {
 	Point2i a(0, 0), b(0, 0), c(0, 0), d(33, 0), e(0, 1), f(0, 0);// general purpose scratch registers.
 
 	unsigned int Np = 4;
-	P[0] = { 133, 300 };
-	P[1] = { 260, 400 };
-	P[2] = { 555, 111 };
-	P[3] = { 700, 111 };
+	P[0] = {133, 300};
+	P[1] = {260, 400};
+	P[2] = {555, 111};
+	P[3] = {700, 111};
 
 	//  P(5) = { , };
 	//  P(6) = { , };
 	//  P(55) = { , };
-	Np = Np - 1;
+	Np--;
 
 	Lp = P[0];
-	for (float ppercent = 0.00; ppercent < 1.0; ppercent = ppercent + 0.01) {///
+	for (float ppercent = 0.00; ppercent < 1.0; ppercent = ppercent + 0.01) {
 		Pp = P;
 		int c2ccount = Np;
-		for (auto c1ccount = 0; c1ccount < Np; c1ccount = c1ccount + 1) {//
+		for (auto c1ccount = 0; c1ccount < Np; c1ccount = c1ccount + 1) {
 			for (auto cccount = 0; cccount < c2ccount; cccount = cccount + 1) {
 				a = Pp[cccount] - Pp[cccount + 1];
 				a = Pp[cccount + 1] - Pp[cccount];
@@ -49,13 +49,13 @@ int testBazier() {
 			}
 			c2ccount = c2ccount - 1;
 			Pp = Ppp;
-		}//
+		}
 
 		line(image, c, Lp, Scalar(110, 220, 0), 1, 1);
 		Lp = c;
-	}///
+	}
 
-	 // P straight line generator.
+	// P straight line generator.
 	for (auto c3ccount = 0; c3ccount < Np; c3ccount = c3ccount + 1) {
 		line(image, P[c3ccount], P[c3ccount + 1], Scalar(200, 200, 200), 2, 8);
 		a = P[c3ccount] + e;
@@ -67,7 +67,7 @@ int testBazier() {
 	imshow("Bezier_curve", image);
 	waitKey(0);
 	cout << "done\n";
-	return(0);
+	return (0);
 }
 
 //void test_video(cv::Mat input) {
@@ -179,7 +179,7 @@ int main(int argc, char** argv) {
 	args.addOption("buildinfo", 'b', "Show OpenCV build information", Args::Optional, false);
 	args.addOption("settings", 'l', "Loads camera calibration settings from file", Args::Optional, false);
 	args.addOption("video", 'v', "Enable video recording of resulting images.", Args::Optional, false);
-//	args.addAdditionalOption(calibrate, "Calibration method");
+	//	args.addAdditionalOption(calibrate, "Calibration method");
 	args.parse(argc, argv);
 
 	auto showBuildInfo = args.getArgument("buildinfo", false);
@@ -210,7 +210,8 @@ int main(int argc, char** argv) {
 
 	if (calibration_file_exists) {
 		c.initCalibrationSettings(camera_calibration_file);
-	} else {
+	}
+	else {
 		cerr << "Error. Calibration file does not exist, no settings will be applied." << endl;
 	}
 
@@ -227,10 +228,11 @@ int main(int argc, char** argv) {
 		if (returnValue) {
 			cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
 		}
-	} catch (CaptureFailException& e) {
+	}
+	catch (CaptureFailException& e) {
 		cout << "Something happend.. but what?\n" << e.what() << endl;
 	}
 
-	return returnValue ^true;
+	return returnValue ^ true;
 
 }

@@ -53,25 +53,23 @@ void ThicknessGauge::sobel(Mat& image) const {
 	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, BORDER_DEFAULT);
 }
 
-void ThicknessGauge::skeleton(Mat& image) {
-	//cv::threshold(image, image, 200, 255, cv::THRESH_BINARY);
-	Mat skel(image.size(), CV_8UC1, Scalar(0));
+void ThicknessGauge::skeleton(Mat* image) {
+	Mat skel(image->size(), CV_8UC1, Scalar(0));
 	Mat temp;
 	Mat eroded;
 
-	auto element = getStructuringElement(MORPH_CROSS, Size(6, 6));
+	auto element = getStructuringElement(MORPH_CROSS, Size(3, 3));
 
-	for (;;) {
-		erode(image, eroded, element);
+	bool done;
+	do {
+		erode(*image, eroded, element);
 		dilate(eroded, temp, element); // temp = open(img)
-		subtract(image, temp, temp);
+		subtract(*image, temp, temp);
 		bitwise_or(skel, temp, skel);
-		eroded.copyTo(image);
+		eroded.copyTo(*image);
 
-		if (countNonZero(image) < 25000)
-			break;
-	}
-
+		done = (countNonZero(*image) == 0);
+	} while (!done);
 }
 
 void ThicknessGauge::drawPlarnarPixels(Mat& targetImage, vector<Point>& planarMap) const {
@@ -162,7 +160,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	auto line_thickness = 1;
 
 	/* erosion and dilation trackbar settings */
-	auto erosion_type = 1;
+	auto erosion_type = 2;
 	auto erosion_size = 3;
 
 	auto dilation_type = 0;
@@ -282,7 +280,7 @@ bool ThicknessGauge::generatePlanarImage() {
 			}
 
 			findNonZero(outputs[i], pix_planarMap[arrayLimit - (1 + i)]);
-			if (miniCalc.fillElementGabs(pix_planarMap[arrayLimit - (1 + i)], outputs[i], outputs[i].rows - baseLine_)) {
+			if (miniCalc.fillElementGabs(pix_planarMap[arrayLimit - (1 + i)], outputs[i], baseLine_)) {
 				//Mat temp(pix_planarMap[arrayLimit - (1 + i)]);
 				//cout << "TEMP cols " << temp.cols << endl;
 				//imshow("temp", temp);
@@ -299,7 +297,8 @@ bool ThicknessGauge::generatePlanarImage() {
 		// merge the images to target
 		for (auto i = 0; i < frameCount_; ++i) {
 			addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
-			//add(outputs[i], frame, frame);
+			//add(outputs[i], lines, lines);
+			outputs[i].release();
 			if (saveVideo_) is.SaveVideoFrame(lines);
 		}
 
@@ -316,10 +315,12 @@ bool ThicknessGauge::generatePlanarImage() {
 		//if (showWindows_) imshow(cornerWindowName, corner_image);
 
 		/* test stuff for filtering out crap pixels */
-		addWeighted(lines, 1.5, lines, -0.5, 0, lines);
+		addWeighted(lines, 1.5, lines, -0.5, 0, output);
 
-		auto erosion_image = this->erosion(lines, erosion_type, erosion_size);
+		//skeleton(&output);
+		auto erosion_image = this->erosion(output, erosion_type, erosion_size);
 		bilateralFilter(erosion_image, output, 1, 80, 20);
+		erosion_image.release();
 
 		/* end test stuff */
 		
@@ -327,10 +328,12 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		GaussianBlur(frame, output, blurSize, 10, 10, BORDER_CONSTANT);
 
+		frame.release();
+
 		//resize(output, frame, frame.size() / 2, 0, 0, INTER_LANCZOS4);
 
 		// test for highest pixel for eroded image
-		double highestPixel = frame.rows - getHighestYpixel(output, heightLine) - baseLine_;
+		double highestPixel = output.rows - getHighestYpixel(output, heightLine) - baseLine_;
 		cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
 
 		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
@@ -342,17 +345,14 @@ bool ThicknessGauge::generatePlanarImage() {
 		computerGaugeLine(output);
 
 		if (showWindows_) {
-			Specs s;
-			s.getPixelStrengths(output, allPixels_, heightLine);
-			auto lulu = s.getNonBaseLine(output, baseLine_);
-			line(output, Point(0, lulu), Point(output.cols, lulu), baseColour_);
+			//Specs s;
+			//s.getPixelStrengths(output, allPixels_, heightLine);
+			//auto lulu = s.getNonBaseLine(output, baseLine_);
+			//line(output, Point(0, lulu), Point(output.cols, lulu), baseColour_);
+
 			line(output, Point(heightLine, 0), Point(heightLine, output.rows), baseColour_);
 
 			drawHorizontalLine(&output, baseLine_, baseColour_);
-
-
-			// draw the gauge line
-
 
 		}
 
@@ -372,6 +372,9 @@ bool ThicknessGauge::generatePlanarImage() {
 			if (key == 27)
 				break; // esc
 		}
+
+		output.release();
+
 	}
 	if (showWindows_) {
 		destroyWindow(inputWindowName);
@@ -657,146 +660,6 @@ Mat ThicknessGauge::dilation(Mat& input, int dilation, int size) const {
 
 	dilate(input, dilation_dst, element);
 	return dilation_dst;
-}
-
-int ThicknessGauge::autoBinaryThreshold(unsigned int pixelLimit) {
-
-	if (!cap.isOpened()) // check if we succeeded
-		throw CaptureFailException("Error while attempting to open capture device.");
-
-	MiniCalc miniCalc;
-
-	auto targetReached = false;
-	auto currentThreshold = 1;
-
-	const auto maxValue = 254;
-
-	const Size blurSize(5, 5);
-	const auto alpha = 0.2;
-	const auto beta = 1.0 - alpha;
-
-	auto thres = 250;
-	auto line_fraction = 0;
-	auto line_thickness = 1;
-
-	/* erosion and dilation trackbar settings */
-	auto erosion_type = 1;
-	auto erosion_size = 3;
-
-	auto dilation_type = 0;
-	auto dilation_size = 1;
-
-	auto const max_ed_elem = 2;
-	auto const max_ed_kernel_size = 21;
-	/* end */
-
-	//cvvNamedWindow("auto threshold");
-
-	ImageSave is("pic_x", SaveType::Image_Png, Information::Basic);
-
-	Mat frame;
-	Mat outputs[1024];
-	vi pix_planarMap[1024]; // shit c++11 ->
-	vi nonZero;
-
-	// capture first frame
-	cap >> frame;
-
-	vector<Point2d> test_subPix;
-
-	auto frameSize(frame.size());
-	setImageSize(frame.size());
-
-	// configure output stuff
-	for (auto i = 0; i < frameCount_; ++i)
-		pix_planarMap[i].reserve(frameSize.width);
-
-	// start the process of gathering information for set frame count
-
-	uint64 time_begin = getTickCount();
-
-	while (!targetReached) {
-
-		for (auto i = 0; i < frameCount_; ++i) {
-
-			outputs[i] = Mat::zeros(imageSize_, CV_8UC1);
-			pix_planarMap[i].clear();
-
-			cap >> frame;
-
-			//equalizeHist(frame, frame);
-
-			// do basic in-place binary threshold
-			threshold(frame, frame, currentThreshold, 255, CV_THRESH_BINARY);
-
-			// blur in-place
-			GaussianBlur(frame, frame, blurSize, 0, 0, BORDER_DEFAULT);
-
-			// perform some stuff
-			laplace(frame);
-			//c.Sobel(frame);
-
-			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
-			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i], test_subPix);
-
-			if (!generateOk) {
-				cout << "autoBinaryThreshold() : Failed to map elements to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
-				break;
-			}
-
-		}
-
-		frame = Mat::zeros(imageSize_, CV_8UC1);
-		Mat lines = Mat::zeros(imageSize_, CV_8UC1);
-
-		// merge the images to target
-		for (auto i = 0; i < frameCount_; ++i) {
-			addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
-			add(outputs[i], frame, frame);
-			//is.SaveVideoFrame(lines);
-		}
-
-		Mat output = Mat::zeros(imageSize_, CV_8UC1);
-
-		bilateralFilter(frame, output, 1, 80, 20);
-
-		//auto corner_image = cornerHarris_test(lines, 200);
-
-		auto erosion_image = this->erosion(lines, /*TESTING, def = 0 */ 1, erosion_size);
-		resize(erosion_image, frame, erosion_image.size() * 2, 0, 0, INTER_LANCZOS4);
-
-		// test for highest pixel for eroded image
-		auto highestPixel = frame.rows - getHighestYpixel(frame);
-		cout << "Highest Y elements in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
-
-		//imshow("auto threshold", frame);
-
-		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
-		//imshow(dilationWindowName, dilation);
-
-		vi eroded_pixels;
-		findNonZero(frame, eroded_pixels);
-
-		// generate the solar ray vectors..
-		//generateVectors(eroded_pixels);
-
-		if (pixelLimit >= eroded_pixels.size()) {
-			targetReached = true;
-			//cout << "Saving element collection + meta data...\n";
-			//savePlanarImageData("_autogenerated", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
-		}
-		else {
-			currentThreshold++;
-		}
-
-		//if (waitKey(1) >= 0) break;
-
-	}
-
-	frameTime_ = getTickCount() - time_begin;
-
-	setBinaryThreshold(currentThreshold);
-	return currentThreshold;
 }
 
 int ThicknessGauge::getFrameCount() const {

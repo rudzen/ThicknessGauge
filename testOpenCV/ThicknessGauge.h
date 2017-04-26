@@ -19,7 +19,7 @@ The main controller class
 class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
-	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(75), baseLine_(32) {
+	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(75), baseLine_(24) {
 		baseColour_ = CV_RGB(255, 255, 255);
 		settings.ddepth = CV_8S;
 	}
@@ -42,7 +42,10 @@ private:
 		int scale:1;
 		int delta:1;
 		int ddepth:1;
-		Settings() : kernelSize(3), scale(1), delta(0), ddepth(CV_16S) { }
+
+		Settings() : kernelSize(3), scale(1), delta(0), ddepth(CV_16S) {
+		}
+
 		Settings(int init_kernelSize, int init_scale, int init_delta, int init_ddepth) {
 			kernelSize = init_kernelSize;
 			scale = init_scale;
@@ -91,7 +94,7 @@ public: // basic stuff to extract information
 
 	void sobel(cv::Mat& image) const;
 
-	static void skeleton(cv::Mat& image);
+	static void skeleton(cv::Mat* image);
 
 	void drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const;
 
@@ -106,7 +109,7 @@ public: // basic stuff to extract information
 
 	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY) const;
 
-	double sumColumn(cv::Mat & image, int x);
+	double sumColumn(cv::Mat& image, int x);
 
 	void sumColumns(cv::Mat& image, cv::Mat& target);
 
@@ -148,17 +151,9 @@ public: // draw functions
 
 public: // generate meta stuff
 
-	/**
-	* \brief Auto generate binary threshold cutoff based on pixel limit
-	* \param pixelLimit The pixel limit to apply to the algorithm
-	* \return The binary threshold that was generated
-	*/
-	int autoBinaryThreshold(unsigned int pixelLimit);
-	
 	static void GenerateInputQuad(cv::Mat* image, cv::Point2f* quad);
 
 	static void GenerateOutputQuad(cv::Mat* image, cv::Point2f* quad);
-
 
 public: // misc quad temp stuff
 

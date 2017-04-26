@@ -146,10 +146,90 @@ public:
 
 	}
 
-	bool fillElementGabs(vi& elements, cv::Mat& target, int barrier) {
+	cv::Point getRightEdge(vi& elements, int imageHeight, int baseLevel) const {
+
+		sort(elements.begin(), elements.end(), sortX);
+
+		const auto barrier = imageHeight - baseLevel;
+
+		const auto size = elements.size() / 2;
+
+		for (auto i = size; i > 0; --i) {
+			if (elements[i].y < barrier)
+				return elements[i];
+		}
+		
+		return Point(0, imageHeight);
+	}
+
+	cv::Point getLeftEdge(vi& elements, int imageHeight, int baseLevel) const {
+
+		sort(elements.begin(), elements.end(), sortX);
+
+		const auto barrier = imageHeight - baseLevel;
+
+		const auto size = elements.size() / 2;
+
+		for (auto i = size; i > 0; ++i) {
+			if (elements[i].y < barrier)
+				return elements[i];
+		}
+
+		return Point(0, imageHeight);
+	}
+
+	void computeLeftElements(vi& elements, vi& targetElements, int leftEdge, int imageWidth, bool sortElements) const {
+
+		if (sortElements)
+			sort(elements.begin(), elements.end(), sortX);
+
+		targetElements.clear();
+
+		for (auto& e : elements) {
+			if (e.x >= leftEdge)
+				targetElements.push_back(e);
+		}
+
+		// just fill out the rest towards the left of the border
+		if (targetElements.back().x < imageWidth) {
+			const auto targetLastX = targetElements.back().x;
+			const auto targetLastY = targetElements.back().y;
+			for (auto i = targetLastX; i < imageWidth; ++i)
+				targetElements.push_back(Point(i, targetLastY));
+		}
+	}
+
+	void computeRightElements(vi& elements, vi& targetElements, int rightEdge, bool sortElements) const {
+		
+		if (sortElements)
+			sort(elements.begin(), elements.end(), sortX);
+
+		targetElements.clear();
+
+		for (auto& e : elements) {
+			if (e.x > rightEdge)
+				break;
+			targetElements.push_back(e);
+		}
+
+		// just fill out the rest towards the left of the border
+		if (targetElements.back().x > 0) {
+			const auto targetLastX = targetElements.back().x;
+			const auto targetLastY = targetElements.back().y;
+			for (auto i = targetLastX; i >= 0; --i)
+				targetElements.push_back(Point(i, targetLastY));
+		}
+
+	}
+
+
+	bool fillElementGabs(vi& elements, cv::Mat& target, int barrier) const {
 
 		auto gab = false;
-		auto gabEnd = -1;
+		auto result = false;
+
+		elements.push_back(Point(0, target.rows));
+		elements.push_back(Point(target.cols, target.rows));
 
 		sort(elements.begin(), elements.end(), sortX);
 
@@ -162,18 +242,27 @@ public:
 		vector<Point> gabLine;
 
 		for (auto i = first; i < size; ++i) {
-			if (elements[i].y > barrier)
-				continue;
-			auto posX = elements[i].x;
+			//if (elements[i].y > barrier)
+			//	continue;
 			if (i + 1 == size)
 				break;
+			auto posX = elements[i].x;
 			auto nextX = elements[i + 1].x;
 			auto dif = nextX - posX;
 			if (dif < 2) {
-				// no gab, just continue
-				continue;
+				// no gab in x, try with y !!
+				auto posY = elements[i].y;
+				auto nextY = elements[i + 1].y;
+				auto diffY = nextY - posY;
+				if (diffY < 4)
+					continue;
+				gab = true;
 			}
-			line(target, elements[i], elements[i + 1], Scalar(255, 255, 255), 1, LINE_8);
+			if (gab) {
+				line(target, elements[i], elements[i + 1], Scalar(255, 255, 255), 1, LINE_AA);
+				result = true;
+			}
+			gab ^= true;
 		}
 
 
@@ -184,18 +273,9 @@ public:
 
 		//elements = gabLine;
 
-		return true;
-
-		//// remove temporary added element
+		// remove temporary added element
 		//elements.erase(elements.end());
-
-		//if (!gabLine.empty()) {
-		//	for (auto& g : gabLine)
-		//		elements.push_back(g);
-		//}
-
-
-
+		return result;
 	}
 
 	static double computeYSum(vi& elements) {
