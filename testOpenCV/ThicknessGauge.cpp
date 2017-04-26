@@ -174,9 +174,11 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	ImageSave is("pic_x", SaveType::Image_Png, Information::Basic);
 
+	const int arrayLimit = 512; // shit c++11 ->
+
 	Mat frame;
-	Mat outputs[1024];
-	vi pix_planarMap[1024]; // shit c++11 ->
+	Mat outputs[arrayLimit];
+	vi pix_planarMap[arrayLimit];
 	vi nonZero;
 
 	// capture first frame
@@ -278,6 +280,14 @@ bool ThicknessGauge::generatePlanarImage() {
 			if (!generateOk) {
 				cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
 				break;
+			}
+
+			findNonZero(outputs[i], pix_planarMap[arrayLimit - (1 + i)]);
+			if (miniCalc.fillElementGabs(pix_planarMap[arrayLimit - (1 + i)], outputs[i], outputs[i].rows - baseLine_)) {
+				//Mat temp(pix_planarMap[arrayLimit - (1 + i)]);
+				//cout << "TEMP cols " << temp.cols << endl;
+				//imshow("temp", temp);
+				//add(outputs[i], temp, outputs[i]);
 			}
 
 			if (showWindows_) imshow(line1WindowName, outputs[i]);

@@ -146,8 +146,56 @@ public:
 
 	}
 
-	static bool computeElementGab(cv::Point& currentPoint, vi& elements) {
-		
+	bool fillElementGabs(vi& elements, cv::Mat& target, int barrier) {
+
+		auto gab = false;
+		auto gabEnd = -1;
+
+		sort(elements.begin(), elements.end(), sortX);
+
+		auto size = elements.size();
+
+		elements.push_back(elements.front());
+
+		auto first = elements.front().x;
+
+		vector<Point> gabLine;
+
+		for (auto i = first; i < size; ++i) {
+			if (elements[i].y > barrier)
+				continue;
+			auto posX = elements[i].x;
+			if (i + 1 == size)
+				break;
+			auto nextX = elements[i + 1].x;
+			auto dif = nextX - posX;
+			if (dif < 2) {
+				// no gab, just continue
+				continue;
+			}
+			line(target, elements[i], elements[i + 1], Scalar(255, 255, 255), 1, LINE_8);
+		}
+
+
+		//if (gabLine.empty())
+		//	return false;
+
+		//cout << "gab detected.." << gabLine.size() << endl;
+
+		//elements = gabLine;
+
+		return true;
+
+		//// remove temporary added element
+		//elements.erase(elements.end());
+
+		//if (!gabLine.empty()) {
+		//	for (auto& g : gabLine)
+		//		elements.push_back(g);
+		//}
+
+
+
 	}
 
 	static double computeYSum(vi& elements) {
