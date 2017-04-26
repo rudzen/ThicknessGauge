@@ -5,7 +5,7 @@
 #include <vector>
 #include "_cv.h"
 #include "Interpolate.h"
-#include "Bezier.h"
+#include "Bezier_1.h"
 #include "LineConfig.h"
 
 using namespace std;
