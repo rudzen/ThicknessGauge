@@ -141,6 +141,9 @@ double ThicknessGauge::getYPixelsAvg(Mat& image, int x) {
 	return sum / count;
 }
 
+inline void ThicknessGauge::computeAllElements(Mat& image) {
+	findNonZero(image, allPixels_);
+}
 
 bool ThicknessGauge::generatePlanarImage() {
 	if (!cap.isOpened()) // check if we succeeded
@@ -153,7 +156,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	const auto beta = 1.0 - alpha;
 
 	auto thres = binaryThreshold_; // default threshold.
-	auto baseLine = baseLine_; // baseline default.
+	//auto baseLine = baseLine_; // baseline default.
 
 	auto line_fraction = 0;
 	auto line_thickness = 1;
@@ -195,7 +198,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	if (showWindows_) {
 		namedWindow(inputWindowName, WINDOW_AUTOSIZE);
 		createTrackbar("Threshold", inputWindowName, &thres, 254);
-		createTrackbar("Base Line", inputWindowName, &baseLine, imageSize_.height);
+		createTrackbar("Base Line", inputWindowName, &baseLine_, imageSize_.height);
 		createTrackbar("Height Line", inputWindowName, &heightLine, (imageSize_.width * 2) - 1);
 
 		namedWindow(outputWindowName, WINDOW_AUTOSIZE);
@@ -318,30 +321,33 @@ bool ThicknessGauge::generatePlanarImage() {
 		//resize(output, frame, frame.size() / 2, 0, 0, INTER_LANCZOS4);
 
 		// test for highest pixel for eroded image
-		double highestPixel = frame.rows - getHighestYpixel(frame, heightLine) - baseLine;
+		double highestPixel = frame.rows - getHighestYpixel(output, heightLine) - baseLine_;
 		cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
 
 		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
 		//imshow(dilationWindowName, dilation);
 
+		// gather all elements from final matrix
+		computeAllElements(output);
 
-		vi eroded_pixels;
-		findNonZero(frame, eroded_pixels);
-
-
-
+		computerGaugeLine(output);
 
 		if (showWindows_) {
 			Specs s;
-			s.getPixelStrengths(frame, eroded_pixels, heightLine);
-			auto lulu = s.getNonBaseLine(frame, baseLine_);
-			line(frame, Point(0, lulu), Point(frame.cols, lulu), baseColour_);
-			line(frame, Point(heightLine, 0), Point(heightLine, frame.rows), baseColour_);
+			s.getPixelStrengths(output, allPixels_, heightLine);
+			auto lulu = s.getNonBaseLine(output, baseLine_);
+			line(output, Point(0, lulu), Point(output.cols, lulu), baseColour_);
+			line(output, Point(heightLine, 0), Point(heightLine, output.rows), baseColour_);
 
-			drawHorizontalLine(&frame, baseLine, baseColour_);
+			drawHorizontalLine(&output, baseLine_, baseColour_);
+
+
+			// draw the gauge line
+
+
 		}
 
-		if (showWindows_) imshow(erodeWindowName, frame);
+		if (showWindows_) imshow(erodeWindowName, output);
 
 		frameTime_ = getTickCount() - time_begin;
 
@@ -389,8 +395,8 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<Point>& pixels,
 	fs << "Seconds for computation" << static_cast<long>(frameTime_ / tickFrequency_);
 	fs << "Highest Y" << highestY;
 
-	fs << "Eroded pixel count" << static_cast<int>(pixels.size());
-	fs << "Eroded pixels" << pixels;
+	fs << "Eroded element count" << static_cast<int>(pixels.size());
+	fs << "Eroded elements" << pixels;
 	fs << "Eroded image" << image;
 
 	fs.release();
@@ -435,6 +441,36 @@ void ThicknessGauge::sumColumns(Mat& image, Mat& target) {
 		cout << "sum [row] : " << row << "-> " << sum << "\n";
 	}
 
+
+}
+
+void ThicknessGauge::computerGaugeLine(Mat& output) {
+	vi aboveLine;
+
+	if (miniCalc.getActualPixels(allPixels_, aboveLine, baseLine_, output.rows)) {
+		cout << "Retrived " << aboveLine.size() << " elements above line.\n";
+		if (miniCalc.computerCompleteLine(aboveLine, gaugeLine_, lineConfig_)) {
+			cout << "Computed line fitting... " << gaugeLine_ << "\n";
+
+			gaugeLineSet_ = true;
+
+			// sort the elements for quick access to first and last (outer points in line)
+			sort(aboveLine.begin(), aboveLine.end(), miniCalc.sortX);
+
+			avgGaugeHeight_ = gaugeLine_[3];
+
+			if (showWindows_) {
+				line(output, Point2f(aboveLine.front().x + gaugeLine_[0], gaugeLine_[3]), Point2f(aboveLine.back().x, gaugeLine_[3]), baseColour_, 1, LINE_AA);
+				cout << "Average line height : " << output.rows - avgGaugeHeight_ << " elements.\n";
+			}
+		} else {
+			gaugeLineSet_ = false;
+			cout << "Failed to generate fitted line.\n";
+		}
+	} else {
+		gaugeLineSet_ = false;
+		cout << "Failed to retrive elements above line.\n";
+	}
 
 }
 
@@ -695,7 +731,7 @@ int ThicknessGauge::autoBinaryThreshold(unsigned int pixelLimit) {
 			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i], test_subPix);
 
 			if (!generateOk) {
-				cout << "autoBinaryThreshold() : Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
+				cout << "autoBinaryThreshold() : Failed to map elements to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
 				break;
 			}
 
@@ -722,7 +758,7 @@ int ThicknessGauge::autoBinaryThreshold(unsigned int pixelLimit) {
 
 		// test for highest pixel for eroded image
 		auto highestPixel = frame.rows - getHighestYpixel(frame);
-		cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
+		cout << "Highest Y elements in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
 
 		//imshow("auto threshold", frame);
 
@@ -737,7 +773,7 @@ int ThicknessGauge::autoBinaryThreshold(unsigned int pixelLimit) {
 
 		if (pixelLimit >= eroded_pixels.size()) {
 			targetReached = true;
-			//cout << "Saving image...\n";
+			//cout << "Saving element collection + meta data...\n";
 			//savePlanarImageData("_autogenerated", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
 		}
 		else {

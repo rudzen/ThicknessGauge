@@ -169,6 +169,7 @@
     <ClInclude Include="Interpolate.h" />
     <ClInclude Include="InvalidFileException.h" />
     <ClInclude Include="IsValidFileName.h" />
+    <ClInclude Include="LineConfig.h" />
     <ClInclude Include="PointData.h" />
     <ClInclude Include="Q.h" />
     <ClInclude Include="Specs.h" />

@@ -6,6 +6,7 @@
 #include "_cv.h"
 #include "Interpolate.h"
 #include "Bezier.h"
+#include "LineConfig.h"
 
 using namespace std;
 using namespace _cv;
@@ -48,7 +49,6 @@ public:
 public:
 	MiniCalc();
 	~MiniCalc();
-
 
 	static double calculatePixelToMm(int pixels);
 
@@ -123,5 +123,76 @@ public:
 	bool generateGradientPlanarMap(Mat& image, vector<Point2d> planarPixels, vector<Vec3b>& gradientPixels);
 
 	uchar getGradientYValues(Mat& image, int x, int y, int maxY, int minY);
+
+	/**
+	 * \brief Computes mu
+	 * Simple mu computation helper function for use with Interpolate and Bezier calculations
+	 * \param currentPosition The current position
+	 * \param inBetweenCount How many points there are in the source position and the target position
+	 * \return The computed mu
+	 */
+	static double computeMu(double currentPosition, double inBetweenCount) {
+		return currentPosition / inBetweenCount;
+	}
+
+	/**
+	 * \brief Computes lines between two points
+	 * \param currentPoint The source point
+	 * \param targetPoint The destination point
+	 * \param result The resulting vector of points which makes up the line
+	 * \return true if the result is not empty, otherwise false
+	 */
+	static bool computeSimpleLine(cv::Point& currentPoint, cv::Point& targetPoint, vi& result) {
+
+
+
+	}
+
+
+	/**
+	 * \brief Computes a line from a vector of pixels points
+	 * \param pixels The pixels to calculate the line from
+	 * \param result The resulting line
+	 * \return true if line was created, otherwise false
+	 */
+	static bool computerCompleteLine(vi& pixels, cv::Vec4f& result, LineConfig& config) {
+		cv::fitLine(pixels, result, config.getDistType(), config.getParams(), config.getReps(), config.getAepa());
+		return true;
+	}
+
+
+	/**
+	 * \brief Crude cutoff of pixels from image based on Y
+	 * \param image The image data
+	 * \param output The output vector
+	 * \param yLimit The limit in height
+	 * \return true if something was found, otherwise false
+	 */
+	static bool getActualPixels(Mat& image, vi& output, int yLimit) {
+		vi result;
+		cv::findNonZero(image, result);
+		yLimit = abs(image.rows - yLimit);
+		for (auto& p : result) {
+			if (p.y <= yLimit)
+				output.push_back(p);
+		}
+		return !output.empty();
+	}
+
+	static bool getActualPixels(vi& pixels, vi&target, int yLimit, int imageHeight) {
+		if (!target.empty())
+			target.clear();
+
+		yLimit = abs(imageHeight - yLimit);
+
+		for (auto& p : pixels) {
+			if (p.y <= yLimit)
+				target.push_back(p);
+		}
+
+		return !target.empty();
+	}
+
+
 
 };

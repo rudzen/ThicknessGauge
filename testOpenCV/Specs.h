@@ -35,7 +35,7 @@ public:
 	int DefaultHeight() const;
 	int DefaultWidth() const;
 
-	double getPixelStrengths(cv::Mat& image, vi& pixels, int x);
+	double getPixelStrengths(cv::Mat& image, vi& pixels, int x) const;
 
 	double getNonBaseLine(cv::Mat& image, int baseLine);
 
@@ -53,7 +53,7 @@ inline int Specs::DefaultWidth() const {
 	return defaultWidth_;
 }
 
-inline double Specs::getPixelStrengths(cv::Mat& image, vi& pixels, int x) {
+inline double Specs::getPixelStrengths(cv::Mat& image, vi& pixels, int x) const {
 
 	MiniCalc miniCalc;
 

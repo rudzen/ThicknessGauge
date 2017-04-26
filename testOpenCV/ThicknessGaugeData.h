@@ -9,9 +9,8 @@ protected:
 
 	// The pixels located in the image
 	vi pixels_;
-
-	vd allPixels_;
-	vd measureLine_;
+	vi allPixels_;
+	vi measureLine_;
 	vd rightSideLine_;
 	vd leftSideLine_;
 	vd intensity_;
@@ -19,6 +18,13 @@ protected:
 	vector<p> lines_;
 	p center_;
 
+	LineConfig lineConfig_;
+
+	Vec4f gaugeLine_;
+
+	double avgGaugeHeight_;
+
+	bool gaugeLineSet_;
 
 public:
 	void setImageType(int imageType);
@@ -39,7 +45,8 @@ protected:
 
 public:
 
-	ThicknessGaugeData(): imageType_(0), rightMean_(0), leftMean_(0) { }
+	ThicknessGaugeData(): avgGaugeHeight_(0), gaugeLineSet_(false), imageType_(0), rightMean_(0), leftMean_(0) {
+	}
 
 	cv::Mat& GetPlanarImage();
 
@@ -50,8 +57,8 @@ public:
 	double getLeftMean() const;
 
 	const vi& getPixels() const;
-	const vd& getAllPixels() const;
-	const vd& getMeasureLine() const;
+	const vi& getAllPixels() const;
+	const vi& getMeasureLine() const;
 	const vd& getRightSideLine() const;
 	const vd& getLeftSideLine() const;
 	const vd& getIntensity() const;
@@ -92,11 +99,11 @@ inline const vi& ThicknessGaugeData::getPixels() const {
 	return pixels_;
 }
 
-inline const vd& ThicknessGaugeData::getAllPixels() const {
+inline const vi& ThicknessGaugeData::getAllPixels() const {
 	return allPixels_;
 }
 
-inline const vd& ThicknessGaugeData::getMeasureLine() const {
+inline const vi& ThicknessGaugeData::getMeasureLine() const {
 	return measureLine_;
 }
 

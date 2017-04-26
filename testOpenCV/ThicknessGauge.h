@@ -110,6 +110,10 @@ public: // basic stuff to extract information
 
 	void sumColumns(cv::Mat& image, cv::Mat& target);
 
+	void computeAllElements(Mat& image);
+
+	void computerGaugeLine(Mat& output);
+
 public: // getters and setters
 
 	int getFrameCount() const;

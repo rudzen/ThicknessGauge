@@ -12,18 +12,16 @@ public:
 	PointData(const p center, const p lowerCenter, const p upperCenter)
 		: center_(center),
 		  lowerCenter_(lowerCenter),
-		  upperCenter_(upperCenter) {
+		  upperCenter_(upperCenter), centerDist(0) {
 	}
 
 private:
 
-	
 	p center_;
 	p lowerCenter_;
 	p upperCenter_;
 
 	double centerDist;
-
 
 public:
 	const p& Center() const;

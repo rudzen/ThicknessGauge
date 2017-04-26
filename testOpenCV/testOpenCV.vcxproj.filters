@@ -167,6 +167,9 @@
     <ClInclude Include="Bezier.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
+    <ClInclude Include="LineConfig.h">
+      <Filter>Header Files\CV\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />
