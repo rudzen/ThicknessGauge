@@ -281,7 +281,6 @@ public:
 
 		v2<double> sum;
 		auto gab = false;
-		auto result = false;
 
 		for (auto i = first; i < size; ++i) {
 			if (elements[i].y > target.rows - barrier)
@@ -304,15 +303,11 @@ public:
 				line(target, elements[i], elements[i + 1], Scalar(255, 255, 255), 1, LINE_AA);
 				sum.x += abs(elements[i + 1].x - elements[i].x);
 				sum.y += abs(elements[i + 1].y - elements[i].y);
-				result = true;
 			}
 			gab ^= true;
 		}
 
-		if (result)
-			return sum;
-
-		return v2<double>(0.0, 0.0);
+		return sum;
 	}
 
 	static double computeYSum(vi& elements) {

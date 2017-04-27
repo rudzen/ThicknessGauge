@@ -147,6 +147,10 @@ public:
 		return det(that) == 0 ? 1 : 0;
 	}
 
+	virtual bool hasValue() {
+		return this->x != 0 || this->y != 0;
+	}
+
 };
 
 template<class T>
@@ -211,6 +215,10 @@ public:
 
 	T angle(const v3 &that) {
 		return v3<T>(this->x, this->y, this->z) * that / (len() * that.len());
+	}
+
+	bool hasValue() override {
+		return this->x != 0 || this->y != 0 || this->z != 0;
 	}
 
 };

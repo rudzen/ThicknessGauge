@@ -5,6 +5,7 @@
 #include "ImageSave.h"
 #include "CaptureFailException.h"
 #include "Specs.h"
+#include <array>
 
 int ThicknessGauge::getBaseLine() const {
 	return baseLine_;
@@ -147,7 +148,6 @@ bool ThicknessGauge::generatePlanarImage() {
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
 
-	Point textPoint(100, 100);
 	Size blurSize(3, 3);
 
 	const auto alpha = 0.5;
@@ -172,11 +172,17 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	ImageSave is("pic_x", SaveType::Image_Png, Information::Basic);
 
-	const int arrayLimit = 512; // shit c++11 ->
+	const auto arrayLimit = 512; // shit c++11 ->
 
 	Mat frame;
-	Mat outputs[arrayLimit];
-	vi pix_planarMap[arrayLimit];
+	vector<Mat> outputs(frameCount_);
+	vector<vi> pix_Planarmap(frameCount_ * 2); // using double of these for testing
+	vector<v2<double>> gabs(frameCount_);
+
+	//array<Mat, arrayLimit> outputs;
+	//array<vi, arrayLimit> pix_planarMap;
+	//array<v2<int>, arrayLimit> gabs;
+
 	vi nonZero;
 
 	// capture first frame
@@ -221,7 +227,6 @@ bool ThicknessGauge::generatePlanarImage() {
 		//createTrackbar("Kernel size: 2n +1", dilationWindowName, &dilation_size, max_ed_kernel_size);
 	}
 
-
 	// test for video recording
 	if (saveVideo_) {
 		is.SetInformation(Information::Full);
@@ -237,9 +242,13 @@ bool ThicknessGauge::generatePlanarImage() {
 	vector<Point2d> test_subPix;
 
 	// configure output stuff
-	for (auto i = 0; i < frameCount_; ++i) {
-		pix_planarMap[i].reserve(imageSize_.width);
+	for (auto& p : pix_Planarmap) {
+		p.reserve(imageSize_.width);
 	}
+
+	//for (auto i = 0; i < frameCount_; ++i) {
+	//	pix_planarMap[i].reserve(imageSize_.width);
+	//}
 
 	// start the process of gathering information for set frame count
 
@@ -250,7 +259,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		for (auto i = 0; i < frameCount_; ++i) {
 
 			outputs[i] = Mat::zeros(imageSize_, CV_8UC1);
-			pix_planarMap[i].clear();
+			pix_Planarmap.at(i).clear();
 
 			cap >> frame;
 
@@ -272,15 +281,18 @@ bool ThicknessGauge::generatePlanarImage() {
 			if (showWindows_) imshow(outputWindowName, frame);
 
 			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
-			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_planarMap[i], test_subPix);
+			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_Planarmap.at(i), test_subPix);
 
 			if (!generateOk) {
 				cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
 				break;
 			}
 
-			findNonZero(outputs[i], pix_planarMap[arrayLimit - (1 + i)]);
-			if (miniCalc.fillElementGabs(pix_planarMap[arrayLimit - (1 + i)], outputs[i], baseLine_)) {
+			findNonZero(outputs[i], pix_Planarmap[arrayLimit - (1 + i)]);
+			gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i], baseLine_));
+			if (gabs.back().hasValue()) {
+				// at least one gab was filled..
+
 				//Mat temp(pix_planarMap[arrayLimit - (1 + i)]);
 				//cout << "TEMP cols " << temp.cols << endl;
 				//imshow("temp", temp);
