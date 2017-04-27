@@ -290,7 +290,7 @@ uchar MiniCalc::getGradientYValues(Mat& image, int x, int y, int maxY, int minY)
 }
 
 
-double MiniCalc::calculatePixelToMm(int pixelLocation) {
+double MiniCalc::calculatePixelToMm(double pixelLocation) {
 	Specs s;
 	return s.PixMm() * pixelLocation;
 }

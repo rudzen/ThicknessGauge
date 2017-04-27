@@ -70,7 +70,8 @@ void ThicknessGauge::skeleton(Mat* image) {
 		eroded.copyTo(*image);
 
 		done = (countNonZero(*image) == 0);
-	} while (!done);
+	}
+	while (!done);
 }
 
 void ThicknessGauge::drawPlarnarPixels(Mat& targetImage, vector<Point>& planarMap) const {
@@ -144,6 +145,92 @@ inline void ThicknessGauge::computeAllElements(Mat& image) {
 	findNonZero(image, allPixels_);
 }
 
+bool ThicknessGauge::computerBaseLine(const Mat& image) {
+
+	Mat dst, cdst;
+	Canny(image, dst, 20, 100, 3);
+	cvtColor(dst, cdst, CV_GRAY2BGR);
+
+	typedef pair<Point, Point> Points;
+
+	vector<Vec2f> hlines;
+	vector<Points> allHLines;
+	// detect lines
+	HoughLines(dst, hlines, 1, CV_PI / 180, lineThreshold_);
+
+	auto baseLineAvg = 0.0;
+	auto count = 0;
+
+	Rect roi(0, image.rows - (image.rows / 2), image.cols, image.rows / 2);
+
+	cout << "roi : " << roi << endl;
+
+	auto limit = image.rows - (image.rows / 8);
+
+	for (auto& l : hlines) {
+		auto theta = l[1];
+		if (theta > CV_PI / 180 * 89.99 && theta < CV_PI / 180 * 90.01) {
+			auto rho = l[0];
+			auto a = cos(theta);
+			auto b = sin(theta);
+			auto x0 = a * rho;
+			auto y0 = b * rho;
+			Point pt1(cvRound(x0 + 1000 * (-b)),
+			          cvRound(y0 + 1000 * (a)));
+			Point pt2(cvRound(x0 - 1000 * (-b)),
+			          cvRound(y0 - 1000 * (a)));
+			//if (roi.contains(pt1) && roi.contains(pt2)) {
+			if (pt1.y > limit && pt2.y > limit) {
+				count += 2;
+				//line(image, pt1, pt2, baseColour_, 2);
+				allHLines.push_back(Points(pt1, pt2));
+				baseLineAvg += pt1.y + pt2.y;
+			}
+		}
+	}
+
+	baseLine_ = (image.rows) - baseLineAvg / count;
+
+	// draw lines
+	//for (size_t i = 0; i < hlines.size(); i++) {
+	//	auto theta = hlines[i][1];
+	//	if (theta>CV_PI / 180 * 80 && theta<CV_PI / 180 * 100) {
+	//		auto rho = hlines[i][0];
+	//		auto a = cos(theta);
+	//		auto b = sin(theta);
+	//		auto x0 = a * rho;
+	//		auto y0 = b * rho;
+	//		Point pt1, pt2;
+	//		//pt1.x = cvRound(x0 + 1000 * (-b));
+	//		//pt1.y = cvRound(y0 + 1000 * (a));
+	//		pt2.x = cvRound(x0 - 1000 * (-b));
+	//		pt2.y = cvRound(y0 - 1000 * (a));
+	//		allHLines.push_back(v2<double>(pt2.x, pt2.y));
+	//	}
+	//}
+
+	// //squickly calc avg of hlines
+	//auto yavg = 0.0;
+	//for (auto& v : allHLines) {
+	//	yavg += v.y;
+	//}
+	//yavg /= allHLines.size();
+	//baseLine_ = (image.cols - yavg) / image.rows;
+
+
+	//cout << "baselineavg = " << baseLineAvg << endl;
+	////if (count > 0)
+	////baseLine_ = abs((image.rows / 2) - (baseLineAvg / count)) / 2;
+	//baseLine_ = image.cols - round(baseLineAvg / static_cast<double>(hlines.size()));
+
+	//cout << "baseLine_ = " << baseLine_ << endl;
+
+	////cout << "baseLine_ = " << baseLine_ << '\n';
+	////baseLine_ = output.cols - static_cast<int>(round(baseLineAvg));
+
+	return baseLine_ != 0.0;
+}
+
 bool ThicknessGauge::generatePlanarImage() {
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
@@ -152,9 +239,6 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	const auto alpha = 0.5;
 	const auto beta = 1.0 - alpha;
-
-	auto thres = binaryThreshold_; // default threshold.
-	//auto baseLine = baseLine_; // baseline default.
 
 	auto line_fraction = 0;
 	auto line_thickness = 1;
@@ -175,12 +259,12 @@ bool ThicknessGauge::generatePlanarImage() {
 	const auto arrayLimit = 512; // shit c++11 ->
 
 	Mat frame;
-	vector<Mat> outputs(frameCount_);
-	vector<vi> pix_Planarmap(frameCount_ * 2); // using double of these for testing
+	//vector<Mat> outputs(frameCount_);
+	//vector<vi> pix_Planarmap(frameCount_ * 2); // using double of these for testing
 	vector<v2<double>> gabs(frameCount_);
 
-	//array<Mat, arrayLimit> outputs;
-	//array<vi, arrayLimit> pix_planarMap;
+	array<Mat, arrayLimit> outputs;
+	array<vi, arrayLimit> pix_Planarmap;
 	//array<v2<int>, arrayLimit> gabs;
 
 	vi nonZero;
@@ -194,31 +278,35 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	const string inputWindowName = "GC2450 feed";
 	const string outputWindowName = "GC2450 manipulated";
-	const string line1WindowName = "GC2450 singular frame mean intensity";
-	const string line2WindowName = "GC2450 raw adding of means over time";
+	const string line1WindowName = "frame";
+	const string line2WindowName = "hlines";
 	const string line3WindowName = "GC2450 weighted means over time";
 	const string cornerWindowName = "GC2450 Corner View";
 	const string erodeWindowName = "Erosion";
 	const string dilationWindowName = "Dilation";
+
 	if (showWindows_) {
-		namedWindow(inputWindowName, WINDOW_AUTOSIZE);
-		createTrackbar("Threshold", inputWindowName, &thres, 254);
-		createTrackbar("Base Line", inputWindowName, &baseLine_, imageSize_.height);
+		namedWindow(inputWindowName, WINDOW_KEEPRATIO);
+		createTrackbar("BThreshold", inputWindowName, &binaryThreshold_, 254);
+		createTrackbar("HThreshold", inputWindowName, &lineThreshold_, 255);
+		//createTrackbar("Base Line", inputWindowName, &baseLine_, imageSize_.height);
 		createTrackbar("Height Line", inputWindowName, &heightLine, (imageSize_.width * 2) - 1);
 
-		namedWindow(outputWindowName, WINDOW_AUTOSIZE);
+		namedWindow(outputWindowName, WINDOW_KEEPRATIO);
 
-		//namedWindow(line1WindowName);
+		namedWindow(line1WindowName, WINDOW_KEEPRATIO);
+
 		////createTrackbar("Frac", line1WindowName, &line_fraction, 4);
 		////createTrackbar("Thick", line1WindowName, &line_thickness, 5);
 
-		//namedWindow(line2WindowName, WINDOW_AUTOSIZE);
+		//namedWindow(line2WindowName, WINDOW_KEEPRATIO);
+
 
 		//namedWindow(line3WindowName, WINDOW_AUTOSIZE);
 
 		//namedWindow(cornerWindowName, WINDOW_AUTOSIZE);
 
-		namedWindow(erodeWindowName, WINDOW_AUTOSIZE);
+		namedWindow(erodeWindowName, WINDOW_KEEPRATIO);
 		//createTrackbar("Element:", erodeWindowName, &erosion_type, max_ed_elem);
 		//createTrackbar("Kernel size: 2n +1", erodeWindowName, &erosion_size, max_ed_kernel_size);
 
@@ -242,13 +330,9 @@ bool ThicknessGauge::generatePlanarImage() {
 	vector<Point2d> test_subPix;
 
 	// configure output stuff
-	for (auto& p : pix_Planarmap) {
-		p.reserve(imageSize_.width);
+	for (auto i = 0; i < frameCount_; ++i) {
+		pix_Planarmap[i].reserve(imageSize_.width);
 	}
-
-	//for (auto i = 0; i < frameCount_; ++i) {
-	//	pix_planarMap[i].reserve(imageSize_.width);
-	//}
 
 	// start the process of gathering information for set frame count
 
@@ -264,15 +348,21 @@ bool ThicknessGauge::generatePlanarImage() {
 			cap >> frame;
 
 			// show default input image (always shown live!)
-			if (showWindows_) imshow(inputWindowName, frame);
-
+			if (showWindows_) {
+				imshow(inputWindowName, frame);
+				if (showWindows_) {
+					auto key = static_cast<char>(waitKey(10));
+					if (key == 27)
+						return true; // esc
+				}
+			}
 			// do basic in-place binary threshold
-			threshold(frame, frame, thres, 255, CV_THRESH_BINARY);
+			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
 
 			equalizeHist(frame, frame);
 
 			// blur in-place
-			GaussianBlur(frame, frame, Size(7,5), 10, 2, BORDER_DEFAULT);
+			GaussianBlur(frame, frame, Size(7, 5), 10, 2, BORDER_DEFAULT);
 
 			// perform some stuff
 			//laplace(frame);
@@ -289,7 +379,8 @@ bool ThicknessGauge::generatePlanarImage() {
 			}
 
 			findNonZero(outputs[i], pix_Planarmap[arrayLimit - (1 + i)]);
-			gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i], baseLine_));
+			//gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i], baseLine_));
+			gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i]));
 			if (gabs.back().hasValue()) {
 				// at least one gab was filled..
 
@@ -335,7 +426,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		erosion_image.release();
 
 		/* end test stuff */
-		
+
 		resize(output, frame, output.size() * 2, 0, 0, INTER_LANCZOS4);
 
 		GaussianBlur(frame, output, blurSize, 10, 10, BORDER_CONSTANT);
@@ -356,31 +447,38 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		computerGaugeLine(output);
 
+		if (!computerBaseLine(output))
+			cerr << "Error while computing baseline..\n";
+
 		if (showWindows_) {
 			//Specs s;
 			//s.getPixelStrengths(output, allPixels_, heightLine);
 			//auto lulu = s.getNonBaseLine(output, baseLine_);
 			//line(output, Point(0, lulu), Point(output.cols, lulu), baseColour_);
 
+			//line(output, Point(0, baseLine_), Point(output.cols, baseLine_), baseColour_);
+
 			line(output, Point(heightLine, 0), Point(heightLine, output.rows), baseColour_);
-
 			drawHorizontalLine(&output, baseLine_, baseColour_);
-
 		}
 
-		if (showWindows_) imshow(erodeWindowName, output);
+
+		if (showWindows_) {
+			imshow(erodeWindowName, output);
+			//imshow(line2WindowName, cdst);
+		}
 
 		frameTime_ = getTickCount() - time_begin;
 
 		//cout << "Y avr for heightline : " << getYPixelsAvg(frame, heightLine) << endl;
 
-
 		//cout << "Saving image...\n";
-		//is.SaveImage(&frame, "_testoutput" + to_string(frameCount_));
-		//savePlanarImageData("_testoutput", eroded_pixels, frame, frame.rows - getHighestYpixel(frame));
+		//is.UpdateTimeStamp();
+		//is.SaveImage(&output, "_testoutput" + to_string(frameCount_));
+		//savePlanarImageData("_testoutput", allPixels_, output, highestPixel);
 
 		if (showWindows_) {
-			auto key = static_cast<char>(waitKey(1));
+			auto key = static_cast<char>(waitKey(10));
 			if (key == 27)
 				break; // esc
 		}
@@ -487,11 +585,13 @@ void ThicknessGauge::computerGaugeLine(Mat& output) {
 				line(output, Point2f(aboveLine.front().x + gaugeLine_[0], gaugeLine_[3]), Point2f(aboveLine.back().x, gaugeLine_[3]), baseColour_, 1, LINE_AA);
 				cout << "Average line height : " << output.rows - avgGaugeHeight_ << " elements.\n";
 			}
-		} else {
+		}
+		else {
 			gaugeLineSet_ = false;
 			cout << "Failed to generate fitted line.\n";
 		}
-	} else {
+	}
+	else {
 		gaugeLineSet_ = false;
 		cout << "Failed to retrive elements above line.\n";
 	}
@@ -533,7 +633,8 @@ void ThicknessGauge::drawText(Mat* image, const string text, TextDrawPosition po
 }
 
 void ThicknessGauge::drawHorizontalLine(Mat* image, unsigned int pos, Scalar colour) {
-	line(*image, Point(0, image->rows - pos), Point(image->cols, image->rows - pos), colour);
+	cout << "line drawn at : " << pos << endl;
+	line(*image, Point(0, image->rows - pos), Point(image->cols, image->rows - pos), colour, 1, LINE_AA);
 }
 
 void ThicknessGauge::drawCenterAxisLines(Mat* image, Scalar& colour) {

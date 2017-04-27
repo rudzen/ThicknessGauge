@@ -19,12 +19,14 @@ The main controller class
 class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
-	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(75), baseLine_(24) {
+	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(75), lineThreshold_(100), baseLine_(24) {
 		baseColour_ = CV_RGB(255, 255, 255);
 		settings.ddepth = CV_8S;
 	}
 
 private:
+
+	const double PIangle = CV_PI / 180;
 
 	map<WindowType, string> m_WindowNames = {{WindowType::Input, "Camera Input"},{WindowType::Output, "Output"},{WindowType::Temp, "Temp"}};
 
@@ -63,6 +65,8 @@ private:
 	//int ddepth_ = CV_16S;
 
 	int binaryThreshold_;
+
+	int lineThreshold_;
 
 	int baseLine_;
 
@@ -104,6 +108,8 @@ public: // basic stuff to extract information
 	double getYPixelsAvg(Mat& image, int x);
 	int getAllPixelSum(Mat& image, int x);
 	int getHighestYPixel(Mat& image, int x);
+
+	bool computerBaseLine(const Mat& mat);
 
 	bool generatePlanarImage();
 
