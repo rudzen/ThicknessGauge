@@ -146,6 +146,16 @@ public:
 
 	}
 
+	/**
+	 * \brief Right edge detection\n
+	 * Retrieve the right edge of the part to be measured
+	 * by looking at the center of the elements and tracking them towards the right edge until
+	 * the baseLevel is hit.
+	 * \param elements The current data elements
+	 * \param imageHeight The image height
+	 * \param baseLevel The base level of the entirety of the data
+	 * \return The point where the elements to be measured are below baseline
+	 */
 	cv::Point getRightEdge(vi& elements, int imageHeight, int baseLevel) const {
 
 		sort(elements.begin(), elements.end(), sortX);
@@ -162,6 +172,16 @@ public:
 		return Point(0, imageHeight);
 	}
 
+	/**
+	* \brief Left edge detection\n
+	* Retrieve the left edge of the part to be measured
+	* by looking at the center of the elements and tracking them backwards to the left edge until
+	* the baseLevel is hit.
+	* \param elements The current data elements
+	* \param imageHeight The image height
+	* \param baseLevel The base level of the entirety of the data
+	* \return The point where the elements to be measured are below baseline
+	*/
 	cv::Point getLeftEdge(vi& elements, int imageHeight, int baseLevel) const {
 
 		sort(elements.begin(), elements.end(), sortX);
@@ -178,6 +198,14 @@ public:
 		return Point(0, imageHeight);
 	}
 
+	/**
+	 * \brief Compute the location of the elements on the left side of measuring target
+	 * \param elements All current elements
+	 * \param targetElements The resulting elements will be stored here
+	 * \param leftEdge The left edge
+	 * \param imageWidth The width of the image
+	 * \param sortElements if true, the source elements will be sorted, otherwise they wont
+	 */
 	void computeLeftElements(vi& elements, vi& targetElements, int leftEdge, int imageWidth, bool sortElements) const {
 
 		if (sortElements)
@@ -199,6 +227,13 @@ public:
 		}
 	}
 
+	/**
+	* \brief Compute the location of the elements on the right side of measuring target
+	* \param elements All current elements
+	* \param targetElements The resulting elements will be stored here
+	* \param rightEdge The right edge
+	* \param sortElements if true, the source elements will be sorted, otherwise they wont
+	*/
 	void computeRightElements(vi& elements, vi& targetElements, int rightEdge, bool sortElements) const {
 		
 		if (sortElements)
@@ -222,11 +257,14 @@ public:
 
 	}
 
-
-	bool fillElementGabs(vi& elements, cv::Mat& target, int barrier) const {
-
-		auto gab = false;
-		auto result = false;
+	/**
+	 * \brief Fills the gabs in the elements with simple linear lines
+	 * \param elements The elements to fill gabs in
+	 * \param target The target matrix
+	 * \param barrier The current known location of the baseLevel, default is 0, which means all gabs will be filled
+	 * \return Vector (2D) representing the number of elements filled in both X and Y
+	 */
+	v2<double> fillElementGabs(vi& elements, cv::Mat& target, int barrier = 0) const {
 
 		elements.push_back(Point(0, target.rows));
 		elements.push_back(Point(target.cols, target.rows));
@@ -241,9 +279,13 @@ public:
 
 		vector<Point> gabLine;
 
+		v2<double> sum;
+		auto gab = false;
+		auto result = false;
+
 		for (auto i = first; i < size; ++i) {
-			//if (elements[i].y > barrier)
-			//	continue;
+			if (elements[i].y > target.rows - barrier)
+				continue;
 			if (i + 1 == size)
 				break;
 			auto posX = elements[i].x;
@@ -260,22 +302,17 @@ public:
 			}
 			if (gab) {
 				line(target, elements[i], elements[i + 1], Scalar(255, 255, 255), 1, LINE_AA);
+				sum.x += abs(elements[i + 1].x - elements[i].x);
+				sum.y += abs(elements[i + 1].y - elements[i].y);
 				result = true;
 			}
 			gab ^= true;
 		}
 
+		if (result)
+			return sum;
 
-		//if (gabLine.empty())
-		//	return false;
-
-		//cout << "gab detected.." << gabLine.size() << endl;
-
-		//elements = gabLine;
-
-		// remove temporary added element
-		//elements.erase(elements.end());
-		return result;
+		return v2<double>(0.0, 0.0);
 	}
 
 	static double computeYSum(vi& elements) {
