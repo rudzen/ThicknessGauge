@@ -7,11 +7,11 @@
 #include "Specs.h"
 #include <array>
 
-int ThicknessGauge::getBaseLine() const {
+double ThicknessGauge::getBaseLine() const {
 	return baseLine_;
 }
 
-void ThicknessGauge::setBaseLine(int baseLine) {
+void ThicknessGauge::setBaseLine(double baseLine) {
 	baseLine_ = baseLine;
 }
 
@@ -78,18 +78,6 @@ void ThicknessGauge::drawPlarnarPixels(Mat& targetImage, vector<Point>& planarMa
 	polylines(targetImage, planarMap, false, Scalar(255, 255, 255), 2);
 }
 
-int ThicknessGauge::getHighestYpixel(Mat& image) {
-	auto highest = image.rows;
-	vector<Point> pix;
-	findNonZero(image, pix);
-
-	for (auto& p : pix) {
-		if (p.y < highest)
-			highest = p.y;
-	}
-	return highest;
-}
-
 int ThicknessGauge::getHighestYpixel(Mat& image, int x) const {
 	auto highest = image.rows;
 	vector<Point> pix;
@@ -97,14 +85,37 @@ int ThicknessGauge::getHighestYpixel(Mat& image, int x) const {
 
 	sort(pix.begin(), pix.end(), miniCalc.sortX);
 
+	auto intensitySum = 0.0;
+	auto yAvg = 0.0;
+
+	vector<Point> elements;
+	
+	// grab all elements from the specific col
 	for (auto& p : pix) {
 		if (p.x < x)
 			continue;
 		if (p.x > x)
 			break;
-		if (p.y < highest)
-			highest = p.y;
+		elements.push_back(p);
 	}
+
+	auto highestIntensity = 0;
+
+	for (auto& e : elements) {
+		auto intensity = getElementIntensity(image, e);
+		intensitySum += intensity;
+		if (intensity > highestIntensity)
+			highest = e.y;
+		yAvg += e.y;
+	}
+
+	intensitySum /= elements.size();
+	yAvg /= elements.size();
+
+	cout << "Intensity avg/x " << intensitySum << "/" << x << endl;
+	cout << "yAvg/x " << yAvg << "/" << x << endl;
+
+
 	return highest;
 }
 
@@ -124,6 +135,16 @@ int ThicknessGauge::getAllPixelSum(Mat& image) {
 	}
 	return sum;
 }
+
+uchar ThicknessGauge::getElementIntensity(Mat& image, Point& point) {
+	return image.at<uchar>(point);
+}
+
+uchar ThicknessGauge::getElementIntensity(Mat& image, v2<int> &point) const {
+	Point p(point.x, point.y);
+	return getElementIntensity(image, p);
+}
+
 
 double ThicknessGauge::getYPixelsAvg(Mat& image, int x) {
 	auto sum = 0;
@@ -145,7 +166,7 @@ inline void ThicknessGauge::computeAllElements(Mat& image) {
 	findNonZero(image, allPixels_);
 }
 
-bool ThicknessGauge::computerBaseLine(const Mat& image) {
+bool ThicknessGauge::computerBaseLine(const Mat& image, double limit) {
 
 	Mat dst, cdst;
 	Canny(image, dst, 20, 100, 3);
@@ -163,9 +184,12 @@ bool ThicknessGauge::computerBaseLine(const Mat& image) {
 
 	Rect roi(0, image.rows - (image.rows / 2), image.cols, image.rows / 2);
 
-	cout << "roi : " << roi << endl;
+	//cout << "roi : " << roi << endl;
 
-	auto limit = image.rows - (image.rows / 8);
+	//double limit = image.rows / 2;
+
+	// adjust limit
+	limit += image.rows / 2;
 
 	for (auto& l : hlines) {
 		auto theta = l[1];
@@ -179,17 +203,20 @@ bool ThicknessGauge::computerBaseLine(const Mat& image) {
 			          cvRound(y0 + 1000 * (a)));
 			Point pt2(cvRound(x0 - 1000 * (-b)),
 			          cvRound(y0 - 1000 * (a)));
+
 			//if (roi.contains(pt1) && roi.contains(pt2)) {
 			if (pt1.y > limit && pt2.y > limit) {
+				cout << "pt1.y : " << pt1.y << endl;
 				count += 2;
-				//line(image, pt1, pt2, baseColour_, 2);
 				allHLines.push_back(Points(pt1, pt2));
 				baseLineAvg += pt1.y + pt2.y;
+				//line(image, pt1, pt2, baseColour_, 1);
 			}
 		}
 	}
 
 	baseLine_ = (image.rows) - baseLineAvg / count;
+	cout << "new baseline : " << baseLine_ << endl;
 
 	// draw lines
 	//for (size_t i = 0; i < hlines.size(); i++) {
@@ -375,7 +402,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			if (!generateOk) {
 				cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
-				break;
+				continue;
 			}
 
 			findNonZero(outputs[i], pix_Planarmap[arrayLimit - (1 + i)]);
@@ -422,7 +449,8 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		//skeleton(&output);
 		auto erosion_image = this->erosion(output, erosion_type, erosion_size);
-		bilateralFilter(erosion_image, output, 1, 80, 20);
+		bilateralFilter(erosion_image, output, 1, 20, 10);
+		//bilateralFilter(erosion_image, output, 1, 80, 20);
 		erosion_image.release();
 
 		/* end test stuff */
@@ -436,7 +464,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		//resize(output, frame, frame.size() / 2, 0, 0, INTER_LANCZOS4);
 
 		// test for highest pixel for eroded image
-		double highestPixel = output.rows - getHighestYpixel(output, heightLine) - baseLine_;
+		auto highestPixel = output.rows - getHighestYpixel(output, heightLine) - baseLine_;
 		cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
 
 		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
@@ -447,7 +475,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		computerGaugeLine(output);
 
-		if (!computerBaseLine(output))
+		if (!computerBaseLine(output, highestPixel))
 			cerr << "Error while computing baseline..\n";
 
 		if (showWindows_) {
@@ -459,7 +487,7 @@ bool ThicknessGauge::generatePlanarImage() {
 			//line(output, Point(0, baseLine_), Point(output.cols, baseLine_), baseColour_);
 
 			line(output, Point(heightLine, 0), Point(heightLine, output.rows), baseColour_);
-			drawHorizontalLine(&output, baseLine_, baseColour_);
+			drawHorizontalLine(&output, Util::round(baseLine_), baseColour_);
 		}
 
 
@@ -582,7 +610,7 @@ void ThicknessGauge::computerGaugeLine(Mat& output) {
 			avgGaugeHeight_ = gaugeLine_[3];
 
 			if (showWindows_) {
-				line(output, Point2f(aboveLine.front().x + gaugeLine_[0], gaugeLine_[3]), Point2f(aboveLine.back().x, gaugeLine_[3]), baseColour_, 1, LINE_AA);
+				line(output, Point2f(aboveLine.front().x + Util::round(gaugeLine_[0]), gaugeLine_[3]), Point2f(aboveLine.back().x, Util::round(gaugeLine_[3])), baseColour_, 2, LINE_AA);
 				cout << "Average line height : " << output.rows - avgGaugeHeight_ << " elements.\n";
 			}
 		}
@@ -629,12 +657,12 @@ void ThicknessGauge::drawText(Mat* image, const string text, TextDrawPosition po
 		// oh noes..
 		break;
 	}
-	putText(*image, text, pos, 1, 1.0, CV_RGB(0, 0, 0), 2);
+	putText(*image, text, pos, 1, 1.0, baseColour_, 2);
 }
 
-void ThicknessGauge::drawHorizontalLine(Mat* image, unsigned int pos, Scalar colour) {
-	cout << "line drawn at : " << pos << endl;
-	line(*image, Point(0, image->rows - pos), Point(image->cols, image->rows - pos), colour, 1, LINE_AA);
+void ThicknessGauge::drawHorizontalLine(Mat* image, uint pos, Scalar colour) {
+	//cout << "line drawn at : " << pos << endl;
+	line(*image, Point(0, image->rows - pos), Point(image->cols, image->rows - pos), colour, 2, LINE_AA);
 }
 
 void ThicknessGauge::drawCenterAxisLines(Mat* image, Scalar& colour) {

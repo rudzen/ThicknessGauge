@@ -68,13 +68,13 @@ private:
 
 	int lineThreshold_;
 
-	int baseLine_;
+	double baseLine_;
 
 	Scalar baseColour_;
 
 public:
-	int getBaseLine() const;
-	void setBaseLine(int baseLine);
+	double getBaseLine() const;
+	void setBaseLine(double baseLine);
 	// opencv and misc settings objects
 
 	cv::VideoCapture cap;
@@ -102,14 +102,15 @@ public: // basic stuff to extract information
 
 	void drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const;
 
-	static int getHighestYpixel(cv::Mat& image);
 	int getHighestYpixel(Mat& image, int x) const;
 	int getAllPixelSum(Mat& image);
-	double getYPixelsAvg(Mat& image, int x);
+	static uchar getElementIntensity(Mat& image, Point& point);
+	uchar getElementIntensity(Mat& image, v2<int>& point) const;
+	static double getYPixelsAvg(Mat& image, int x);
 	int getAllPixelSum(Mat& image, int x);
 	int getHighestYPixel(Mat& image, int x);
 
-	bool computerBaseLine(const Mat& mat);
+	bool computerBaseLine(const Mat& mat, double limit);
 
 	bool generatePlanarImage();
 
@@ -149,9 +150,9 @@ public: // getters and setters
 
 public: // draw functions
 
-	static void drawText(cv::Mat* image, const string text, TextDrawPosition position);
+	void drawText(cv::Mat* image, const string text, TextDrawPosition position);
 
-	static void drawHorizontalLine(cv::Mat* image, unsigned int pos, cv::Scalar colour);
+	static void drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar colour);
 
 	static void drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour);
 
