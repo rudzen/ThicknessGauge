@@ -49,6 +49,15 @@ Point2d MiniCalc::mean(vector<Point>& pixels) {
 	return Point2d(resX / pixels.size(), resY / pixels.size());
 }
 
+double MiniCalc::mean(vector<double>& vec) {
+	auto sum = 0.0;
+	if (vec.empty())
+		return sum;
+	for (auto& v : vec)
+		sum += v;
+	return sum / vec.size();
+}
+
 double MiniCalc::meanX(vector<Point>& pixels) {
 	auto resX = 0.0;
 

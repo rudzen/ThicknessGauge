@@ -69,6 +69,8 @@ public:
 
 	static Point2d mean(vector<Point2i>& pixels);
 
+	static double mean(vector<double>& vec);
+
 	static double meanX(vector<Point2i>& pixels);
 
 	static double meanY(vector<Point2i>& pixels);
