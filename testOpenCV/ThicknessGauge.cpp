@@ -482,12 +482,12 @@ bool ThicknessGauge::generatePlanarImage() {
 			//}
 			
 
-			drawVerticalLine(&output, heightLine, baseColour_);
+			drawVerticalLine(&output, heightLine);
 			//line(output, cv::Point(heightLine, 0), cv::Point(heightLine, output.rows), baseColour_);
 
 
 			// calculated baseline test drawing
-			drawHorizontalLine(&output, Util::round(baseLine_), baseColour_);
+			drawHorizontalLine(&output, Util::round(baseLine_));
 		}
 
 		if (showWindows_) {
@@ -670,6 +670,15 @@ void ThicknessGauge::drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour) {
 	line(*image, Point(0, image->rows >> 1), Point(image->cols, image->rows >> 1), colour);
 	line(*image, Point(image->cols >> 1, 0), Point(image->cols >> 1, image->rows), colour);
 }
+
+void ThicknessGauge::drawHorizontalLine(cv::Mat* image, uint pos) const {
+	drawHorizontalLine(image, pos, baseColour_);
+}
+
+void ThicknessGauge::drawVerticalLine(cv::Mat* image, uint pos) const {
+	drawVerticalLine(image, pos, baseColour_);
+}
+
 
 void ThicknessGauge::GenerateInputQuad(cv::Mat* image, cv::Point2f* quad) {
 	// The 4 points that select quadilateral on the input , from top-left in clockwise order

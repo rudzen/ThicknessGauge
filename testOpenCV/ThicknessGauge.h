@@ -104,11 +104,17 @@ public: // basic stuff to extract information
 	void drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const;
 
 	int getHighestYpixel(cv::Mat& image, int x) const;
+
 	int getAllPixelSum(cv::Mat& image);
+
 	static uchar getElementIntensity(cv::Mat& image, cv::Point& point);
+
 	uchar getElementIntensity(cv::Mat& image, v2<int>& point) const;
+
 	static double getYPixelsAvg(cv::Mat& image, int x);
+
 	int getAllPixelSum(cv::Mat& image, int x);
+
 	int getHighestYPixel(cv::Mat& image, int x);
 
 	double computerBaseLine(const cv::Mat& mat, double limit);
@@ -153,10 +159,21 @@ public: // draw functions
 
 	void drawText(cv::Mat* image, const string text, TextDrawPosition position);
 
+	/**
+	 * \brief Draws a horizontal line on the parsed image
+	 * \param image The image to draw the line on
+	 * \param pos The position in Y where the line should be drawn
+	 * \param colour The scalar colour of the line
+	 */
 	static void drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar colour);
+
 	static void drawVerticalLine(cv::Mat* image, uint pos, cv::Scalar colour);
 
 	static void drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour);
+
+	void drawHorizontalLine(cv::Mat* image, uint pos) const;
+
+	void drawVerticalLine(cv::Mat* image, uint pos) const;
 
 public: // generate meta stuff
 
@@ -173,7 +190,9 @@ public: // misc quad temp stuff
 	static void WarpMeSomeCookies(cv::Mat* image, cv::Mat* output);
 
 	cv::Mat cornerHarris_test(cv::Mat& image, int threshold) const;
+
 	cv::Mat erosion(cv::Mat& input, int element, int size) const;
+
 	cv::Mat dilation(cv::Mat& input, int dilation, int size) const;
 
 private: // generic helper methods
