@@ -399,5 +399,8 @@ public:
 	}
 
 
+	bool computeDiags(cv::Mat& image, vector<cv::Mat>& diags);
+
+	bool computeDiagAvg(vector<cv::Mat>& diagonals, vd& output);
 
 };

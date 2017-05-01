@@ -1,11 +1,10 @@
 #include <algorithm>
+#include <array>
 #include "ThicknessGauge.h"
 #include "MiniCalc.h"
 #include "Util.h"
 #include "ImageSave.h"
 #include "CaptureFailException.h"
-#include "Specs.h"
-#include <array>
 
 double ThicknessGauge::getBaseLine() const {
 	return baseLine_;
@@ -23,7 +22,7 @@ void ThicknessGauge::initCalibrationSettings(string fileName) {
 	cs.readSettings(fileName);
 }
 
-void ThicknessGauge::gatherPixels(Mat& image) {
+void ThicknessGauge::gatherPixels(cv::Mat& image) {
 	findNonZero(image, pixels_);
 
 	for (auto& pixel_point : pixels_) {
@@ -36,30 +35,30 @@ void ThicknessGauge::gatherPixels(Mat& image) {
 	}
 }
 
-void ThicknessGauge::Blur(Mat& image, Size size) {
+void ThicknessGauge::Blur(cv::Mat& image, cv::Size size) {
 	GaussianBlur(image, image, size, 1.5, 1.5);
 }
 
-void ThicknessGauge::MeanReduction(Mat& image) {
+void ThicknessGauge::MeanReduction(cv::Mat& image) {
 	MeanReduction(image);
 }
 
-void ThicknessGauge::laplace(Mat& image) const {
-	Mat tmp;
+void ThicknessGauge::laplace(cv::Mat& image) const {
+	cv::Mat tmp;
 	Laplacian(image, tmp, settings.ddepth, settings.kernelSize); // , scale, delta, BORDER_DEFAULT);
 	convertScaleAbs(tmp, image);
 }
 
-void ThicknessGauge::sobel(Mat& image) const {
-	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, BORDER_DEFAULT);
+void ThicknessGauge::sobel(cv::Mat& image) const {
+	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, cv::BORDER_DEFAULT);
 }
 
-void ThicknessGauge::skeleton(Mat* image) {
-	Mat skel(image->size(), CV_8UC1, Scalar(0));
-	Mat temp;
-	Mat eroded;
+void ThicknessGauge::skeleton(cv::Mat* image) {
+	cv::Mat skel(image->size(), CV_8UC1, cv::Scalar(0));
+	cv::Mat temp;
+	cv::Mat eroded;
 
-	auto element = getStructuringElement(MORPH_CROSS, Size(3, 3));
+	auto element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
 
 	bool done;
 	do {
@@ -74,13 +73,13 @@ void ThicknessGauge::skeleton(Mat* image) {
 	while (!done);
 }
 
-void ThicknessGauge::drawPlarnarPixels(Mat& targetImage, vector<Point>& planarMap) const {
-	polylines(targetImage, planarMap, false, Scalar(255, 255, 255), 2);
+void ThicknessGauge::drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const {
+	cv::polylines(targetImage, planarMap, false, cv::Scalar(255, 255, 255), 2);
 }
 
-int ThicknessGauge::getHighestYpixel(Mat& image, int x) const {
+int ThicknessGauge::getHighestYpixel(cv::Mat& image, int x) const {
 	auto highest = image.rows;
-	vector<Point> pix;
+	vector<cv::Point> pix;
 	findNonZero(image, pix);
 
 	sort(pix.begin(), pix.end(), miniCalc.sortX);
@@ -88,7 +87,7 @@ int ThicknessGauge::getHighestYpixel(Mat& image, int x) const {
 	auto intensitySum = 0.0;
 	auto yAvg = 0.0;
 
-	vector<Point> elements;
+	vector<cv::Point> elements;
 	
 	// grab all elements from the specific col
 	for (auto& p : pix) {
@@ -109,17 +108,17 @@ int ThicknessGauge::getHighestYpixel(Mat& image, int x) const {
 		yAvg += e.y;
 	}
 
-	intensitySum /= elements.size();
-	yAvg /= elements.size();
+	//intensitySum /= elements.size();
+	//yAvg /= elements.size();
 
-	cout << "Intensity avg/x " << intensitySum << "/" << x << endl;
-	cout << "yAvg/x " << yAvg << "/" << x << endl;
+	//cout << "Intensity avg/x " << intensitySum << "/" << x << endl;
+	//cout << "yAvg/x " << yAvg << "/" << x << endl;
 
 
 	return highest;
 }
 
-int ThicknessGauge::getAllPixelSum(Mat& image) {
+int ThicknessGauge::getAllPixelSum(cv::Mat& image) {
 
 	auto sum = 0;
 	auto uc_pixel = image.data;
@@ -136,17 +135,17 @@ int ThicknessGauge::getAllPixelSum(Mat& image) {
 	return sum;
 }
 
-uchar ThicknessGauge::getElementIntensity(Mat& image, Point& point) {
+uchar ThicknessGauge::getElementIntensity(cv::Mat& image, cv::Point& point) {
 	return image.at<uchar>(point);
 }
 
-uchar ThicknessGauge::getElementIntensity(Mat& image, v2<int> &point) const {
-	Point p(point.x, point.y);
+uchar ThicknessGauge::getElementIntensity(cv::Mat& image, v2<int> &point) const {
+	cv::Point p(point.x, point.y);
 	return getElementIntensity(image, p);
 }
 
 
-double ThicknessGauge::getYPixelsAvg(Mat& image, int x) {
+double ThicknessGauge::getYPixelsAvg(cv::Mat& image, int x) {
 	auto sum = 0;
 	auto count = 0;
 	auto col = image.col(x);
@@ -162,19 +161,19 @@ double ThicknessGauge::getYPixelsAvg(Mat& image, int x) {
 	return sum / count;
 }
 
-inline void ThicknessGauge::computeAllElements(Mat& image) {
+inline void ThicknessGauge::computeAllElements(cv::Mat& image) {
 	findNonZero(image, allPixels_);
 }
 
-bool ThicknessGauge::computerBaseLine(const Mat& image, double limit) {
+double ThicknessGauge::computerBaseLine(const cv::Mat& image, double limit) {
 
-	Mat dst, cdst;
+	cv::Mat dst, cdst;
 	Canny(image, dst, 20, 100, 3);
 	cvtColor(dst, cdst, CV_GRAY2BGR);
 
-	typedef pair<Point, Point> Points;
+	typedef pair<cv::Point, cv::Point> Points;
 
-	vector<Vec2f> hlines;
+	vector<cv::Vec2f> hlines;
 	vector<Points> allHLines;
 	// detect lines
 	HoughLines(dst, hlines, 1, CV_PI / 180, lineThreshold_);
@@ -182,14 +181,14 @@ bool ThicknessGauge::computerBaseLine(const Mat& image, double limit) {
 	auto baseLineAvg = 0.0;
 	auto count = 0;
 
-	Rect roi(0, image.rows - (image.rows / 2), image.cols, image.rows / 2);
+	cv::Rect roi(0, image.rows - (image.rows / 2), image.cols, image.rows / 2);
 
 	//cout << "roi : " << roi << endl;
 
 	//double limit = image.rows / 2;
 
 	// adjust limit
-	limit += image.rows / 2;
+	//limit += image.rows / 2;
 
 	for (auto& l : hlines) {
 		auto theta = l[1];
@@ -199,24 +198,28 @@ bool ThicknessGauge::computerBaseLine(const Mat& image, double limit) {
 			auto b = sin(theta);
 			auto x0 = a * rho;
 			auto y0 = b * rho;
-			Point pt1(cvRound(x0 + 1000 * (-b)),
+			cv::Point pt1(cvRound(x0 + 1000 * (-b)),
 			          cvRound(y0 + 1000 * (a)));
-			Point pt2(cvRound(x0 - 1000 * (-b)),
+			cv::Point pt2(cvRound(x0 - 1000 * (-b)),
 			          cvRound(y0 - 1000 * (a)));
 
 			//if (roi.contains(pt1) && roi.contains(pt2)) {
 			if (pt1.y > limit && pt2.y > limit) {
-				cout << "pt1.y : " << pt1.y << endl;
+				//cout << "pt1.y : " << pt1.y << endl;
 				count += 2;
 				allHLines.push_back(Points(pt1, pt2));
 				baseLineAvg += pt1.y + pt2.y;
-				//line(image, pt1, pt2, baseColour_, 1);
+				if (showWindows_)
+					line(image, pt1, pt2, baseColour_, 1);
 			}
 		}
 	}
 
+	//cout << "new baseline : " << (image.rows) - baseLineAvg / count << endl;
+
+	return (image.rows) - baseLineAvg / count;
+
 	baseLine_ = (image.rows) - baseLineAvg / count;
-	cout << "new baseline : " << baseLine_ << endl;
 
 	// draw lines
 	//for (size_t i = 0; i < hlines.size(); i++) {
@@ -262,7 +265,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
 
-	Size blurSize(3, 3);
+	cv::Size blurSize(3, 3);
 
 	const auto alpha = 0.5;
 	const auto beta = 1.0 - alpha;
@@ -285,12 +288,12 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	const auto arrayLimit = 512; // shit c++11 ->
 
-	Mat frame;
+	cv::Mat frame;
 	//vector<Mat> outputs(frameCount_);
 	//vector<vi> pix_Planarmap(frameCount_ * 2); // using double of these for testing
 	vector<v2<double>> gabs(frameCount_);
 
-	array<Mat, arrayLimit> outputs;
+	array<cv::Mat, arrayLimit> outputs;
 	array<vi, arrayLimit> pix_Planarmap;
 	//array<v2<int>, arrayLimit> gabs;
 
@@ -313,15 +316,15 @@ bool ThicknessGauge::generatePlanarImage() {
 	const string dilationWindowName = "Dilation";
 
 	if (showWindows_) {
-		namedWindow(inputWindowName, WINDOW_KEEPRATIO);
-		createTrackbar("BThreshold", inputWindowName, &binaryThreshold_, 254);
-		createTrackbar("HThreshold", inputWindowName, &lineThreshold_, 255);
+		cv::namedWindow(inputWindowName, cv::WINDOW_KEEPRATIO);
+		cv::createTrackbar("BThreshold", inputWindowName, &binaryThreshold_, 254);
+		cv::createTrackbar("HThreshold", inputWindowName, &lineThreshold_, 255);
 		//createTrackbar("Base Line", inputWindowName, &baseLine_, imageSize_.height);
-		createTrackbar("Height Line", inputWindowName, &heightLine, (imageSize_.width * 2) - 1);
+		cv::createTrackbar("Height Line", inputWindowName, &heightLine, (imageSize_.width * 2) - 1);
 
-		namedWindow(outputWindowName, WINDOW_KEEPRATIO);
+		cv::namedWindow(outputWindowName, cv::WINDOW_KEEPRATIO);
 
-		namedWindow(line1WindowName, WINDOW_KEEPRATIO);
+		cv::namedWindow(line1WindowName, cv::WINDOW_KEEPRATIO);
 
 		////createTrackbar("Frac", line1WindowName, &line_fraction, 4);
 		////createTrackbar("Thick", line1WindowName, &line_thickness, 5);
@@ -333,7 +336,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		//namedWindow(cornerWindowName, WINDOW_AUTOSIZE);
 
-		namedWindow(erodeWindowName, WINDOW_KEEPRATIO);
+		cv::namedWindow(erodeWindowName, cv::WINDOW_KEEPRATIO);
 		//createTrackbar("Element:", erodeWindowName, &erosion_type, max_ed_elem);
 		//createTrackbar("Kernel size: 2n +1", erodeWindowName, &erosion_size, max_ed_kernel_size);
 
@@ -354,7 +357,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		is.OpenVideo();
 	}
 
-	vector<Point2d> test_subPix;
+	vector<cv::Point2d> test_subPix;
 
 	// configure output stuff
 	for (auto i = 0; i < frameCount_; ++i) {
@@ -362,14 +365,15 @@ bool ThicknessGauge::generatePlanarImage() {
 	}
 
 	// start the process of gathering information for set frame count
-
 	while (true) {
 
-		uint64 time_begin = getTickCount();
+		uint64 time_begin = cv::getTickCount();
+
+		vector<double> baseLine(frameCount_);
 
 		for (auto i = 0; i < frameCount_; ++i) {
 
-			outputs[i] = Mat::zeros(imageSize_, CV_8UC1);
+			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
 			pix_Planarmap.at(i).clear();
 
 			cap >> frame;
@@ -377,11 +381,6 @@ bool ThicknessGauge::generatePlanarImage() {
 			// show default input image (always shown live!)
 			if (showWindows_) {
 				imshow(inputWindowName, frame);
-				if (showWindows_) {
-					auto key = static_cast<char>(waitKey(10));
-					if (key == 27)
-						return true; // esc
-				}
 			}
 			// do basic in-place binary threshold
 			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
@@ -389,7 +388,7 @@ bool ThicknessGauge::generatePlanarImage() {
 			equalizeHist(frame, frame);
 
 			// blur in-place
-			GaussianBlur(frame, frame, Size(7, 5), 10, 2, BORDER_DEFAULT);
+			GaussianBlur(frame, frame, cv::Size(7, 5), 10, 2, cv::BORDER_DEFAULT);
 
 			// perform some stuff
 			//laplace(frame);
@@ -417,12 +416,30 @@ bool ThicknessGauge::generatePlanarImage() {
 				//add(outputs[i], temp, outputs[i]);
 			}
 
-			if (showWindows_) imshow(line1WindowName, outputs[i]);
+			auto highestPixel = outputs[i].rows - getHighestYpixel(outputs[i], heightLine);
+
+			auto bl = computerBaseLine(outputs[i], highestPixel);
+			if (cvIsNaN(bl)) {
+				cerr << "Error while computing baseline for frame " << to_string(i) << '\n';
+				continue;
+			}
+
+			baseLine.push_back(bl);
+
+			if (showWindows_) {
+				auto key = static_cast<char>(cv::waitKey(10));
+				if (key == 27)
+					return true; // esc
+			}
+
 
 		}
 
-		frame = Mat::zeros(imageSize_, CV_8UC1);
-		Mat lines = Mat::zeros(imageSize_, CV_8UC1);
+		baseLine_ = miniCalc.mean(baseLine);
+		cout << "baseline real : " << baseLine_ << endl;
+
+		frame = cv::Mat::zeros(imageSize_, CV_8UC1);
+		cv::Mat lines = cv::Mat::zeros(imageSize_, CV_8UC1);
 
 		// merge the images to target
 		for (auto i = 0; i < frameCount_; ++i) {
@@ -432,8 +449,7 @@ bool ThicknessGauge::generatePlanarImage() {
 			if (saveVideo_) is.SaveVideoFrame(lines);
 		}
 
-
-		Mat output = Mat::zeros(imageSize_, lines.type());
+		cv::Mat output = cv::Mat::zeros(imageSize_, lines.type());
 
 		//if (showWindows_) imshow(line2WindowName, output);
 		//if (showWindows_) imshow(line3WindowName, lines);
@@ -455,9 +471,9 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		/* end test stuff */
 
-		resize(output, frame, output.size() * 2, 0, 0, INTER_LANCZOS4);
+		resize(output, frame, output.size() * 2, 0, 0, cv::INTER_LANCZOS4);
 
-		GaussianBlur(frame, output, blurSize, 10, 10, BORDER_CONSTANT);
+		GaussianBlur(frame, output, blurSize, 10, 10, cv::BORDER_CONSTANT);
 
 		frame.release();
 
@@ -475,18 +491,32 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		computerGaugeLine(output);
 
-		if (!computerBaseLine(output, highestPixel))
-			cerr << "Error while computing baseline..\n";
+		//if (!computerBaseLine(output, highestPixel))
+		//	cerr << "Error while computing baseline..\n";
 
 		if (showWindows_) {
-			//Specs s;
-			//s.getPixelStrengths(output, allPixels_, heightLine);
-			//auto lulu = s.getNonBaseLine(output, baseLine_);
-			//line(output, Point(0, lulu), Point(output.cols, lulu), baseColour_);
 
-			//line(output, Point(0, baseLine_), Point(output.cols, baseLine_), baseColour_);
+			// test diagonals
+			vector<cv::Mat> diagonals;
+			if (miniCalc.computeDiags(output, diagonals)) {
+				cout << "Diagonals created : " << diagonals.size() << endl;
+				add(output, diagonals.front(), output);
+				vector<Point2d> heights;
+				if (miniCalc.computeDiagAvg(diagonals, heights)) {
+					cout << "Created " << heights.size() << " average points." << endl;
+				} else {
+					cerr << "Error while creating height average for diagonals." << endl;
+				}
+			} else {
+				cerr << "Error while creating diagonals." << endl;
+			}
+			
 
-			line(output, Point(heightLine, 0), Point(heightLine, output.rows), baseColour_);
+
+
+
+
+			line(output, cv::Point(heightLine, 0), cv::Point(heightLine, output.rows), baseColour_);
 			drawHorizontalLine(&output, Util::round(baseLine_), baseColour_);
 		}
 
@@ -496,7 +526,7 @@ bool ThicknessGauge::generatePlanarImage() {
 			//imshow(line2WindowName, cdst);
 		}
 
-		frameTime_ = getTickCount() - time_begin;
+		frameTime_ = cv::getTickCount() - time_begin;
 
 		//cout << "Y avr for heightline : " << getYPixelsAvg(frame, heightLine) << endl;
 
@@ -506,7 +536,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		//savePlanarImageData("_testoutput", allPixels_, output, highestPixel);
 
 		if (showWindows_) {
-			auto key = static_cast<char>(waitKey(10));
+			auto key = static_cast<char>(cv::waitKey(10));
 			if (key == 27)
 				break; // esc
 		}
@@ -515,11 +545,11 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	}
 	if (showWindows_) {
-		destroyWindow(inputWindowName);
-		destroyWindow(outputWindowName);
-		destroyWindow(line1WindowName);
-		destroyWindow(line2WindowName);
-		destroyWindow(line3WindowName);
+		cv::destroyWindow(inputWindowName);
+		cv::destroyWindow(outputWindowName);
+		cv::destroyWindow(line1WindowName);
+		cv::destroyWindow(line2WindowName);
+		cv::destroyWindow(line3WindowName);
 	}
 
 	if (saveVideo_)
@@ -528,8 +558,8 @@ bool ThicknessGauge::generatePlanarImage() {
 	return true;
 }
 
-bool ThicknessGauge::savePlanarImageData(string filename, vector<Point>& pixels, Mat& image, int highestY) const {
-	FileStorage fs(filename + to_string(frameCount_) + ".json", FileStorage::WRITE_BASE64);
+bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY) const {
+	cv::FileStorage fs(filename + to_string(frameCount_) + ".json", cv::FileStorage::WRITE_BASE64);
 
 	if (!fs.isOpened()) {
 		cerr << "Error while opening " << filename << " for output." << endl;
@@ -557,7 +587,7 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<Point>& pixels,
 	return true;
 }
 
-double ThicknessGauge::sumColumn(Mat& image, int x) {
+double ThicknessGauge::sumColumn(cv::Mat& image, int x) {
 
 	auto sum = 0;
 	auto count = 0;
@@ -575,7 +605,7 @@ double ThicknessGauge::sumColumn(Mat& image, int x) {
 
 }
 
-void ThicknessGauge::sumColumns(Mat& image, Mat& target) {
+void ThicknessGauge::sumColumns(cv::Mat& image, cv::Mat& target) {
 
 	// note: this function is not the fastest possible,
 	// but has security for non-continious image data in matrix
@@ -590,11 +620,9 @@ void ThicknessGauge::sumColumns(Mat& image, Mat& target) {
 		}
 		cout << "sum [row] : " << row << "-> " << sum << "\n";
 	}
-
-
 }
 
-void ThicknessGauge::computerGaugeLine(Mat& output) {
+void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
 	vi aboveLine;
 
 	if (miniCalc.getActualPixels(allPixels_, aboveLine, baseLine_, output.rows)) {
@@ -610,7 +638,7 @@ void ThicknessGauge::computerGaugeLine(Mat& output) {
 			avgGaugeHeight_ = gaugeLine_[3];
 
 			if (showWindows_) {
-				line(output, Point2f(aboveLine.front().x + Util::round(gaugeLine_[0]), gaugeLine_[3]), Point2f(aboveLine.back().x, Util::round(gaugeLine_[3])), baseColour_, 2, LINE_AA);
+				line(output, cv::Point2f(aboveLine.front().x + Util::round(gaugeLine_[0]), gaugeLine_[3]), cv::Point2f(aboveLine.back().x, Util::round(gaugeLine_[3])), baseColour_, 2, cv::LINE_AA);
 				cout << "Average line height : " << output.rows - avgGaugeHeight_ << " elements.\n";
 			}
 		}
@@ -634,8 +662,8 @@ void ThicknessGauge::setBinaryThreshold(int binaryThreshold) {
 	binaryThreshold_ = binaryThreshold;
 }
 
-void ThicknessGauge::drawText(Mat* image, const string text, TextDrawPosition position) {
-	Point pos;
+void ThicknessGauge::drawText(cv::Mat* image, const string text, TextDrawPosition position) {
+	cv::Point pos;
 	switch (position) {
 	case TextDrawPosition::UpperLeft:
 		pos.x = image->cols / 3;
@@ -660,42 +688,42 @@ void ThicknessGauge::drawText(Mat* image, const string text, TextDrawPosition po
 	putText(*image, text, pos, 1, 1.0, baseColour_, 2);
 }
 
-void ThicknessGauge::drawHorizontalLine(Mat* image, uint pos, Scalar colour) {
+void ThicknessGauge::drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar colour) {
 	//cout << "line drawn at : " << pos << endl;
-	line(*image, Point(0, image->rows - pos), Point(image->cols, image->rows - pos), colour, 2, LINE_AA);
+	line(*image, cv::Point(0, image->rows - pos), cv::Point(image->cols, image->rows - pos), colour, 2, cv::LINE_AA);
 }
 
-void ThicknessGauge::drawCenterAxisLines(Mat* image, Scalar& colour) {
+void ThicknessGauge::drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour) {
 	line(*image, cvPoint(0, image->rows >> 1), cvPoint(image->cols, image->rows >> 1), colour);
 	line(*image, cvPoint(image->cols >> 1, 0), cvPoint(image->cols >> 1, image->rows), colour);
 }
 
-void ThicknessGauge::GenerateInputQuad(Mat* image, Point2f* quad) {
+void ThicknessGauge::GenerateInputQuad(cv::Mat* image, cv::Point2f* quad) {
 	// The 4 points that select quadilateral on the input , from top-left in clockwise order
 	// These four pts are the sides of the rect box used as input
-	quad[0] = Point2f(0.0f, 0.0f);
-	quad[1] = Point2f(static_cast<float>(image->cols), 0.0f);
-	quad[2] = Point2f(static_cast<float>(image->cols), static_cast<float>(image->rows));
-	quad[3] = Point2f(0.0f, static_cast<float>(image->rows));
+	quad[0] = cv::Point2f(0.0f, 0.0f);
+	quad[1] = cv::Point2f(static_cast<float>(image->cols), 0.0f);
+	quad[2] = cv::Point2f(static_cast<float>(image->cols), static_cast<float>(image->rows));
+	quad[3] = cv::Point2f(0.0f, static_cast<float>(image->rows));
 }
 
-void ThicknessGauge::GenerateOutputQuad(Mat* image, Point2f* quad) {
+void ThicknessGauge::GenerateOutputQuad(cv::Mat* image, cv::Point2f* quad) {
 	// The 4 points where the mapping is to be done , from top-left in clockwise order
-	quad[0] = Point2f(-image->cols / 2.0f, 0.0f);
-	quad[1] = Point2f(static_cast<float>(image->cols) + image->cols / 2.0f, 0.0f);
-	quad[2] = Point2f(static_cast<float>(image->cols), static_cast<float>(image->rows));
-	quad[3] = Point2f(0.0f, static_cast<float>(image->rows));
+	quad[0] = cv::Point2f(-image->cols / 2.0f, 0.0f);
+	quad[1] = cv::Point2f(static_cast<float>(image->cols) + image->cols / 2.0f, 0.0f);
+	quad[2] = cv::Point2f(static_cast<float>(image->cols), static_cast<float>(image->rows));
+	quad[3] = cv::Point2f(0.0f, static_cast<float>(image->rows));
 }
 
-void ThicknessGauge::FitQuad(Mat* image, Point2f* inputQuad, Point2f* outputQuad) const {
+void ThicknessGauge::FitQuad(cv::Mat* image, cv::Point2f* inputQuad, cv::Point2f* outputQuad) const {
 	// calculate transformation
-	Matx33f M = getPerspectiveTransform(inputQuad, outputQuad);
+	cv::Matx33f M = getPerspectiveTransform(inputQuad, outputQuad);
 
 	// calculate warped position of all corners
-	auto a = M.inv() * Point3f(0.0f, 0.0f, 1.0f);
-	auto b = M.inv() * Point3f(0.0f, static_cast<float>(image->rows), 1.0f);
-	auto c = M.inv() * Point3f(static_cast<float>(image->cols), static_cast<float>(image->rows), 1.0f);
-	auto d = M.inv() * Point3f(static_cast<float>(image->cols), 0.0f, 1.0f);
+	auto a = M.inv() * cv::Point3f(0.0f, 0.0f, 1.0f);
+	auto b = M.inv() * cv::Point3f(0.0f, static_cast<float>(image->rows), 1.0f);
+	auto c = M.inv() * cv::Point3f(static_cast<float>(image->cols), static_cast<float>(image->rows), 1.0f);
+	auto d = M.inv() * cv::Point3f(static_cast<float>(image->cols), 0.0f, 1.0f);
 
 	a *= (1.0f / a.z);
 	b *= (1.0f / b.z);
@@ -712,38 +740,38 @@ void ThicknessGauge::FitQuad(Mat* image, Point2f* inputQuad, Point2f* outputQuad
 
 	// adjust target points accordingly
 	for (auto i = 0; i < 4; i++)
-		inputQuad[i] += Point2f(x, y);
+		inputQuad[i] += cv::Point2f(x, y);
 
 	// recalculate transformation
 	M = getPerspectiveTransform(inputQuad, outputQuad);
 
 	// get result
-	Mat result;
-	warpPerspective(*image, result, M, Size(static_cast<int>(width), static_cast<int>(height)), WARP_INVERSE_MAP);
+	cv::Mat result;
+	warpPerspective(*image, result, M, cv::Size(static_cast<int>(width), static_cast<int>(height)), cv::WARP_INVERSE_MAP);
 
 	imshow("quadfit", result);
 
-	waitKey(3);
+	cv::waitKey(3);
 }
 
-void ThicknessGauge::WarpImage(Mat* input, Mat* output) {
+void ThicknessGauge::WarpImage(cv::Mat* input, cv::Mat* output) {
 }
 
-void ThicknessGauge::WarpMeSomeCookies(Mat* image, Mat* output) {
-	vector<Point2f> points2D;
-	points2D.push_back(Point2f(0, 0));
-	points2D.push_back(Point2f(50, 0));
-	points2D.push_back(Point2f(50, 50));
-	points2D.push_back(Point2f(0, 50));
+void ThicknessGauge::WarpMeSomeCookies(cv::Mat* image, cv::Mat* output) {
+	vector<cv::Point2f> points2D;
+	points2D.push_back(cv::Point2f(0, 0));
+	points2D.push_back(cv::Point2f(50, 0));
+	points2D.push_back(cv::Point2f(50, 50));
+	points2D.push_back(cv::Point2f(0, 50));
 
 	//cv::Mat perspectiveMat = cv::getPerspectiveTransform(points2D, *image);
 	//cv::warpPerspective(*_image, *_undistortedImage, M, cv::Size(_image->cols, _image->rows));
 }
 
-Mat ThicknessGauge::cornerHarris_test(Mat& image, int threshold) const {
+cv::Mat ThicknessGauge::cornerHarris_test(cv::Mat& image, int threshold) const {
 
-	Mat dst_norm, dst_norm_scaled;
-	Mat dst = Mat::zeros(image.size(), CV_32FC1);
+	cv::Mat dst_norm, dst_norm_scaled;
+	cv::Mat dst = cv::Mat::zeros(image.size(), CV_32FC1);
 
 	/// Detector parameters
 	auto blockSize = 2;
@@ -751,53 +779,53 @@ Mat ThicknessGauge::cornerHarris_test(Mat& image, int threshold) const {
 	auto k = 0.04;
 
 	/// Detecting corners
-	cornerHarris(image, dst, blockSize, apertureSize, k, BORDER_DEFAULT);
+	cornerHarris(image, dst, blockSize, apertureSize, k, cv::BORDER_DEFAULT);
 
 	/// Normalizing
-	normalize(dst, dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat());
+	normalize(dst, dst_norm, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());
 	convertScaleAbs(dst_norm, dst_norm_scaled);
 
 	/// Drawing a circle around corners
 	for (auto j = 0; j < dst_norm.rows; j++) {
 		for (auto i = 0; i < dst_norm.cols; i++) {
 			if (static_cast<int>(dst_norm.at<float>(j, i)) > threshold)
-				circle(dst_norm_scaled, Point(i, j), 5, Scalar(0), 2, 8, 0);
+				circle(dst_norm_scaled, cv::Point(i, j), 5, cv::Scalar(0), 2, 8, 0);
 		}
 	}
 	return dst_norm_scaled;
 }
 
-Mat ThicknessGauge::erosion(Mat& input, int element, int size) const {
-	MorphShapes erosion_type;
+cv::Mat ThicknessGauge::erosion(cv::Mat& input, int element, int size) const {
+	cv::MorphShapes erosion_type;
 	if (element == 0)
-		erosion_type = MORPH_RECT;
+		erosion_type = cv::MORPH_RECT;
 	else if (element == 1)
-		erosion_type = MORPH_CROSS;
+		erosion_type = cv::MORPH_CROSS;
 	else if (element == 2)
-		erosion_type = MORPH_ELLIPSE;
+		erosion_type = cv::MORPH_ELLIPSE;
 	else
-		erosion_type = MORPH_RECT;
+		erosion_type = cv::MORPH_RECT;
 
-	auto input_element = getStructuringElement(erosion_type, Size(2 * size + 1, 2 * size + 1), Point(size, size));
+	auto input_element = getStructuringElement(erosion_type, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
 
-	Mat erosion_dst = Mat::zeros(input.size(), input.type());
-	erode(input, erosion_dst, element, Point(-1, -1), 1, BORDER_DEFAULT);
+	cv::Mat erosion_dst = cv::Mat::zeros(input.size(), input.type());
+	erode(input, erosion_dst, element, cv::Point(-1, -1), 1, cv::BORDER_DEFAULT);
 	return erosion_dst;
 }
 
-Mat ThicknessGauge::dilation(Mat& input, int dilation, int size) const {
-	MorphShapes dilation_type;
+cv::Mat ThicknessGauge::dilation(cv::Mat& input, int dilation, int size) const {
+	cv::MorphShapes dilation_type;
 	if (dilation == 0)
-		dilation_type = MORPH_RECT;
+		dilation_type = cv::MORPH_RECT;
 	else if (dilation == 1)
-		dilation_type = MORPH_CROSS;
+		dilation_type = cv::MORPH_CROSS;
 	else if (dilation == 2)
-		dilation_type = MORPH_ELLIPSE;
+		dilation_type = cv::MORPH_ELLIPSE;
 	else
-		dilation_type = MORPH_RECT;
+		dilation_type = cv::MORPH_RECT;
 
-	auto element = getStructuringElement(dilation_type, Size(2 * size + 1, 2 * size + 1), Point(size, size));
-	Mat dilation_dst = Mat::zeros(input.size(), input.type());
+	auto element = getStructuringElement(dilation_type, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
+	cv::Mat dilation_dst = cv::Mat::zeros(input.size(), input.type());
 
 	dilate(input, dilation_dst, element);
 	return dilation_dst;

@@ -1,16 +1,17 @@
 #pragma once
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
 #include <vector>
+#include "MiniCalc.h"
+#include "ThicknessGaugeData.h"
+
 #include "_cv.h"
 #include "CalibrationSettings.h"
 #include "Vec.h"
 #include "Util.h"
-#include "MiniCalc.h"
-#include "ThicknessGaugeData.h"
 
-using namespace std;
+#include <opencv2/opencv.hpp>
+
+
 using namespace _cv;
 
 /*
@@ -70,7 +71,7 @@ private:
 
 	double baseLine_;
 
-	Scalar baseColour_;
+	cv::Scalar baseColour_;
 
 public:
 	double getBaseLine() const;
@@ -102,15 +103,15 @@ public: // basic stuff to extract information
 
 	void drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const;
 
-	int getHighestYpixel(Mat& image, int x) const;
-	int getAllPixelSum(Mat& image);
-	static uchar getElementIntensity(Mat& image, Point& point);
-	uchar getElementIntensity(Mat& image, v2<int>& point) const;
-	static double getYPixelsAvg(Mat& image, int x);
-	int getAllPixelSum(Mat& image, int x);
-	int getHighestYPixel(Mat& image, int x);
+	int getHighestYpixel(cv::Mat& image, int x) const;
+	int getAllPixelSum(cv::Mat& image);
+	static uchar getElementIntensity(cv::Mat& image, cv::Point& point);
+	uchar getElementIntensity(cv::Mat& image, v2<int>& point) const;
+	static double getYPixelsAvg(cv::Mat& image, int x);
+	int getAllPixelSum(cv::Mat& image, int x);
+	int getHighestYPixel(cv::Mat& image, int x);
 
-	bool computerBaseLine(const Mat& mat, double limit);
+	double computerBaseLine(const cv::Mat& mat, double limit);
 
 	bool generatePlanarImage();
 
@@ -120,9 +121,9 @@ public: // basic stuff to extract information
 
 	void sumColumns(cv::Mat& image, cv::Mat& target);
 
-	void computeAllElements(Mat& image);
+	void computeAllElements(cv::Mat& image);
 
-	void computerGaugeLine(Mat& output);
+	void computerGaugeLine(cv::Mat& output);
 
 public: // getters and setters
 
