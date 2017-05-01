@@ -21,7 +21,7 @@ class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
 	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(75), lineThreshold_(100), baseLine_(24) {
-		baseColour_ = CV_RGB(255, 255, 255);
+		baseColour_ = Scalar(255, 255, 255);
 		settings.ddepth = CV_8S;
 	}
 
@@ -154,6 +154,7 @@ public: // draw functions
 	void drawText(cv::Mat* image, const string text, TextDrawPosition position);
 
 	static void drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar colour);
+	static void drawVerticalLine(cv::Mat* image, uint pos, cv::Scalar colour);
 
 	static void drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour);
 

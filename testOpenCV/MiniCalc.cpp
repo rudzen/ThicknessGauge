@@ -326,24 +326,20 @@ bool MiniCalc::computeDiags(cv::Mat& image, vector<cv::Mat>& diags) {
 
 bool MiniCalc::computeDiagAvg(vector<cv::Mat>& diagonals, vd& output) {
 
-
 	output.clear();
 	output.reserve(diagonals.front().cols);
 
-	auto sum = 0.0;
-
 
 	for (auto& d : diagonals) {
-		for (auto row = 0; row < d.rows; ++row) {
-			auto uc_pixel = d.data + row * d.step;
-			for (auto col = 0; col < d.cols; ++col) {
-				int pixelIntensity = uc_pixel[0];
-				sum += pixelIntensity;
-				uc_pixel++;
+		auto input = static_cast<unsigned char*>(d.data);
+		for (auto j = 0; j < d.rows; j++) {
+			auto sum = 0.0;
+			for (auto i = 0; i < d.cols; i++)
+				sum += input[d.step * j + i];
+			if (sum > 0.0) {
+				output.push_back(Point2d(j, sum / d.cols));
+				//cout << "sum : " << sum << endl;
 			}
-			cout << "sum [row] : " << row << "-> " << sum << "\n";
-			output.push_back(Point2d(row, sum));
-			sum = 0.0;
 		}
 	}
 

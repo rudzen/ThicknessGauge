@@ -190,6 +190,8 @@ double ThicknessGauge::computerBaseLine(const cv::Mat& image, double limit) {
 	// adjust limit
 	//limit += image.rows / 2;
 
+	auto bestGuess = 0.0;
+
 	for (auto& l : hlines) {
 		auto theta = l[1];
 		if (theta > CV_PI / 180 * 89.99 && theta < CV_PI / 180 * 90.01) {
@@ -206,59 +208,26 @@ double ThicknessGauge::computerBaseLine(const cv::Mat& image, double limit) {
 			//if (roi.contains(pt1) && roi.contains(pt2)) {
 			if (pt1.y > limit && pt2.y > limit) {
 				//cout << "pt1.y : " << pt1.y << endl;
+				double yAvg = (pt1.y + pt2.y) / 2;
+				// check for best guess
+				if (yAvg > bestGuess)
+					bestGuess = yAvg;
+
 				count += 2;
 				allHLines.push_back(Points(pt1, pt2));
 				baseLineAvg += pt1.y + pt2.y;
-				if (showWindows_)
-					line(image, pt1, pt2, baseColour_, 1);
+				if (showWindows_) {
+					//line(image, Point(0, bestGuess), Point(image.cols, bestGuess), baseColour_);
+					//line(image, pt1, pt2, baseColour_, 1);
+				}
 			}
 		}
 	}
 
 	//cout << "new baseline : " << (image.rows) - baseLineAvg / count << endl;
 
-	return (image.rows) - baseLineAvg / count;
-
-	baseLine_ = (image.rows) - baseLineAvg / count;
-
-	// draw lines
-	//for (size_t i = 0; i < hlines.size(); i++) {
-	//	auto theta = hlines[i][1];
-	//	if (theta>CV_PI / 180 * 80 && theta<CV_PI / 180 * 100) {
-	//		auto rho = hlines[i][0];
-	//		auto a = cos(theta);
-	//		auto b = sin(theta);
-	//		auto x0 = a * rho;
-	//		auto y0 = b * rho;
-	//		Point pt1, pt2;
-	//		//pt1.x = cvRound(x0 + 1000 * (-b));
-	//		//pt1.y = cvRound(y0 + 1000 * (a));
-	//		pt2.x = cvRound(x0 - 1000 * (-b));
-	//		pt2.y = cvRound(y0 - 1000 * (a));
-	//		allHLines.push_back(v2<double>(pt2.x, pt2.y));
-	//	}
-	//}
-
-	// //squickly calc avg of hlines
-	//auto yavg = 0.0;
-	//for (auto& v : allHLines) {
-	//	yavg += v.y;
-	//}
-	//yavg /= allHLines.size();
-	//baseLine_ = (image.cols - yavg) / image.rows;
-
-
-	//cout << "baselineavg = " << baseLineAvg << endl;
-	////if (count > 0)
-	////baseLine_ = abs((image.rows / 2) - (baseLineAvg / count)) / 2;
-	//baseLine_ = image.cols - round(baseLineAvg / static_cast<double>(hlines.size()));
-
-	//cout << "baseLine_ = " << baseLine_ << endl;
-
-	////cout << "baseLine_ = " << baseLine_ << '\n';
-	////baseLine_ = output.cols - static_cast<int>(round(baseLineAvg));
-
-	return baseLine_ != 0.0;
+	return bestGuess;
+	//return (image.rows) - baseLineAvg / count;
 }
 
 bool ThicknessGauge::generatePlanarImage() {
@@ -497,29 +466,29 @@ bool ThicknessGauge::generatePlanarImage() {
 		if (showWindows_) {
 
 			// test diagonals
-			vector<cv::Mat> diagonals;
-			if (miniCalc.computeDiags(output, diagonals)) {
-				cout << "Diagonals created : " << diagonals.size() << endl;
-				add(output, diagonals.front(), output);
-				vector<Point2d> heights;
-				if (miniCalc.computeDiagAvg(diagonals, heights)) {
-					cout << "Created " << heights.size() << " average points." << endl;
-				} else {
-					cerr << "Error while creating height average for diagonals." << endl;
-				}
-			} else {
-				cerr << "Error while creating diagonals." << endl;
-			}
+			//vector<cv::Mat> diagonals;
+			//if (miniCalc.computeDiags(output, diagonals)) {
+			//	cout << "Diagonals created : " << diagonals.size() << endl;
+			//	//add(output, diagonals.front(), output);
+			//	vector<Point2d> heights;
+			//	if (miniCalc.computeDiagAvg(diagonals, heights)) {
+			//		cout << "Created " << heights.size() << " average points." << endl;
+			//		//cout << heights << endl;
+			//	} else {
+			//		cerr << "Error while creating height average for diagonals." << endl;
+			//	}
+			//} else {
+			//	cerr << "Error while creating diagonals." << endl;
+			//}
 			
 
+			drawVerticalLine(&output, heightLine, baseColour_);
+			//line(output, cv::Point(heightLine, 0), cv::Point(heightLine, output.rows), baseColour_);
 
 
-
-
-			line(output, cv::Point(heightLine, 0), cv::Point(heightLine, output.rows), baseColour_);
+			// calculated baseline test drawing
 			drawHorizontalLine(&output, Util::round(baseLine_), baseColour_);
 		}
-
 
 		if (showWindows_) {
 			imshow(erodeWindowName, output);
@@ -693,9 +662,13 @@ void ThicknessGauge::drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar col
 	line(*image, cv::Point(0, image->rows - pos), cv::Point(image->cols, image->rows - pos), colour, 2, cv::LINE_AA);
 }
 
+void ThicknessGauge::drawVerticalLine(cv::Mat* image, uint pos, cv::Scalar colour) {
+	line(*image, Point(pos, 0), Point(pos, image->rows), colour);
+}
+
 void ThicknessGauge::drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour) {
-	line(*image, cvPoint(0, image->rows >> 1), cvPoint(image->cols, image->rows >> 1), colour);
-	line(*image, cvPoint(image->cols >> 1, 0), cvPoint(image->cols >> 1, image->rows), colour);
+	line(*image, Point(0, image->rows >> 1), Point(image->cols, image->rows >> 1), colour);
+	line(*image, Point(image->cols >> 1, 0), Point(image->cols >> 1, image->rows), colour);
 }
 
 void ThicknessGauge::GenerateInputQuad(cv::Mat* image, cv::Point2f* quad) {
