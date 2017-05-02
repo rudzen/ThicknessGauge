@@ -10,6 +10,8 @@
 #include "Util.h"
 
 #include <opencv2/opencv.hpp>
+#include "TestConfig.h"
+#include <vector>
 
 
 using namespace _cv;
@@ -125,9 +127,11 @@ public: // basic stuff to extract information
 
 	bool generatePlanarImage(); // <- important!
 
+	static void addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y);
+
 	bool testAggressive();
 
-	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY, std::string extraInfo) const;
+	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY, std::string timeString, std::string extraInfo) const;
 
 	double sumColumn(cv::Mat& image, int x);
 

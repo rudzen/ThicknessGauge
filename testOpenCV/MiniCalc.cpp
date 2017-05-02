@@ -255,6 +255,8 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 	auto gradientSum = 0.0;
 	//unsigned char value = image.at<unsigned char>(y, x);
 
+	//output = cv::Mat::zeros(input.cols, input.rows, input.type());
+
 	for (auto& p : pix) {
 		if (p.x != x) {
 			if (count > 0) {

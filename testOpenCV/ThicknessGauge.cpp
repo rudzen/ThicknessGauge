@@ -6,6 +6,8 @@
 #include "ImageSave.h"
 #include "CaptureFailException.h"
 #include "TestConfig.h"
+#include "omp.h"
+
 
 double ThicknessGauge::getBaseLine() const {
 	return baseLine_;
@@ -59,7 +61,7 @@ void ThicknessGauge::skeleton(cv::Mat* image) {
 	cv::Mat temp;
 	cv::Mat eroded;
 
-	auto element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+	auto element = getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
 
 	bool done;
 	do {
@@ -75,7 +77,7 @@ void ThicknessGauge::skeleton(cv::Mat* image) {
 }
 
 void ThicknessGauge::drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const {
-	cv::polylines(targetImage, planarMap, false, cv::Scalar(255, 255, 255), 2);
+	polylines(targetImage, planarMap, false, cv::Scalar(255, 255, 255), 2);
 }
 
 int ThicknessGauge::getHighestYpixel(cv::Mat& image, int x) const {
@@ -89,7 +91,7 @@ int ThicknessGauge::getHighestYpixel(cv::Mat& image, int x) const {
 	auto yAvg = 0.0;
 
 	vector<cv::Point> elements;
-	
+
 	// grab all elements from the specific col
 	for (auto& p : pix) {
 		if (p.x < x)
@@ -140,7 +142,7 @@ uchar ThicknessGauge::getElementIntensity(cv::Mat& image, cv::Point& point) {
 	return image.at<uchar>(point);
 }
 
-uchar ThicknessGauge::getElementIntensity(cv::Mat& image, v2<int> &point) const {
+uchar ThicknessGauge::getElementIntensity(cv::Mat& image, v2<int>& point) const {
 	cv::Point p(point.x, point.y);
 	return getElementIntensity(image, p);
 }
@@ -202,9 +204,9 @@ double ThicknessGauge::computerBaseLine(const cv::Mat& image, double limit) {
 			auto x0 = a * rho;
 			auto y0 = b * rho;
 			cv::Point pt1(cvRound(x0 + 1000 * (-b)),
-			          cvRound(y0 + 1000 * (a)));
+			              cvRound(y0 + 1000 * (a)));
 			cv::Point pt2(cvRound(x0 - 1000 * (-b)),
-			          cvRound(y0 - 1000 * (a)));
+			              cvRound(y0 - 1000 * (a)));
 
 			//if (roi.contains(pt1) && roi.contains(pt2)) {
 			if (pt1.y > limit && pt2.y > limit) {
@@ -263,6 +265,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	//vector<vi> pix_Planarmap(frameCount_ * 2); // using double of these for testing
 	vector<v2<double>> gabs(frameCount_);
 
+	array<cv::Mat, arrayLimit> frames;
 	array<cv::Mat, arrayLimit> outputs;
 	array<vi, arrayLimit> pix_Planarmap;
 	//array<v2<int>, arrayLimit> gabs;
@@ -286,15 +289,15 @@ bool ThicknessGauge::generatePlanarImage() {
 	const string dilationWindowName = "Dilation";
 
 	if (showWindows_) {
-		cv::namedWindow(inputWindowName, cv::WINDOW_KEEPRATIO);
+		namedWindow(inputWindowName, cv::WINDOW_KEEPRATIO);
 		cv::createTrackbar("BThreshold", inputWindowName, &binaryThreshold_, 254);
 		cv::createTrackbar("HThreshold", inputWindowName, &lineThreshold_, 255);
 		//createTrackbar("Base Line", inputWindowName, &baseLine_, imageSize_.height);
 		cv::createTrackbar("Height Line", inputWindowName, &heightLine, (imageSize_.width * 2) - 1);
 
-		cv::namedWindow(outputWindowName, cv::WINDOW_KEEPRATIO);
+		namedWindow(outputWindowName, cv::WINDOW_KEEPRATIO);
 
-		cv::namedWindow(line1WindowName, cv::WINDOW_KEEPRATIO);
+		namedWindow(line1WindowName, cv::WINDOW_KEEPRATIO);
 
 		////createTrackbar("Frac", line1WindowName, &line_fraction, 4);
 		////createTrackbar("Thick", line1WindowName, &line_thickness, 5);
@@ -306,7 +309,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		//namedWindow(cornerWindowName, WINDOW_AUTOSIZE);
 
-		cv::namedWindow(erodeWindowName, cv::WINDOW_KEEPRATIO);
+		namedWindow(erodeWindowName, cv::WINDOW_KEEPRATIO);
 		//createTrackbar("Element:", erodeWindowName, &erosion_type, max_ed_elem);
 		//createTrackbar("Kernel size: 2n +1", erodeWindowName, &erosion_size, max_ed_kernel_size);
 
@@ -330,9 +333,8 @@ bool ThicknessGauge::generatePlanarImage() {
 	vector<cv::Point2d> test_subPix;
 
 	// configure output stuff
-	for (auto i = 0; i < frameCount_; ++i) {
+	for (auto i = 0; i < arrayLimit; ++i)
 		pix_Planarmap[i].reserve(imageSize_.width);
-	}
 
 	// start the process of gathering information for set frame count
 	while (true) {
@@ -341,12 +343,17 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		vector<double> baseLine(frameCount_);
 
+		// capture frame amount and clear storage
 		for (auto i = 0; i < frameCount_; ++i) {
-
+			cap >> frames[i];
 			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
 			pix_Planarmap.at(i).clear();
+		}
 
-			cap >> frame;
+		for (auto i = 0; i < frameCount_; ++i) {
+
+			// just share the joy
+			frame = frames[i];
 
 			// show default input image (always shown live!)
 			if (showWindows_) {
@@ -481,7 +488,7 @@ bool ThicknessGauge::generatePlanarImage() {
 			//} else {
 			//	cerr << "Error while creating diagonals." << endl;
 			//}
-			
+
 
 			drawVerticalLine(&output, heightLine);
 			//line(output, cv::Point(heightLine, 0), cv::Point(heightLine, output.rows), baseColour_);
@@ -514,6 +521,9 @@ bool ThicknessGauge::generatePlanarImage() {
 		output.release();
 
 	}
+
+	cap.release();
+
 	if (showWindows_) {
 		cv::destroyWindow(inputWindowName);
 		cv::destroyWindow(outputWindowName);
@@ -526,6 +536,19 @@ bool ThicknessGauge::generatePlanarImage() {
 		is.CloseVideo();
 
 	return true;
+}
+
+void ThicknessGauge::addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y) {
+	for (auto j = x; j <= y; j += 2) {
+		for (auto i = 1; i <= 10; ++i) {
+			if (x == j)
+				continue;
+			auto sig = baseSigmaX * i;
+			tests.push_back(TestConfig(alpha, sig, i, cv::Size(x, x)));
+			tests.push_back(TestConfig(alpha, sig, i, cv::Size(x, j)));
+			tests.push_back(TestConfig(alpha, sig, i, cv::Size(j, x)));
+		}
+	}
 }
 
 
@@ -544,14 +567,14 @@ bool ThicknessGauge::testAggressive() {
 	ImageSave is("test_x", SaveType::Image_Png, Information::Basic);
 
 	// kernel size vector
-	const vector<cv::Size> kernels_ = { cv::Size(0,0), cv::Size(3, 3), cv::Size(5, 5), cv::Size(7, 7), cv::Size(9, 9) };
+	const vector<cv::Size> kernels_ = {cv::Size(0, 0), cv::Size(3, 3), cv::Size(5, 5), cv::Size(7, 7), cv::Size(9, 9)};
 
 	// weigthed adding boundries for alpha
 	// beta values are always 1.0 = alpha
 	float alphaBase = 0.1;
 
 	// blur sigma boundries
-	int sigmaXBase = 5;
+	auto sigmaXBase = 5;
 
 	// each test is put here, to better control the flow
 	vector<TestConfig> tests;
@@ -561,6 +584,7 @@ bool ThicknessGauge::testAggressive() {
 	cv::Mat frame;
 	vector<v2<double>> gabs(frameCount_);
 
+	array<cv::Mat, arrayLimit> frames;
 	array<cv::Mat, arrayLimit> outputs;
 	array<vi, arrayLimit> pix_Planarmap;
 
@@ -569,6 +593,12 @@ bool ThicknessGauge::testAggressive() {
 	cv::Mat first;
 	// capture first frame, only to get sizes etc.
 	cap >> first;
+
+	Util::log("Capturing " + to_string(frameCount_) + " frames.");
+	for (auto i = 0; i < frameCount_; ++i)
+		cap >> frames[i];
+
+	cap.release();
 
 	setImageSize(first.size());
 
@@ -579,45 +609,14 @@ bool ThicknessGauge::testAggressive() {
 	auto sigmaY = 2;
 	auto currentTest = 1;
 
-	// add alpha variants
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase * i, sigmaXBase, i, cv::Size(3, 3)));
+	auto kernelMin = 3;
+	auto kernelMax = 31;
+
+	addKernelTests(tests, alphaBase, sigmaXBase, kernelMin, kernelMax);
 
 	// auto kernel from sigma
 	for (auto i = currentTest; i <= 10; ++i)
 		tests.push_back(TestConfig(alphaBase, sigmaXBase * i, i, cv::Size(0, 0)));
-
-	// kernel 3x3 with vary on sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase * i, i, cv::Size(3, 3)));
-
-	// kernel 5x5 with vary on sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase * i, i, cv::Size(5, 5)));
-
-	// kernel 7x7 with vary on sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase * i, i, cv::Size(7, 7)));
-
-	// kernel 9x9 with vary on sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase * i, i, cv::Size(9, 9)));
-
-	// kernel 3x3 with fixed sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase, i, cv::Size(3, 3)));
-
-	// kernel 5x5 with fixed sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase, i, cv::Size(5, 5)));
-
-	// kernel 7x7 with fixed sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase, i, cv::Size(7, 7)));
-
-	// kernel 9x9 with fixed sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase, i, cv::Size(9, 9)));
 
 	// start the process of gathering information for set frame count
 	cv::Size blurSize(3, 3);
@@ -638,11 +637,6 @@ bool ThicknessGauge::testAggressive() {
 	auto const max_ed_elem = 2;
 	auto const max_ed_kernel_size = 21;
 	/* end */
-
-	// capture first frame
-	cap >> frame;
-
-	setImageSize(frame.size());
 
 	//const string inputWindowName = "GC2450 feed";
 	//const string outputWindowName = "GC2450 manipulated";
@@ -700,21 +694,28 @@ bool ThicknessGauge::testAggressive() {
 		pix_Planarmap[i].reserve(imageSize_.width);
 	}
 
-	// start the process of gathering information for set frame count
-	for (auto& t : tests) {
+	auto testSize = tests.size();
+
+	int i;
+
+	for (i = 0; i < testSize; ++i) {
+
+		// start the process of gathering information for set frame count
+		//	for (auto& t : tests) {
 		Util::log("Running test " + to_string(currentTest) + " of " + to_string(tests.size()));
-		cout << "Config : " << t << endl;
+		cout << "Config : " << tests[i] << endl;
 
 		uint64 time_begin = cv::getTickCount();
 
 		vector<double> baseLine(frameCount_);
 
-		for (auto i = 0; i < frameCount_; ++i) {
+		for (auto j = 0; j < frameCount_; ++j) {
 
-			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
-			pix_Planarmap.at(i).clear();
+			outputs[j] = cv::Mat::zeros(imageSize_, CV_8UC1);
+			pix_Planarmap.at(j).clear();
 
-			cap >> frame;
+			frame = frames[j].clone();
+			//cap >> frame;
 
 			// do basic in-place binary threshold
 			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
@@ -722,36 +723,36 @@ bool ThicknessGauge::testAggressive() {
 			equalizeHist(frame, frame);
 
 			// blur in-place
-			GaussianBlur(frame, frame, t.kernel(), t.sigma(), 2, cv::BORDER_DEFAULT);
+			GaussianBlur(frame, frame, tests[i].kernel(), tests[i].sigma(), 2, cv::BORDER_DEFAULT);
 
 			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
-			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_Planarmap.at(i), test_subPix);
+			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[j], pix_Planarmap.at(j), test_subPix);
 
 			if (!generateOk) {
-				Util::loge("Failed to map pixels to 2D plane for frame #" + to_string(i + 1) + " of " + to_string(frameCount_));
+				Util::loge("Failed to map pixels to 2D plane for frame #" + to_string(j + 1) + " of " + to_string(frameCount_));
 				continue;
 			}
 
-			findNonZero(outputs[i], pix_Planarmap[arrayLimit - (1 + i)]);
+			findNonZero(outputs[j], pix_Planarmap[arrayLimit - (1 + j)]);
 			//gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i], baseLine_));
-			gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i]));
+			gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + j)], outputs[j]));
 			if (gabs.back().hasValue()) {
 
 			}
 
-			auto highestPixel = outputs[i].rows - getHighestYpixel(outputs[i], heightLine);
+			auto highestPixel = outputs[j].rows - getHighestYpixel(outputs[j], heightLine);
 
-			auto bl = computerBaseLine(outputs[i], highestPixel);
+			auto bl = computerBaseLine(outputs[j], highestPixel);
 			if (cvIsNaN(bl)) {
-				Util::loge("Error while computing baseline for frame " + to_string(i));
+				Util::loge("Error while computing baseline for frame " + to_string(j));
 				continue;
 			}
 
 			baseLine.push_back(bl);
-	
+
 		}
 
-		baseLine_ = miniCalc.mean(baseLine);
+		double base = miniCalc.mean(baseLine);
 
 		frame = cv::Mat::zeros(imageSize_, CV_8UC1);
 		cv::Mat lines = cv::Mat::zeros(imageSize_, CV_8UC1);
@@ -779,12 +780,12 @@ bool ThicknessGauge::testAggressive() {
 
 		resize(output, frame, output.size() * 2, 0, 0, cv::INTER_LANCZOS4);
 
-		GaussianBlur(frame, output, t.kernel(), t.sigma(), 10, cv::BORDER_CONSTANT);
+		GaussianBlur(frame, output, tests[i].kernel(), tests[i].sigma(), 10, cv::BORDER_CONSTANT);
 
 		frame.release();
 
 		// test for highest pixel for eroded image
-		auto highestPixel = output.rows - getHighestYpixel(output, heightLine) - baseLine_;
+		auto highestPixel = output.rows - getHighestYpixel(output, heightLine) - base;
 		//cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
 
 		// gather all elements from final matrix
@@ -794,23 +795,23 @@ bool ThicknessGauge::testAggressive() {
 		frameTime_ = cv::getTickCount() - time_begin;
 		is.UpdateTimeStamp();
 
-		drawVerticalLine(&output, heightLine);
-		drawHorizontalLine(&output, Util::round(baseLine_));
-
 		//if (showWindows_) {
 		//	imshow(erodeWindowName, output);
 		//}
 
-		std::ostringstream testInfo;
-		testInfo << t;
+		auto timeString = to_string(getFrameTime() / getTickFrequency());
+		ostringstream testInfo;
+		testInfo << tests[i];
 		Util::log("Saving image..");
 		is.SaveImage(&output, "_test" + to_string(currentTest));
 		Util::log("Saving test data..");
-		savePlanarImageData("_test" + to_string(currentTest) + "_data", allPixels_, output, highestPixel, testInfo.str());
+		savePlanarImageData("_test" + to_string(currentTest) + "_data", allPixels_, output, highestPixel, timeString, testInfo.str());
 
-		output.release();
+		drawVerticalLine(&output, heightLine);
+		drawHorizontalLine(&output, Util::round(base));
+		is.SaveImage(&output, "_test_full" + to_string(currentTest));
 
-		Util::log("Test " + to_string(currentTest) + " completed, took " + to_string(getFrameTime() / getTickFrequency()) + " seconds");
+		Util::log("Test " + to_string(currentTest) + " completed, took " + timeString + " seconds");
 
 		currentTest++;
 	}
@@ -820,7 +821,7 @@ bool ThicknessGauge::testAggressive() {
 	return true;
 }
 
-bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY, std::string extraInfo) const {
+bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY, string timeString, string extraInfo) const {
 	cv::FileStorage fs(filename + ".json", cv::FileStorage::WRITE);
 
 	if (!fs.isOpened()) {
@@ -834,7 +835,8 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pix
 
 	fs << "Original filename" << filename;
 	fs << "Saved time" << Util::getTime();
-	fs << "Seconds for computation" << static_cast<long>(frameTime_ / tickFrequency_);
+	fs << "Time to compute" << timeString;
+	//fs << "Seconds for computation" << static_cast<long>(frameTime_ / tickFrequency_);
 	fs << "Highest Y" << highestY;
 	fs << "Extra info" << extraInfo;
 
@@ -902,6 +904,7 @@ void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
 
 			if (showWindows_) {
 				line(output, cv::Point2f(aboveLine.front().x + Util::round(gaugeLine_[0]), gaugeLine_[3]), cv::Point2f(aboveLine.back().x, Util::round(gaugeLine_[3])), baseColour_, 2, cv::LINE_AA);
+
 				//cout << "Average line height : " << output.rows - avgGaugeHeight_ << " elements.\n";
 			}
 		}
@@ -1007,12 +1010,12 @@ void ThicknessGauge::FitQuad(cv::Mat* image, cv::Point2f* inputQuad, cv::Point2f
 	d *= (1.0f / d.z);
 
 	// to make sure all corners are in the image, every position must be > (0, 0)
-	auto x = ceil(abs(std::min(std::min(a.x, b.x), std::min(c.x, d.x))));
-	auto y = ceil(abs(std::min(std::min(a.y, b.y), std::min(c.y, d.y))));
+	auto x = ceil(abs(min(min(a.x, b.x), min(c.x, d.x))));
+	auto y = ceil(abs(min(min(a.y, b.y), min(c.y, d.y))));
 
 	// and also < (width, height)
-	auto width = ceil(abs(std::max(std::max(a.x, b.x), std::max(c.x, d.x)))) + x;
-	auto height = ceil(abs(std::max(std::max(a.y, b.y), std::max(c.y, d.y)))) + y;
+	auto width = ceil(abs(max(max(a.x, b.x), max(c.x, d.x)))) + x;
+	auto height = ceil(abs(max(max(a.y, b.y), max(c.y, d.y)))) + y;
 
 	// adjust target points accordingly
 	for (auto i = 0; i < 4; i++)
@@ -1114,7 +1117,7 @@ int ThicknessGauge::getFrameCount() const {
 void ThicknessGauge::setFrameCount(int frameCount) {
 	if (frameCount < 1 || frameCount > 999)
 		frameCount = 25;
-	
+
 	frameCount_ = frameCount;
 }
 
