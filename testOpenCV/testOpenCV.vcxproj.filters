@@ -176,6 +176,9 @@
     <ClInclude Include="FileConstraint.h">
       <Filter>Header Files\Menu\CommandLine\Constraints</Filter>
     </ClInclude>
+    <ClInclude Include="CalibrationException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

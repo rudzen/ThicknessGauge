@@ -7,9 +7,20 @@
 #include "CommandLineOptions.h"
 #include "IntegerConstraint.h"
 #include "FileConstraint.h"
+#include "CalibrationException.h"
 
 using namespace std;
 using namespace TCLAP;
+
+/*
+ * Application return codes :
+ * 
+ * -1	= Argument parsing error
+ * -2	= Capture fail
+ * -3	= Calibration error
+ *
+ */
+
 
 #define _USE_MATH_DEFINES
 cv::RNG rng(12345);
@@ -20,22 +31,18 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options);
 int main(int argc, char** argv) {
 
 	auto returnValue = false;
-
 	CommandLineOptions options;
 
-	if (!parseArgs(argc, argv, options)) {
-		cerr << "Error while parsing command line parameters." << endl;
-		return -1;
-
-	}
-
-	// unique case for build information
-	if (options.BuildInfoMode()) {
-		cout << cv::getBuildInformation() << endl;
-		return 0;
-	}
-
 	try {
+
+		if (parseArgs(argc, argv, options)) {
+			// unique case for build information
+			if (options.BuildInfoMode()) {
+				Util::log(cv::getBuildInformation());
+				return 0;
+			}
+		}
+
 		ThicknessGauge c;
 
 		c.setFrameCount(options.Frames());
@@ -46,6 +53,11 @@ int main(int argc, char** argv) {
 		if (calibration_file_exists) {
 			c.initCalibrationSettings(options.CameraFile());
 		}
+
+		if (options.CalibrationMode()) {
+			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
+		}
+
 
 		if (options.DemoMode()) {
 
@@ -62,13 +74,21 @@ int main(int argc, char** argv) {
 			}
 
 		}
-
-
 	}
-	catch (CaptureFailException& e) {
-		string what = e.what();
-		cout << "Something happend.. but what?\n" << what << endl;
-		//LOG_ERR("CaptureFailException\n" + what);
+	catch (ArgException& ae) {
+		string what = ae.what();
+		Util::loge("Exception suddenly happend (but what?)\n" + what);
+		return -1;
+	}
+	catch (CaptureFailException& cfe) {
+		string what = cfe.what();
+		Util::loge("Exception suddenly happend (but what?)\n" + what);
+		return -2;
+	}
+	catch (CalibrationException& cale) {
+		string what = cale.what();
+		Util::loge("Exception suddenly happend (but what?)\n" + what);
+		return -3;
 	}
 
 
@@ -148,15 +168,12 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		options.setCalibrationMode(calib);
 		options.setTestMode(test);
 
-		return true;
-	} catch (ArgException& e) {
-		string what = e.what();
-		cerr << "Something happend.. but what?\n" << what << endl;
+		return false;
 	}
-
-	return false;
+	catch (ArgException& e) {
+		throw(e);
+	}
 }
-
 
 
 int testBazier() {

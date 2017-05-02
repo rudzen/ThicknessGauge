@@ -164,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bezier_1.h" />
+    <ClInclude Include="CalibrationException.h" />
     <ClInclude Include="CalibrationSettings.h" />
     <ClInclude Include="CaptureFailException.h" />
     <ClInclude Include="CommandLineOptions.h" />

@@ -37,6 +37,11 @@ public:
 		std::cout << message << std::endl;
 	}
 
+	static void loge(char *message) {
+		std::cerr << message << std::endl;
+	}
+
+
 	/** Brief Print message to console
 	* Outputs message to console
 	* @param message The message to output
@@ -44,6 +49,18 @@ public:
 	static void log(std::string message) {
 		std::cout << message << std::endl;
 	}
+
+	static void loge(std::string message) {
+		std::cerr << message << std::endl;
+	}
+
+
+	static void log(std::string& message, std::ofstream& filename) {
+		log(message);
+		filename << message << std::endl;
+	}
+
+
 
 	/** Brief Determines the highest of two values
 	* Max of two ints
