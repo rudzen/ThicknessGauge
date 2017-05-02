@@ -10,20 +10,19 @@
 
 using namespace std;
 using namespace _cv;
-using namespace cv;
 
 class MiniCalc {
 
 private:
 
-	Point2i lowestPixel_;
-	Point2i highestPixel_;
+	cv::Point2i lowestPixel_;
+	cv::Point2i highestPixel_;
 
 	map<Quantile, double> quantileMap_ = {{Quantile::Q25 , 0.25},{Quantile::Q50, 0.5},{Quantile::Q75, 0.75}};
 
-	Point2d mean_;
+	cv::Point2d mean_;
 
-	Point2d variance_;
+	cv::Point2d variance_;
 
 	Interpolate<double> interpolate_;
 
@@ -32,17 +31,17 @@ private:
 public:
 
 	struct pixelYsort {
-		bool operator()(Point2i pt1, Point2i pt2) const { return pt1.y < pt2.y; }
-		bool operator()(Point2d pt1, Point2d pt2) const { return pt1.y < pt2.y; }
+		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
+		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
 	} sortY;
 
 	struct pixelXsort {
-		bool operator()(Point2i pt1, Point2i pt2) const { return pt1.x < pt2.x; }
-		bool operator()(Point2d pt1, Point2d pt2) const { return pt1.x < pt2.x; }
+		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
+		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
 	} sortX;
 
-	void sortContours(vector<vector<Point>>& contours) {
-		auto contourComparator = [](vector<Point> a, vector<Point> b) { return contourArea(a) > contourArea(b); };
+	void sortContours(vector<vector<cv::Point>>& contours) {
+		auto contourComparator = [](vector<cv::Point> a, vector<cv::Point> b) { return contourArea(a) > contourArea(b); };
 		sort(contours.begin(), contours.end(), contourComparator);
 	}
 
@@ -53,59 +52,59 @@ public:
 	static double calculatePixelToMm(double pixels);
 
 	// means of all Y values for each X
-	vector<Point> m_PlanarPixels;
+	vector<cv::Point> m_PlanarPixels;
 
-	void SetMean(Point2d newMean);
+	void SetMean(cv::Point2d newMean);
 
-	Point2d GetMean() const;
+	cv::Point2d GetMean() const;
 
-	void AddMean(Point2d meanToAdd);
+	void AddMean(cv::Point2d meanToAdd);
 
-	void SetVariance(Point2d newVariance);
+	void SetVariance(cv::Point2d newVariance);
 
-	Point2d GetVariance() const;
+	cv::Point2d GetVariance() const;
 
-	void AddVariance(Point2d varianceToAdd);
+	void AddVariance(cv::Point2d varianceToAdd);
 
-	static Point2d mean(vector<Point2i>& pixels);
+	static cv::Point2d mean(vector<cv::Point2i>& pixels);
 
 	static double mean(vector<double>& vec);
 
-	static double meanX(vector<Point2i>& pixels);
+	static double meanX(vector<cv::Point2i>& pixels);
 
-	static double meanY(vector<Point2i>& pixels);
+	static double meanY(vector<cv::Point2i>& pixels);
 
-	Point2i quantileX(Quantile quant, vector<Point2i>& pixels);
+	cv::Point2i quantileX(Quantile quant, vector<cv::Point2i>& pixels);
 
-	Point2i quantileY(Quantile quant, vector<Point2i>& pixels);
+	cv::Point2i quantileY(Quantile quant, vector<cv::Point2i>& pixels);
 
-	Point2i percentileX(double percentage, vector<Point2i>& pixels) const;
+	cv::Point2i percentileX(double percentage, vector<cv::Point2i>& pixels) const;
 
-	Point2i percentileY(double percentage, vector<Point2i>& pixels) const;
+	cv::Point2i percentileY(double percentage, vector<cv::Point2i>& pixels) const;
 
-	Point2d variance(vector<Point2i>& pixels) const;
+	cv::Point2d variance(vector<cv::Point2i>& pixels) const;
 
-	Point2d variance(Point2d& mean, vector<Point2i>& pixels) const;
+	cv::Point2d variance(cv::Point2d& mean, vector<cv::Point2i>& pixels) const;
 
-	static void varianceAdd(vector<Point2i>& pixels);
+	static void varianceAdd(vector<cv::Point2i>& pixels);
 
-	double varianceX(vector<Point2i>& pixels) const;
+	double varianceX(vector<cv::Point2i>& pixels) const;
 
-	double varianceX(double mean, vector<Point2i>& pixels) const;
+	double varianceX(double mean, vector<cv::Point2i>& pixels) const;
 
-	double varianceY(vector<Point2i>& pixels) const;
+	double varianceY(vector<cv::Point2i>& pixels) const;
 
-	double varianceY(double mean, vector<Point2i>& pixels) const;
+	double varianceY(double mean, vector<cv::Point2i>& pixels) const;
 
-	Point2d sd(vector<Point2i>& pixels) const {
-		return Point2d(sqrt(varianceX(pixels)), sqrt(varianceY(pixels)));
+	cv::Point2d sd(vector<cv::Point2i>& pixels) const {
+		return cv::Point2d(sqrt(varianceX(pixels)), sqrt(varianceY(pixels)));
 	}
 
-	double sdX(vector<Point2i>& pixels) const {
+	double sdX(vector<cv::Point2i>& pixels) const {
 		return sqrt(varianceX(pixels));
 	}
 
-	double sdY(vector<Point2i>& pixels) const {
+	double sdY(vector<cv::Point2i>& pixels) const {
 		return sqrt(varianceY(pixels));
 	}
 
@@ -113,18 +112,18 @@ public:
 		return *s / mean * 100;
 	}
 
-	static int calculateHighLow(vector<Point2i>& pixels);
+	static int calculateHighLow(vector<cv::Point2i>& pixels);
 
-	int highestPixelInLine(Mat& image) const;
+	int highestPixelInLine(cv::Mat& image) const;
 
 	bool saveData(string filename) const;
 
 	/* Converts pixels from an image to a singular line vector in X, where Y is the mean of all pixels located at that given X in the image */
-	bool generatePlanarPixels(Mat& input, Mat& output, vector<Point>& pixels, vector<Point2d>& gradientPixels) const;
+	bool generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point>& pixels, vector<cv::Point2d>& gradientPixels) const;
 
-	bool generateGradientPlanarMap(Mat& image, vector<Point2d> planarPixels, vector<Vec3b>& gradientPixels);
+	bool generateGradientPlanarMap(cv::Mat& image, vector<cv::Point2d> planarPixels, vector<cv::Vec3b>& gradientPixels);
 
-	uchar getGradientYValues(Mat& image, int x, int y, int maxY, int minY);
+	uchar getGradientYValues(cv::Mat& image, int x, int y, int maxY, int minY);
 
 	/**
 	 * \brief Computes mu
@@ -171,7 +170,7 @@ public:
 				return elements[i];
 		}
 		
-		return Point(0, imageHeight);
+		return cv::Point(0, imageHeight);
 	}
 
 	/**
@@ -197,7 +196,7 @@ public:
 				return elements[i];
 		}
 
-		return Point(0, imageHeight);
+		return cv::Point(0, imageHeight);
 	}
 
 	/**
@@ -225,7 +224,7 @@ public:
 			const auto targetLastX = targetElements.back().x;
 			const auto targetLastY = targetElements.back().y;
 			for (auto i = targetLastX; i < imageWidth; ++i)
-				targetElements.push_back(Point(i, targetLastY));
+				targetElements.push_back(cv::Point(i, targetLastY));
 		}
 	}
 
@@ -254,7 +253,7 @@ public:
 			const auto targetLastX = targetElements.back().x;
 			const auto targetLastY = targetElements.back().y;
 			for (auto i = targetLastX; i >= 0; --i)
-				targetElements.push_back(Point(i, targetLastY));
+				targetElements.push_back(cv::Point(i, targetLastY));
 		}
 
 	}
@@ -268,8 +267,8 @@ public:
 	 */
 	v2<double> fillElementGabs(vi& elements, cv::Mat& target, int barrier = 0) const {
 
-		elements.push_back(Point(0, target.rows));
-		elements.push_back(Point(target.cols, target.rows));
+		elements.push_back(cv::Point(0, target.rows));
+		elements.push_back(cv::Point(target.cols, target.rows));
 
 		sort(elements.begin(), elements.end(), sortX);
 
@@ -279,7 +278,7 @@ public:
 
 		auto first = elements.front().x;
 
-		vector<Point> gabLine;
+		vector<cv::Point> gabLine;
 
 		v2<double> sum;
 		auto gab = false;
@@ -302,7 +301,7 @@ public:
 				gab = true;
 			}
 			if (gab) {
-				line(target, elements[i], elements[i + 1], Scalar(255, 255, 255), 1, LINE_AA);
+				line(target, elements[i], elements[i + 1], cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
 				sum.x += abs(elements[i + 1].x - elements[i].x);
 				sum.y += abs(elements[i + 1].y - elements[i].y);
 			}
@@ -336,7 +335,7 @@ public:
 		return 0.0;
 	}
 
-	double computeWeigthedIntensity(vi& elements, Point point) {
+	double computeWeigthedIntensity(vi& elements, cv::Point point) {
 		return computeWeigthedIntensity(elements, point.x, point.y);
 	}
 
@@ -373,7 +372,7 @@ public:
 	 * \param yLimit The limit in height
 	 * \return true if something was found, otherwise false
 	 */
-	static bool getActualPixels(Mat& image, vi& output, int yLimit) {
+	static bool getActualPixels(cv::Mat& image, vi& output, int yLimit) {
 		vi result;
 		cv::findNonZero(image, result);
 		yLimit = abs(image.rows - yLimit);

@@ -21,16 +21,20 @@ class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
 	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(75), lineThreshold_(100), baseLine_(24) {
-		baseColour_ = Scalar(255, 255, 255);
+		baseColour_ = cv::Scalar(255, 255, 255);
 		settings.ddepth = CV_8S;
 	}
-
 private:
 
 	const double PIangle = CV_PI / 180;
 
 	map<WindowType, string> m_WindowNames = {{WindowType::Input, "Camera Input"},{WindowType::Output, "Output"},{WindowType::Temp, "Temp"}};
 
+
+public:
+
+
+private:
 	uint64 frameTime_;
 
 	int frameCount_;

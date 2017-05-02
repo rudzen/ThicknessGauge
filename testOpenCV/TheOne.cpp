@@ -2,27 +2,173 @@
 #include <iostream>
 #include "ThicknessGauge.h"
 #include "CalibrationTest.cpp"
-#include "args.h"
 #include "CaptureFailException.h"
+#include "tclap/CmdLine.h"
+#include "CommandLineOptions.h"
+#include "IntegerConstraint.h"
+#include "FileConstraint.h"
 
 using namespace std;
+using namespace TCLAP;
 
 #define _USE_MATH_DEFINES
-
-RNG rng(12345);
-
+cv::RNG rng(12345);
 const string default_camera_calibration_file = "C2450.json";
+
+bool parseArgs(int argc, char** argv, CommandLineOptions& options);
+
+int main(int argc, char** argv) {
+
+	auto returnValue = false;
+
+	CommandLineOptions options;
+
+	if (!parseArgs(argc, argv, options)) {
+		cerr << "Error while parsing command line parameters." << endl;
+		return -1;
+
+	}
+
+	// unique case for build information
+	if (options.BuildInfoMode()) {
+		cout << cv::getBuildInformation() << endl;
+		return 0;
+	}
+
+	try {
+		ThicknessGauge c;
+
+		c.setFrameCount(options.Frames());
+		c.setShowWindows(options.ShowWindows());
+		c.setSaveVideo(options.RecordVideo());
+
+		auto calibration_file_exists = Util::isFile(options.CameraFile());
+		if (calibration_file_exists) {
+			c.initCalibrationSettings(options.CameraFile());
+		}
+
+		if (options.DemoMode()) {
+
+			c.initVideoCapture();
+
+			auto bThreshold = 0;
+			//bThreshold = c.autoBinaryThreshold(25000);
+			//cout << "generating threshold : " << bThreshold << endl;
+			//returnValue = bThreshold != 0;
+
+			returnValue = c.generatePlanarImage();
+			if (returnValue) {
+				cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
+			}
+
+		}
+
+
+	}
+	catch (CaptureFailException& e) {
+		string what = e.what();
+		cout << "Something happend.. but what?\n" << what << endl;
+		//LOG_ERR("CaptureFailException\n" + what);
+	}
+
+
+	return returnValue ^ true;
+
+	//return testBazier();
+
+	//PrettyMenu menu;
+	//menu.show();
+
+	//string calibrate("calibrate");
+
+}
+
+bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
+	try {
+		CmdLine cmd("ThicknessGauge [OpenCV]", '=', "0.1", true);
+
+		// add basic switches
+		SwitchArg demoSwitch("d", "demo", "runs regular demo", true);
+		cmd.add(demoSwitch);
+
+		SwitchArg calibrationSwitch("c", "calibrate", "perform camera calibration", false);
+		cmd.add(calibrationSwitch);
+
+		SwitchArg buildInfoSwitch("i", "info", "show software information", false);
+		cmd.add(buildInfoSwitch);
+
+		SwitchArg testSwitch("t", "test_frames", "Performs aggresive testing from 5 to --t frames", false);
+		cmd.add(testSwitch);
+
+		ValueArg<int> frameArg("f", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint(5, 200));
+		cmd.add(frameArg);
+
+		ValueArg<bool> showArg("s", "show_windows", "displays windows in demo mode", false, true, "true/false");
+		cmd.add(showArg);
+
+		ValueArg<bool> videoArg("v", "record_video", "Records demo mode to video", false, false, "true/false");
+		cmd.add(videoArg);
+
+		ValueArg<int> testArg("m", "max_frames", "Aggresive testing maximum frames", false, 50, "positive % 5 number >= 10");
+		cmd.add(testArg);
+
+		ValueArg<string> cameraFileArg("", "camera_settings", "OpenCV camera calibration file", false, default_camera_calibration_file, new FileConstraint());
+		cmd.add(cameraFileArg);
+
+		cmd.parse(argc, argv);
+
+		// read all parsed command line arguments
+		auto buildinfo = buildInfoSwitch.getValue();
+
+		options.setBuildInfoMode(buildinfo);
+
+		// check, its a instant abort if build info is found
+		if (buildinfo)
+			return true;
+
+		auto cameraFile = cameraFileArg.getValue();
+		options.setCameraFile(cameraFile);
+
+		auto frames = frameArg.getValue();
+		options.set_frames(frames);
+
+		auto showwindows = showArg.getValue();
+		auto recordvideo = videoArg.getValue();
+		auto testmaxframes = testArg.getValue();
+
+		options.setShowWindows(showwindows);
+		options.setRecordVideo(recordvideo);
+		options.setTestMax(testmaxframes);
+
+		auto demo = demoSwitch.getValue();
+		auto calib = calibrationSwitch.getValue();
+		auto test = testSwitch.getValue();
+
+		options.setDemoMode(demo);
+		options.setCalibrationMode(calib);
+		options.setTestMode(test);
+
+		return true;
+	} catch (ArgException& e) {
+		string what = e.what();
+		cerr << "Something happend.. but what?\n" << what << endl;
+	}
+
+	return false;
+}
+
+
 
 int testBazier() {
 	// Create black empty images
-	Mat image = Mat::zeros(500, 800, CV_8UC3);
+	cv::Mat image = cv::Mat::zeros(500, 800, CV_8UC3);
 
-	Point2i Lp(0, 0);
+	cv::Point2i Lp(0, 0);
 
-	vector<Point2i> P(20);
-	vector<Point2i> Pp(20);
-	vector<Point2i> Ppp(20);
-	Point2i a(0, 0), b(0, 0), c(0, 0), d(33, 0), e(0, 1), f(0, 0);// general purpose scratch registers.
+	vector<cv::Point2i> P(20);
+	vector<cv::Point2i> Pp(20);
+	vector<cv::Point2i> Ppp(20);
+	cv::Point2i a(0, 0), b(0, 0), c(0, 0), d(33, 0), e(0, 1), f(0, 0);// general purpose scratch registers.
 
 	unsigned int Np = 4;
 	P[0] = {133, 300};
@@ -51,21 +197,21 @@ int testBazier() {
 			Pp = Ppp;
 		}
 
-		line(image, c, Lp, Scalar(110, 220, 0), 1, 1);
+		line(image, c, Lp, cv::Scalar(110, 220, 0), 1, 1);
 		Lp = c;
 	}
 
 	// P straight line generator.
 	for (auto c3ccount = 0; c3ccount < Np; c3ccount = c3ccount + 1) {
-		line(image, P[c3ccount], P[c3ccount + 1], Scalar(200, 200, 200), 2, 8);
+		line(image, P[c3ccount], P[c3ccount + 1], cv::Scalar(200, 200, 200), 2, 8);
 		a = P[c3ccount] + e;
-		line(image, P[c3ccount], a, Scalar(55, 55, 200), 9, 8);
+		line(image, P[c3ccount], a, cv::Scalar(55, 55, 200), 9, 8);
 		a = P[c3ccount + 1] + e;
-		line(image, P[c3ccount + 1], a, Scalar(55, 55, 200), 9, 8);
+		line(image, P[c3ccount + 1], a, cv::Scalar(55, 55, 200), 9, 8);
 	}
 
 	imshow("Bezier_curve", image);
-	waitKey(0);
+	cv::waitKey(0);
 	cout << "done\n";
 	return (0);
 }
@@ -161,78 +307,3 @@ int testBazier() {
 //	is.CloseVideo();
 //
 //}
-
-int main(int argc, char** argv) {
-
-	//return testBazier();
-
-	//PrettyMenu menu;
-	//menu.show();
-
-	string calibrate("calibrate");
-
-	Args args;
-	args.addOption("demo", 'd', "start basic demo", Args::Optional, false);
-	args.addOption("calibrate", 'c', "Calibrates camera a single frame at a time", Args::Optional, false);
-	args.addOption("frames", 'f', "Frame interval between computations", Args::Optional, false);
-	args.addOption("show", 's', "Show OpenCV output windows", Args::Optional, false);
-	args.addOption("buildinfo", 'b', "Show OpenCV build information", Args::Optional, false);
-	args.addOption("settings", 'l', "Loads camera calibration settings from file", Args::Optional, false);
-	args.addOption("video", 'v', "Enable video recording of resulting images.", Args::Optional, false);
-	//	args.addAdditionalOption(calibrate, "Calibration method");
-	args.parse(argc, argv);
-
-	auto showBuildInfo = args.getArgument("buildinfo", false);
-
-	if (showBuildInfo) {
-		cout << getBuildInformation();
-		return 0;
-	}
-
-	auto initiateCalibration = args.getArgument("calibrate", false);
-
-	if (initiateCalibration) {
-		// TODO : Construct modular calibration test and start it here!
-		cout << "Calibration is not completed yet, please do so manually." << endl;
-		return 0;
-	}
-
-	ThicknessGauge c;
-
-	// settings from arguments.
-	c.setFrameCount(args.getArgument("frames", 25));
-	c.setShowWindows(args.getArgument("show", true));
-	c.setSaveVideo(args.getArgument("video", false));
-
-	auto camera_calibration_file = args.getArgument("settings", default_camera_calibration_file);
-
-	auto calibration_file_exists = Util::isFile(camera_calibration_file);
-
-	if (calibration_file_exists) {
-		c.initCalibrationSettings(camera_calibration_file);
-	}
-	else {
-		cerr << "Error. Calibration file does not exist, no settings will be applied." << endl;
-	}
-
-	c.initVideoCapture();
-
-	auto returnValue = false;
-	auto bThreshold = 0;
-	try {
-		//bThreshold = c.autoBinaryThreshold(25000);
-		//cout << "generating threshold : " << bThreshold << endl;
-		//returnValue = bThreshold != 0;
-
-		returnValue = c.generatePlanarImage();
-		if (returnValue) {
-			cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
-		}
-	}
-	catch (CaptureFailException& e) {
-		cout << "Something happend.. but what?\n" << e.what() << endl;
-	}
-
-	return returnValue ^ true;
-
-}

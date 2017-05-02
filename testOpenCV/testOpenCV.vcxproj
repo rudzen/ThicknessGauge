@@ -84,8 +84,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files\Allied Vision Technologies\GigESDK\inc-pc;C:\Program Files\Allied Vision\Vimba_2.0\VimbaCPP\Include;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\include;C:\Program Files\Allied Vision\Vimba_2.0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Allied Vision Technologies\GigESDK\lib-pc\x64;C:\Program Files\Allied Vision\Vimba_2.0\VimbaCPP\Lib\Win64;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\RUAK\Documents\Visual Studio 2017\Projects\ThicknessGauge\testOpenCV\log4cpp;C:\Program Files\Allied Vision Technologies\GigESDK\inc-pc;C:\Program Files\Allied Vision\Vimba_2.0\VimbaCPP\Include;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\include;C:\Program Files\Allied Vision\Vimba_2.0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\RUAK\Documents\Visual Studio 2017\Projects\ThicknessGauge\testOpenCV\log4cpp;C:\Program Files\Allied Vision Technologies\GigESDK\lib-pc\x64;C:\Program Files\Allied Vision\Vimba_2.0\VimbaCPP\Lib\Win64;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\x64\vc15\lib;C:\libs\log4cpp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -141,12 +141,13 @@
       <LanguageStandard>stdcpp14</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>C:\Users\RUAK\Documents\Visual Studio 2017\Projects\ThicknessGauge\testOpenCV;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>PvAPI.lib;VimbaCPP.lib;opencv_aruco320.lib;opencv_bgsegm320.lib;opencv_bioinspired320.lib;opencv_calib3d320.lib;opencv_ccalib320.lib;opencv_core320.lib;opencv_datasets320.lib;opencv_dnn320.lib;opencv_dpm320.lib;opencv_face320.lib;opencv_features2d320.lib;opencv_flann320.lib;opencv_fuzzy320.lib;opencv_highgui320.lib;opencv_imgcodecs320.lib;opencv_imgproc320.lib;opencv_line_descriptor320.lib;opencv_ml320.lib;opencv_objdetect320.lib;opencv_optflow320.lib;opencv_phase_unwrapping320.lib;opencv_photo320.lib;opencv_plot320.lib;opencv_reg320.lib;opencv_rgbd320.lib;opencv_saliency320.lib;opencv_shape320.lib;opencv_stereo320.lib;opencv_stitching320.lib;opencv_structured_light320.lib;opencv_superres320.lib;opencv_surface_matching320.lib;opencv_text320.lib;opencv_tracking320.lib;opencv_video320.lib;opencv_videoio320.lib;opencv_videostab320.lib;opencv_xfeatures2d320.lib;opencv_ximgproc320.lib;opencv_xobjdetect320.lib;opencv_xphoto320.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>log4cpp.lib;PvAPI.lib;VimbaCPP.lib;opencv_aruco320.lib;opencv_bgsegm320.lib;opencv_bioinspired320.lib;opencv_calib3d320.lib;opencv_ccalib320.lib;opencv_core320.lib;opencv_datasets320.lib;opencv_dnn320.lib;opencv_dpm320.lib;opencv_face320.lib;opencv_features2d320.lib;opencv_flann320.lib;opencv_fuzzy320.lib;opencv_highgui320.lib;opencv_imgcodecs320.lib;opencv_imgproc320.lib;opencv_line_descriptor320.lib;opencv_ml320.lib;opencv_objdetect320.lib;opencv_optflow320.lib;opencv_phase_unwrapping320.lib;opencv_photo320.lib;opencv_plot320.lib;opencv_reg320.lib;opencv_rgbd320.lib;opencv_saliency320.lib;opencv_shape320.lib;opencv_stereo320.lib;opencv_stitching320.lib;opencv_structured_light320.lib;opencv_superres320.lib;opencv_surface_matching320.lib;opencv_text320.lib;opencv_tracking320.lib;opencv_video320.lib;opencv_videoio320.lib;opencv_videostab320.lib;opencv_xfeatures2d320.lib;opencv_ximgproc320.lib;opencv_xobjdetect320.lib;opencv_xphoto320.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -165,7 +166,10 @@
     <ClInclude Include="Bezier_1.h" />
     <ClInclude Include="CalibrationSettings.h" />
     <ClInclude Include="CaptureFailException.h" />
+    <ClInclude Include="CommandLineOptions.h" />
     <ClInclude Include="Compute.h" />
+    <ClInclude Include="FileConstraint.h" />
+    <ClInclude Include="IntegerConstraint.h" />
     <ClInclude Include="Interpolate.h" />
     <ClInclude Include="InvalidFileException.h" />
     <ClInclude Include="IsValidFileName.h" />
@@ -174,8 +178,6 @@
     <ClInclude Include="Q.h" />
     <ClInclude Include="Specs.h" />
     <ClInclude Include="ThicknessGauge.h" />
-    <ClInclude Include="args.h" />
-    <ClInclude Include="getopt.h" />
     <ClInclude Include="ImageDimensionException.h" />
     <ClInclude Include="ImageSave.h" />
     <ClInclude Include="InvalidMeanException.h" />

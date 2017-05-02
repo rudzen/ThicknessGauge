@@ -663,12 +663,12 @@ void ThicknessGauge::drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar col
 }
 
 void ThicknessGauge::drawVerticalLine(cv::Mat* image, uint pos, cv::Scalar colour) {
-	line(*image, Point(pos, 0), Point(pos, image->rows), colour);
+	line(*image, cv::Point(pos, 0), cv::Point(pos, image->rows), colour);
 }
 
 void ThicknessGauge::drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour) {
-	line(*image, Point(0, image->rows >> 1), Point(image->cols, image->rows >> 1), colour);
-	line(*image, Point(image->cols >> 1, 0), Point(image->cols >> 1, image->rows), colour);
+	line(*image, cv::Point(0, image->rows >> 1), cv::Point(image->cols, image->rows >> 1), colour);
+	line(*image, cv::Point(image->cols >> 1, 0), cv::Point(image->cols >> 1, image->rows), colour);
 }
 
 void ThicknessGauge::drawHorizontalLine(cv::Mat* image, uint pos) const {
@@ -818,6 +818,9 @@ int ThicknessGauge::getFrameCount() const {
 }
 
 void ThicknessGauge::setFrameCount(int frameCount) {
+	if (frameCount < 1 || frameCount > 999)
+		frameCount = 25;
+	
 	frameCount_ = frameCount;
 }
 

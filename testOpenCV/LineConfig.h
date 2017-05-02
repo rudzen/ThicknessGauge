@@ -1,8 +1,6 @@
 #pragma once
 #include <opencv2/imgproc.hpp>
 
-using namespace cv;
-
 /**
 * \brief LineConfig data holder
 * Contains the meta for which to use when computing lines
@@ -51,7 +49,7 @@ public:
 	/**
 	 * \brief Default configuration
 	 */
-	LineConfig(): distType_(DIST_L12), params_(0.0), reps_(0.01), aepa_(0.01) {
+	LineConfig(): distType_(cv::DIST_L12), params_(0.0), reps_(0.01), aepa_(0.01) {
 	}
 
 	int getDistType() const {

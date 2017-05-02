@@ -43,9 +43,6 @@
     <Filter Include="Source Files\Camera\Calibrate">
       <UniqueIdentifier>{0301527b-b7ed-4baf-80e9-faa79432ca41}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Args">
-      <UniqueIdentifier>{c440676d-d810-4ec4-abc8-02bb21192320}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Utils">
       <UniqueIdentifier>{982653c9-ce35-4eca-8b1b-689159973b37}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,12 @@
     </Filter>
     <Filter Include="Header Files\CV\Data">
       <UniqueIdentifier>{47ce9c4e-698e-4206-9702-1a8e72b79918}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Menu\CommandLine">
+      <UniqueIdentifier>{82c41425-6f0e-4575-af57-1f022679eb09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Menu\CommandLine\Constraints">
+      <UniqueIdentifier>{ef7472bf-b9f9-4fdb-b78c-681f2d75ee94}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -122,12 +125,6 @@
     <ClInclude Include="CaptureFailException.h">
       <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
-    <ClInclude Include="args.h">
-      <Filter>Header Files\Args</Filter>
-    </ClInclude>
-    <ClInclude Include="getopt.h">
-      <Filter>Header Files\Args</Filter>
-    </ClInclude>
     <ClInclude Include="Stringtools.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
@@ -169,6 +166,15 @@
     </ClInclude>
     <ClInclude Include="Bezier_1.h">
       <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandLineOptions.h">
+      <Filter>Header Files\Menu\CommandLine</Filter>
+    </ClInclude>
+    <ClInclude Include="IntegerConstraint.h">
+      <Filter>Header Files\Menu\CommandLine\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="FileConstraint.h">
+      <Filter>Header Files\Menu\CommandLine\Constraints</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

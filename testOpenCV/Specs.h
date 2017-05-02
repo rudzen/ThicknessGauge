@@ -74,7 +74,7 @@ inline double Specs::getNonBaseLine(cv::Mat& image, int baseLine) {
 	const auto COLUMN = 0;
 
 
-	Mat row_mean, col_mean;
+	cv::Mat row_mean, col_mean;
 	reduce(image, row_mean, 0, CV_REDUCE_AVG);
 	reduce(image, col_mean, 1, CV_REDUCE_AVG);
 

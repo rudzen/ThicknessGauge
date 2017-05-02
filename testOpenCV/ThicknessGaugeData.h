@@ -20,7 +20,7 @@ protected:
 
 	LineConfig lineConfig_;
 
-	Vec4f gaugeLine_;
+	cv::Vec4f gaugeLine_;
 
 	double avgGaugeHeight_;
 
@@ -127,6 +127,6 @@ inline cv::Mat& ThicknessGaugeData::GetPlanarImage() {
 	return planarImage_;
 }
 
-inline void ThicknessGaugeData::setPlanarImage(const Mat& mat) {
+inline void ThicknessGaugeData::setPlanarImage(const cv::Mat& mat) {
 	planarImage_ = mat;
 }

@@ -1,8 +1,9 @@
+#pragma once
+
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
 #include <time.h>
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
@@ -14,7 +15,6 @@
 # define _CRT_SECURE_NO_WARNINGS
 #endif
 
-using namespace cv;
 using namespace std;
 using namespace utils;
 
@@ -32,7 +32,7 @@ public:
 	enum class InputType { INVALID, CAMERA, VIDEO_FILE, IMAGE_LIST };
 
 	//Write serialization for this class
-	void write(FileStorage& fs) const {
+	void write(cv::FileStorage& fs) const {
 		fs << "{" << "BoardSize_Width" << boardSize.width
 			<< "BoardSize_Height" << boardSize.height
 			<< "Square_Size" << squareSize
@@ -55,7 +55,7 @@ public:
 	}
 
 	//Read serialization for this class
-	void read(const FileNode& node) {
+	void read(const cv::FileNode& node) {
 		node["BoardSize_Width"] >> boardSize.width;
 		node["BoardSize_Height"] >> boardSize.height;
 		node["Calibrate_Pattern"] >> patternToUse;
@@ -136,27 +136,27 @@ public:
 		atImageList = 0;
 	}
 
-	Mat nextImage() {
-		Mat result;
+	cv::Mat nextImage() {
+		cv::Mat result;
 		if (inputCapture.isOpened()) {
-			Mat view0;
+			cv::Mat view0;
 			inputCapture >> view0;
 			return view0;
 			//view0.copyTo(result);
 		}
 		if (atImageList < static_cast<int>(imageList.size()))
-			result = imread(imageList[atImageList++], CV_LOAD_IMAGE_COLOR);
+			result = cv::imread(imageList[atImageList++], CV_LOAD_IMAGE_COLOR);
 
 		return result;
 	}
 
 	static bool readStringList(const string& filename, vector<string>& l) {
 		l.clear();
-		FileStorage fs(filename, FileStorage::READ);
+		cv::FileStorage fs(filename, cv::FileStorage::READ);
 		if (!fs.isOpened())
 			return false;
 		auto node = fs.getFirstTopLevelNode();
-		if (node.type() != FileNode::SEQ)
+		if (node.type() != cv::FileNode::SEQ)
 			return false;
 		auto file_node_iterator = node.begin(), it_end = node.end();
 		for (; file_node_iterator != it_end; ++file_node_iterator)
@@ -179,7 +179,7 @@ public:
 	}
 
 public:
-	Size boardSize; // The size of the board -> Number of items by width and height
+	cv::Size boardSize; // The size of the board -> Number of items by width and height
 	Pattern calibrationPattern;// One of the Chessboard, circles, or asymmetric circle pattern
 	float squareSize; // The size of a square in your defined unit (point, millimeter,etc).
 	int nrFrames; // The number of frames to use from the input for calibration
@@ -197,7 +197,7 @@ public:
 	int cameraID;
 	vector<string> imageList;
 	int atImageList;
-	VideoCapture inputCapture;
+	cv::VideoCapture inputCapture;
 	InputType inputType;
 	bool goodInput;
 	int flag;
@@ -210,19 +210,19 @@ public:
 			"how to edit it.  It may be any OpenCV supported file format XML/YAML/JSON." << endl;
 	}
 
-	static double computeReprojectionErrors(const vector<vector<Point3f>>& objectPoints,
-	                                        const vector<vector<Point2f>>& imagePoints,
-	                                        const vector<Mat>& rvecs, const vector<Mat>& tvecs,
-	                                        const Mat& cameraMatrix, const Mat& distCoeffs,
+	static double computeReprojectionErrors(const vector<vector<cv::Point3f>>& objectPoints,
+	                                        const vector<vector<cv::Point2f>>& imagePoints,
+	                                        const vector<cv::Mat>& rvecs, const vector<cv::Mat>& tvecs,
+	                                        const cv::Mat& cameraMatrix, const cv::Mat& distCoeffs,
 	                                        vector<float>& perViewErrors) {
-		vector<Point2f> imagePoints2;
+		vector<cv::Point2f> imagePoints2;
 		auto totalPoints = 0;
 		double totalErr = 0;
 		perViewErrors.resize(objectPoints.size());
 
 		for (auto i = 0; i < static_cast<int>(objectPoints.size()); ++i) {
-			projectPoints(Mat(objectPoints[i]), rvecs[i], tvecs[i], cameraMatrix, distCoeffs, imagePoints2);
-			auto err = norm(Mat(imagePoints[i]), Mat(imagePoints2), CV_L2);
+			projectPoints(cv::Mat(objectPoints[i]), rvecs[i], tvecs[i], cameraMatrix, distCoeffs, imagePoints2);
+			auto err = norm(cv::Mat(imagePoints[i]), cv::Mat(imagePoints2), CV_L2);
 
 			auto n = static_cast<int>(objectPoints[i].size());
 			perViewErrors[i] = static_cast<float>(std::sqrt(err * err / n));
@@ -234,11 +234,11 @@ public:
 	}
 
 	// Print camera parameters to the output file
-	void saveCameraParams(Settings& s, Size& imageSize, Mat& cameraMatrix, Mat& distCoeffs,
-	                      const vector<Mat>& rvecs, const vector<Mat>& tvecs,
-	                      const vector<float>& reprojErrs, const vector<vector<Point2f>>& imagePoints,
+	void saveCameraParams(Settings& s, cv::Size& imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs,
+	                      const vector<cv::Mat>& rvecs, const vector<cv::Mat>& tvecs,
+	                      const vector<float>& reprojErrs, const vector<vector<cv::Point2f>>& imagePoints,
 	                      double totalAvgErr) const {
-		FileStorage fs(s.outputFileName, FileStorage::WRITE_BASE64);
+		cv::FileStorage fs(s.outputFileName, cv::FileStorage::WRITE_BASE64);
 
 		fs << "calibration_Time" << Util::getTime();
 
@@ -283,15 +283,15 @@ public:
 
 		fs << "Avg_Reprojection_Error" << totalAvgErr;
 		if (!reprojErrs.empty())
-			fs << "Per_View_Reprojection_Errors" << Mat(reprojErrs);
+			fs << "Per_View_Reprojection_Errors" << cv::Mat(reprojErrs);
 
 		if (!rvecs.empty() && !tvecs.empty()) {
 			CV_Assert(rvecs[0].type() == tvecs[0].type());
-			Mat bigmat(static_cast<int>(rvecs.size()), 6, rvecs[0].type());
+			cv::Mat bigmat(static_cast<int>(rvecs.size()), 6, rvecs[0].type());
 			for (auto i = 0; i < static_cast<int>(rvecs.size()); i++) {
 				// ReSharper disable CppInitializedValueIsAlwaysRewritten
-				auto rotation = bigmat(Range(i, i + 1), Range(0, 3));
-				auto translation = bigmat(Range(i, i + 1), Range(3, 6));
+				auto rotation = bigmat(cv::Range(i, i + 1), cv::Range(0, 3));
+				auto translation = bigmat(cv::Range(i, i + 1), cv::Range(3, 6));
 				// ReSharper restore CppInitializedValueIsAlwaysRewritten
 
 				CV_Assert(rvecs[i].rows == 3 && rvecs[i].cols == 1);
@@ -307,30 +307,30 @@ public:
 		if (imagePoints.empty())
 			return;
 
-		Mat imagePtMat(static_cast<int>(imagePoints.size()), static_cast<int>(imagePoints[0].size()), CV_32FC2);
+		cv::Mat imagePtMat(static_cast<int>(imagePoints.size()), static_cast<int>(imagePoints[0].size()), CV_32FC2);
 		for (auto i = 0; i < static_cast<int>(imagePoints.size()); i++) {
 			auto r = imagePtMat.row(i).reshape(2, imagePtMat.cols);
-			Mat imgpti(imagePoints[i]);
+			cv::Mat imgpti(imagePoints[i]);
 			imgpti.copyTo(r);
 		}
 		fs << "Image_points" << imagePtMat;
 	}
 
-	bool runCalibration(Settings& s, Size& imageSize, Mat& cameraMatrix, Mat& distCoeffs,
-	                    vector<vector<Point2f>> imagePoints, vector<Mat>& rvecs, vector<Mat>& tvecs,
+	bool runCalibration(Settings& s, cv::Size& imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs,
+	                    vector<vector<cv::Point2f>> imagePoints, vector<cv::Mat>& rvecs, vector<cv::Mat>& tvecs,
 	                    vector<float>& reprojErrs, double& totalAvgErr) const {
 
 		cout << "Configuring matricies.." << endl;
 
-		cameraMatrix = Mat::eye(3, 3, CV_64F);
+		cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
 		if (s.flag & CV_CALIB_FIX_ASPECT_RATIO)
 			cameraMatrix.at<double>(0, 0) = 1.0;
 
-		distCoeffs = Mat::zeros(8, 1, CV_64F);
+		distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
 
 		cout << "Calculating board corner positions and resizing object points.." << endl;
 
-		vector<vector<Point3f>> objectPoints(1);
+		vector<vector<cv::Point3f>> objectPoints(1);
 		calcBoardCornerPositions(s.boardSize, s.squareSize, objectPoints[0], s.calibrationPattern);
 
 		objectPoints.resize(imagePoints.size(), objectPoints[0]);
@@ -350,7 +350,7 @@ public:
 		return ok;
 	}
 
-	static void calcBoardCornerPositions(Size boardSize, float squareSize, vector<Point3f>& corners, Pattern patternType /*= Settings::CHESSBOARD*/) {
+	static void calcBoardCornerPositions(cv::Size boardSize, float squareSize, vector<cv::Point3f>& corners, Pattern patternType /*= Settings::CHESSBOARD*/) {
 		corners.clear();
 
 		switch (patternType) {
@@ -358,22 +358,22 @@ public:
 		case Pattern::CIRCLES_GRID:
 			for (auto i = 0; i < boardSize.height; ++i)
 				for (auto j = 0; j < boardSize.width; ++j)
-					corners.push_back(Point3f(float(j * squareSize), float(i * squareSize), 0));
+					corners.push_back(cv::Point3f(float(j * squareSize), float(i * squareSize), 0));
 			break;
 
 		case Pattern::ASYMMETRIC_CIRCLES_GRID:
 			for (auto i = 0; i < boardSize.height; i++)
 				for (auto j = 0; j < boardSize.width; j++)
-					corners.push_back(Point3f(float((2 * j + i % 2) * squareSize), float(i * squareSize), 0));
+					corners.push_back(cv::Point3f(float((2 * j + i % 2) * squareSize), float(i * squareSize), 0));
 			break;
 		default:
 			break;
 		}
 	}
 
-	bool runCalibrationAndSave(Settings& s, Size imageSize, Mat& cameraMatrix, Mat& distCoeffs, vector<vector<Point2f>> imagePoints) const {
-		vector<Mat> rvecs;
-		vector<Mat> tvecs;
+	bool runCalibrationAndSave(Settings& s, cv::Size imageSize, cv::Mat& cameraMatrix, cv::Mat& distCoeffs, vector<vector<cv::Point2f>> imagePoints) const {
+		vector<cv::Mat> rvecs;
+		vector<cv::Mat> tvecs;
 		vector<float> reprojErrs;
 		double totalAvgErr = 0;
 
@@ -391,7 +391,7 @@ public:
 		help();
 
 		// Read the settings
-		FileStorage fs(inputSettingsFile, FileStorage::READ);
+		cv::FileStorage fs(inputSettingsFile, cv::FileStorage::READ);
 
 		if (!fs.isOpened()) {
 			cout << "Could not open the configuration file: \"" << inputSettingsFile << "\"" << endl;
@@ -407,15 +407,15 @@ public:
 			return -1;
 		}
 
-		vector<vector<Point2f>> imagePoints;
-		Mat cameraMatrix, distCoeffs;
-		Size imageSize;
+		vector<vector<cv::Point2f>> imagePoints;
+		cv::Mat cameraMatrix, distCoeffs;
+		cv::Size imageSize;
 		auto mode = s.inputType == InputType::IMAGE_LIST ? Mode::CAPTURING : Mode::DETECTION;
 		clock_t prevTimestamp = 0;
-		const Scalar RED(0, 0, 255), GREEN(0, 255, 0);
+		const cv::Scalar RED(0, 0, 255), GREEN(0, 255, 0);
 		const char ESC_KEY = 27;
 
-		namedWindow("Image View", WINDOW_FREERATIO);
+		cv::namedWindow("Image View", cv::WINDOW_FREERATIO);
 
 		for (auto i = 0;; ++i) {
 			auto view = s.nextImage();
@@ -442,7 +442,7 @@ public:
 			if (s.flipVertical)
 				flip(view, view, 0);
 
-			vector<Point2f> pointBuf;
+			vector<cv::Point2f> pointBuf;
 
 			// Find feature points on the input format
 			bool found;
@@ -454,7 +454,7 @@ public:
 				found = findCirclesGrid(view, s.boardSize, pointBuf);
 				break;
 			case Pattern::ASYMMETRIC_CIRCLES_GRID:
-				found = findCirclesGrid(view, s.boardSize, pointBuf, CALIB_CB_ASYMMETRIC_GRID);
+				found = findCirclesGrid(view, s.boardSize, pointBuf, cv::CALIB_CB_ASYMMETRIC_GRID);
 				break;
 			default:
 				found = false;
@@ -466,9 +466,9 @@ public:
 				// improve the found corners' coordinate accuracy for chessboard
 				if (s.calibrationPattern == Pattern::CHESSBOARD) {
 					// from colour to gray
-					Mat viewGray;
-					cvtColor(view, viewGray, COLOR_BGR2GRAY);
-					cornerSubPix(viewGray, pointBuf, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+					cv::Mat viewGray;
+					cvtColor(view, viewGray, cv::COLOR_BGR2GRAY);
+					cornerSubPix(viewGray, pointBuf, cv::Size(11, 11), cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 				}
 
 				// For camera only take new samples after delay time
@@ -479,20 +479,20 @@ public:
 				}
 
 				// Draw the corners.
-				drawChessboardCorners(view, s.boardSize, Mat(pointBuf), found);
+				drawChessboardCorners(view, s.boardSize, cv::Mat(pointBuf), found);
 			}
 
 			//----------------------------- Output Text ------------------------------------------------
 			string msg = (mode == Mode::CAPTURING) ? "100/100" : mode == Mode::CALIBRATED ? "Calibrated" : "Press 'g' to start";
 			auto baseLine = 0;
-			auto textSize = getTextSize(msg, 1, 1, 1, &baseLine);
-			Point textOrigin(view.cols - 2 * textSize.width - 10, view.rows - 2 * baseLine - 10);
+			auto textSize = cv::getTextSize(msg, 1, 1, 1, &baseLine);
+			cv::Point textOrigin(view.cols - 2 * textSize.width - 10, view.rows - 2 * baseLine - 10);
 
 			if (mode == Mode::CAPTURING) {
 				if (s.showUndistorsed)
-					msg = format("%d/%d Undist", static_cast<int>(imagePoints.size()), s.nrFrames);
+					msg = cv::format("%d/%d Undist", static_cast<int>(imagePoints.size()), s.nrFrames);
 				else
-					msg = format("%d/%d", static_cast<int>(imagePoints.size()), s.nrFrames);
+					msg = cv::format("%d/%d", static_cast<int>(imagePoints.size()), s.nrFrames);
 			}
 
 			putText(view, msg, textOrigin, 1, 1, mode == Mode::CALIBRATED ? GREEN : RED);
@@ -509,7 +509,7 @@ public:
 			//------------------------------ Show image and check for input commands -------------------
 			cout << s.imageList[s.atImageList] << endl;
 			imshow("Image View", view);
-			auto key = static_cast<char>(waitKey(s.inputCapture.isOpened() ? 50 : s.delay));
+			auto key = static_cast<char>(cv::waitKey(s.inputCapture.isOpened() ? 50 : s.delay));
 
 			if (key == ESC_KEY)
 				break;
@@ -525,17 +525,17 @@ public:
 
 		// -----------------------Show the undistorted image for the image list ------------------------
 		if (s.inputType == InputType::IMAGE_LIST && s.showUndistorsed) {
-			Mat rview, map1, map2;
-			initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, nullptr), imageSize, CV_16SC2, map1, map2);
+			cv::Mat rview, map1, map2;
+			initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, nullptr), imageSize, CV_16SC2, map1, map2);
 
 			for (auto i = 0; i < static_cast<int>(s.imageList.size()); i++) {
-				auto view = imread(s.imageList[i], 1);
+				auto view = cv::imread(s.imageList[i], 1);
 				if (view.empty())
 					continue;
 
-				remap(view, rview, map1, map2, INTER_LINEAR);
+				remap(view, rview, map1, map2, cv::INTER_LINEAR);
 				imshow("Image View", rview);
-				auto c = static_cast<char>(waitKey());
+				auto c = static_cast<char>(cv::waitKey());
 				if (c == ESC_KEY || c == 'q' || c == 'Q') {
 					break;
 				}
@@ -550,7 +550,7 @@ private:
 	string patternToUse;
 };
 
-static void read(const FileNode& node, Settings& x, const Settings& default_value = Settings()) {
+static void read(const cv::FileNode& node, Settings& x, const Settings& default_value = Settings()) {
 	if (node.empty())
 		x = default_value;
 	else

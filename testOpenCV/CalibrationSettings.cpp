@@ -1,7 +1,5 @@
 #include "CalibrationSettings.h"
 
-using namespace cv;
-
 CalibrationSettings::CalibrationSettings(): calibration_Time(0), nrOfFrames(0), image_Width(0), image_Height(0), board_Width(0), board_Height(0), square_Size(0), FixAspectRatio(0), flagValue(0), Avg_Reprojection_Error(0) {
 }
 
@@ -9,8 +7,8 @@ CalibrationSettings::~CalibrationSettings() {
 }
 
 int CalibrationSettings::readSettings(const string calibrationFile) {
-	FileStorage fs;
-	fs.open(calibrationFile, FileStorage::READ);
+	cv::FileStorage fs;
+	fs.open(calibrationFile, cv::FileStorage::READ);
 
 	if (!fs.isOpened()) {
 		cerr << "Failed to open " << calibrationFile << endl;
