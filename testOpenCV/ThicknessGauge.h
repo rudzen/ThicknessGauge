@@ -123,7 +123,9 @@ public: // basic stuff to extract information
 
 	double computerBaseLine(const cv::Mat& mat, double limit);
 
-	bool generatePlanarImage();
+	bool generatePlanarImage(); // <- important!
+
+	bool testAggressive();
 
 	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY) const;
 

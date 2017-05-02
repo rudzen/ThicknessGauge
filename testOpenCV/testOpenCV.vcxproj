@@ -178,6 +178,7 @@
     <ClInclude Include="PointData.h" />
     <ClInclude Include="Q.h" />
     <ClInclude Include="Specs.h" />
+    <ClInclude Include="TestConfig.h" />
     <ClInclude Include="TestException.h" />
     <ClInclude Include="ThicknessGauge.h" />
     <ClInclude Include="ImageDimensionException.h" />

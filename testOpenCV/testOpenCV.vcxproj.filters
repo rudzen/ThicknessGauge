@@ -182,6 +182,9 @@
     <ClInclude Include="TestException.h">
       <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="TestConfig.h">
+      <Filter>Header Files\CV\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

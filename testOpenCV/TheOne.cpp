@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 			c.initCalibrationSettings(options.CameraFile());
 		}
 
-		if (options.DemoMode()) {
+		if (options.DemoMode() && !options.TestMode() && !options.CalibrationMode()) {
 
 			c.initVideoCapture();
 
@@ -70,10 +70,9 @@ int main(int argc, char** argv) {
 		} else if (options.CalibrationMode()) {
 			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
 		} else if (options.TestMode()) {
-			throw TestException("Not implemented yet!");
+			c.initVideoCapture();
+			c.testAggressive();
 		}
-
-
 	}
 	catch (ArgException& ae) {
 		string what = ae.what();
@@ -95,6 +94,8 @@ int main(int argc, char** argv) {
 		Util::loge("Exception suddenly happend (but what?)\n" + what);
 		return -4;
 	}
+
+	Util::log("Smooth operator...");
 
 	return returnValue ^ true;
 
