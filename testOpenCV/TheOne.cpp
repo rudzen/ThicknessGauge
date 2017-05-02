@@ -8,6 +8,7 @@
 #include "IntegerConstraint.h"
 #include "FileConstraint.h"
 #include "CalibrationException.h"
+#include "TestException.h"
 
 using namespace std;
 using namespace TCLAP;
@@ -18,7 +19,7 @@ using namespace TCLAP;
  * -1	= Argument parsing error
  * -2	= Capture fail
  * -3	= Calibration error
- *
+ * -4	= Test mode exception
  */
 
 #define _USE_MATH_DEFINES
@@ -69,7 +70,7 @@ int main(int argc, char** argv) {
 		} else if (options.CalibrationMode()) {
 			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
 		} else if (options.TestMode()) {
-			
+			throw TestException("Not implemented yet!");
 		}
 
 
@@ -88,6 +89,11 @@ int main(int argc, char** argv) {
 		string what = cale.what();
 		Util::loge("Exception suddenly happend (but what?)\n" + what);
 		return -3;
+	}
+	catch (TestException& te) {
+		string what = te.what();
+		Util::loge("Exception suddenly happend (but what?)\n" + what);
+		return -4;
 	}
 
 	return returnValue ^ true;
