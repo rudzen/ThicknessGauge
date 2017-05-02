@@ -792,6 +792,7 @@ bool ThicknessGauge::testAggressive() {
 		computerGaugeLine(output);
 
 		frameTime_ = cv::getTickCount() - time_begin;
+		is.UpdateTimeStamp();
 
 		drawVerticalLine(&output, heightLine);
 		drawHorizontalLine(&output, Util::round(baseLine_));
@@ -800,12 +801,12 @@ bool ThicknessGauge::testAggressive() {
 		//	imshow(erodeWindowName, output);
 		//}
 
-		is.UpdateTimeStamp();
-
+		std::ostringstream testInfo;
+		testInfo << t;
 		Util::log("Saving image..");
 		is.SaveImage(&output, "_test" + to_string(currentTest));
 		Util::log("Saving test data..");
-		savePlanarImageData("/images/_test" + to_string(currentTest) + "_data", allPixels_, output, highestPixel);
+		savePlanarImageData("_test" + to_string(currentTest) + "_data", allPixels_, output, highestPixel, testInfo.str());
 
 		output.release();
 
@@ -819,7 +820,7 @@ bool ThicknessGauge::testAggressive() {
 	return true;
 }
 
-bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY) const {
+bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY, std::string extraInfo) const {
 	cv::FileStorage fs(filename + ".json", cv::FileStorage::WRITE);
 
 	if (!fs.isOpened()) {
@@ -835,6 +836,7 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pix
 	fs << "Saved time" << Util::getTime();
 	fs << "Seconds for computation" << static_cast<long>(frameTime_ / tickFrequency_);
 	fs << "Highest Y" << highestY;
+	fs << "Extra info" << extraInfo;
 
 	fs << "Eroded element count" << static_cast<int>(pixels.size());
 	fs << "Eroded elements" << pixels;
