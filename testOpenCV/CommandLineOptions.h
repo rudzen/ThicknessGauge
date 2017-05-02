@@ -14,13 +14,24 @@ private:
 	bool recordVideo;
 
 	std::string cameraFile;
+	std::string calibrationOutput;
 
+private:
 	int frames;
 	int testMax;
 	int testInterval;
 
 
 public:
+
+	const std::string& CalibrationOutput() const {
+		return calibrationOutput;
+	}
+
+	void setCalibrationOutput(const std::string& calibrationOutput) {
+		this->calibrationOutput = calibrationOutput;
+	}
+
 	const bool& BuildInfoMode() const {
 		return buildInfoMode;
 	}

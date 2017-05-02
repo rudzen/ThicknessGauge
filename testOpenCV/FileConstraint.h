@@ -21,6 +21,18 @@ class FileConstraint : public TCLAP::Constraint<std::string> {
 #endif
 	}
 
+	static bool isNameLegal(const std::string& name) {
+		string illegalChars = "\\/:?\"<>|";
+		for (auto it = name.begin(); it < name.end(); ++it) {
+			auto found = illegalChars.find(*it) != string::npos;
+			if (found) {
+				return false;
+				//*it = ' ';
+			}
+		}
+		return true;
+	}
+
 public:
 
 	/**
@@ -43,7 +55,7 @@ public:
 	* \param value - The value that will be checked.
 	*/
 	bool check(const std::string& value) const override {
-		return isFile(value);
+		return isNameLegal(value) && isFile(value);
 	};
 
 

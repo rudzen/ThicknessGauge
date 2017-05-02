@@ -121,7 +121,7 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		SwitchArg buildInfoSwitch("i", "info", "show software information", false);
 		cmd.add(buildInfoSwitch);
 
-		SwitchArg testSwitch("t", "test_frames", "Performs aggresive testing from 5 to --t frames", false);
+		SwitchArg testSwitch("t", "test_frames", "Performs aggresive testing from 5 to -m=<frames>", false);
 		cmd.add(testSwitch);
 
 		ValueArg<int> frameArg("f", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint(5, 200));
@@ -133,11 +133,14 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		ValueArg<bool> videoArg("v", "record_video", "Records demo mode to video", false, false, "true/false");
 		cmd.add(videoArg);
 
-		ValueArg<int> testArg("m", "max_frames", "Aggresive testing maximum frames", false, 50, "positive % 5 number >= 10");
+		ValueArg<int> testArg("m", "max_frames", "Aggresive testing maximum frames", false, 50, new IntegerConstraint(10, 1000));
 		cmd.add(testArg);
 
 		ValueArg<string> cameraFileArg("", "camera_settings", "OpenCV camera calibration file", false, default_camera_calibration_file, new FileConstraint());
 		cmd.add(cameraFileArg);
+
+		ValueArg<string> calibrationOutput("", "calibrate_output", "output file for camera matricies", false, "output.json", "filename");
+		cmd.add(calibrationOutput);
 
 		cmd.parse(argc, argv);
 
@@ -152,6 +155,9 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		auto cameraFile = cameraFileArg.getValue();
 		options.setCameraFile(cameraFile);
+
+		cameraFile = calibrationOutput.getValue();
+		options.setCalibrationOutput(cameraFile);
 
 		auto frames = frameArg.getValue();
 		options.set_frames(frames);
