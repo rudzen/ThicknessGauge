@@ -21,7 +21,6 @@ using namespace TCLAP;
  *
  */
 
-
 #define _USE_MATH_DEFINES
 cv::RNG rng(12345);
 const string default_camera_calibration_file = "C2450.json";
@@ -54,11 +53,6 @@ int main(int argc, char** argv) {
 			c.initCalibrationSettings(options.CameraFile());
 		}
 
-		if (options.CalibrationMode()) {
-			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
-		}
-
-
 		if (options.DemoMode()) {
 
 			c.initVideoCapture();
@@ -72,8 +66,13 @@ int main(int argc, char** argv) {
 			if (returnValue) {
 				cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
 			}
-
+		} else if (options.CalibrationMode()) {
+			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
+		} else if (options.TestMode()) {
+			
 		}
+
+
 	}
 	catch (ArgException& ae) {
 		string what = ae.what();
@@ -90,7 +89,6 @@ int main(int argc, char** argv) {
 		Util::loge("Exception suddenly happend (but what?)\n" + what);
 		return -3;
 	}
-
 
 	return returnValue ^ true;
 

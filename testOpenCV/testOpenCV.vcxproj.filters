@@ -179,6 +179,9 @@
     <ClInclude Include="CalibrationException.h">
       <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="TestException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />
