@@ -638,45 +638,6 @@ bool ThicknessGauge::testAggressive() {
 	auto const max_ed_kernel_size = 21;
 	/* end */
 
-	//const string inputWindowName = "GC2450 feed";
-	//const string outputWindowName = "GC2450 manipulated";
-	//const string line1WindowName = "frame";
-	//const string line2WindowName = "hlines";
-	//const string line3WindowName = "GC2450 weighted means over time";
-	//const string cornerWindowName = "GC2450 Corner View";
-	//const string erodeWindowName = "Erosion";
-	//const string dilationWindowName = "Dilation";
-
-	//if (showWindows_) {
-	//	cv::namedWindow(inputWindowName, cv::WINDOW_KEEPRATIO);
-	//	cv::createTrackbar("BThreshold", inputWindowName, &binaryThreshold_, 254);
-	//	cv::createTrackbar("HThreshold", inputWindowName, &lineThreshold_, 255);
-	//	//createTrackbar("Base Line", inputWindowName, &baseLine_, imageSize_.height);
-	//	cv::createTrackbar("Height Line", inputWindowName, &heightLine, (imageSize_.width * 2) - 1);
-
-	//	cv::namedWindow(outputWindowName, cv::WINDOW_KEEPRATIO);
-
-	//	cv::namedWindow(line1WindowName, cv::WINDOW_KEEPRATIO);
-
-	//	////createTrackbar("Frac", line1WindowName, &line_fraction, 4);
-	//	////createTrackbar("Thick", line1WindowName, &line_thickness, 5);
-
-	//	//namedWindow(line2WindowName, WINDOW_KEEPRATIO);
-
-
-	//	//namedWindow(line3WindowName, WINDOW_AUTOSIZE);
-
-	//	//namedWindow(cornerWindowName, WINDOW_AUTOSIZE);
-
-	//	cv::namedWindow(erodeWindowName, cv::WINDOW_KEEPRATIO);
-	//	//createTrackbar("Element:", erodeWindowName, &erosion_type, max_ed_elem);
-	//	//createTrackbar("Kernel size: 2n +1", erodeWindowName, &erosion_size, max_ed_kernel_size);
-
-	//	//namedWindow(dilationWindowName, WINDOW_AUTOSIZE);
-	//	//createTrackbar("Element:", dilationWindowName, &dilation_type, max_ed_elem);
-	//	//createTrackbar("Kernel size: 2n +1", dilationWindowName, &dilation_size, max_ed_kernel_size);
-	//}
-
 	// test for video recording
 	if (saveVideo_) {
 		is.SetInformation(Information::Full);
@@ -752,7 +713,7 @@ bool ThicknessGauge::testAggressive() {
 
 		}
 
-		double base = miniCalc.mean(baseLine);
+		auto base = miniCalc.mean(baseLine);
 
 		frame = cv::Mat::zeros(imageSize_, CV_8UC1);
 		cv::Mat lines = cv::Mat::zeros(imageSize_, CV_8UC1);

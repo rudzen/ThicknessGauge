@@ -32,7 +32,7 @@ public:
 	* \param value - The value that will be checked.
 	*/
 	bool check(const int& value) const override {
-		if (value <= min_ || value >= max_)
+		if (value < min_ && value > max_)
 			return false;
 		return true;
 	}
