@@ -9,6 +9,9 @@
 #include "FileConstraint.h"
 #include "CalibrationException.h"
 #include "TestException.h"
+#include "DemoModeVisitor.h"
+#include "CalibrationModeVisitor.h"
+#include "TestSuitConstraint.h"
 
 using namespace std;
 using namespace TCLAP;
@@ -112,18 +115,23 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 	try {
 		CmdLine cmd("ThicknessGauge [OpenCV]", '=', "0.1", true);
 
+		// xor args
+		vector<Arg*> xors;
+
 		// add basic switches
-		SwitchArg demoSwitch("d", "demo", "runs regular demo", true);
-		cmd.add(demoSwitch);
-
-		SwitchArg calibrationSwitch("c", "calibrate", "perform camera calibration", false);
-		cmd.add(calibrationSwitch);
-
+		SwitchArg demoSwitch("d", "demo", "runs regular demo", true, new DemoModeVisitor());
+		SwitchArg calibrationSwitch("c", "calibrate", "perform camera calibration", false, new CalibrationModeVisitor());
 		SwitchArg buildInfoSwitch("i", "info", "show software information", false);
-		cmd.add(buildInfoSwitch);
+		ValueArg<string> testSwitch("t", "run_test", "Performs aggresive testing -f=<frames>", false, "input", new FileConstraint());
+		ValueArg<string> makeTestSuit("m", "make_test", "Captures and saves -f frames as a test suit to be used later.", false, "test_suite", new TestSuitConstraint());
 
-		SwitchArg testSwitch("t", "test_frames", "Performs aggresive testing -f=<frames>", false);
-		cmd.add(testSwitch);
+		xors.push_back(&demoSwitch);
+		xors.push_back(&calibrationSwitch);
+		xors.push_back(&buildInfoSwitch);
+		xors.push_back(&testSwitch);
+		xors.push_back(&makeTestSuit);
+
+		cmd.xorAdd(xors);
 
 		ValueArg<int> frameArg("f", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint(5, 200));
 		cmd.add(frameArg);
@@ -133,9 +141,6 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		ValueArg<bool> videoArg("v", "record_video", "Records demo mode to video", false, false, "true/false");
 		cmd.add(videoArg);
-
-		ValueArg<int> testArg("m", "max_frames", "Aggresive testing maximum frames", false, 50, new IntegerConstraint(10, 1000));
-		cmd.add(testArg);
 
 		ValueArg<string> cameraFileArg("", "camera_settings", "OpenCV camera calibration file", false, default_camera_calibration_file, new FileConstraint());
 		cmd.add(cameraFileArg);
@@ -165,11 +170,9 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		auto showwindows = showArg.getValue();
 		auto recordvideo = videoArg.getValue();
-		auto testmaxframes = testArg.getValue();
 
 		options.setShowWindows(showwindows);
 		options.setRecordVideo(recordvideo);
-		options.setTestMax(testmaxframes);
 
 		auto demo = demoSwitch.getValue();
 		auto calib = calibrationSwitch.getValue();
@@ -177,7 +180,6 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		options.setDemoMode(demo);
 		options.setCalibrationMode(calib);
-		options.setTestMode(test);
 
 		return false;
 	}

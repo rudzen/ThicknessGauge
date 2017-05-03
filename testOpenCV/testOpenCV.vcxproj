@@ -154,6 +154,7 @@
     <ClCompile Include="CalibrationSettings.cpp" />
     <ClCompile Include="CalibrationTest.cpp" />
     <ClCompile Include="IsValidFileName.cpp" />
+    <ClCompile Include="ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
     <ClCompile Include="ImageSave.cpp" />
     <ClCompile Include="MiniCalc.cpp" />
@@ -164,7 +165,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bezier_1.h" />
+    <ClInclude Include="BuildInfoVisitor.h" />
     <ClInclude Include="CalibrationException.h" />
+    <ClInclude Include="CalibrationModeVisitor.h" />
     <ClInclude Include="CalibrationSettings.h" />
     <ClInclude Include="CaptureFailException.h" />
     <ClInclude Include="CommandLineOptions.h" />
@@ -176,10 +179,13 @@
     <ClInclude Include="IsValidFileName.h" />
     <ClInclude Include="LineConfig.h" />
     <ClInclude Include="PointData.h" />
+    <ClInclude Include="ProgressBar.h" />
     <ClInclude Include="Q.h" />
     <ClInclude Include="Specs.h" />
     <ClInclude Include="TestConfig.h" />
     <ClInclude Include="TestException.h" />
+    <ClInclude Include="DemoModeVisitor.h" />
+    <ClInclude Include="TestSuitConstraint.h" />
     <ClInclude Include="ThicknessGauge.h" />
     <ClInclude Include="ImageDimensionException.h" />
     <ClInclude Include="ImageSave.h" />

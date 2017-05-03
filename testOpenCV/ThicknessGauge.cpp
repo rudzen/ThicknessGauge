@@ -7,6 +7,7 @@
 #include "CaptureFailException.h"
 #include "TestConfig.h"
 #include "omp.h"
+#include "ProgressBar.h"
 
 
 double ThicknessGauge::getBaseLine() const {
@@ -564,6 +565,10 @@ bool ThicknessGauge::testAggressive() {
 
 	Util::log("Initiating test mode.. please wait...");
 
+	ProgressBar progress(100, "Testing");
+	progress.SetFrequencyUpdate(frameCount_);
+	progress.SetStyle(">", "-");
+
 	ImageSave is("test_x", SaveType::Image_Png, Information::Basic);
 
 	// kernel size vector
@@ -595,8 +600,11 @@ bool ThicknessGauge::testAggressive() {
 	cap >> first;
 
 	Util::log("Capturing " + to_string(frameCount_) + " frames.");
-	for (auto i = 0; i < frameCount_; ++i)
+
+	for (auto i = 0; i < frameCount_; ++i) {
+		progress.Progressed(i);
 		cap >> frames[i];
+	}
 
 	cap.release();
 
@@ -651,9 +659,8 @@ bool ThicknessGauge::testAggressive() {
 	}
 
 	// configure output stuff
-	for (auto i = 0; i < frameCount_; ++i) {
+	for (auto i = 0; i < frameCount_; ++i)
 		pix_Planarmap[i].reserve(imageSize_.width);
-	}
 
 	auto testSize = tests.size();
 
@@ -669,6 +676,8 @@ bool ThicknessGauge::testAggressive() {
 		uint64 time_begin = cv::getTickCount();
 
 		vector<double> baseLine(frameCount_);
+
+		progress.Progressed(0);
 
 		for (auto j = 0; j < frameCount_; ++j) {
 
@@ -710,6 +719,8 @@ bool ThicknessGauge::testAggressive() {
 			}
 
 			baseLine.push_back(bl);
+
+			progress.Progressed(i);
 
 		}
 

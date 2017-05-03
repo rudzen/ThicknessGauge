@@ -70,6 +70,9 @@
     <Filter Include="Header Files\UI\ProgressBar">
       <UniqueIdentifier>{a7953cd2-dc06-4688-abba-a6adc0bb58ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UI\CommandLine\Visitors">
+      <UniqueIdentifier>{39b0e344-f1ac-4ad0-b460-0a1970e7e9ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TheOne.cpp">
@@ -101,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="IsValidFileName.cpp">
       <Filter>Source Files\File</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressBar.cpp">
+      <Filter>Source Files\UI\ProgressBar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +196,21 @@
     </ClInclude>
     <ClInclude Include="TestConfig.h">
       <Filter>Header Files\CV\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressBar.h">
+      <Filter>Header Files\UI\ProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoModeVisitor.h">
+      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
+    </ClInclude>
+    <ClInclude Include="CalibrationModeVisitor.h">
+      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildInfoVisitor.h">
+      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
+    </ClInclude>
+    <ClInclude Include="TestSuitConstraint.h">
+      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
