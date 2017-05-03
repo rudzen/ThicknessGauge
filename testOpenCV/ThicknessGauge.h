@@ -22,7 +22,9 @@ The main controller class
 class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
-	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(75), lineThreshold_(100), baseLine_(24) {
+	ThicknessGauge(): frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(75), lineThreshold_(100) {
+		baseLine_[0] = 0.0;
+		baseLine_[1] = 0.0;
 		baseColour_ = cv::Scalar(255, 255, 255);
 		settings.ddepth = CV_8S;
 	}
@@ -75,13 +77,22 @@ private:
 
 	int lineThreshold_;
 
-	double baseLine_;
+	vi line_[2];
+
+	double baseLine_[2];
 
 	cv::Scalar baseColour_;
 
 public:
-	double getBaseLine() const;
-	void setBaseLine(double baseLine);
+
+	double ThicknessGauge::getBaseLine(int side) const {
+		return baseLine_[side];
+	}
+
+	void ThicknessGauge::setBaseLine(double baseLine, int side) {
+		baseLine_[side] = baseLine;
+	}
+	
 	// opencv and misc settings objects
 
 	cv::VideoCapture cap;
@@ -105,8 +116,6 @@ public: // basic stuff to extract information
 
 	void sobel(cv::Mat& image) const;
 
-	static void skeleton(cv::Mat* image);
-
 	void drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const;
 
 	int getHighestYpixel(cv::Mat& image, int x) const;
@@ -128,6 +137,7 @@ public: // basic stuff to extract information
 	bool generatePlanarImage(); // <- important!
 
 	static void addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y);
+	bool testDiff();
 
 	bool testAggressive();
 
@@ -140,6 +150,8 @@ public: // basic stuff to extract information
 	void computeAllElements(cv::Mat& image);
 
 	void computerGaugeLine(cv::Mat& output);
+
+	bool getSparseY(cv::Mat& image, vi& output) const;
 
 public: // getters and setters
 

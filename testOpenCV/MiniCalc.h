@@ -402,4 +402,66 @@ public:
 
 	bool computeDiagAvg(vector<cv::Mat>& diagonals, vd& output);
 
+	static void diffirentiateSparse(vi& input ,vi& output) {
+		
+		if (input.empty())
+			return;
+
+		auto size = input.size();
+
+		if (size == 1) {
+			output.push_back(cv::Point(input.front().x, -input.front().y));
+			return;
+		}
+
+		output.reserve(input.size() - 1);
+
+		for (auto i = 1; i < size; ++i)
+			output.push_back(cv::Point(input[i].x, input[i].y - input[i - 1].y));
+	}
+
+	static void splitSparse(vi& input, vi& left, vi& right, int center) {
+		
+		if (input.empty())
+			return;
+
+		auto size = input.size();
+
+		right.clear();
+		left.clear();
+
+		const auto minLim = 10;
+
+		if (size >= minLim) {
+			right.reserve(minLim);
+			left.reserve(minLim);
+		}
+
+		for (auto& p : input) {
+			if (p.x < center)
+				left.push_back(p);
+			else
+				right.push_back(p);
+		}
+	}
+
+
+	/**
+	 * \brief Populate an image with sparse location intensity from original image
+	 * \param original The original image
+	 * \param sparse The sparse vector
+	 * \param output The output image
+	 */
+	static void recombineSparse(cv::Mat& original, vi& sparse, cv::Mat& output) {
+		
+		if (original.empty() || sparse.empty())
+			return;
+
+		copy(original.begin<cv::Point>(), original.end<cv::Point>(), output.end<cv::Point>());
+		
+		//	 for (auto& element : sparse) {
+		//	output.at<uchar>(element.x, element.y) = original.at<uchar>(element.x, element.y);
+		//}
+	}
+
 };

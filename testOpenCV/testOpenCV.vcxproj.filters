@@ -212,6 +212,9 @@
     <ClInclude Include="TestSuitConstraint.h">
       <Filter>Header Files\UI\CommandLine\Constraints</Filter>
     </ClInclude>
+    <ClInclude Include="FolderConstraint.h">
+      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

@@ -346,5 +346,4 @@ bool MiniCalc::computeDiagAvg(vector<cv::Mat>& diagonals, vd& output) {
 	}
 
 	return output.empty() ^ true;
-
 }

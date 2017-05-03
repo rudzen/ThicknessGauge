@@ -7,6 +7,18 @@ private:
 	// modes (xor : build -> test -> calib -> demo
 	bool buildInfoMode;
 	bool testMode;
+	bool testDiffMode;
+
+public:
+	const bool& getTestDiffMode() const {
+		return testDiffMode;
+	}
+
+	void setTestDiffMode(bool testDiffMode) {
+		this->testDiffMode = testDiffMode;
+	}
+
+private:
 	bool demoMode;
 	bool calibrationMode;
 	bool showWindows;

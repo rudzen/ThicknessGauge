@@ -173,6 +173,7 @@
     <ClInclude Include="CommandLineOptions.h" />
     <ClInclude Include="Compute.h" />
     <ClInclude Include="FileConstraint.h" />
+    <ClInclude Include="FolderConstraint.h" />
     <ClInclude Include="IntegerConstraint.h" />
     <ClInclude Include="Interpolate.h" />
     <ClInclude Include="InvalidFileException.h" />

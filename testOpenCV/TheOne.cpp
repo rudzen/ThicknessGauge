@@ -72,6 +72,9 @@ int main(int argc, char** argv) {
 			}
 		} else if (options.CalibrationMode()) {
 			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
+		} else if (options.getTestDiffMode()) {
+			c.initVideoCapture();
+			c.testDiff();
 		} else if (options.TestMode()) {
 			c.initVideoCapture();
 			c.testAggressive();
@@ -120,18 +123,30 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		// add basic switches
 		SwitchArg demoSwitch("d", "demo", "runs regular demo", true, new DemoModeVisitor());
+		cmd.add(demoSwitch);
+
 		SwitchArg calibrationSwitch("c", "calibrate", "perform camera calibration", false, new CalibrationModeVisitor());
+		cmd.add(calibrationSwitch);
+
 		SwitchArg buildInfoSwitch("i", "info", "show software information", false);
-		ValueArg<string> testSwitch("t", "run_test", "Performs aggresive testing -f=<frames>", false, "input", new FileConstraint());
+		cmd.add(buildInfoSwitch);
+
+		ValueArg<string> testSwitch("t", "run_test", "Performs aggresive testing -f=<frames>", false, "camera", "Run test");
+		cmd.add(testSwitch);
+
+		ValueArg<string> testDiffSwitch("", "run_diff_test", "Performs diff testing -f=<frames>", false, "camera", "Run test");
+		cmd.add(testDiffSwitch);
+
 		ValueArg<string> makeTestSuit("m", "make_test", "Captures and saves -f frames as a test suit to be used later.", false, "test_suite", new TestSuitConstraint());
+		cmd.add(makeTestSuit);
 
-		xors.push_back(&demoSwitch);
-		xors.push_back(&calibrationSwitch);
-		xors.push_back(&buildInfoSwitch);
-		xors.push_back(&testSwitch);
-		xors.push_back(&makeTestSuit);
+		//xors.push_back(&demoSwitch);
+		//xors.push_back(&calibrationSwitch);
+		//xors.push_back(&buildInfoSwitch);
+		//xors.push_back(&testSwitch);
+		//xors.push_back(&makeTestSuit);
 
-		cmd.xorAdd(xors);
+		//cmd.xorAdd(xors);
 
 		ValueArg<int> frameArg("f", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint(5, 200));
 		cmd.add(frameArg);
@@ -175,11 +190,17 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		options.setRecordVideo(recordvideo);
 
 		auto demo = demoSwitch.getValue();
-		auto calib = calibrationSwitch.getValue();
-		auto test = testSwitch.getValue();
-
 		options.setDemoMode(demo);
+
+		auto calib = calibrationSwitch.getValue();
 		options.setCalibrationMode(calib);
+
+		auto test = testSwitch.getValue();
+		options.setTestMode(!test.empty());
+
+		auto testDiffMode = testDiffSwitch.getValue();
+		options.setTestDiffMode(!testDiffMode.empty());
+
 
 		return false;
 	}
