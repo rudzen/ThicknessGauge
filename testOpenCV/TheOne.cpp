@@ -122,7 +122,7 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		SwitchArg buildInfoSwitch("i", "info", "show software information", false);
 		cmd.add(buildInfoSwitch);
 
-		SwitchArg testSwitch("t", "test_frames", "Performs aggresive testing from 5 to -m=<frames>", false);
+		SwitchArg testSwitch("t", "test_frames", "Performs aggresive testing -f=<frames>", false);
 		cmd.add(testSwitch);
 
 		ValueArg<int> frameArg("f", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint(5, 200));

@@ -17,7 +17,7 @@ public:
 	*/
 	std::string description() const override {
 		return "Valid input is between " + std::to_string(min_) + " and " + std::to_string(max_) + " (inclusive).";
-	};
+	}
 
 	/**
 	* Returns the short ID for the Constraint.
@@ -32,7 +32,7 @@ public:
 	* \param value - The value that will be checked.
 	*/
 	bool check(const int& value) const override {
-		if (value < min_ && value > max_)
+		if (value < min_ || value > max_)
 			return false;
 		return true;
 	}

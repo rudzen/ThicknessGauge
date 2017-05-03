@@ -49,20 +49,26 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{5f07639a-e7d5-46fa-9a70-5a3242e3a9a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Menu">
-      <UniqueIdentifier>{b5df08a4-69da-4183-8eb3-4f68b16e444a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Menu">
-      <UniqueIdentifier>{d3942e94-74c6-437c-9e07-0f877dd9b000}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\CV\Data">
       <UniqueIdentifier>{47ce9c4e-698e-4206-9702-1a8e72b79918}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Menu\CommandLine">
+    <Filter Include="Header Files\UI">
+      <UniqueIdentifier>{d3942e94-74c6-437c-9e07-0f877dd9b000}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI\CommandLine">
       <UniqueIdentifier>{82c41425-6f0e-4575-af57-1f022679eb09}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Menu\CommandLine\Constraints">
+    <Filter Include="Header Files\UI\CommandLine\Constraints">
       <UniqueIdentifier>{ef7472bf-b9f9-4fdb-b78c-681f2d75ee94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{b5df08a4-69da-4183-8eb3-4f68b16e444a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI\ProgressBar">
+      <UniqueIdentifier>{cfd632c6-441f-4256-9b31-e950d8adf920}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI\ProgressBar">
+      <UniqueIdentifier>{a7953cd2-dc06-4688-abba-a6adc0bb58ba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -88,7 +94,7 @@
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
     <ClCompile Include="PrettyMenu.cpp">
-      <Filter>Source Files\Menu</Filter>
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
     <ClCompile Include="ThicknessGauge.cpp">
       <Filter>Source Files\CV</Filter>
@@ -132,7 +138,7 @@
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="PrettyMenu.h">
-      <Filter>Header Files\Menu</Filter>
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="ThicknessGauge.h">
       <Filter>Header Files\CV</Filter>
@@ -168,13 +174,13 @@
       <Filter>Header Files\CV</Filter>
     </ClInclude>
     <ClInclude Include="CommandLineOptions.h">
-      <Filter>Header Files\Menu\CommandLine</Filter>
+      <Filter>Header Files\UI\CommandLine</Filter>
     </ClInclude>
     <ClInclude Include="IntegerConstraint.h">
-      <Filter>Header Files\Menu\CommandLine\Constraints</Filter>
+      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
     </ClInclude>
     <ClInclude Include="FileConstraint.h">
-      <Filter>Header Files\Menu\CommandLine\Constraints</Filter>
+      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
     </ClInclude>
     <ClInclude Include="CalibrationException.h">
       <Filter>Header Files\Exceptions</Filter>
