@@ -12,6 +12,7 @@
 #include <opencv2/opencv.hpp>
 #include "TestConfig.h"
 #include <vector>
+#include "Line.h"
 
 
 using namespace _cv;
@@ -33,7 +34,6 @@ private:
 	const double PIangle = CV_PI / 180;
 
 	map<WindowType, string> m_WindowNames = {{WindowType::Input, "Camera Input"},{WindowType::Output, "Output"},{WindowType::Temp, "Temp"}};
-
 
 public:
 
@@ -82,6 +82,8 @@ private:
 	double baseLine_[2];
 
 	cv::Scalar baseColour_;
+
+	Line histoLine_;
 
 public:
 
@@ -240,7 +242,7 @@ private: // generic helper methods
 		for (auto& p : pix) {
 
 			// TODO : Get the center Y point of each X position
-			lines_.push_back(_cv::p(center_.x, p.y));
+			lines_.push_back(v2<int>(center_.x, p.y));
 			//cout << "line : " << lines_.back() << endl;
 			//cout << "Manhattan : " << Util::dist_manhattan(center_.x, p.x, center_.y, p.y) << '\n';
 		}

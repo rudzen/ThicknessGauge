@@ -3,13 +3,20 @@
 #include "PointData.h"
 #include <map>
 #include "Util.h"
+#include <opencv2/stitching/detail/warpers.hpp>
 
 /**
  * \brief Line class, contains information from a singular captured frame.
  * Including defined sections for 3 sides (right/center/left), frame reference and test output matrix.
  */
 class Line {
-	
+public:
+	enum class Location {
+		baseOne, baseTwo, heigthOne, heigthTwo
+	};
+
+private:
+
 	enum class SortMethod {
 		none, x, y
 	};
@@ -22,25 +29,86 @@ class Line {
 		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
 	} sortX;
 
-public:
+	const std::map<Location, int> locationBaseMap = { { Location::baseOne , 0 }, { Location::baseTwo, 1 } };
+	const std::map<Location, int> locationHeigthMap = { { Location::heigthOne , 0 }, { Location::heigthTwo, 1 } };
 
-	enum class Location {
-		baseOne, baseTwo, heigthOne, heigthTwo
-	};
+	std::map<int, unsigned char> intensity_;
+
+
+public:
+	const std::map<int, unsigned char>& intensity() const {
+		return intensity_;
+	}
+
+	void intensity(const std::map<int, unsigned char>& intensity) {
+		intensity_ = intensity;
+	}
 
 private:
+	/**
+	* \brief The frame for which the data set in the class is based
+	*/
+	cv::Mat frame_;
 
-	const map<Location, int> locationBaseMap = { { Location::baseOne , 0 }, { Location::baseTwo, 1 } };
-	const map<Location, int> locationHeigthMap = { { Location::heigthOne , 0 }, { Location::heigthTwo, 1 } };
+	/**
+	* \brief Matrix representation of the data vectors in the class
+	*/
+	cv::Mat output_;
 
-	map<int, unsigned char> intensity_;
+	/**
+	* \brief Area of interest based on the 4 "focus" areas
+	*/
+	cv::Rect roi[4];
+
+	/**
+	* \brief All the sparse elements
+	*/
+	std::vector<cv::Point2i> allSparse_;
+
+	/**
+	* \brief All the sparse elements with differentiated intensity values
+	*/
+	std::vector<cv::Point2i> allTotal_;
+
+	/**
+	* \brief Left side of the elements
+	*/
+	std::vector<cv::Point2i> leftOne_;
+
+	/**
+	* \brief Left side #2 of the elements
+	*/
+	std::vector<cv::Point2i> leftTwo_;
+
+	/**
+	* \brief Right side #1 of the elements
+	*/
+	std::vector<cv::Point2i> rightOne_;
+
+	/**
+	* \brief Right side #2 of the elements
+	*/
+	std::vector<cv::Point2i> rightTwo_;
+
+	/**
+	* \brief The calculated baseline for all 3 sides
+	*/
+	double baseLine_[2] = { 0.0, 0.0 };
+
+	double heigthLin_[2] = { 0.0, 0.0 };
+
+
+public:
+
+
+public:
 
 	/**
 	 * \brief Differentiates points in a vector
 	 * \param input The vector to be differentiated
 	 * \param output The results
 	 */
-	static void differentiateY(std::vector<cv::Point2d>& input, std::vector<cv::Point2d>& output);
+	static void differentiateY(std::vector<cv::Point2i>& input, std::vector<cv::Point2i>& output);
 
 	/**
 	 * \brief Differentiates the intensity levels in X direction
@@ -73,57 +141,7 @@ private:
 	 */
 	void generateOutput();
 
-	/**
-	 * \brief The frame for which the data set in the class is based
-	 */
-	cv::Mat frame_;
-
-	/**
-	 * \brief Matrix representation of the data vectors in the class
-	 */
-	cv::Mat output_;
-
-	/**
-	 * \brief Area of interest based on the 4 "focus" areas
-	 */
-	cv::Rect roi[4];
-
-	/**
-	 * \brief All the sparse elements
-	 */
-	std::vector<cv::Point2i> allSparse_;
-
-	/**
-	* \brief All the sparse elements with differentiated intensity values
-	*/
-	std::vector<cv::Point2i> allTotal_;
-
-	/**
-	 * \brief Left side of the elements
-	 */
-	std::vector<cv::Point2i> leftOne_;
-
-	/**
-	* \brief Left side #2 of the elements
-	*/
-	std::vector<cv::Point2i> leftTwo_;
-
-	/**
-	 * \brief Right side #1 of the elements
-	 */
-	std::vector<cv::Point2i> rightOne_;
-
-	/**
-	* \brief Right side #2 of the elements
-	*/
-	std::vector<cv::Point2i> rightTwo_;
-
-	/**
-	 * \brief The calculated baseline for all 3 sides
-	 */
-	double baseLine_[2] = { 0.0, 0.0 };
-
-	double heigthLin_[2] = { 0.0, 0.0 };
+	bool generateSparse();
 
 public:
 
@@ -188,7 +206,7 @@ public: // getters and setter + minor functions
 
 };
 
-inline void Line::differentiateY(std::vector<cv::Point2d>& input, std::vector<cv::Point2d>& output) {
+inline void Line::differentiateY(std::vector<cv::Point2i>& input, std::vector<cv::Point2i>& output) {
 
 	output.clear();
 
@@ -274,6 +292,50 @@ inline void Line::generateOutput() {
 	// just basic method, can be optimized.
 	for (auto& e : allSparse_)
 		output_.at<unsigned char>(e) = 255;
+}
+
+inline bool Line::generateSparse() {
+
+	if (!allSparse_.empty())
+		allSparse_.clear();
+
+	allSparse_.reserve(frame_.cols);
+
+	std::vector<cv::Point2i> pix;
+
+	pix.reserve(frame_.cols);
+
+	cv::findNonZero(frame_, pix);
+
+	// sort the list in X
+	std::sort(pix.begin(), pix.end(), sortX);
+
+	auto x = 0;
+	auto y = 0;
+	auto count = 0;
+	auto highest = 0;
+
+	x = pix.front().x;
+
+	for (auto& p : pix) {
+		if (p.x != x) {
+			if (count > 0) {
+				allSparse_.push_back(cv::Point(x, y));
+				count = 0;
+			}
+			highest = 0;
+		}
+		auto intensity = frame_.at<unsigned char>(p);
+		if (intensity >= highest) {
+			highest = p.y;
+			x = p.x;
+			y = p.y;
+		}
+		count++;
+	}
+
+	return allSparse_.empty() ^ true;
+
 }
 
 inline void Line::split(double leftOne, double leftTwo, double rightOne, double rightTwo) {

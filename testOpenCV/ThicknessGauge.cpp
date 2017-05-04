@@ -8,6 +8,7 @@
 #include "TestConfig.h"
 #include "ProgressBar.h"
 #include "Line.h"
+#include "Histogram.h"
 
 
 void ThicknessGauge::initVideoCapture() {
@@ -475,13 +476,31 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		if (showWindows_) {
 			imshow(erodeWindowName, output);
-			vector<cv::Point> sparse;
-			if (getSparseY(output, sparse)) {
-				//cv::SparseMat tmp(cv::Mat(sparse));
-				//imshow(line2WindowName, cv::Mat(sparse));
-			} else {
-				Util::loge("Failed to get sparse..");
-			}
+
+
+			histoLine_.setFrame(output);
+			histoLine_.generateSparse();
+			histoLine_.differentiateIntensity();
+
+			Histogram hg;
+			hg.histogramImage();
+			auto intense = histoLine_.intensity();
+			hg.populateHistogram(intense, true);
+
+			//hg.createHistogramImage();
+
+			cv::imshow(line2WindowName, hg.histogramImage());
+			
+			
+			//vector<cv::Point> sparse;
+			//if (getSparseY(output, sparse)) {
+			//	//cv::SparseMat tmp(cv::Mat(sparse));
+			//	//imshow(line2WindowName, cv::Mat(sparse));
+			//} else {
+			//	Util::loge("Failed to get sparse..");
+			//}
+
+
 
 		}
 
@@ -766,8 +785,6 @@ bool ThicknessGauge::testDiff() {
 		resize(output, frame, output.size() * 2, 0, 0, cv::INTER_LANCZOS4);
 
 		GaussianBlur(frame, output, tests[i].kernel(), tests[i].sigma(), 10, cv::BORDER_CONSTANT);
-
-		frame.release();
 
 		// test for highest pixel for eroded image
 		auto highestPixel = output.rows - getHighestYpixel(output, heightLine) - base;
@@ -1156,6 +1173,7 @@ void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
 
 }
 
+// OBSOLETE - REPLACED BY LINE CLASS
 bool ThicknessGauge::getSparseY(cv::Mat& image, vi& output) const {
 
 	output.reserve(image.cols);

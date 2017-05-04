@@ -1,9 +1,7 @@
 #pragma once
-#include "Vec.h"
 
 namespace _cv {
 
-	typedef v2<double> p;
 	typedef std::vector<cv::Point2d> vd;
 	typedef std::vector<cv::Point2i> vi;
 

@@ -8,9 +8,11 @@
 
 class Histogram {
 
-	const int MAX = 256;
+	static int maxIntensity() {
+		return 256;
+	}
 
-	std::array<int, 256> histogram_;
+	std::array<double, 256> histogram_;
 
 	cv::Mat histogramImage_;
 
@@ -22,7 +24,7 @@ class Histogram {
 
 	void normalizeHistogramImage(const int max) {
 		//auto modifier = max * hist_w;
-		for (auto i = 0; i < MAX; i += 4) {
+		for (auto i = 0; i < maxIntensity(); i += 4) {
 			histogram_[i] = (static_cast<double>(histogram_[i]) / max) * hist_w;
 			histogram_[i + 1] = (static_cast<double>(histogram_[i + 1]) / max) * hist_w;
 			histogram_[i + 2] = (static_cast<double>(histogram_[i + 2]) / max) * hist_w;
@@ -30,13 +32,17 @@ class Histogram {
 		}
 	}
 
-protected:
+public:
+
+	Histogram() {
+
+	}
 
 	/**
 	 * \brief Populate local histogram array from external map
 	 * \param intensityMap The intensity map to populate from
 	 */
-	void populateHistogram(std::map<int, unsigned char>& intensityMap, bool createImage = false);
+	void populateHistogram(std::map<int, unsigned char>& intensityMap, bool createImage);
 
 	/**
 	 * \brief Reset all histogram data
@@ -45,11 +51,7 @@ protected:
 
 	void createHistogramImage();
 
-public:
 
-	Histogram() {
-
-	}
 
 	const cv::Mat& histogramImage() const {
 		return histogramImage_;
@@ -62,7 +64,7 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& os, const Histogram& obj) {
 		const auto space = ' ';
-		for (auto i = 0; i < obj.MAX; i += 4) {
+		for (auto i = 0; i < obj.maxIntensity(); i += 4) {
 			os << obj.histogram_[i] << space;
 			os << obj.histogram_[i + 1] << space;
 			os << obj.histogram_[i + 2] << space;
@@ -73,7 +75,7 @@ public:
 
 };
 
-inline void Histogram::populateHistogram(std::map<int, unsigned char>& intensityMap, bool createImage = false) {
+inline void Histogram::populateHistogram(std::map<int, unsigned char>& intensityMap, bool createImage) {
 	if (intensityMap.empty())
 		return;
 
@@ -86,7 +88,7 @@ inline void Histogram::populateHistogram(std::map<int, unsigned char>& intensity
 }
 
 inline void Histogram::nullify() {
-	for (auto i = 0; i < MAX; i += 4) {
+	for (auto i = 0; i < maxIntensity(); i += 4) {
 		histogram_[i] = 0;
 		histogram_[i + 1] = 0;
 		histogram_[i + 2] = 0;
@@ -106,6 +108,10 @@ inline void Histogram::createHistogramImage() {
 
 	normalizeHistogramImage(max);
 
-	for (auto i = 0; i < MAX; i++)
-		line(histogramImage_, cv::Point(bin_w * (i), hist_h), cv::Point(bin_w * (i), hist_h - histogram_[i]), cv::Scalar(0, 0, 0), 1, cv::LINE_8, 0);
+	const cv::Scalar black(0, 0, 0);
+
+	for (auto i = 0; i < maxIntensity(); i++) {
+		auto x = bin_w * i;
+		line(histogramImage_, cv::Point(x, hist_h), cv::Point(x, hist_h - histogram_[i]), black, 1, cv::LINE_8, 0);
+	}
 }

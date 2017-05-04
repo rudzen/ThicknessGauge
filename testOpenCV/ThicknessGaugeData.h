@@ -15,8 +15,8 @@ protected:
 	vi leftSideLine_;
 	vi intensity_;
 
-	vector<p> lines_;
-	p center_;
+	vector<v2<int>> lines_;
+	v2<int> center_;
 
 	LineConfig lineConfig_;
 
