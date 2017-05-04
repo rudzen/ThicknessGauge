@@ -178,6 +178,7 @@
     <ClInclude Include="Interpolate.h" />
     <ClInclude Include="InvalidFileException.h" />
     <ClInclude Include="IsValidFileName.h" />
+    <ClInclude Include="Line.h" />
     <ClInclude Include="LineConfig.h" />
     <ClInclude Include="PointData.h" />
     <ClInclude Include="ProgressBar.h" />

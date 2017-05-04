@@ -420,32 +420,6 @@ public:
 			output.push_back(cv::Point(input[i].x, input[i].y - input[i - 1].y));
 	}
 
-	static void splitSparse(vi& input, vi& left, vi& right, int center) {
-		
-		if (input.empty())
-			return;
-
-		auto size = input.size();
-
-		right.clear();
-		left.clear();
-
-		const auto minLim = 10;
-
-		if (size >= minLim) {
-			right.reserve(minLim);
-			left.reserve(minLim);
-		}
-
-		for (auto& p : input) {
-			if (p.x < center)
-				left.push_back(p);
-			else
-				right.push_back(p);
-		}
-	}
-
-
 	/**
 	 * \brief Populate an image with sparse location intensity from original image
 	 * \param original The original image

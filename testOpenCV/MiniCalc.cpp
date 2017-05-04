@@ -315,13 +315,11 @@ bool MiniCalc::computeDiags(cv::Mat& image, vector<cv::Mat>& diags) {
 	// sorted by: positive -> negative
 
 	// grab the positive diags
-	for (auto i = 1; i < image.rows; ++i) {
+	for (auto i = 1; i < image.rows; ++i)
 		diags.push_back(image.diag(i));
-	}
 
-	for (auto i = image.rows; i >= 0; --i) {
+	for (auto i = image.rows; i >= 0; --i)
 		diags.push_back(image.diag(i));
-	}
 
 	return diags.empty() ^ true;
 }
