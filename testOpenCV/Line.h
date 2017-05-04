@@ -32,12 +32,14 @@ private:
 
 	const map<Location, int> locationMap = { { Location::right , 0 }, { Location::center, 1 }, { Location::left, 2 } };
 
+	map<int, unsigned char> intensity_;
+
 	/**
 	 * \brief Differentiates points in a vector
 	 * \param input The vector to be differentiated
 	 * \param output The results
 	 */
-	static void differentiate(std::vector<cv::Point2d>& input, std::vector<cv::Point2d>& output);
+	static void differentiateY(std::vector<cv::Point2d>& input, std::vector<cv::Point2d>& output);
 
 	/**
 	 * \brief Combines two vectors into a third
@@ -149,7 +151,10 @@ public: // getters and setter + minor functions
 
 };
 
-inline void Line::differentiate(std::vector<cv::Point2d>& input, std::vector<cv::Point2d>& output) {
+inline void Line::differentiateY(std::vector<cv::Point2d>& input, std::vector<cv::Point2d>& output) {
+
+	output.clear();
+
 	if (input.empty())
 		return;
 
