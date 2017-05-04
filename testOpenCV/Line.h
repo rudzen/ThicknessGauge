@@ -42,7 +42,12 @@ private:
 	 */
 	static void differentiateY(std::vector<cv::Point2d>& input, std::vector<cv::Point2d>& output);
 
+	/**
+	 * \brief Differentiates the intensity levels in X direction
+	 */
 	void differentiateIntensity();
+
+	void mergeIntensity();
 
 	/**
 	 * \brief Combines two vectors into a third
@@ -81,20 +86,29 @@ private:
 	std::vector<cv::Point2i> allSparse_;
 
 	/**
+	* \brief All the sparse elements
+	*/
+	std::vector<cv::Point2i> allTotal_;
+
+	/**
 	 * \brief Left side of the elements
 	 */
-	std::vector<cv::Point2i> left_;
+	std::vector<cv::Point2i> leftOne_;
 
 	/**
-	 * \brief Right side of the elements
-	 */
-	std::vector<cv::Point2i> right_;
+	* \brief Left side #2 of the elements
+	*/
+	std::vector<cv::Point2i> leftTwo_;
 
 	/**
-	 * \brief Everything in between the left and the right side
+	 * \brief Right side #1 of the elements
 	 */
-	std::vector<cv::Point2i> center_;
+	std::vector<cv::Point2i> rightOne_;
 
+	/**
+	* \brief Right side #2 of the elements
+	*/
+	std::vector<cv::Point2i> rightTwo_;
 
 	/**
 	 * \brief The calculated baseline for all 3 sides
@@ -108,10 +122,10 @@ public:
 	/**
 	 * \brief Splits the elements based on values in X,
 	 * <rigth> < rightX, <center> < leftX, the rest in <left>
-	 * \param rightX The right section border in X
-	 * \param leftX The left section border in X
+	 * \param rightOne The right section border in X
+	 * \param rightTwo The left section border in X
 	 */
-	void split(double rightX, double leftX);
+	void split(double leftOne, double leftTwo, double rightOne, double rightTwo);
 
 public: // getters and setter + minor functions
 
@@ -208,6 +222,22 @@ inline void Line::differentiateIntensity() {
 
 }
 
+inline void Line::mergeIntensity() {
+
+	if (allSparse_.empty())
+		return;
+
+	if (intensity_.empty())
+		return;
+
+	allTotal_.clear();
+
+	allTotal_.reserve(allSparse_.size());
+
+	for (auto& p : allSparse_)
+		allTotal_.push_back(cv::Point(p.x, p.y + intensity_.at(p.x)));
+
+}
 
 inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sort) const {
 	target.reserve(sourceOne.size() + sourceTwo.size());
@@ -238,24 +268,28 @@ inline void Line::generateOutput() {
 		output_.at<unsigned char>(e) = 255;
 }
 
-inline void Line::split(double rightX, double leftX) {
+inline void Line::split(double leftOne, double leftTwo, double rightOne, double rightTwo) {
 	if (allSparse_.empty())
 		return;
 
+	// TODO : Validate input.
+
 	auto size = allSparse_.size();
 
-	right_.clear();
-	left_.clear();
+	rightOne_.clear();
+	leftOne_.clear();
 
-	right_.reserve(size);
-	left_.reserve(size);
+	rightOne_.reserve(size);
+	leftOne_.reserve(size);
 
 	for (auto& p : allSparse_) {
-		if (p.x < rightX)
-			right_.push_back(p);
-		else if (p.x < leftX)
-			center_.push_back(p);
+		if (p.x < leftOne)
+			leftOne_.push_back(p);
+		else if (p.x < leftTwo)
+			leftTwo_.push_back(p);
+		else if (p.x < rightOne)
+			rightOne_.push_back(p);
 		else
-			left_.push_back(p);
+			rightTwo_.push_back(p);
 	}
 }
