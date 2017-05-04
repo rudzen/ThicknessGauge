@@ -4,6 +4,10 @@
 #include <map>
 #include "Util.h"
 
+/**
+ * \brief Line class, contains information from a singular captured frame.
+ * Including defined sections for 3 sides (right/center/left), frame reference and test output matrix.
+ */
 class Line {
 	
 	enum class SortMethod {
@@ -49,7 +53,12 @@ private:
 	 * \param location The point location to get the intensity from
 	 * \return The grey scale pixel intensity
 	 */
-	uchar getPixelIntensity(cv::Point2d& location);
+	unsigned char getPixelIntensity(cv::Point2d& location);
+
+	/**
+	 * \brief Generates the output matrix based on the current elements
+	 */
+	void generateOutput();
 
 	/**
 	 * \brief The frame for which the data set in the class is based
@@ -60,7 +69,6 @@ private:
 	 * \brief Matrix representation of the data vectors in the class
 	 */
 	cv::Mat output_;
-
 
 	/**
 	 * \brief All the sparse elements
@@ -89,26 +97,52 @@ private:
 
 public:
 
+	/**
+	 * \brief Splits the elements based on values in X,
+	 * <rigth> < rightX, <center> < leftX, the rest in <left>
+	 * \param rightX The right section border in X
+	 * \param leftX The left section border in X
+	 */
 	void split(double rightX, double leftX);
 
 public: // getters and setter + minor functions
 
+	/**
+	 * \brief Reset the default output matrix
+	 */
 	void resetOutput() {
 		resetOutput(frame_);
 	}
 
+	/**
+	 * \brief Reset the default output matrix using custom matrix as template
+	 * \param templateFrame The template to base the configuration of the output matrix on
+	 */
 	void resetOutput(cv::Mat& templateFrame) {
 		output_ = cv::Mat::zeros(templateFrame.rows, templateFrame.cols, templateFrame.type());
 	}
 
+	/**
+	 * \brief Set the class main frame reference (no pun)
+	 * \param frameToSet The frame t
+	 */
 	void setFrame(cv::Mat& frameToSet) {
 		frameToSet.copyTo(frame_); // copy ref
 	}
 
+	/**
+	 * \brief Get output matrix reference
+	 * \return The output matrix reference
+	 */
 	const cv::Mat& getOutput() const {
 		return output_;
 	}
 
+	/**
+	 * \brief Get the baseline (Y)
+	 * \param location For which location
+	 * \return The baseline (Y)
+	 */
 	double getBaseLine(Location location) {
 		return baseLine_[locationMap.at(location)];
 	}
@@ -142,7 +176,7 @@ inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::P
 		std::sort(target.begin(), target.end(), sortY);
 }
 
-inline uchar Line::getPixelIntensity(cv::Point2d& location) {
+inline unsigned char Line::getPixelIntensity(cv::Point2d& location) {
 	if (frame_.empty())
 		return 0;
 
@@ -153,6 +187,12 @@ inline uchar Line::getPixelIntensity(cv::Point2d& location) {
 		return 0;
 
 	return frame_.at<uchar>(location);
+}
+
+inline void Line::generateOutput() {
+	// just basic method, can be optimized.
+	for (auto& e : allSparse_)
+		output_.at<unsigned char>(e) = 255;
 }
 
 inline void Line::split(double rightX, double leftX) {
