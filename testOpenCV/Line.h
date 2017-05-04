@@ -15,22 +15,23 @@ class Line {
 	};
 
 	struct elementYsort {
-		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
+		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
 	} sortY;
 
 	struct elementXsort {
-		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
+		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
 	} sortX;
 
 public:
 
 	enum class Location {
-		right, left, center
+		baseOne, baseTwo, heigthOne, heigthTwo
 	};
 
 private:
 
-	const map<Location, int> locationMap = { { Location::right , 0 }, { Location::center, 1 }, { Location::left, 2 } };
+	const map<Location, int> locationBaseMap = { { Location::baseOne , 0 }, { Location::baseTwo, 1 } };
+	const map<Location, int> locationHeigthMap = { { Location::heigthOne , 0 }, { Location::heigthTwo, 1 } };
 
 	map<int, unsigned char> intensity_;
 
@@ -40,6 +41,8 @@ private:
 	 * \param output The results
 	 */
 	static void differentiateY(std::vector<cv::Point2d>& input, std::vector<cv::Point2d>& output);
+
+	void differentiateIntensity();
 
 	/**
 	 * \brief Combines two vectors into a third
@@ -75,27 +78,30 @@ private:
 	/**
 	 * \brief All the sparse elements
 	 */
-	std::vector<cv::Point2d> allSparse_;
+	std::vector<cv::Point2i> allSparse_;
 
 	/**
 	 * \brief Left side of the elements
 	 */
-	std::vector<cv::Point2d> left_;
+	std::vector<cv::Point2i> left_;
 
 	/**
 	 * \brief Right side of the elements
 	 */
-	std::vector<cv::Point2d> right_;
+	std::vector<cv::Point2i> right_;
 
 	/**
 	 * \brief Everything in between the left and the right side
 	 */
-	std::vector<cv::Point2d> center_;
+	std::vector<cv::Point2i> center_;
+
 
 	/**
 	 * \brief The calculated baseline for all 3 sides
 	 */
-	double baseLine_[3] = { 0.0, 0.0, 0.0 };
+	double baseLine_[2] = { 0.0, 0.0 };
+
+	double heigthLin_[2] = { 0.0, 0.0 };
 
 public:
 
@@ -145,8 +151,17 @@ public: // getters and setter + minor functions
 	 * \param location For which location
 	 * \return The baseline (Y)
 	 */
-	double getBaseLine(Location location) {
-		return baseLine_[locationMap.at(location)];
+	double getLine(Location location) {
+		switch (location) {
+		case Location::baseOne:;
+		case Location::baseTwo:
+			return baseLine_[locationBaseMap.at(location)];
+			break;
+		case Location::heigthOne:;
+		case Location::heigthTwo:;
+		default:;
+			return heigthLin_[locationHeigthMap.at(location)];
+		}
 	}
 
 };
@@ -170,6 +185,29 @@ inline void Line::differentiateY(std::vector<cv::Point2d>& input, std::vector<cv
 	for (auto i = 1; i < size; ++i)
 		output.push_back(cv::Point(input[i].x, input[i].y - input[i - 1].y));
 }
+
+inline void Line::differentiateIntensity() {
+
+	if (frame_.empty())
+		return;
+
+	if (allSparse_.empty())
+		return;
+
+	auto size = allSparse_.size();
+
+	intensity_.clear();
+
+	if (size == 1) {
+		auto front = allSparse_.front();
+		intensity_[front.x] = frame_.at<unsigned char>(front);
+	}
+
+	for (auto i = 1; i < size; ++i)
+		intensity_[allSparse_[i].x] = frame_.at<unsigned char>(allSparse_[i]) - frame_.at<unsigned char>(allSparse_[i - 1]);
+
+}
+
 
 inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sort) const {
 	target.reserve(sourceOne.size() + sourceTwo.size());
