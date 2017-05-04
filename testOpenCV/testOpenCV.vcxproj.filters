@@ -108,6 +108,9 @@
     <ClCompile Include="ProgressBar.cpp">
       <Filter>Source Files\UI\ProgressBar</Filter>
     </ClCompile>
+    <ClCompile Include="LineController.cpp">
+      <Filter>Source Files\CV</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageSave.h">
@@ -216,6 +219,12 @@
       <Filter>Header Files\UI\CommandLine\Constraints</Filter>
     </ClInclude>
     <ClInclude Include="Line.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Histogram.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="LineController.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
   </ItemGroup>

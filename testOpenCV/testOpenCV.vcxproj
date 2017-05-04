@@ -154,6 +154,7 @@
     <ClCompile Include="CalibrationSettings.cpp" />
     <ClCompile Include="CalibrationTest.cpp" />
     <ClCompile Include="IsValidFileName.cpp" />
+    <ClCompile Include="LineController.cpp" />
     <ClCompile Include="ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
     <ClCompile Include="ImageSave.cpp" />
@@ -174,12 +175,14 @@
     <ClInclude Include="Compute.h" />
     <ClInclude Include="FileConstraint.h" />
     <ClInclude Include="FolderConstraint.h" />
+    <ClInclude Include="Histogram.h" />
     <ClInclude Include="IntegerConstraint.h" />
     <ClInclude Include="Interpolate.h" />
     <ClInclude Include="InvalidFileException.h" />
     <ClInclude Include="IsValidFileName.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineConfig.h" />
+    <ClInclude Include="LineController.h" />
     <ClInclude Include="PointData.h" />
     <ClInclude Include="ProgressBar.h" />
     <ClInclude Include="Q.h" />

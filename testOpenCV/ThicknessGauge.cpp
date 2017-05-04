@@ -7,8 +7,7 @@
 #include "CaptureFailException.h"
 #include "TestConfig.h"
 #include "ProgressBar.h"
-
-
+#include "Line.h"
 
 
 void ThicknessGauge::initVideoCapture() {
@@ -309,6 +308,8 @@ bool ThicknessGauge::generatePlanarImage() {
 	// configure output stuff
 	for (auto i = 0; i < arrayLimit; ++i)
 		pix_Planarmap[i].reserve(imageSize_.width);
+
+
 
 	// start the process of gathering information for set frame count
 	while (true) {
@@ -737,15 +738,6 @@ bool ThicknessGauge::testDiff() {
 			if (saveVideo_) is.SaveVideoFrame(lines);
 
 		}
-
-		cv::Mat sparseImage = cv::Mat::zeros(imageSize_, CV_8UC1);
-		for (auto j = 0; j < frameCount_; ++j) {
-			miniCalc.recombineSparse(frames[j], sparse[j], sparseImage);
-		}
-
-		cout << "hoho" << endl;
-
-		is.SaveImage(&sparseImage, "SPARSE_test" + to_string(currentTest));
 
 		//for (auto o = 0; o < frameCount_; ++o) {
 		//	vi diffFirst, diffSecond;

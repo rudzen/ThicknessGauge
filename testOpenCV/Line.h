@@ -47,6 +47,9 @@ private:
 	 */
 	void differentiateIntensity();
 
+	/**
+	 * \brief Merges the differentiated values of height and intensity into Y
+	 */
 	void mergeIntensity();
 
 	/**
@@ -81,12 +84,17 @@ private:
 	cv::Mat output_;
 
 	/**
+	 * \brief Area of interest based on the 4 "focus" areas
+	 */
+	cv::Rect roi[4];
+
+	/**
 	 * \brief All the sparse elements
 	 */
 	std::vector<cv::Point2i> allSparse_;
 
 	/**
-	* \brief All the sparse elements
+	* \brief All the sparse elements with differentiated intensity values
 	*/
 	std::vector<cv::Point2i> allTotal_;
 
