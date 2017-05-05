@@ -250,4 +250,40 @@ private: // generic helper methods
 
 	}
 
+	cv::Mat simpleHist(cv::Mat& image) const {
+		// simple opencv histogram
+		auto histSize = 256; // bin size
+		float range[] = { 0, 255 };
+		const float* ranges[] = { range };
+
+		// Calculate histogram
+		cv::MatND hist;
+		std::ofstream fileout;
+		fileout.open("histoout.txt");
+		calcHist(&image, 1, nullptr, cv::Mat(), hist, 1, &histSize, ranges, true, false);
+		double total = image.rows * image.cols;
+		for (auto h = 0; h < histSize; h++) {
+			auto binVal = hist.at<float>(h);
+			if (h > 0)
+				fileout << '\t';
+			fileout << binVal;
+		}
+
+		// Plot the histogram
+		auto hist_w = 1920;
+		auto hist_h = 1080;
+		auto bin_w = cvRound(static_cast<double>(hist_w) / histSize);
+
+		cv::Mat histImage(hist_h, hist_w, CV_8UC1, cv::Scalar(0, 0, 0));
+		normalize(hist, hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
+
+		for (auto i = 1; i < histSize; i++) {
+			cv::line(histImage, cv::Point(bin_w * (i - 1), hist_h - cvRound(hist.at<float>(i - 1))),
+					 cv::Point(bin_w * (i), hist_h - cvRound(hist.at<float>(i))),
+					 cv::Scalar(255, 0, 0), 2, 8, 0);
+		}
+
+		return histImage;
+	}
+
 };

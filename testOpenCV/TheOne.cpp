@@ -57,7 +57,9 @@ int main(int argc, char** argv) {
 			c.initCalibrationSettings(options.CameraFile());
 		}
 
-		if (options.DemoMode() && !options.TestMode() && !options.CalibrationMode()) {
+		cout << options.DemoMode() << endl;
+
+		if (options.DemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
 			c.initVideoCapture();
 
@@ -167,7 +169,6 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		// read all parsed command line arguments
 		auto buildinfo = buildInfoSwitch.getValue();
-
 		options.setBuildInfoMode(buildinfo);
 
 		// check, its a instant abort if build info is found

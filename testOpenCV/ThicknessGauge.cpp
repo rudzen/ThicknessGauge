@@ -311,7 +311,6 @@ bool ThicknessGauge::generatePlanarImage() {
 		pix_Planarmap[i].reserve(imageSize_.width);
 
 
-
 	// start the process of gathering information for set frame count
 	while (true) {
 
@@ -334,7 +333,13 @@ bool ThicknessGauge::generatePlanarImage() {
 			// show default input image (always shown live!)
 			if (showWindows_) {
 				imshow(inputWindowName, frame);
+				Histogram g;
+				g.populateHistogram(frame);
+				cv::imshow(line2WindowName, g.histogramImage());
+				std::string filename("test_histo_" + to_string(i));
+				g.saveSimpleData(filename);
 			}
+
 			// do basic in-place binary threshold
 			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
 
@@ -389,7 +394,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		}
 
 		baseLine_[0] = miniCalc.mean(baseLine);
-		cout << "baseline real : " << baseLine_ << endl;
+		//cout << "baseline real : " << baseLine_ << endl;
 
 		frame = cv::Mat::zeros(imageSize_, CV_8UC1);
 		cv::Mat lines = cv::Mat::zeros(imageSize_, CV_8UC1);
@@ -477,21 +482,24 @@ bool ThicknessGauge::generatePlanarImage() {
 		if (showWindows_) {
 			imshow(erodeWindowName, output);
 
+			cout << "ok" << endl;
 
-			histoLine_.setFrame(output);
-			histoLine_.generateSparse();
-			histoLine_.differentiateIntensity();
+			// histogram testzone
+			//histoLine_.setFrame(output);
+			//histoLine_.generateSparse();
+			//histoLine_.differentiateIntensity();
 
-			Histogram hg;
-			hg.histogramImage();
-			auto intense = histoLine_.intensity();
-			hg.populateHistogram(intense, true);
-
+			//Histogram hg;
+			//hg.histogramImage();
+			//auto intense = histoLine_.intensity();
+			//hg.populateHistogram(intense, true);
 			//hg.createHistogramImage();
+			//cv::imshow(line2WindowName, hg.histogramImage());
 
-			cv::imshow(line2WindowName, hg.histogramImage());
-			
-			
+
+
+
+
 			//vector<cv::Point> sparse;
 			//if (getSparseY(output, sparse)) {
 			//	//cv::SparseMat tmp(cv::Mat(sparse));
@@ -499,7 +507,6 @@ bool ThicknessGauge::generatePlanarImage() {
 			//} else {
 			//	Util::loge("Failed to get sparse..");
 			//}
-
 
 
 		}
@@ -553,7 +560,7 @@ void ThicknessGauge::addKernelTests(vector<TestConfig>& tests, float alpha, int 
 }
 
 bool ThicknessGauge::testDiff() {
-	
+
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
 
@@ -562,7 +569,7 @@ bool ThicknessGauge::testDiff() {
 	ImageSave is("test_x", SaveType::Image_Png, Information::Basic);
 
 	// kernel size vector
-	const vector<cv::Size> kernels_ = { cv::Size(0, 0), cv::Size(3, 3), cv::Size(5, 5), cv::Size(7, 7), cv::Size(9, 9) };
+	const vector<cv::Size> kernels_ = {cv::Size(0, 0), cv::Size(3, 3), cv::Size(5, 5), cv::Size(7, 7), cv::Size(9, 9)};
 
 	// weigthed adding boundries for alpha
 	// beta values are always 1.0 = alpha
@@ -766,7 +773,6 @@ bool ThicknessGauge::testDiff() {
 		//	//Util::log("sparse: " + to_string(sparse[o].size()));
 		//	//Util::log("Left: " + to_string(leftSideLine_.size()) + " Right: " + to_string(rightSideLine_.size()));
 		//}
-
 
 
 		cv::Mat output = cv::Mat::zeros(imageSize_, lines.type());
@@ -1181,7 +1187,7 @@ bool ThicknessGauge::getSparseY(cv::Mat& image, vi& output) const {
 	vi pix;
 
 	pix.reserve(image.cols);
-	
+
 	findNonZero(image, pix);
 
 	// sort the list in X
