@@ -345,14 +345,20 @@ bool ThicknessGauge::generatePlanarImage() {
 				l.differentiateIntensity();
 				l.mergeIntensity();
 				l.saveAllData(num);
+				l.drawPoly();
 
 				Histogram g;
 				g.populateHistogram(frame);
 				cv::imshow(line2WindowName, g.histogramImage());
 				auto filename("test_histo_" + num + ".txt");
 				g.saveSimpleData(filename);
+
+				auto blobs = drawBlobs(&frame);
+				imshow("keypoints", blobs);
+
 			}
 
+			
 
 			// do basic in-place binary threshold
 			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);

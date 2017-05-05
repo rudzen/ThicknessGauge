@@ -176,6 +176,7 @@ public:
 	 * \param rightTwo The left section border in X
 	 */
 	void split(double leftOne, double leftTwo, double rightOne, double rightTwo);
+	void drawPoly();
 
 public: // getters and setter + minor functions
 
@@ -401,7 +402,7 @@ inline bool Line::generateSparse() {
 	for (auto& p : allTotal_) {
 		if (p.x != x) {
 			if (count > 0) {
-				allSparse_.push_back(cv::Point(x, y));
+				allSparse_.push_back(cv::Point(x, frame_.rows - y));
 				count = 0;
 			}
 			highest = 0;
@@ -443,4 +444,8 @@ inline void Line::split(double leftOne, double leftTwo, double rightOne, double 
 		else
 			rightTwo_.push_back(p);
 	}
+}
+
+inline void Line::drawPoly() {
+	cv::polylines(frame_, allSparse_, false, cv::Scalar(255, 255, 255));
 }

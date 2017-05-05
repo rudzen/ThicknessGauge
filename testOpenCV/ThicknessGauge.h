@@ -250,40 +250,60 @@ private: // generic helper methods
 
 	}
 
-	cv::Mat simpleHist(cv::Mat& image) const {
-		// simple opencv histogram
-		auto histSize = 256; // bin size
-		float range[] = { 0, 255 };
-		const float* ranges[] = { range };
+	cv::Mat drawBlobs(cv::Mat* image) const {
+		// Setup SimpleBlobDetector parameters.
+		cv::SimpleBlobDetector::Params params;
 
-		// Calculate histogram
-		cv::MatND hist;
-		std::ofstream fileout;
-		fileout.open("histoout.txt");
-		calcHist(&image, 1, nullptr, cv::Mat(), hist, 1, &histSize, ranges, true, false);
-		double total = image.rows * image.cols;
-		for (auto h = 0; h < histSize; h++) {
-			auto binVal = hist.at<float>(h);
-			if (h > 0)
-				fileout << '\t';
-			fileout << binVal;
-		}
+		// Change thresholds
+		params.minThreshold = 10;
+		params.maxThreshold = 200;
 
-		// Plot the histogram
-		auto hist_w = 1920;
-		auto hist_h = 1080;
-		auto bin_w = cvRound(static_cast<double>(hist_w) / histSize);
+		// Filter by Area.
+		params.filterByArea = true;
+		params.minArea = 1500;
 
-		cv::Mat histImage(hist_h, hist_w, CV_8UC1, cv::Scalar(0, 0, 0));
-		normalize(hist, hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
+		// Filter by Circularity
+		params.filterByCircularity = true;
+		params.minCircularity = 0.1;
 
-		for (auto i = 1; i < histSize; i++) {
-			cv::line(histImage, cv::Point(bin_w * (i - 1), hist_h - cvRound(hist.at<float>(i - 1))),
-					 cv::Point(bin_w * (i), hist_h - cvRound(hist.at<float>(i))),
-					 cv::Scalar(255, 0, 0), 2, 8, 0);
-		}
+		// Filter by Convexity
+		params.filterByConvexity = true;
+		params.minConvexity = 0.87;
 
-		return histImage;
+		// Filter by Inertia
+		params.filterByInertia = true;
+		params.minInertiaRatio = 0.01;
+
+
+		// Storage for blobs
+		vector<cv::KeyPoint> keypoints;
+
+
+#if CV_MAJOR_VERSION < 3   // If you are using OpenCV 2
+
+		// Set up detector with params
+		SimpleBlobDetector detector(params);
+
+		// Detect blobs
+		detector.detect(image, keypoints);
+#else 
+
+		// Set up detector with params
+		cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
+
+		// Detect blobs
+		detector->detect(*image, keypoints);
+#endif 
+
+		// Draw detected blobs as red circles.
+		// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures
+		// the size of the circle corresponds to the size of blob
+
+		cv::Mat im_with_keypoints;
+		drawKeypoints(*image, keypoints, im_with_keypoints, cv::Scalar(255, 255, 255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+		// Show blobs
+		return im_with_keypoints;
 	}
 
 };
