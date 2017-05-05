@@ -333,27 +333,43 @@ bool ThicknessGauge::generatePlanarImage() {
 			// show default input image (always shown live!)
 			if (showWindows_) {
 				imshow(inputWindowName, frame);
+			}
+
+			if (showWindows_) {
+				Line l;
+				auto num(to_string(i));
+
+				l.setFrame(frame);
+				l.generateSparse();
+				l.differentiateY();
+				l.differentiateIntensity();
+				l.mergeIntensity();
+				l.saveAllData(num);
+
 				Histogram g;
 				g.populateHistogram(frame);
 				cv::imshow(line2WindowName, g.histogramImage());
-				std::string filename("test_histo_" + to_string(i));
+				auto filename("test_histo_" + num + ".txt");
 				g.saveSimpleData(filename);
 			}
+
 
 			// do basic in-place binary threshold
 			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
 
-			equalizeHist(frame, frame);
+			//equalizeHist(frame, frame);
 
 			// blur in-place
 			GaussianBlur(frame, frame, cv::Size(7, 5), 10, 2, cv::BORDER_DEFAULT);
+
 
 			// perform some stuff
 			//laplace(frame);
 			// c.Sobel(frame);
 
-			if (showWindows_) imshow(outputWindowName, frame);
-
+			if (showWindows_) {
+				imshow(outputWindowName, frame);
+			}
 			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
 			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_Planarmap.at(i), test_subPix);
 
