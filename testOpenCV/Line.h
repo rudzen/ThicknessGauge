@@ -343,7 +343,6 @@ inline void Line::mergeIntensity() {
 	}
 
 	std::sort(allComplete_.begin(), allComplete_.end(), sortX);
-
 }
 
 inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sort) const {
