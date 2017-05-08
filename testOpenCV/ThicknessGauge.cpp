@@ -344,19 +344,19 @@ bool ThicknessGauge::generatePlanarImage() {
 		// capture frame amount and clear storage
 		for (auto i = 0; i < frameCount_; ++i) {
 
-			cap >> frame;
-			frames[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
-			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
-
-			for (auto& n : nulls_)
-				frames[i] = frame - n;
-
-			pix_Planarmap.at(i).clear();
-
-
-			//cap >> frames[i];
+			//cap >> frame;
+			//frames[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
 			//outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
+
+			//for (auto& n : nulls_)
+			//	frames[i] = frame - n;
+
 			//pix_Planarmap.at(i).clear();
+
+
+			cap >> frames[i];
+			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
+			pix_Planarmap.at(i).clear();
 		}
 
 		for (auto i = 0; i < frameCount_; ++i) {

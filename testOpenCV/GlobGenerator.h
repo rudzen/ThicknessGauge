@@ -19,6 +19,8 @@ class GlobGenerator {
 
 	int type_ = CV_8UC1;
 
+	_cv::GlobType glob_;
+
 public:
 
 	GlobGenerator(const std::string pattern, const bool recursive)
@@ -46,9 +48,17 @@ public:
 		recursive_ = false;
 	}
 
+	/* getters */
+
 	const std::vector<cv::Mat>& getImages() const {
 		return images_;
 	}
+
+	const std::vector<cv::String>& getFiles() const {
+		return files_;
+	}
+
+	/* getters and setters */
 
 	const cv::String& getPattern() const {
 		return pattern_;
@@ -58,15 +68,19 @@ public:
 		pattern_ = pattern;
 	}
 
-	const std::vector<cv::String>& getFiles() const {
-		return files_;
-	}
-
 	const bool& isRecursive() const {
 		return recursive_;
 	}
 
 	void setRecursive(bool recursive) {
 		recursive_ = recursive;
+	}
+
+	_cv::GlobType glob() const {
+		return glob_;
+	}
+
+	void glob(_cv::GlobType glob) {
+		glob_ = glob;
 	}
 };

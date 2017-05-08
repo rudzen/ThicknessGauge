@@ -74,15 +74,9 @@ int main(int argc, char** argv) {
 		c.setShowWindows(options.isShowWindows());
 		c.setSaveVideo(options.isRecordVideo());
 		c.initCalibrationSettings(options.getCameraFile());
-
-		//auto calibration_file_exists = Util::isFile(options.getCameraFile());
-		//if (calibration_file_exists) {
-		//	c.initCalibrationSettings(options.getCameraFile());
-		//}
+		cv::setNumThreads(options.getNumOpenCvThreads());
 
 		cout << options << endl;
-
-		cv::setNumThreads(options.getNumOpenCvThreads());
 
 		if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
