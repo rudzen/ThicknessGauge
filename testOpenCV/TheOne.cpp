@@ -14,6 +14,7 @@
 #include "TestSuitConstraint.h"
 #include "TestModeVisitor.h"
 #include "BuildInfoVisitor.h"
+#include "ImageSave.h"
 
 using namespace std;
 using namespace TCLAP;
@@ -33,6 +34,23 @@ const string default_camera_calibration_file = "C2450.json";
 
 bool parseArgs(int argc, char** argv, CommandLineOptions& options);
 
+void saveNull(std::string filename) {
+
+	// quick and dirty hack to save null image quickly
+
+	cout << "Enter delay in seconds before capture to " << filename << "\n>";
+	int t;
+	cin >> t;
+	cv::setNumThreads(2);
+	cv::Mat nullImage;
+	cv::VideoCapture cap;
+	cap.open(CV_CAP_PVAPI);
+	cap >> nullImage;
+	cv::imwrite(filename, nullImage);
+	cap.release();
+}
+
+
 int main(int argc, char** argv) {
 
 	auto returnValue = false;
@@ -46,6 +64,9 @@ int main(int argc, char** argv) {
 				Util::log(cv::getBuildInformation());
 				return 0;
 			}
+			// null save mode..
+			saveNull(options.getCameraFile());
+			return 0;
 		}
 
 		ThicknessGauge c;
@@ -53,17 +74,16 @@ int main(int argc, char** argv) {
 		c.setFrameCount(options.getFrames());
 		c.setShowWindows(options.isShowWindows());
 		c.setSaveVideo(options.isRecordVideo());
+		c.initCalibrationSettings(options.getCameraFile());
 
-		auto calibration_file_exists = Util::isFile(options.getCameraFile());
-		if (calibration_file_exists) {
-			c.initCalibrationSettings(options.getCameraFile());
-		}
+		//auto calibration_file_exists = Util::isFile(options.getCameraFile());
+		//if (calibration_file_exists) {
+		//	c.initCalibrationSettings(options.getCameraFile());
+		//}
 
 		cout << options << endl;
 
-		return 0;
-
-		cv::setNumThreads(6);
+		cv::setNumThreads(options.getNumOpenCvThreads());
 
 		if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
@@ -78,9 +98,11 @@ int main(int argc, char** argv) {
 			if (returnValue) {
 				cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
 			}
-		} else if (options.isCalibrationMode()) {
+		}
+		else if (options.isCalibrationMode()) {
 			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
-		} else if (options.isTestMode()) {
+		}
+		else if (options.isTestMode()) {
 			c.initVideoCapture();
 			c.testAggressive();
 		}
@@ -146,6 +168,9 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		cmd.xorAdd(xors);
 
+		ValueArg<string> nullSaveArg("", "null_save", "Save a singular image and exit", false, "null.png", new TestSuitConstraint());
+		cmd.add(nullSaveArg);
+
 		/* end switches */
 
 		/* begin value base argument*/
@@ -168,8 +193,15 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		cmd.add(calibrationOutput);
 
 		ValueArg<int> threadArg("", "opencv_threads", "OpenCV thread limit", false, 4, new IntegerConstraint("OpenCV Threads", 1, 40));
+		cmd.add(threadArg);
 
 		cmd.parse(argc, argv);
+
+		// check for null save.. this is an important thing! :-)
+		if (nullSaveArg.isSet()) {
+			options.setCameraFile(nullSaveArg.getValue());
+			return true;
+		}
 
 		// read all parsed command line arguments
 		if (demoSwitch.isSet())
@@ -178,7 +210,7 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 			options.setCalibrationMode(true);
 		else if (testSwitch.isSet())
 			options.setTestMode(true);
-		else { 		// check, its a instant abort if build info is found
+		else { // check, its a instant abort if build info is found
 			options.setBuildInfoMode(true);
 			return true;
 		}
@@ -194,6 +226,9 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		auto ival = frameArg.getValue();
 		options.setFrames(ival);
+
+		ival = threadArg.getValue();
+		options.setNumOpenCvThreads(ival);
 
 		auto bval = showArg.getValue();
 		options.setShowWindows(bval);
