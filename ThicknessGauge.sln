@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.0
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testOpenCV", "testOpenCV\testOpenCV.vcxproj", "{1463A1B1-1383-4142-8001-FF934EDD3AD6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThicknessGauge", "testOpenCV\testOpenCV.vcxproj", "{1463A1B1-1383-4142-8001-FF934EDD3AD6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThicknessGaugeTest", "ThicknessGaugeTest\ThicknessGaugeTest.vcxproj", "{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{1463A1B1-1383-4142-8001-FF934EDD3AD6}.Release|x64.Build.0 = Release|x64
 		{1463A1B1-1383-4142-8001-FF934EDD3AD6}.Release|x86.ActiveCfg = Release|Win32
 		{1463A1B1-1383-4142-8001-FF934EDD3AD6}.Release|x86.Build.0 = Release|Win32
+		{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}.Debug|x64.ActiveCfg = Debug|x64
+		{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}.Debug|x64.Build.0 = Debug|x64
+		{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}.Debug|x86.ActiveCfg = Debug|Win32
+		{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}.Debug|x86.Build.0 = Debug|Win32
+		{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}.Release|x64.ActiveCfg = Release|x64
+		{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}.Release|x64.Build.0 = Release|x64
+		{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}.Release|x86.ActiveCfg = Release|Win32
+		{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

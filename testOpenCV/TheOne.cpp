@@ -14,7 +14,6 @@
 #include "TestSuitConstraint.h"
 #include "TestModeVisitor.h"
 #include "BuildInfoVisitor.h"
-#include "ImageSave.h"
 
 using namespace std;
 using namespace TCLAP;

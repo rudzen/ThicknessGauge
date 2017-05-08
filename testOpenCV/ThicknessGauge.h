@@ -35,10 +35,6 @@ private:
 
 	map<WindowType, string> m_WindowNames = {{WindowType::Input, "Camera Input"},{WindowType::Output, "Output"},{WindowType::Temp, "Temp"}};
 
-public:
-
-
-private:
 	uint64 frameTime_;
 
 	int frameCount_;
@@ -84,6 +80,8 @@ private:
 	cv::Scalar baseColour_;
 
 	Line histoLine_;
+
+	std::vector<cv::Mat> nulls_;
 
 public:
 
