@@ -230,7 +230,7 @@
     <ClInclude Include="Histogram\Histogram.h">
       <Filter>Header Files\CV\Histogram</Filter>
     </ClInclude>
-    <ClInclude Include="HistoPeak.h">
+    <ClInclude Include="Histogram\HistoPeak.h">
       <Filter>Header Files\CV\Histogram</Filter>
     </ClInclude>
   </ItemGroup>

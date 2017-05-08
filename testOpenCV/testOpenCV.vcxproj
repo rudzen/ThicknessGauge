@@ -176,7 +176,7 @@
     <ClInclude Include="FolderConstraint.h" />
     <ClInclude Include="GlobGenerator.h" />
     <ClInclude Include="Histogram\Histogram.h" />
-    <ClInclude Include="HistoPeak.h" />
+    <ClInclude Include="Histogram\HistoPeak.h" />
     <ClInclude Include="IntegerConstraint.h" />
     <ClInclude Include="Interpolate.h" />
     <ClInclude Include="InvalidFileException.h" />
