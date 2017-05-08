@@ -73,6 +73,9 @@
     <Filter Include="Header Files\UI\CommandLine\Visitors">
       <UniqueIdentifier>{39b0e344-f1ac-4ad0-b460-0a1970e7e9ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\CV\Histogram">
+      <UniqueIdentifier>{1b9254c4-7bb6-425b-9305-ee69155c6f8f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TheOne.cpp">
@@ -218,14 +221,17 @@
     <ClInclude Include="Line.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="Histogram.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
     <ClInclude Include="TestModeVisitor.h">
       <Filter>Header Files\UI\CommandLine\Visitors</Filter>
     </ClInclude>
     <ClInclude Include="GlobGenerator.h">
       <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Histogram\Histogram.h">
+      <Filter>Header Files\CV\Histogram</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoPeak.h">
+      <Filter>Header Files\CV\Histogram</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
