@@ -354,7 +354,6 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			//pix_Planarmap.at(i).clear();
 
-
 			cap >> frames[i];
 			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
 			pix_Planarmap.at(i).clear();
@@ -381,9 +380,6 @@ bool ThicknessGauge::generatePlanarImage() {
 				//l.saveAllData(num);
 				//l.drawPoly();
 
-				HistoPeak hp;
-				hp.processImage(frame);
-
 				//Histogram g;
 				//g.populateHistogram(frame);
 				//cv::imshow(line2WindowName, g.histogramImage());
@@ -393,17 +389,18 @@ bool ThicknessGauge::generatePlanarImage() {
 				//auto blobs = drawBlobs(&frame);
 				//imshow("keypoints", blobs);
 
-			}
+				HistoPeak hp;
+				hp.processImage(frame);
 
-			
+			}
 
 			// do basic in-place binary threshold
 			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
 
-			//equalizeHist(frame, frame);
+			equalizeHist(frame, frame);
 
 			// blur in-place
-			GaussianBlur(frame, frame, cv::Size(7, 5), 10, 2, cv::BORDER_DEFAULT);
+			GaussianBlur(frame, frame, cv::Size(9, 9), 10, 2, cv::BORDER_DEFAULT);
 
 
 			// perform some stuff
@@ -411,6 +408,7 @@ bool ThicknessGauge::generatePlanarImage() {
 			// c.Sobel(frame);
 
 			if (showWindows_) {
+
 				imshow(outputWindowName, frame);
 			}
 			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
