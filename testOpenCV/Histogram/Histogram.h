@@ -4,7 +4,6 @@
 #include <ostream>
 #include <opencv2/core/mat.hpp>
 #include "Util.h"
-#include <opencv2/videostab/ring_buffer.hpp>
 
 class Histogram {
 
@@ -25,7 +24,7 @@ class Histogram {
 
 	int bin_w = Util::round(static_cast<double>(hist_w) / histSize);
 
-	vector<int> dale_;
+	std::vector<int> dale_;
 
 private:
 
@@ -182,6 +181,6 @@ inline void Histogram::createHistogramImage() {
 
 	for (auto i = 0; i < histSize; i++) {
 		auto x = bin_w * i;
-		line(histogramImage_, cv::Point(x, hist_h), cv::Point(x, hist_h - histogram_[i]), black, 1, cv::LINE_8, 0);
+		line(histogramImage_, cv::Point(x, hist_h), cv::Point(x, hist_h - cvRound(histogram_[i])), black, 1, cv::LINE_8, 0);
 	}
 }

@@ -182,15 +182,6 @@
     <ClInclude Include="Bezier_1.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="CommandLineOptions.h">
-      <Filter>Header Files\UI\CommandLine</Filter>
-    </ClInclude>
-    <ClInclude Include="IntegerConstraint.h">
-      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
-    </ClInclude>
-    <ClInclude Include="FileConstraint.h">
-      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
-    </ClInclude>
     <ClInclude Include="CalibrationException.h">
       <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
@@ -203,26 +194,14 @@
     <ClInclude Include="ProgressBar.h">
       <Filter>Header Files\UI\ProgressBar</Filter>
     </ClInclude>
-    <ClInclude Include="DemoModeVisitor.h">
-      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
-    </ClInclude>
     <ClInclude Include="CalibrationModeVisitor.h">
-      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
-    </ClInclude>
-    <ClInclude Include="BuildInfoVisitor.h">
       <Filter>Header Files\UI\CommandLine\Visitors</Filter>
     </ClInclude>
     <ClInclude Include="TestSuitConstraint.h">
       <Filter>Header Files\UI\CommandLine\Constraints</Filter>
     </ClInclude>
-    <ClInclude Include="FolderConstraint.h">
-      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
-    </ClInclude>
     <ClInclude Include="Line.h">
       <Filter>Header Files\CV</Filter>
-    </ClInclude>
-    <ClInclude Include="TestModeVisitor.h">
-      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
     </ClInclude>
     <ClInclude Include="GlobGenerator.h">
       <Filter>Header Files\CV</Filter>
@@ -232,6 +211,27 @@
     </ClInclude>
     <ClInclude Include="Histogram\HistoPeak.h">
       <Filter>Header Files\CV\Histogram</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgClasses\BuildInfoVisitor.h">
+      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgClasses\CommandLineOptions.h">
+      <Filter>Header Files\UI\CommandLine</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgClasses\DemoModeVisitor.h">
+      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgClasses\FolderConstraint.h">
+      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgClasses\FileConstraint.h">
+      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgClasses\IntegerConstraint.h">
+      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgClasses\TestModeVisitor.h">
+      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

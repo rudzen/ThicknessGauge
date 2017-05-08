@@ -8,7 +8,7 @@
 #include "TestConfig.h"
 #include "ProgressBar.h"
 #include "Line.h"
-#include "Histogram.h"
+#include "Histogram/Histogram.h"
 #include "GlobGenerator.h"
 
 

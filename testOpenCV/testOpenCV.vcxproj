@@ -165,19 +165,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bezier_1.h" />
-    <ClInclude Include="BuildInfoVisitor.h" />
+    <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />
     <ClInclude Include="CalibrationException.h" />
     <ClInclude Include="CalibrationModeVisitor.h" />
     <ClInclude Include="CalibrationSettings.h" />
     <ClInclude Include="CaptureFailException.h" />
-    <ClInclude Include="CommandLineOptions.h" />
+    <ClInclude Include="ArgClasses\CommandLineOptions.h" />
     <ClInclude Include="Compute.h" />
-    <ClInclude Include="FileConstraint.h" />
-    <ClInclude Include="FolderConstraint.h" />
+    <ClInclude Include="ArgClasses\FileConstraint.h" />
+    <ClInclude Include="ArgClasses\FolderConstraint.h" />
     <ClInclude Include="GlobGenerator.h" />
     <ClInclude Include="Histogram\Histogram.h" />
     <ClInclude Include="Histogram\HistoPeak.h" />
-    <ClInclude Include="IntegerConstraint.h" />
+    <ClInclude Include="ArgClasses\IntegerConstraint.h" />
     <ClInclude Include="Interpolate.h" />
     <ClInclude Include="InvalidFileException.h" />
     <ClInclude Include="IsValidFileName.h" />
@@ -189,9 +189,9 @@
     <ClInclude Include="Specs.h" />
     <ClInclude Include="TestConfig.h" />
     <ClInclude Include="TestException.h" />
-    <ClInclude Include="DemoModeVisitor.h" />
+    <ClInclude Include="ArgClasses\DemoModeVisitor.h" />
     <ClInclude Include="TestSuitConstraint.h" />
-    <ClInclude Include="TestModeVisitor.h" />
+    <ClInclude Include="ArgClasses\TestModeVisitor.h" />
     <ClInclude Include="ThicknessGauge.h" />
     <ClInclude Include="ImageDimensionException.h" />
     <ClInclude Include="ImageSave.h" />

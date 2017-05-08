@@ -4,16 +4,16 @@
 #include "CalibrationTest.cpp"
 #include "CaptureFailException.h"
 #include "tclap/CmdLine.h"
-#include "CommandLineOptions.h"
-#include "IntegerConstraint.h"
-#include "FileConstraint.h"
+#include "ArgClasses/CommandLineOptions.h"
+#include "ArgClasses/IntegerConstraint.h"
+#include "ArgClasses/FileConstraint.h"
 #include "CalibrationException.h"
 #include "TestException.h"
-#include "DemoModeVisitor.h"
+#include "ArgClasses/DemoModeVisitor.h"
 #include "CalibrationModeVisitor.h"
 #include "TestSuitConstraint.h"
-#include "TestModeVisitor.h"
-#include "BuildInfoVisitor.h"
+#include "ArgClasses/TestModeVisitor.h"
+#include "ArgClasses/BuildInfoVisitor.h"
 
 using namespace std;
 using namespace TCLAP;
