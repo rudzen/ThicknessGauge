@@ -6,11 +6,13 @@ class IntegerConstraint : public TCLAP::Constraint<int> {
 	int min_;
 	int max_;
 
+	std::string name_;
+
 public:
 
-	IntegerConstraint(const int min, const int max) : min_(min), max_(max) { }
+	IntegerConstraint(std::string name, const int min, const int max) : name_(name), min_(min), max_(max) { }
 
-	IntegerConstraint(): min_(5), max_(200) { }
+	IntegerConstraint(): name_("value constraint"), min_(5), max_(200) { }
 
 	/**
 	* Returns a description of the Constraint.
@@ -23,7 +25,7 @@ public:
 	* Returns the short ID for the Constraint.
 	*/
 	std::string shortID() const override {
-		return "frames";
+		return name_;
 	}
 
 	/**

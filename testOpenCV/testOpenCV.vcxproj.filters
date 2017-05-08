@@ -221,6 +221,9 @@
     <ClInclude Include="Histogram.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
+    <ClInclude Include="TestModeVisitor.h">
+      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

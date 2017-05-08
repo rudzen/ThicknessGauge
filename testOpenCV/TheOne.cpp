@@ -12,6 +12,8 @@
 #include "DemoModeVisitor.h"
 #include "CalibrationModeVisitor.h"
 #include "TestSuitConstraint.h"
+#include "TestModeVisitor.h"
+#include "BuildInfoVisitor.h"
 
 using namespace std;
 using namespace TCLAP;
@@ -40,7 +42,7 @@ int main(int argc, char** argv) {
 
 		if (parseArgs(argc, argv, options)) {
 			// unique case for build information
-			if (options.BuildInfoMode()) {
+			if (options.isBuildInfoMode()) {
 				Util::log(cv::getBuildInformation());
 				return 0;
 			}
@@ -48,18 +50,22 @@ int main(int argc, char** argv) {
 
 		ThicknessGauge c;
 
-		c.setFrameCount(options.Frames());
-		c.setShowWindows(options.ShowWindows());
-		c.setSaveVideo(options.RecordVideo());
+		c.setFrameCount(options.getFrames());
+		c.setShowWindows(options.isShowWindows());
+		c.setSaveVideo(options.isRecordVideo());
 
-		auto calibration_file_exists = Util::isFile(options.CameraFile());
+		auto calibration_file_exists = Util::isFile(options.getCameraFile());
 		if (calibration_file_exists) {
-			c.initCalibrationSettings(options.CameraFile());
+			c.initCalibrationSettings(options.getCameraFile());
 		}
 
-		cout << options.DemoMode() << endl;
+		cout << options << endl;
 
-		if (options.DemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
+		return 0;
+
+		cv::setNumThreads(6);
+
+		if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
 			c.initVideoCapture();
 
@@ -72,12 +78,9 @@ int main(int argc, char** argv) {
 			if (returnValue) {
 				cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
 			}
-		} else if (options.CalibrationMode()) {
+		} else if (options.isCalibrationMode()) {
 			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
-		} else if (options.getTestDiffMode()) {
-			c.initVideoCapture();
-			c.testDiff();
-		} else if (options.TestMode()) {
+		} else if (options.isTestMode()) {
 			c.initVideoCapture();
 			c.testAggressive();
 		}
@@ -120,43 +123,42 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 	try {
 		CmdLine cmd("ThicknessGauge [OpenCV]", '=', "0.1", true);
 
+		/* begin singular switches, only one permitted, default is demo mode */
+
 		// xor args
 		vector<Arg*> xors;
 
 		// add basic switches
 		SwitchArg demoSwitch("d", "demo", "runs regular demo", true, new DemoModeVisitor());
-		cmd.add(demoSwitch);
+		xors.push_back(&demoSwitch);
+		//cmd.add(demoSwitch);
 
 		SwitchArg calibrationSwitch("c", "calibrate", "perform camera calibration", false, new CalibrationModeVisitor());
-		cmd.add(calibrationSwitch);
+		xors.push_back(&calibrationSwitch);
+		//cmd.add(calibrationSwitch);
 
-		SwitchArg buildInfoSwitch("i", "info", "show software information", false);
-		cmd.add(buildInfoSwitch);
+		SwitchArg buildInfoSwitch("i", "info", "show software information", false, new BuildInfoVisitor());
+		xors.push_back(&buildInfoSwitch);
+		//cmd.add(buildInfoSwitch);
 
-		ValueArg<string> testSwitch("t", "run_test", "Performs aggresive testing -f=<frames>", false, "camera", "Run test");
-		cmd.add(testSwitch);
+		SwitchArg testSwitch("t", "test", "Perform test", false, new TestModeVisitor());
+		xors.push_back(&testSwitch);
 
-		ValueArg<string> testDiffSwitch("", "run_diff_test", "Performs diff testing -f=<frames>", false, "camera", "Run test");
-		cmd.add(testDiffSwitch);
+		cmd.xorAdd(xors);
 
-		ValueArg<string> makeTestSuit("m", "make_test", "Captures and saves -f frames as a test suit to be used later.", false, "test_suite", new TestSuitConstraint());
-		cmd.add(makeTestSuit);
+		/* end switches */
 
-		//xors.push_back(&demoSwitch);
-		//xors.push_back(&calibrationSwitch);
-		//xors.push_back(&buildInfoSwitch);
-		//xors.push_back(&testSwitch);
-		//xors.push_back(&makeTestSuit);
+		/* begin value base argument*/
+		ValueArg<string> testSuiteArg("", "test_suite", "Test name for saving the test under.", false, "default", new TestSuitConstraint());
+		cmd.add(testSuiteArg);
 
-		//cmd.xorAdd(xors);
-
-		ValueArg<int> frameArg("f", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint(5, 200));
+		ValueArg<int> frameArg("", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint("Frames", 5, 200));
 		cmd.add(frameArg);
 
-		ValueArg<bool> showArg("s", "show_windows", "displays windows in demo mode", false, true, "true/false");
+		ValueArg<bool> showArg("", "show_windows", "displays windows in demo mode", false, true, "true/false");
 		cmd.add(showArg);
 
-		ValueArg<bool> videoArg("v", "record_video", "Records demo mode to video", false, false, "true/false");
+		ValueArg<bool> videoArg("", "record_video", "Records demo mode to video", false, false, "true/false");
 		cmd.add(videoArg);
 
 		ValueArg<string> cameraFileArg("", "camera_settings", "OpenCV camera calibration file", false, default_camera_calibration_file, new FileConstraint());
@@ -165,43 +167,39 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		ValueArg<string> calibrationOutput("", "calibrate_output", "output file for camera matricies", false, "output.json", "filename");
 		cmd.add(calibrationOutput);
 
+		ValueArg<int> threadArg("", "opencv_threads", "OpenCV thread limit", false, 4, new IntegerConstraint("OpenCV Threads", 1, 40));
+
 		cmd.parse(argc, argv);
 
 		// read all parsed command line arguments
-		auto buildinfo = buildInfoSwitch.getValue();
-		options.setBuildInfoMode(buildinfo);
-
-		// check, its a instant abort if build info is found
-		if (buildinfo)
+		if (demoSwitch.isSet())
+			options.setDemoMode(true);
+		else if (calibrationSwitch.isSet())
+			options.setCalibrationMode(true);
+		else if (testSwitch.isSet())
+			options.setTestMode(true);
+		else { 		// check, its a instant abort if build info is found
+			options.setBuildInfoMode(true);
 			return true;
+		}
 
-		auto cameraFile = cameraFileArg.getValue();
-		options.setCameraFile(cameraFile);
+		auto sval = cameraFileArg.getValue();
+		options.setCameraFile(sval);
 
-		cameraFile = calibrationOutput.getValue();
-		options.setCalibrationOutput(cameraFile);
+		sval = calibrationOutput.getValue();
+		options.setCalibrationOutput(sval);
 
-		auto frames = frameArg.getValue();
-		options.set_frames(frames);
+		sval = testSuiteArg.getValue();
+		options.setTestSuite(sval);
 
-		auto showwindows = showArg.getValue();
-		auto recordvideo = videoArg.getValue();
+		auto ival = frameArg.getValue();
+		options.setFrames(ival);
 
-		options.setShowWindows(showwindows);
-		options.setRecordVideo(recordvideo);
+		auto bval = showArg.getValue();
+		options.setShowWindows(bval);
 
-		auto demo = demoSwitch.getValue();
-		options.setDemoMode(demo);
-
-		auto calib = calibrationSwitch.getValue();
-		options.setCalibrationMode(calib);
-
-		auto test = testSwitch.getValue();
-		options.setTestMode(!test.empty());
-
-		auto testDiffMode = testDiffSwitch.getValue();
-		options.setTestDiffMode(!testDiffMode.empty());
-
+		bval = videoArg.getValue();
+		options.setRecordVideo(bval);
 
 		return false;
 	}

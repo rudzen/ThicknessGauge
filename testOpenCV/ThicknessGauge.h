@@ -264,15 +264,15 @@ private: // generic helper methods
 
 		// Filter by Circularity
 		params.filterByCircularity = true;
-		params.minCircularity = 0.1;
+		params.minCircularity = 0.1f;
 
 		// Filter by Convexity
 		params.filterByConvexity = true;
-		params.minConvexity = 0.87;
+		params.minConvexity = 0.87f;
 
 		// Filter by Inertia
 		params.filterByInertia = true;
-		params.minInertiaRatio = 0.01;
+		params.minInertiaRatio = 0.01f;
 
 
 		// Storage for blobs

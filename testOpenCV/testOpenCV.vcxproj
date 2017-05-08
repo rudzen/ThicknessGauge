@@ -189,6 +189,7 @@
     <ClInclude Include="TestException.h" />
     <ClInclude Include="DemoModeVisitor.h" />
     <ClInclude Include="TestSuitConstraint.h" />
+    <ClInclude Include="TestModeVisitor.h" />
     <ClInclude Include="ThicknessGauge.h" />
     <ClInclude Include="ImageDimensionException.h" />
     <ClInclude Include="ImageSave.h" />

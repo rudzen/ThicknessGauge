@@ -2,12 +2,12 @@
 #include <tclap/Visitor.h>
 #include <iostream>
 
-class BuildInfoVisitor : public TCLAP::Visitor {
+class TestModeVisitor : public TCLAP::Visitor {
 
 public:
 
 	void visit() override {
-		std::cout << "Showing build info." << std::endl;
+		std::cout << "Test mode set." << std::endl;
 	}
 
 };

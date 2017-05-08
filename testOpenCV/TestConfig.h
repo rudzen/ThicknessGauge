@@ -21,7 +21,7 @@ private:
 
 public:
 
-	TestConfig(): alpha_(0.1), sigma_(5), testNum_(1), kernel_(0, 0) { }
+	TestConfig(): alpha_(0.1f), sigma_(5), testNum_(1), kernel_(0, 0) { }
 
 	TestConfig(const float alpha, const int sigma, const int testNum, const cv::Size kernel)
 		: testNum_(testNum), alpha_(alpha),
