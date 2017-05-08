@@ -9,6 +9,7 @@
 #include "ProgressBar.h"
 #include "Line.h"
 #include "Histogram.h"
+#include "GlobGenerator.h"
 
 
 void ThicknessGauge::initVideoCapture() {
@@ -17,6 +18,28 @@ void ThicknessGauge::initVideoCapture() {
 
 void ThicknessGauge::initCalibrationSettings(string fileName) {
 	cs.readSettings(fileName);
+}
+
+void ThicknessGauge::addNulls() {
+	std::vector<cv::String> files;
+	cv::String folder = "./nulls/";
+
+	cv::glob(folder, files);
+
+	nulls_.clear();
+	nulls_.reserve(files.size());
+
+	for (auto& file : files) {
+		std::cout << "loading null file : " << file << endl;
+		//cv::Mat tmp = cv::imread(file, CV_8UC1);
+
+		nulls_.push_back(cv::imread(file, CV_8UC1));
+	}
+
+	for (auto& n : nulls_) {
+		std::cout << n.size() << endl;
+	}
+
 }
 
 void ThicknessGauge::gatherPixels(cv::Mat& image) {
@@ -320,9 +343,20 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		// capture frame amount and clear storage
 		for (auto i = 0; i < frameCount_; ++i) {
-			cap >> frames[i];
+
+			cap >> frame;
+			frames[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
 			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
+
+			for (auto& n : nulls_)
+				frames[i] = frame - n;
+
 			pix_Planarmap.at(i).clear();
+
+
+			//cap >> frames[i];
+			//outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
+			//pix_Planarmap.at(i).clear();
 		}
 
 		for (auto i = 0; i < frameCount_; ++i) {

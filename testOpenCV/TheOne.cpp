@@ -88,6 +88,8 @@ int main(int argc, char** argv) {
 
 			c.initVideoCapture();
 
+			c.addNulls();
+
 			auto bThreshold = 0;
 			//bThreshold = c.autoBinaryThreshold(25000);
 			//cout << "generating threshold : " << bThreshold << endl;

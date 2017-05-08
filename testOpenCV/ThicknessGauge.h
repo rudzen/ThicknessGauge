@@ -84,14 +84,6 @@ private:
 	std::vector<cv::Mat> nulls_;
 
 public:
-
-	double ThicknessGauge::getBaseLine(int side) const {
-		return baseLine_[side];
-	}
-
-	void ThicknessGauge::setBaseLine(double baseLine, int side) {
-		baseLine_[side] = baseLine;
-	}
 	
 	// opencv and misc settings objects
 
@@ -105,6 +97,11 @@ public:
 	void initCalibrationSettings(string fileName);
 
 public: // basic stuff to extract information
+
+	/**
+	 * \brief Loads all null images from "./null/" folder.
+	 */
+	void addNulls();
 
 	void gatherPixels(cv::Mat& image);
 
@@ -154,6 +151,14 @@ public: // basic stuff to extract information
 	bool getSparseY(cv::Mat& image, vi& output) const;
 
 public: // getters and setters
+
+	double ThicknessGauge::getBaseLine(int side) const {
+		return baseLine_[side];
+	}
+
+	void ThicknessGauge::setBaseLine(double baseLine, int side) {
+		baseLine_[side] = baseLine;
+	}
 
 	int getFrameCount() const;
 
@@ -287,7 +292,7 @@ private: // generic helper methods
 #else 
 
 		// Set up detector with params
-		cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
+		auto detector = cv::SimpleBlobDetector::create(params);
 
 		// Detect blobs
 		detector->detect(*image, keypoints);
