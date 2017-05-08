@@ -23,7 +23,7 @@
     <ProjectGuid>{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ThicknessGaugeTest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
     <ProjectSubType>NativeUnitTestProject</ProjectSubType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
