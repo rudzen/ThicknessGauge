@@ -1,8 +1,8 @@
-#include "ImageSave.h"
+#include "IO/ImageSave.h"
 #include "ThicknessGauge.h"
-#include "Stringtools.h"
-#include "Util.h"
-#include "InvalidFileException.h"
+#include "Util/Stringtools.h"
+#include "Util/Util.h"
+#include "Exceptions/InvalidFileException.h"
 
 using namespace utils;
 

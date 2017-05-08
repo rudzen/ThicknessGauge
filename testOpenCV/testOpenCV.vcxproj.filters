@@ -81,129 +81,51 @@
     <ClCompile Include="TheOne.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ImageSave.cpp">
-      <Filter>Source Files\File</Filter>
-    </ClCompile>
-    <ClCompile Include="VideoInfo.cpp">
-      <Filter>Source Files\File</Filter>
-    </ClCompile>
-    <ClCompile Include="MiniCalc.cpp">
-      <Filter>Source Files\CV</Filter>
-    </ClCompile>
-    <ClCompile Include="CalibrationSettings.cpp">
-      <Filter>Source Files\Camera\Calibrate</Filter>
-    </ClCompile>
-    <ClCompile Include="CalibrationTest.cpp">
-      <Filter>Source Files\Camera\Calibrate</Filter>
-    </ClCompile>
-    <ClCompile Include="Util.cpp">
-      <Filter>Source Files\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="PrettyMenu.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
     <ClCompile Include="ThicknessGauge.cpp">
       <Filter>Source Files\CV</Filter>
     </ClCompile>
-    <ClCompile Include="IsValidFileName.cpp">
+    <ClCompile Include="Calibrate\CalibrationSettings.cpp">
+      <Filter>Source Files\Camera\Calibrate</Filter>
+    </ClCompile>
+    <ClCompile Include="Calibrate\CalibrationTest.cpp">
+      <Filter>Source Files\Camera\Calibrate</Filter>
+    </ClCompile>
+    <ClCompile Include="Calc\MiniCalc.cpp">
+      <Filter>Source Files\CV</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\PrettyMenu.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\ProgressBar.cpp">
+      <Filter>Source Files\UI\ProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\VideoInfo.cpp">
       <Filter>Source Files\File</Filter>
     </ClCompile>
-    <ClCompile Include="ProgressBar.cpp">
-      <Filter>Source Files\UI\ProgressBar</Filter>
+    <ClCompile Include="IO\IsValidFileName.cpp">
+      <Filter>Source Files\File</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\ImageSave.cpp">
+      <Filter>Source Files\File</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Util.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ImageSave.h">
-      <Filter>Header Files\File</Filter>
-    </ClInclude>
-    <ClInclude Include="ImageDimensionException.h">
-      <Filter>Header Files\Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="VideoInfo.h">
-      <Filter>Header Files\File</Filter>
-    </ClInclude>
     <ClInclude Include="_cv.h">
       <Filter>Header Files\Namespaces</Filter>
-    </ClInclude>
-    <ClInclude Include="InvalidMeanException.h">
-      <Filter>Header Files\Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="MiniCalc.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
-    <ClInclude Include="Compute.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CalibrationSettings.h">
-      <Filter>Header Files\Camera\Calibrate</Filter>
-    </ClInclude>
-    <ClInclude Include="CaptureFailException.h">
-      <Filter>Header Files\Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="Stringtools.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Util.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="PrettyMenu.h">
-      <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="ThicknessGauge.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="Vec.h">
-      <Filter>Header Files\CV\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Q.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="IsValidFileName.h">
-      <Filter>Header Files\File</Filter>
-    </ClInclude>
-    <ClInclude Include="InvalidFileException.h">
-      <Filter>Header Files\Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="PointData.h">
-      <Filter>Header Files\CV\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Specs.h">
-      <Filter>Header Files\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="ThicknessGaugeData.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
-    <ClInclude Include="Interpolate.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
     <ClInclude Include="LineConfig.h">
       <Filter>Header Files\CV\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Bezier_1.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
-    <ClInclude Include="CalibrationException.h">
-      <Filter>Header Files\Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="TestException.h">
-      <Filter>Header Files\Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="TestConfig.h">
-      <Filter>Header Files\CV\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="ProgressBar.h">
-      <Filter>Header Files\UI\ProgressBar</Filter>
-    </ClInclude>
-    <ClInclude Include="CalibrationModeVisitor.h">
-      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
-    </ClInclude>
-    <ClInclude Include="TestSuitConstraint.h">
-      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
-    </ClInclude>
     <ClInclude Include="Line.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobGenerator.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
     <ClInclude Include="Histogram\Histogram.h">
@@ -232,6 +154,78 @@
     </ClInclude>
     <ClInclude Include="ArgClasses\TestModeVisitor.h">
       <Filter>Header Files\UI\CommandLine\Visitors</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions\CalibrationException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions\CaptureFailException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions\ImageDimensionException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions\InvalidFileException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions\InvalidMeanException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgClasses\TestSuitConstraint.h">
+      <Filter>Header Files\UI\CommandLine\Constraints</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions\TestException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgClasses\CalibrationModeVisitor.h">
+      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
+    </ClInclude>
+    <ClInclude Include="Calibrate\CalibrationSettings.h">
+      <Filter>Header Files\Camera\Calibrate</Filter>
+    </ClInclude>
+    <ClInclude Include="Calc\Compute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Calc\Interpolate.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Calc\Bezier_1.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Calc\MiniCalc.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\PrettyMenu.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\ProgressBar.h">
+      <Filter>Header Files\UI\ProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\VideoInfo.h">
+      <Filter>Header Files\File</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\IsValidFileName.h">
+      <Filter>Header Files\File</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\ImageSave.h">
+      <Filter>Header Files\File</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\GlobGenerator.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Stringtools.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Q.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Testing\TestConfig.h">
+      <Filter>Header Files\CV\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Util.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Vec.h">
+      <Filter>Header Files\CV\Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

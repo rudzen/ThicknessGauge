@@ -1,15 +1,16 @@
 #include <algorithm>
 #include <array>
 #include "ThicknessGauge.h"
-#include "MiniCalc.h"
-#include "Util.h"
-#include "ImageSave.h"
-#include "CaptureFailException.h"
-#include "TestConfig.h"
-#include "ProgressBar.h"
+#include "Calc/MiniCalc.h"
+#include "Util/Util.h"
+#include "IO/ImageSave.h"
+#include "Exceptions/CaptureFailException.h"
+#include "Testing/TestConfig.h"
+#include "UI/ProgressBar.h"
 #include "Line.h"
 #include "Histogram/Histogram.h"
-#include "GlobGenerator.h"
+#include "IO/GlobGenerator.h"
+#include "Histogram/HistoPeak.h"
 
 
 void ThicknessGauge::initVideoCapture() {
@@ -299,7 +300,7 @@ bool ThicknessGauge::generatePlanarImage() {
 		////createTrackbar("Frac", line1WindowName, &line_fraction, 4);
 		////createTrackbar("Thick", line1WindowName, &line_thickness, 5);
 
-		namedWindow(line2WindowName, cv::WINDOW_KEEPRATIO);
+		//namedWindow(line2WindowName, cv::WINDOW_KEEPRATIO);
 
 
 		//namedWindow(line3WindowName, WINDOW_AUTOSIZE);
@@ -370,25 +371,27 @@ bool ThicknessGauge::generatePlanarImage() {
 			}
 
 			if (showWindows_) {
-				Line l;
-				auto num(to_string(i));
+				//Line l;
+				//auto num(to_string(i));
+				//l.setFrame(frame);
+				//l.generateSparse();
+				//l.differentiateY();
+				//l.differentiateIntensity();
+				//l.mergeIntensity();
+				//l.saveAllData(num);
+				//l.drawPoly();
 
-				l.setFrame(frame);
-				l.generateSparse();
-				l.differentiateY();
-				l.differentiateIntensity();
-				l.mergeIntensity();
-				l.saveAllData(num);
-				l.drawPoly();
+				HistoPeak hp;
+				hp.processImage(frame);
 
-				Histogram g;
-				g.populateHistogram(frame);
-				cv::imshow(line2WindowName, g.histogramImage());
-				auto filename("test_histo_" + num + ".txt");
-				g.saveSimpleData(filename);
+				//Histogram g;
+				//g.populateHistogram(frame);
+				//cv::imshow(line2WindowName, g.histogramImage());
+				//auto filename("test_histo_" + num + ".txt");
+				//g.saveSimpleData(filename);
 
-				auto blobs = drawBlobs(&frame);
-				imshow("keypoints", blobs);
+				//auto blobs = drawBlobs(&frame);
+				//imshow("keypoints", blobs);
 
 			}
 
@@ -495,7 +498,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		// test for highest pixel for eroded image
 		auto highestPixel = output.rows - getHighestYpixel(output, heightLine) - baseLine_[0];
-		cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
+		cout << "Highest Y in eroded line : " << highestPixel << " [mm: N/A ]" << endl;
 
 		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
 		//imshow(dilationWindowName, dilation);

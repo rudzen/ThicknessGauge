@@ -49,8 +49,6 @@ public:
 	MiniCalc();
 	~MiniCalc();
 
-	static double calculatePixelToMm(double pixels);
-
 	// means of all Y values for each X
 	vector<cv::Point> m_PlanarPixels;
 

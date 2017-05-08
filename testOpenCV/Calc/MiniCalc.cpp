@@ -1,6 +1,5 @@
-#include "MiniCalc.h"
-#include "Util.h"
-#include "Specs.h"
+#include "Calc/MiniCalc.h"
+#include "Util/Util.h"
 
 MiniCalc::MiniCalc() {
 }
@@ -298,12 +297,6 @@ uchar MiniCalc::getGradientYValues(cv::Mat& image, int x, int y, int maxY, int m
 
 
 	return 1;
-}
-
-
-double MiniCalc::calculatePixelToMm(double pixelLocation) {
-	Specs s;
-	return s.PixMm() * pixelLocation;
 }
 
 bool MiniCalc::computeDiags(cv::Mat& image, vector<cv::Mat>& diags) {

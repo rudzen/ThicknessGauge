@@ -1,17 +1,17 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include "ThicknessGauge.h"
-#include "CalibrationTest.cpp"
-#include "CaptureFailException.h"
+#include "Calibrate/CalibrationTest.cpp"
 #include "tclap/CmdLine.h"
+#include "Exceptions/CaptureFailException.h"
+#include "Exceptions/CalibrationException.h"
+#include "Exceptions/TestException.h"
 #include "ArgClasses/CommandLineOptions.h"
 #include "ArgClasses/IntegerConstraint.h"
 #include "ArgClasses/FileConstraint.h"
-#include "CalibrationException.h"
-#include "TestException.h"
 #include "ArgClasses/DemoModeVisitor.h"
-#include "CalibrationModeVisitor.h"
-#include "TestSuitConstraint.h"
+#include "ArgClasses/CalibrationModeVisitor.h"
+#include "ArgClasses/TestSuitConstraint.h"
 #include "ArgClasses/TestModeVisitor.h"
 #include "ArgClasses/BuildInfoVisitor.h"
 

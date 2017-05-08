@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include "Stringtools.h"
-#include "IsValidFileName.h"
+#include "IO/IsValidFileName.h"
 
 // generic utility functions...
 
@@ -11,7 +11,8 @@ class Util {
 
 public:
 
-	static char* getTime();
+	//static char* getTime();
+	static std::string getTime();
 
 	static std::string type2str(int type);
 

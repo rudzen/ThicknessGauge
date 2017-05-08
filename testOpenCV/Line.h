@@ -1,8 +1,7 @@
 #pragma once
 #include <vector>
-#include "PointData.h"
 #include <map>
-#include "Util.h"
+#include "Util/Util.h"
 #include <opencv2/stitching/detail/warpers.hpp>
 
 /**

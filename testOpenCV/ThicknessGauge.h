@@ -1,16 +1,16 @@
 #pragma once
 
 #include <vector>
-#include "MiniCalc.h"
+#include "Calc/MiniCalc.h"
 #include "ThicknessGaugeData.h"
 
 #include "_cv.h"
-#include "CalibrationSettings.h"
-#include "Vec.h"
-#include "Util.h"
+#include "Calibrate/CalibrationSettings.h"
+#include "Util/Vec.h"
+#include "Util/Util.h"
 
 #include <opencv2/opencv.hpp>
-#include "TestConfig.h"
+#include "Testing/TestConfig.h"
 #include <vector>
 #include "Line.h"
 

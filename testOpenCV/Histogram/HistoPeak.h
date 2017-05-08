@@ -41,7 +41,7 @@ public:
 
 	void processImage(cv::Mat& image);
 
-	void drawPeaks(cv::Mat& histImage, std::vector<int>& peaks, int hist_size = 256, cv::Scalar color = cv::Scalar(0, 0, 255)) const;
+	void drawPeaks(cv::Mat& histImage, std::vector<int>& peaks) const;
 
 	cv::Mat drawHistogram(cv::Mat& hist, int hist_h = 400, int hist_w = 1024, int hist_size = 256, cv::Scalar color = cv::Scalar(255, 255, 255), int type = 2) const;
 
@@ -65,10 +65,11 @@ inline void HistoPeak::processImage(cv::Mat& image) {
 	peaks = getLocalMaximum(histImage);
 }
 
-inline void HistoPeak::drawPeaks(cv::Mat& histImage, std::vector<int>& peaks, int hist_size = 256, cv::Scalar color = cv::Scalar(0, 0, 255)) const {
-	auto bin_w = cvRound(static_cast<double>(histImage.cols) / hist_size);
+inline void HistoPeak::drawPeaks(cv::Mat& histImage, std::vector<int>& peaks) const {
+	auto bin_w = cvRound(static_cast<double>(histImage.cols) / histSize);
+	auto col = cv::Scalar(255, 0, 255);
 	for (size_t i = 0; i < peaks.size(); i++)
-		line(histImage, cv::Point(bin_w * peaks[i], histImage.rows), cv::Point(bin_w * peaks[i], 0), color);
+		line(histImage, cv::Point(bin_w * peaks[i], histImage.rows), cv::Point(bin_w * peaks[i], 0), col);
 
 
 	imshow("Peaks", histImage);

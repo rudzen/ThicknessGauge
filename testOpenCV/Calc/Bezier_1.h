@@ -1,7 +1,6 @@
 #pragma once
 #include <opencv2/core/matx.hpp>
-#include "PointData.h"
-#include "Vec.h"
+#include "Util/Vec.h"
 
 template <typename T>
 class Bezier {
