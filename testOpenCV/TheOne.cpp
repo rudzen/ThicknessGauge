@@ -175,10 +175,10 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		ValueArg<int> frameArg("", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint("Frames", 5, 200));
 		cmd.add(frameArg);
 
-		ValueArg<bool> showArg("", "show_windows", "displays windows in demo mode", false, true, "true/false");
+		ValueArg<bool> showArg("", "show_windows", "displays windows in demo mode", false, true, "0/1");
 		cmd.add(showArg);
 
-		ValueArg<bool> videoArg("", "record_video", "Records demo mode to video", false, false, "true/false");
+		ValueArg<bool> videoArg("", "record_video", "Records demo mode to video", false, false, "0/1");
 		cmd.add(videoArg);
 
 		ValueArg<string> cameraFileArg("", "camera_settings", "OpenCV camera calibration file", false, default_camera_calibration_file, new FileConstraint());

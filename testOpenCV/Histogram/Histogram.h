@@ -24,14 +24,14 @@ class Histogram {
 
 	int bin_w = Util::round(static_cast<double>(hist_w) / histSize);
 
-	std::vector<int> dale_;
+	std::vector<v2<int>> dale_;
 
 private:
 
 	void normalizeHistogramImage(const int max) {
 
 		//auto modifier = max * hist_w;
-		for (auto i = 0; i < histSize; ++i) {
+		for (auto i = histSize; i--;) {
 			histogram_[i] = (static_cast<double>(histogram_[i]) / max) * hist_w;
 		}
 	}
@@ -93,32 +93,36 @@ inline void Histogram::populateHistogram(std::map<int, unsigned char>& intensity
 }
 
 inline void Histogram::populateHistogram(cv::Mat& image) {
-	
+
 	if (image.empty())
 		return;
 
 	nullify();
 
-	float range[] = { 0, 255 };
-	const float* ranges[] = { range };
+	auto min = 100;
+	auto max = 200;
 
-	calcHist(&image, 1, nullptr, cv::Mat(), hist_, 1, &histSize, ranges, true, false);
+	auto count = max - min;
+
+	float range[] = { min, max };
+	const float* ranges[] = {range};
+
+	calcHist(&image, 1, nullptr, cv::Mat(), hist_, 1, &count, ranges, true, false);
 
 	clearHistogramImage();
 
 	normalize(hist_, histNormalized_, 0, histogramImage_.rows, cv::NORM_MINMAX, -1, cv::Mat());
 
-	for (auto i = 0; i < histSize; i++) {
+	for (auto i = 0; i < count; i++) {
 		cv::line(histogramImage_, cv::Point(bin_w * (i - 1), hist_h - cvRound(histNormalized_.at<float>(i - 1))),
-				 cv::Point(bin_w * (i), hist_h - cvRound(histNormalized_.at<float>(i))),
-				 cv::Scalar(255, 0, 0), 1, cv::LINE_8, 0);
+		         cv::Point(bin_w * (i), hist_h - cvRound(histNormalized_.at<float>(i))),
+		         cv::Scalar(255, 0, 0), 1, cv::LINE_8, 0);
 	}
 
-
-	for (auto i = 0; i < histSize; ++i) {
+	for (auto i = 0; i < count; ++i) {
 		auto val = cvRound(hist_.at<float>(1, i));
-		if (val > 0)
-			dale_.push_back(val);
+		//if (val > 0)
+			dale_.push_back(v2<int>(i, val));
 	}
 
 	// attempt to seperate highest peak with line
@@ -143,26 +147,16 @@ inline void Histogram::populateHistogram(cv::Mat& image) {
 
 inline void Histogram::saveSimpleData(std::string& filename) {
 	std::ofstream file(filename.c_str());
-	
+
 	for (auto& h : dale_) {
-		file << h << '\n';
+		file << h.x << ' ' << h.y << '\n';
 	}
-	//for (auto h = 0; h < histSize; h++) {
-	//	auto binVal = hist_.at<float>(h);
-	//	if (h > 0)
-	//		file << '\t';
-	//	file << binVal;
-	//}
 	file.close();
 }
 
 inline void Histogram::nullify() {
-	for (auto i = 0; i < histSize; i += 4) {
+	for (auto i = histSize; i--;)
 		histogram_[i] = 0;
-		histogram_[i + 1] = 0;
-		histogram_[i + 2] = 0;
-		histogram_[i + 3] = 0;
-	}
 
 	clearHistogramImage();
 }

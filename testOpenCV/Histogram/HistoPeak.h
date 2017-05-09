@@ -2,6 +2,7 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/videostab/ring_buffer.hpp>
 #include <opencv2/highgui.hpp>
+#include <ostream>
 
 
 class HistoPeak {
@@ -33,51 +34,72 @@ class HistoPeak {
 		return output;
 	}
 
-	cv::Mat histImage;
+	cv::Mat histImage_;
 
-	std::vector<int> peaks;
+	std::vector<int> peaks_;
 
-	std::vector<int> dales;
+	std::vector<int> dales_;
+
+	std::vector<cv::Point2i> histElements_;
 
 public:
+	const std::vector<cv::Point2i>& getHistElements() const {
+		return histElements_;
+	}
 
-	void processImage(cv::Mat& image);
+	const cv::Mat& histImage() const {
+		return histImage_;
+	}
+
+	void processImage(cv::Mat& image, bool uniform, bool accumulate);
 
 	void drawPeaks(cv::Mat& histImage, std::vector<int>& peaks) const;
 
 	void drawDales(cv::Mat& histImage, std::vector<int>& dales) const;
 
-	cv::Mat drawHistogram(cv::Mat& hist, int histH = 400, int histW = 1024, int histSize = 256, cv::Scalar color = cv::Scalar(255, 255, 255), int type = 2) const;
+	cv::Mat drawHistogram(cv::Mat& hist, int histH = 400, int histW = 2048, int histSize = 256, cv::Scalar color = cv::Scalar(255, 255, 255), int type = 2) const;
 
 	static std::vector<PeakInfo> findPeaks(cv::InputArray _src, int window_size);
 
 	static std::vector<PeakInfo> findDales(cv::InputArray _src, int windowSize);
 
 	//if you play with the peak_per attribute value, you can increase/decrease the number of peaks found
-	std::vector<int> getLocalMaximum(cv::InputArray _src, int smoothSize = 9, int neighborSize = 3, float peakPer = 0.5) const;
+	std::vector<int> getLocalMaximum(cv::InputArray _src, int smoothSize = 9, int neighborSize = 3, float peakPer = 0.1) const;
 
 	std::vector<int> getLocalMinimum(cv::InputArray _src, int smoothSize = 9, int neighborSize = 3, float dalePer = 0.5) const;
+	//std::vector<int> getLocalMinimum(cv::InputArray _src, int smoothSize = 9, int neighborSize = 3, float dalePer = 0.5) const;
 
+	friend std::ostream& operator<<(std::ostream& os, const HistoPeak& obj) {
+		os << "HistoPeak {";
+		os << "peaks: ";
+		for (auto& p : obj.peaks_)
+			os << ' ' << p;
+
+		os << "\ndales: ";
+		for (auto& d : obj.dales_)
+			os << ' ' << d;
+		os << "}\n";
+		return os;
+	}
 };
 
-inline void HistoPeak::processImage(cv::Mat& image) {
-	float range[] = {0, 256};
+inline void HistoPeak::processImage(cv::Mat& image, bool uniform, bool accumulate) {
+	// default = 0, 256
+	float range[] = {200, 256};
 
 	const float* histRange = {range};
-	auto uniform = true;
-	auto accumulate = false;
 
-	cv::calcHist(&image, 1, nullptr, cv::Mat(), histImage, 1, &histSize, &histRange, uniform, accumulate);
+	cv::calcHist(&image, 1, nullptr, cv::Mat(), histImage_, 1, &histSize, &histRange, uniform, accumulate);
 
-	peaks = getLocalMaximum(histImage);
-	dales = getLocalMinimum(histImage);
+	peaks_ = getLocalMaximum(histImage_);
+	dales_ = getLocalMinimum(histImage_);
 }
 
 inline void HistoPeak::drawPeaks(cv::Mat& histImage, std::vector<int>& peaks) const {
 	auto bin_w = cvRound(static_cast<double>(histImage.cols) / histSize);
 	auto col = cv::Scalar(255, 0, 255);
 	for (auto& p : peaks)
-		line(histImage, cv::Point(bin_w * p, histImage.rows), cv::Point(bin_w * p, 0), col);
+		line(histImage, cv::Point(bin_w * p, histImage.rows), cv::Point(bin_w * p, 0), col, 2);
 
 	imshow("Peaks", histImage);
 }
@@ -86,7 +108,7 @@ inline void HistoPeak::drawDales(cv::Mat& histImage, std::vector<int>& dales) co
 	auto bin_w = cvRound(static_cast<double>(histImage.cols) / histSize);
 	auto col = cv::Scalar(255, 255, 0);
 	for (auto& d : dales)
-		line(histImage, cv::Point(bin_w * d, histImage.rows), cv::Point(bin_w * d, 0), col);
+		line(histImage, cv::Point(bin_w * d, histImage.rows), cv::Point(bin_w * d, 0), col, 2);
 
 	imshow("Dales", histImage);
 }
@@ -121,13 +143,14 @@ inline cv::Mat HistoPeak::drawHistogram(cv::Mat& hist, int hist_h, int hist_w, i
 		}
 		break;
 	default:
-		for (auto i = 1; i < hist_size; ++i) {
+		for (auto i = 1; i < hist_size; ++i)
 			line(histImage, cv::Point(bin_w * (i - 1), hist_h - cvRound(hist.at<float>(i - 1))),
 			     cv::Point(bin_w * (i), hist_h - cvRound(hist.at<float>(i))), color, 1, 8, 0);
-		}
 
 		break;
 	}
+
+	//cv::flip(histImage, histImage, 1);
 
 	cv::imshow("Histogram", histImage);
 
@@ -252,7 +275,7 @@ inline std::vector<int> HistoPeak::getLocalMaximum(cv::InputArray _src, int smoo
 
 	for (auto& p : peaks) {
 		if (p.value > max_val * peak_per && p.leftSize >= 2 && p.rightSize >= 2)
-			output.push_back(p.pos);
+			output.push_back(p.pos); // could be pos
 	}
 
 	auto histImg = drawHistogram(src);

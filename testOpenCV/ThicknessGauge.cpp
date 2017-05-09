@@ -152,7 +152,7 @@ double ThicknessGauge::getYPixelsAvg(cv::Mat& image, int x) {
 	auto col = image.col(x);
 	auto uc_pixel = col.data;
 
-	for (auto i = 0; i < col.cols; ++i) {
+	for (auto i = col.cols; i--; ) {
 		sum += uc_pixel[0];
 		cout << "sum is now : " << sum << "\n";
 		count++;
@@ -331,7 +331,10 @@ bool ThicknessGauge::generatePlanarImage() {
 	vector<cv::Point2d> test_subPix;
 
 	// configure output stuff
-	for (auto i = 0; i < arrayLimit; ++i)
+	for (auto i = frameCount_; i--; )
+		pix_Planarmap[i].reserve(imageSize_.width);
+
+	for (auto i = arrayLimit - 1; i > arrayLimit - frameCount_; i--)
 		pix_Planarmap[i].reserve(imageSize_.width);
 
 
@@ -359,6 +362,8 @@ bool ThicknessGauge::generatePlanarImage() {
 			pix_Planarmap.at(i).clear();
 		}
 
+		HistoPeak hp;
+
 		for (auto i = 0; i < frameCount_; ++i) {
 
 			// just share the joy
@@ -371,7 +376,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			if (showWindows_) {
 				//Line l;
-				//auto num(to_string(i));
+				auto num(to_string(i));
 				//l.setFrame(frame);
 				//l.generateSparse();
 				//l.differentiateY();
@@ -389,26 +394,26 @@ bool ThicknessGauge::generatePlanarImage() {
 				//auto blobs = drawBlobs(&frame);
 				//imshow("keypoints", blobs);
 
-				HistoPeak hp;
-				hp.processImage(frame);
-
 			}
 
-			// do basic in-place binary threshold
-			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
+			//equalizeHist(frame, frame);
 
-			equalizeHist(frame, frame);
+			// do basic in-place binary threshold
+			//threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
 
 			// blur in-place
-			GaussianBlur(frame, frame, cv::Size(9, 9), 10, 2, cv::BORDER_DEFAULT);
+			//GaussianBlur(frame, frame, cv::Size(7, 5), 10, 0, cv::BORDER_DEFAULT);
+			GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0, cv::BORDER_DEFAULT);
 
+			if (showWindows_) {
+				hp.processImage(frame, true, i != 0);
+			}
 
 			// perform some stuff
-			//laplace(frame);
+			// laplace(frame);
 			// c.Sobel(frame);
 
 			if (showWindows_) {
-
 				imshow(outputWindowName, frame);
 			}
 			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
@@ -450,6 +455,8 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		}
 
+		cout << hp << endl;
+
 		baseLine_[0] = miniCalc.mean(baseLine);
 		//cout << "baseline real : " << baseLine_ << endl;
 
@@ -463,6 +470,8 @@ bool ThicknessGauge::generatePlanarImage() {
 			outputs[i].release();
 			if (saveVideo_) is.SaveVideoFrame(lines);
 		}
+
+
 
 		cv::Mat output = cv::Mat::zeros(imageSize_, lines.type());
 
@@ -498,77 +507,26 @@ bool ThicknessGauge::generatePlanarImage() {
 		auto highestPixel = output.rows - getHighestYpixel(output, heightLine) - baseLine_[0];
 		cout << "Highest Y in eroded line : " << highestPixel << " [mm: N/A ]" << endl;
 
-		//Mat dilation = c.dilation(lines, dilation_type, dilation_size);
-		//imshow(dilationWindowName, dilation);
+
+		/* base line etc calculations !!*/
 
 		// gather all elements from final matrix
 		computeAllElements(output);
 
 		computerGaugeLine(output);
 
-		//if (!computerBaseLine(output, highestPixel))
-		//	cerr << "Error while computing baseline..\n";
+		frameTime_ = cv::getTickCount() - time_begin;
 
 		if (showWindows_) {
-
-			// test diagonals
-			//vector<cv::Mat> diagonals;
-			//if (miniCalc.computeDiags(output, diagonals)) {
-			//	cout << "Diagonals created : " << diagonals.size() << endl;
-			//	//add(output, diagonals.front(), output);
-			//	vector<Point2d> heights;
-			//	if (miniCalc.computeDiagAvg(diagonals, heights)) {
-			//		cout << "Created " << heights.size() << " average points." << endl;
-			//		//cout << heights << endl;
-			//	} else {
-			//		cerr << "Error while creating height average for diagonals." << endl;
-			//	}
-			//} else {
-			//	cerr << "Error while creating diagonals." << endl;
-			//}
-
-
 			drawVerticalLine(&output, heightLine);
-			//line(output, cv::Point(heightLine, 0), cv::Point(heightLine, output.rows), baseColour_);
-
-
 			// calculated baseline test drawing
 			drawHorizontalLine(&output, Util::round(baseLine_[0]));
 		}
 
 		if (showWindows_) {
 			imshow(erodeWindowName, output);
-
-			cout << "ok" << endl;
-
-			// histogram testzone
-			//histoLine_.setFrame(output);
-			//histoLine_.generateSparse();
-			//histoLine_.differentiateIntensity();
-
-			//Histogram hg;
-			//hg.histogramImage();
-			//auto intense = histoLine_.intensity();
-			//hg.populateHistogram(intense, true);
-			//hg.createHistogramImage();
-			//cv::imshow(line2WindowName, hg.histogramImage());
-
-
-
-
-
-			//vector<cv::Point> sparse;
-			//if (getSparseY(output, sparse)) {
-			//	//cv::SparseMat tmp(cv::Mat(sparse));
-			//	//imshow(line2WindowName, cv::Mat(sparse));
-			//} else {
-			//	Util::loge("Failed to get sparse..");
-			//}
-
-
 		}
 
-		frameTime_ = cv::getTickCount() - time_begin;
 
 		//cout << "Y avr for heightline : " << getYPixelsAvg(frame, heightLine) << endl;
 
@@ -662,7 +620,7 @@ bool ThicknessGauge::testDiff() {
 	//progress.SetFrequencyUpdate(10);
 	//progress.SetStyle(">", "-");
 
-	for (auto i = 0; i < frameCount_; ++i) {
+	for (auto i = frameCount_; i--; ) {
 		//progress.Progressed(i);
 		cap >> frames[i];
 	}
@@ -723,14 +681,14 @@ bool ThicknessGauge::testDiff() {
 	}
 
 	// configure output stuff
-	for (auto i = 0; i < frameCount_; ++i) {
+	for (auto i = frameCount_; i--; ) {
 		pix_Planarmap[i].reserve(imageSize_.width);
 		sparse[i].reserve(imageSize_.width);
 	}
 
 	auto testSize = tests.size();
 
-	for (auto i = 0; i < testSize; ++i) {
+	for (auto i = testSize; i--; ) {
 
 		// start the process of gathering information for set frame count
 		//	for (auto& t : tests) {
@@ -938,7 +896,7 @@ bool ThicknessGauge::testAggressive() {
 	progress.SetFrequencyUpdate(10);
 	progress.SetStyle(">", "-");
 
-	for (auto i = 0; i < frameCount_; ++i) {
+	for (auto i = frameCount_; i--; ) {
 		progress.Progressed(i);
 		cap >> frames[i];
 	}
@@ -999,7 +957,7 @@ bool ThicknessGauge::testAggressive() {
 	}
 
 	// configure output stuff
-	for (auto i = 0; i < frameCount_; ++i) {
+	for (auto i = frameCount_; i--; ) {
 		pix_Planarmap[i].reserve(imageSize_.width);
 		sparse[i].reserve(imageSize_.width);
 	}
@@ -1074,10 +1032,10 @@ bool ThicknessGauge::testAggressive() {
 		cv::Mat lines = cv::Mat::zeros(imageSize_, CV_8UC1);
 
 		// merge the images to target
-		for (auto i = 0; i < frameCount_; ++i) {
-			addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
-			//add(outputs[i], lines, lines);
-			outputs[i].release();
+		for (auto k = frameCount_; k--; ) {
+			addWeighted(outputs[k], alpha, lines, beta, 0.0, lines);
+			//add(outputs[k], lines, lines);
+			outputs[k].release();
 			if (saveVideo_) is.SaveVideoFrame(lines);
 		}
 
@@ -1312,7 +1270,7 @@ void ThicknessGauge::drawText(cv::Mat* image, const string text, TextDrawPositio
 
 void ThicknessGauge::drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar colour) {
 	//cout << "line drawn at : " << pos << endl;
-	line(*image, cv::Point(0, image->rows - pos), cv::Point(image->cols, image->rows - pos), colour, 2, cv::LINE_AA);
+	line(*image, cv::Point(0, image->rows - pos), cv::Point(image->cols, image->rows - pos), colour, 1, cv::LINE_AA);
 }
 
 void ThicknessGauge::drawVerticalLine(cv::Mat* image, uint pos, cv::Scalar colour) {
