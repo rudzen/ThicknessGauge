@@ -34,6 +34,10 @@ class HistoPeak {
 		return output;
 	}
 
+	cv::Mat _org = cv::Mat::zeros(1, 1, CV_8S);
+
+//	cv::Mat& org_;
+
 	cv::Mat histImage_;
 
 	std::vector<int> peaks_;
@@ -43,6 +47,10 @@ class HistoPeak {
 	std::vector<cv::Point2i> histElements_;
 
 public:
+
+	HistoPeak() /*:  org_(_org) */ {
+	}
+
 	const std::vector<cv::Point2i>& getHistElements() const {
 		return histElements_;
 	}
@@ -51,6 +59,7 @@ public:
 		return histImage_;
 	}
 
+	cv::Mat colourMeDirty(int lowerBoundry, int upperBoundry, cv::Scalar col) const;
 	void processImage(cv::Mat& image, bool uniform, bool accumulate);
 
 	void drawPeaks(cv::Mat& histImage, std::vector<int>& peaks) const;
@@ -83,9 +92,41 @@ public:
 	}
 };
 
+inline cv::Mat HistoPeak::colourMeDirty(int lowerBoundry, int upperBoundry, cv::Scalar col) const {
+	
+	vector<cv::Point2i> pix;
+
+	findNonZero(_org, pix);
+
+	cv::Mat img = cv::Mat::zeros(_org.rows, _org.cols, CV_32F);
+
+	if (pix.empty())
+		return img;
+
+	cv::cvtColor(_org, img, cv::COLOR_GRAY2BGR);
+
+//	cv::add(img, org_, img);
+
+	for (auto& p : pix) {
+		auto intensity = _org.at<unsigned char>(p);
+		if (intensity >= lowerBoundry && intensity <= upperBoundry)
+			cv::line(img, p, p, col);
+	}
+
+	return img;
+}
+
 inline void HistoPeak::processImage(cv::Mat& image, bool uniform, bool accumulate) {
+
+	_org = image.clone();
+
+	auto minRange = 0.0;
+	auto maxRange = 0.0;
+
+	cv::minMaxLoc(image, &minRange, &maxRange);
+
 	// default = 0, 256
-	float range[] = {200, 256};
+	float range[] = {1, 255};
 
 	const float* histRange = {range};
 
@@ -93,6 +134,47 @@ inline void HistoPeak::processImage(cv::Mat& image, bool uniform, bool accumulat
 
 	peaks_ = getLocalMaximum(histImage_);
 	dales_ = getLocalMinimum(histImage_);
+
+	if (peaks_.empty())
+		return;
+
+	int low = 0;
+	int high = histSize;
+	int split = histSize / 2;
+
+	auto size = peaks_.size();
+
+	switch (size) {
+	case 2:
+		low = peaks_.front();
+		high = peaks_.back();
+		split = (low + high) / 2;
+		break;
+	case 1:
+
+
+		break;
+	default: ;
+		//return;
+	}
+
+	auto lowest = histImage_.rows;
+	for (auto i = 1; i < split; ++i) {
+		auto current = histImage_.at<float>(i);
+		if (current < lowest && current > 0) {
+			lowest = current;
+		}
+	}
+
+	imshow("colour me freaky   0-30", colourMeDirty(0, 30, cv::Scalar(0, 255, 0)));
+	imshow("colour me freaky 31-100", colourMeDirty(31, 100, cv::Scalar(0, 0, 255)));
+	imshow("colour me freaky 101-150", colourMeDirty(101, 150, cv::Scalar(255, 0, 255)));
+	imshow("colour me freaky 151-200", colourMeDirty(151, 200, cv::Scalar(255, 0, 255)));
+	imshow("colour me freaky 201-256", colourMeDirty(201, 256, cv::Scalar(0, 255, 255)));
+
+
+
+
 }
 
 inline void HistoPeak::drawPeaks(cv::Mat& histImage, std::vector<int>& peaks) const {

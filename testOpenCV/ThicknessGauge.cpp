@@ -407,6 +407,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			if (showWindows_) {
 				hp.processImage(frame, true, i != 0);
+				
 			}
 
 			// perform some stuff
