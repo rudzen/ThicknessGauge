@@ -473,6 +473,9 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		}
 
+		houghL.alignLeftY(frameCount_);
+
+
 		//cout << hp << endl;
 
 		baseLine_[0] = miniCalc.mean(baseLine);
@@ -882,7 +885,7 @@ bool ThicknessGauge::testAggressive() {
 
 	// weigthed adding boundries for alpha
 	// beta values are always 1.0 = alpha
-	float alphaBase = 0.1;
+	float alphaBase = 0.1f;
 
 	// blur sigma boundries
 	auto sigmaXBase = 5;
@@ -1097,7 +1100,7 @@ bool ThicknessGauge::testAggressive() {
 		Util::log("Saving image..");
 		is.SaveImage(&output, "_test" + to_string(currentTest));
 		Util::log("Saving test data..");
-		savePlanarImageData("_test" + to_string(currentTest) + "_data", allPixels_, output, highestPixel, timeString, testInfo.str());
+		savePlanarImageData("_test" + to_string(currentTest) + "_data", allPixels_, output, static_cast<int>(highestPixel), timeString, testInfo.str());
 
 		drawVerticalLine(&output, heightLine);
 		drawHorizontalLine(&output, Util::round(base));
