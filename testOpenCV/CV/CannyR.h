@@ -32,9 +32,11 @@ class CannyR {
 
 	int threshold2;
 
+	const int aperMin = 3;
+	const int aperMax = 7;
 	int apertureSize;
 
-	bool gradient;
+	int gradient;
 
 	bool showWindow;
 
@@ -42,8 +44,8 @@ class CannyR {
 		cv::namedWindow(windowName, cv::WINDOW_KEEPRATIO);
 		cv::createTrackbar("threshold1", windowName, &threshold1, 200, threshold1cb, this);
 		cv::createTrackbar("threshold2", windowName, &threshold2, 200, threshold2cb, this);
-		cv::createTrackbar("apertureSize", windowName, &apertureSize, 3, apertureSizecb, this);
-		cv::createTrackbar("gradient", windowName, &apertureSize, 1, gradientcb, this);
+		cv::createTrackbar("apertureSize", windowName, &apertureSize, aperMax, apertureSizecb, this);
+		cv::createTrackbar("gradient", windowName, &gradient, 1, gradientcb, this);
 	}
 
 	static void threshold1cb(int value, void *userData);
@@ -60,12 +62,17 @@ class CannyR {
 	}
 
 	void setApertureSize(int apertureSize) {
-		if (apertureSize != 0)
-			this->apertureSize = 2 * apertureSize + 1;
-		//this->apertureSize = apertureSize;
+		auto newSize = apertureSize;
+		if (newSize < aperMin)
+			newSize = aperMin;
+		else if (newSize % 2 == 0)
+			newSize++;
+
+		this->apertureSize = newSize;
+		//this->apertureSize = 2 * apertureSize + 1;
 	}
 
-	void setGradient(bool gradient) {
+	void setGradient(int gradient) {
 		this->gradient = gradient;
 	}
 
@@ -123,7 +130,7 @@ inline void CannyR::gradientcb(int value, void* userData) {
 
 inline void CannyR::doCanny() {
 
-	cv::Canny(image, edges, threshold1, threshold2, apertureSize, gradient);
+	cv::Canny(image, edges, threshold1, threshold2, apertureSize, gradient > 0);
 
 	if (showWindow)
 		cv::imshow(windowName, edges);
