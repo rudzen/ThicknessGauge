@@ -166,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="Calc\Bezier_1.h" />
     <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />
+    <ClInclude Include="Canny.h" />
     <ClInclude Include="Exceptions\CalibrationException.h" />
     <ClInclude Include="ArgClasses\CalibrationModeVisitor.h" />
     <ClInclude Include="Calibrate\CalibrationSettings.h" />

@@ -227,6 +227,9 @@
     <ClInclude Include="Util\Vec.h">
       <Filter>Header Files\CV\Data</Filter>
     </ClInclude>
+    <ClInclude Include="Canny.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

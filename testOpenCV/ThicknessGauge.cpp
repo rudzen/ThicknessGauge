@@ -295,7 +295,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		namedWindow(outputWindowName, cv::WINDOW_KEEPRATIO);
 
-		namedWindow(line1WindowName, cv::WINDOW_KEEPRATIO);
+		//namedWindow(line1WindowName, cv::WINDOW_KEEPRATIO);
 
 		////createTrackbar("Frac", line1WindowName, &line_fraction, 4);
 		////createTrackbar("Thick", line1WindowName, &line_thickness, 5);
@@ -395,6 +395,10 @@ bool ThicknessGauge::generatePlanarImage() {
 				//imshow("keypoints", blobs);
 
 			}
+			if (showWindows_) {
+				hp.processImage(frame, true, i != 0);
+
+			}
 
 			//equalizeHist(frame, frame);
 
@@ -405,10 +409,6 @@ bool ThicknessGauge::generatePlanarImage() {
 			//GaussianBlur(frame, frame, cv::Size(7, 5), 10, 0, cv::BORDER_DEFAULT);
 			GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0, cv::BORDER_DEFAULT);
 
-			if (showWindows_) {
-				hp.processImage(frame, true, i != 0);
-				
-			}
 
 			// perform some stuff
 			// laplace(frame);
