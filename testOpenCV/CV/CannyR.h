@@ -4,15 +4,27 @@
 #include <opencv2/highgui.hpp>
 #include <iostream>
 
+/*
+(      -4QQQQQQQQQQQQQQQQQQ: jQQQQQQQQQQ
+(        4QQQQQQQQQQQQQQQQQ: jQQQQQQQQQQ
+( )QQQm. ]QQQQQQQQQQQQQQQQQ: jQQQQQQQQQQ
+( )WQQQ; ]Qf =QQQ  dQQ@^ -4: jQ(      QQ
+( )WQQD  jQf =QQQ  dQW`  .   jQc___   QQ
+(       jWQf =QQQ  dQf .mQc  jQQQQF  jQQ
+(       ?WQf =QQQ  dQ; ]QQQ  jQQQP  jWQQ
+( )WQQL  WWf =QQQ  dQ: jQQQ. jQQD  <QWQQ
+( )WQQW  dQf :QQW  dQ; )QQ@  jQ@` _QQQQQ
+( )WQQm  3Qk  ??'  dQL  "T'  jQ'  TTTTQQ
+( )WQQQ  3QQ,   <  dQQ,   _. jQ       WW
+wawWQQQwaaQQQwawWaamQQmc_wmwayQaaaaaaamQ
+QWWQQQQWWQQQQQWQQQWQQQQQQQQWWQQQWQWQWQQQ
+*/
 
-class Canny {
+class CannyR {
 	
-	struct images{
-		cv::Mat image;
-		cv::Mat edges;
-	};
+	cv::Mat image;
 
-	images p;
+	cv::Mat edges;
 
 	const std::string windowName = "Canny";
 
@@ -39,7 +51,6 @@ class Canny {
 	static void apertureSizecb(int value, void* userData);
 	static void gradientcb(int value, void* userData);
 
-
 	void setThreshold1(int threshold1) {
 		this->threshold1 = threshold1;
 	}
@@ -49,8 +60,9 @@ class Canny {
 	}
 
 	void setApertureSize(int apertureSize) {
-		//this->apertureSize = 2 * apertureSize + 1;
-		this->apertureSize = apertureSize;
+		if (apertureSize != 0)
+			this->apertureSize = 2 * apertureSize + 1;
+		//this->apertureSize = apertureSize;
 	}
 
 	void setGradient(bool gradient) {
@@ -58,7 +70,7 @@ class Canny {
 	}
 
 public:
-	Canny(const int threshold1, const int threshold2, const int apertureSize, const bool gradient, const bool showWindow)
+	CannyR(const int threshold1, const int threshold2, const int apertureSize, const bool gradient, const bool showWindow)
 		: threshold1(threshold1),
 		  threshold2(threshold2),
 		  apertureSize(apertureSize),
@@ -71,47 +83,48 @@ public:
 	void doCanny();
 
 	const cv::Mat& getImage() const {
-		return p.image;
+		return image;
 	}
 
 	void setImage(cv::Mat& newImage) {
-		p.image = newImage;
+		image = newImage;
 	}
 
 	const cv::Mat& getEdges() const {
-		return p.edges;
+		return edges;
 	}
 
 };
 
-inline void Canny::threshold1cb(int value, void* userData) {
-	auto that = static_cast<Canny*>(userData);
+inline void CannyR::threshold1cb(int value, void* userData) {
+	auto that = static_cast<CannyR*>(userData);
 	that->setThreshold1(value);
 	std::cout << "Canny threshold 1 : " << value << std::endl;
 }
 
-inline void Canny::threshold2cb(int value, void* userData) {
-	auto that = static_cast<Canny*>(userData);
+inline void CannyR::threshold2cb(int value, void* userData) {
+	auto that = static_cast<CannyR*>(userData);
 	that->setThreshold2(value);
 	std::cout << "Canny threshold 2 : " << value << std::endl;
 }
 
-inline void Canny::apertureSizecb(int value, void* userData) {
-	auto that = static_cast<Canny*>(userData);
+inline void CannyR::apertureSizecb(int value, void* userData) {
+	auto that = static_cast<CannyR*>(userData);
 	that->setApertureSize(value);
 	std::cout << "Canny apertureSize : " << value << std::endl;
 }
 
-inline void Canny::gradientcb(int value, void* userData) {
-	auto that = static_cast<Canny*>(userData);
+inline void CannyR::gradientcb(int value, void* userData) {
+	auto that = static_cast<CannyR*>(userData);
 	that->setGradient(value);
 	std::string boltab[2] = { "false", "true" };
 	std::cout << "Canny gradient : " <<  boltab[static_cast<bool>(value)] << std::endl;
 }
 
-inline void Canny::doCanny() {
-	cv::Canny(p.image, p.edges, threshold1, threshold2, apertureSize, gradient);
+inline void CannyR::doCanny() {
+
+	cv::Canny(image, edges, threshold1, threshold2, apertureSize, gradient);
 
 	if (showWindow)
-		cv::imshow(windowName, cv::WINDOW_KEEPRATIO);
+		cv::imshow(windowName, edges);
 }

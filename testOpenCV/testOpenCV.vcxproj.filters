@@ -227,7 +227,7 @@
     <ClInclude Include="Util\Vec.h">
       <Filter>Header Files\CV\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Canny.h">
+    <ClInclude Include="CV\CannyR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
   </ItemGroup>

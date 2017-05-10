@@ -11,7 +11,7 @@
 #include "Histogram/Histogram.h"
 #include "IO/GlobGenerator.h"
 #include "Histogram/HistoPeak.h"
-
+#include "CV/CannyR.h"
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -338,6 +338,8 @@ bool ThicknessGauge::generatePlanarImage() {
 		pix_Planarmap[i].reserve(imageSize_.width);
 
 
+	CannyR canny(50, 150, 3, false, showWindows_);
+
 	// start the process of gathering information for set frame count
 	while (true) {
 
@@ -368,6 +370,9 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			// just share the joy
 			frame = frames[i];
+
+			canny.setImage(frame);
+			canny.doCanny();
 
 			// show default input image (always shown live!)
 			if (showWindows_) {
