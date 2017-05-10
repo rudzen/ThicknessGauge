@@ -230,6 +230,9 @@
     <ClInclude Include="CV\CannyR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
+    <ClInclude Include="CV\HoughLinesR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

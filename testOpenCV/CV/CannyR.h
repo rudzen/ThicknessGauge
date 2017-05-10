@@ -97,7 +97,7 @@ public:
 		image = newImage;
 	}
 
-	const cv::Mat& getEdges() const {
+	cv::Mat& getEdges() {
 		return edges;
 	}
 

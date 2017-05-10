@@ -12,6 +12,7 @@
 #include "IO/GlobGenerator.h"
 #include "Histogram/HistoPeak.h"
 #include "CV/CannyR.h"
+#include "CV/HoughLinesR.h"
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -337,11 +338,11 @@ bool ThicknessGauge::generatePlanarImage() {
 	for (auto i = arrayLimit - 1; i > arrayLimit - frameCount_; i--)
 		pix_Planarmap[i].reserve(imageSize_.width);
 
-
-	CannyR canny(50, 150, 3, false, showWindows_);
-
 	// start the process of gathering information for set frame count
 	while (true) {
+
+		CannyR canny(100, 150, 3, false, showWindows_);
+		HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_);
 
 		uint64 time_begin = cv::getTickCount();
 
@@ -364,19 +365,28 @@ bool ThicknessGauge::generatePlanarImage() {
 			pix_Planarmap.at(i).clear();
 		}
 
-		HistoPeak hp;
+		//HistoPeak hp;
 
 		for (auto i = 0; i < frameCount_; ++i) {
 
 			// just share the joy
 			frame = frames[i];
 
-			canny.setImage(frame);
+			cv::Mat tmp;
+			cv::bilateralFilter(frame, tmp, 1, 20, 10);
+
+			canny.setImage(tmp);
 			canny.doCanny();
+
+			houghL.setOriginal(tmp);
+			houghL.setImage(canny.getEdges());
+			houghL.setAngleLimit(20);
+			houghL.doVerticalHough();
+			houghL.doHorizontalHough();
 
 			// show default input image (always shown live!)
 			if (showWindows_) {
-				imshow(inputWindowName, frame);
+				imshow(inputWindowName, tmp);
 			}
 
 			if (showWindows_) {
@@ -401,7 +411,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			}
 			if (showWindows_) {
-				hp.processImage(frame, true, i != 0);
+				//hp.processImage(frame, true, i != 0);
 
 			}
 
@@ -412,7 +422,9 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			// blur in-place
 			//GaussianBlur(frame, frame, cv::Size(7, 5), 10, 0, cv::BORDER_DEFAULT);
-			GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0, cv::BORDER_DEFAULT);
+			//GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0, cv::BORDER_DEFAULT);
+
+
 
 
 			// perform some stuff
@@ -420,10 +432,10 @@ bool ThicknessGauge::generatePlanarImage() {
 			// c.Sobel(frame);
 
 			if (showWindows_) {
-				imshow(outputWindowName, frame);
+				imshow(outputWindowName, tmp);
 			}
 			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
-			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[i], pix_Planarmap.at(i), test_subPix);
+			auto generateOk = miniCalc.generatePlanarPixels(tmp, outputs[i], pix_Planarmap.at(i), test_subPix);
 
 			if (!generateOk) {
 				cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
@@ -461,7 +473,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 		}
 
-		cout << hp << endl;
+		//cout << hp << endl;
 
 		baseLine_[0] = miniCalc.mean(baseLine);
 		//cout << "baseline real : " << baseLine_ << endl;
