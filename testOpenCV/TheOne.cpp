@@ -195,7 +195,7 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		ValueArg<int> threadArg("", "opencv_threads", "OpenCV thread limit", false, 4, new IntegerConstraint("OpenCV Threads", 1, 40));
 		cmd.add(threadArg);
 
-		ValueArg<string> globNameArg("", "glob_name", "Name to save glob as", false, "glob", "Valid folder name.");
+		ValueArg<string> globNameArg("", "glob_name", "Name to save glob as", false, "camera", "Valid folder name.");
 		cmd.add(globNameArg);
 
 		cmd.parse(argc, argv);
@@ -216,8 +216,10 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		else if (buildInfoSwitch.isSet()) { // check, its a instant abort if build info is found
 			options.setBuildInfoMode(true);
 			return true;
-		} else
+		}
+		else if (globSwitch.isSet())
 			options.setGlobMode(true); // glob mode
+
 
 		auto sval = cameraFileArg.getValue();
 		options.setCameraFile(sval);

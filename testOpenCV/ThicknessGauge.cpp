@@ -38,9 +38,40 @@ void ThicknessGauge::addNulls() {
 		nulls_.push_back(cv::imread(file, CV_8UC1));
 	}
 
-	for (auto& n : nulls_) {
+	for (auto& n : nulls_)
 		std::cout << n.size() << endl;
+
+}
+
+void ThicknessGauge::loadGlob(std::string& globName) {
+	globGenerator.setPattern(globName);
+	globGenerator.setRecursive(false);
+	globGenerator.generateGlob();
+
+	auto files = globGenerator.getFiles();
+	auto size = files.size();
+
+	if (size != frameCount_)
+		setFrameCount(size);
+
+	for (auto i = 0; i < size; ++i)
+		frames[i] = cv::imread(files.at(i));
+		
+	setImageSize(frames[0].size());
+
+}
+
+void ThicknessGauge::captureFrames() {
+	if (!cap.isOpened()) // check if we succeeded
+		throw CaptureFailException("Error while attempting to open capture device.");
+
+	cv::Mat t;
+	for (auto i = 0; i++ < frameCount_;) {
+		cap >> t;
+		frames[i] = t;
 	}
+
+	setImageSize(t.size());
 
 }
 
@@ -145,7 +176,6 @@ uchar ThicknessGauge::getElementIntensity(cv::Mat& image, v2<int>& point) const 
 	cv::Point p(point.x, point.y);
 	return getElementIntensity(image, p);
 }
-
 
 double ThicknessGauge::getYPixelsAvg(cv::Mat& image, int x) {
 	auto sum = 0;
@@ -280,19 +310,17 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	ImageSave is("pic_x", SaveType::Image_Png, Information::Basic);
 
-	const auto arrayLimit = 512; // shit c++11 ->
-
 	cv::Mat frame;
 	//vector<Mat> outputs(frameCount_);
 	//vector<vi> pix_Planarmap(frameCount_ * 2); // using double of these for testing
 	vector<v2<double>> gabs(frameCount_);
 
-	array<cv::Mat, arrayLimit> frames;
-	array<cv::Mat, arrayLimit> outputs;
-	array<vi, arrayLimit> pix_Planarmap;
-	//array<v2<int>, arrayLimit> gabs;
+	array<cv::Mat, 512> outputs;
+	array<vi, 512> pix_Planarmap;
+	//array<v2<int>, 512> gabs;
 
 	vi nonZero;
+
 
 	// capture first frame
 	cap >> frame;
@@ -656,7 +684,6 @@ bool ThicknessGauge::testDiff() {
 	cv::Mat first;
 	// capture first frame, only to get sizes etc.
 	cap >> first;
-
 
 	auto out("Capturing " + to_string(frameCount_) + " frames..");
 

@@ -13,6 +13,7 @@
 #include "Testing/TestConfig.h"
 #include <vector>
 #include "Line.h"
+#include "IO/GlobGenerator.h"
 
 
 using namespace _cv;
@@ -81,8 +82,6 @@ private:
 
 	Line histoLine_;
 
-	std::vector<cv::Mat> nulls_;
-
 public:
 	
 	// opencv and misc settings objects
@@ -91,6 +90,8 @@ public:
 	CalibrationSettings cs;
 
 	MiniCalc miniCalc;
+
+	GlobGenerator globGenerator;
 
 	void initVideoCapture();
 
@@ -102,6 +103,9 @@ public: // basic stuff to extract information
 	 * \brief Loads all null images from "./null/" folder.
 	 */
 	void addNulls();
+
+	void loadGlob(std::string& globName);
+	void captureFrames();
 
 	void gatherPixels(cv::Mat& image);
 

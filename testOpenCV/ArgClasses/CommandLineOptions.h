@@ -33,6 +33,7 @@ public:
 			&& lhs.showWindows_ == rhs.showWindows_
 			&& lhs.recordVideo_ == rhs.recordVideo_
 			&& lhs.cameraFile_ == rhs.cameraFile_
+			&& lhs.globFolder_ == rhs.globFolder_
 			&& lhs.calibrationOutput_ == rhs.calibrationOutput_
 			&& lhs.testSuite_ == rhs.testSuite_
 			&& lhs.frames_ == rhs.frames_

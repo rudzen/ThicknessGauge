@@ -1,11 +1,17 @@
 #pragma once
 
+#include <array>
+
 
 class ThicknessGaugeData {
 	
 protected:
 
 	cv::Mat planarImage_;
+
+	const int arrayLimit = 512; // shit c++11 ->
+
+	array<cv::Mat, 512> frames;
 
 	// The pixels located in the image
 	vi pixels_;
@@ -26,8 +32,8 @@ protected:
 
 	bool gaugeLineSet_;
 
-public:
-	void setImageType(int imageType);
+	std::vector<cv::Mat> nulls_;
+
 protected:
 	cv::Size imageSize_;
 	int imageType_;
@@ -36,8 +42,15 @@ protected:
 	double leftMean_;
 
 public:
+
+	void setImageType(int imageType);
+
 	int getImageType() const;
+
 	void setImageSize(cv::Size size);
+
+	void setImageSize(const int width, const int height);
+
 protected:
 	const int pixelChunkCount_ = 16;
 	const int pixelChunkSize_ = 153; // lowest whole number from 2448 as (2448 >> 4 = 153)
@@ -93,6 +106,11 @@ inline int ThicknessGaugeData::getImageType() const {
 
 inline void ThicknessGaugeData::setImageSize(cv::Size size) {
 	imageSize_ = size;
+}
+
+inline void ThicknessGaugeData::setImageSize(const int width, const int height) {
+	imageSize_.width = width;
+	imageSize_.height = height;
 }
 
 inline const vi& ThicknessGaugeData::getPixels() const {
