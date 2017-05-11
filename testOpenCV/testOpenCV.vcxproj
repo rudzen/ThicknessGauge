@@ -186,6 +186,7 @@
     <ClInclude Include="IO\IsValidFileName.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineConfig.h" />
+    <ClInclude Include="Calc\Pixel.h" />
     <ClInclude Include="UI\ProgressBar.h" />
     <ClInclude Include="Util\Q.h" />
     <ClInclude Include="Testing\TestConfig.h" />
