@@ -23,7 +23,9 @@ class GlobGenerator {
 
 public:
 
-	GlobGenerator() { }
+	GlobGenerator(): recursive_(false)
+	               , count_(0)
+	               , glob_(_cv::GlobType::Sequence) { }
 
 	GlobGenerator(const std::string pattern, const bool recursive)
 		: pattern_(pattern),

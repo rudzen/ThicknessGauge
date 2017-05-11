@@ -19,6 +19,6 @@ namespace _cv {
 
 	enum class Information { None, Basic, Full };
 
-	enum class GlobType { Test, Calibration };
+	enum class GlobType { Test, Calibration, Sequence };
 
 }
