@@ -1,7 +1,4 @@
 #pragma once
-
-
-#pragma once
 #include <opencv2/core/mat.hpp>
 #include <opencv2/videostab/inpainting.hpp>
 #include <opencv2/highgui.hpp>

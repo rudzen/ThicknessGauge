@@ -236,13 +236,13 @@
     <ClInclude Include="CV\HoughLinesR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="Pixel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FilterR.h">
+    <ClInclude Include="CV\Gaussian.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="Gaussian.h">
+    <ClInclude Include="CV\FilterR.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\Pixel.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
   </ItemGroup>

@@ -178,8 +178,8 @@
     <ClInclude Include="Calc\Compute.h" />
     <ClInclude Include="ArgClasses\FileConstraint.h" />
     <ClInclude Include="ArgClasses\FolderConstraint.h" />
-    <ClInclude Include="FilterR.h" />
-    <ClInclude Include="Gaussian.h" />
+    <ClInclude Include="CV\FilterR.h" />
+    <ClInclude Include="CV\Gaussian.h" />
     <ClInclude Include="IO\GlobGenerator.h" />
     <ClInclude Include="Histogram\Histogram.h" />
     <ClInclude Include="Histogram\HistoPeak.h" />
@@ -189,7 +189,7 @@
     <ClInclude Include="IO\IsValidFileName.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineConfig.h" />
-    <ClInclude Include="Pixel.h" />
+    <ClInclude Include="CV\Pixel.h" />
     <ClInclude Include="UI\ProgressBar.h" />
     <ClInclude Include="Util\Q.h" />
     <ClInclude Include="Testing\TestConfig.h" />
