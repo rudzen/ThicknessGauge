@@ -4,6 +4,13 @@
 #include <fstream>
 #include "Stringtools.h"
 #include "IO/IsValidFileName.h"
+#include <sys/stat.h>
+
+#ifdef __unix__
+#include <direct.h>
+#else
+#include <windows.h>
+#endif
 
 // generic utility functions...
 
@@ -29,19 +36,43 @@ public:
 #endif
 	}
 
+	static bool isDirectory(const std::string& pathname) {
+		struct stat info;
+
+		if (stat(pathname.c_str(), &info) != 0)
+			return false;
+		if (info.st_mode & S_IFDIR)
+			return true;
+		return false;
+	}
+
+	static bool createDirectory(const std::string& pathname) {
+		
+#ifdef __unix__
+		mkdir(pathname.c_str());
+#else
+		auto slength = static_cast<int>(pathname.length()) + 1;
+		auto len = MultiByteToWideChar(CP_ACP, 0, pathname.c_str(), slength, nullptr, 0);
+		auto buf = new wchar_t[len];
+		MultiByteToWideChar(CP_ACP, 0, pathname.c_str(), slength, buf, len);
+		std::wstring r(buf);
+		delete[] buf;
+		auto done = CreateDirectory(r.c_str(), nullptr);
+		return done;
+#endif
+	}
 
 	/** Brief Print message to console
 	* Outputs message to console
 	* @param message The message to output
 	*/
-	static void log(char *message) {
+	static void log(char* message) {
 		std::cout << message << std::endl;
 	}
 
-	static void loge(char *message) {
+	static void loge(char* message) {
 		std::cerr << message << std::endl;
 	}
-
 
 	/** Brief Print message to console
 	* Outputs message to console
@@ -60,7 +91,6 @@ public:
 		log(message);
 		filename << message << std::endl;
 	}
-
 
 
 	/** Brief Determines the highest of two values
@@ -123,7 +153,7 @@ public:
 	* @param p2 Point #2
 	* @return The distance as integer
 	*/
-	static int dist_manhattan(cv::Point &p1, cv::Point &p2) {
+	static int dist_manhattan(cv::Point& p1, cv::Point& p2) {
 		return dist_manhattan(p1.x, p2.x, p1.y, p1.y);
 	}
 
@@ -189,4 +219,3 @@ public:
 	}
 
 };
-

@@ -233,6 +233,9 @@
     <ClInclude Include="CV\HoughLinesR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ArgClasses\GlobModeVisitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

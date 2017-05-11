@@ -131,6 +131,8 @@ public: // basic stuff to extract information
 
 	double computerBaseLine(const cv::Mat& mat, double limit);
 
+	void generateGlob(std::string& name);
+
 	bool generatePlanarImage(); // <- important!
 
 	static void addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y);

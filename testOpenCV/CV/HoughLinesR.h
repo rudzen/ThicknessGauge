@@ -24,6 +24,15 @@ QWWQQQQWWQQQQQWQQQWQQQQQQQQWWQQQWQWQWQQQ
 */
 class HoughLinesR {
 
+public:
+
+	enum class Type {
+		Regular, Properlistic
+	};
+
+private:
+
+
 	typedef pair<cv::Point2i, cv::Point2i> linePair;
 
 	cv::Mat original;
@@ -69,13 +78,17 @@ class HoughLinesR {
 
 	bool showWindow;
 
+	Type properlistic;
+
 public:
 
-	HoughLinesR(const int rho, const int theta, const int threshold, const bool showWindow)
+	HoughLinesR(const int rho, const int theta, const int threshold, const bool showWindow, const Type properlistic)
 		: rho(rho),
 		  theta(theta),
 		  threshold(threshold),
-		  showWindow(showWindow) {
+		  showWindow(showWindow),
+		  properlistic(properlistic)
+	{
 		angle = CV_PI / 180 * theta;
 		srn = 0;
 		stn = 0;
@@ -85,6 +98,8 @@ public:
 		if (showWindow)
 			createWindow();
 	}
+
+
 
 private:
 	void createWindow() {
@@ -122,10 +137,12 @@ private:
 	}
 
 
+
 public:
 
 	void doVerticalHough();
 	void doHorizontalHough();
+
 	linePair HoughLinesR::computeLinePair(cv::Vec2f& line) const;
 	void drawLines(std::vector<linePair>& linePairs, cv::Scalar colour);
 

@@ -14,6 +14,7 @@
 #include "ArgClasses/TestSuitConstraint.h"
 #include "ArgClasses/TestModeVisitor.h"
 #include "ArgClasses/BuildInfoVisitor.h"
+#include "ArgClasses/GlobModeVisitor.h"
 
 using namespace std;
 using namespace TCLAP;
@@ -78,7 +79,11 @@ int main(int argc, char** argv) {
 
 		cout << options << endl;
 
-		if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
+		if (options.isGlobMode()) {
+			c.initVideoCapture();
+			auto globName = options.getGlobFolder();
+			c.generateGlob(globName);
+		} else if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
 			c.initVideoCapture();
 
@@ -93,11 +98,9 @@ int main(int argc, char** argv) {
 			if (returnValue) {
 				cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
 			}
-		}
-		else if (options.isCalibrationMode()) {
+		} else if (options.isCalibrationMode()) {
 			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
-		}
-		else if (options.isTestMode()) {
+		} else if (options.isTestMode()) {
 			c.initVideoCapture();
 			c.testAggressive();
 		}
@@ -122,8 +125,7 @@ int main(int argc, char** argv) {
 		Util::loge("Exception suddenly happend (but what?)\n" + what);
 		return -4;
 	}
-
-	Util::log("Smooth operator...");
+	Util::log("\nSmooth operator...");
 
 	return returnValue ^ true;
 
@@ -161,6 +163,9 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		SwitchArg testSwitch("t", "test", "Perform test", false, new TestModeVisitor());
 		xors.push_back(&testSwitch);
 
+		SwitchArg globSwitch("g", "save_glob", "Save -f frames as glob", false, new GlobModeVisitor());
+		xors.push_back(&globSwitch);
+
 		cmd.xorAdd(xors);
 
 		ValueArg<string> nullSaveArg("", "null_save", "Save a singular image and exit", false, "null.png", new TestSuitConstraint());
@@ -190,6 +195,9 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		ValueArg<int> threadArg("", "opencv_threads", "OpenCV thread limit", false, 4, new IntegerConstraint("OpenCV Threads", 1, 40));
 		cmd.add(threadArg);
 
+		ValueArg<string> globNameArg("", "glob_name", "Name to save glob as", false, "glob", "Valid folder name.");
+		cmd.add(globNameArg);
+
 		cmd.parse(argc, argv);
 
 		// check for null save.. this is an important thing! :-)
@@ -205,10 +213,11 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 			options.setCalibrationMode(true);
 		else if (testSwitch.isSet())
 			options.setTestMode(true);
-		else { // check, its a instant abort if build info is found
+		else if (buildInfoSwitch.isSet()) { // check, its a instant abort if build info is found
 			options.setBuildInfoMode(true);
 			return true;
-		}
+		} else
+			options.setGlobMode(true); // glob mode
 
 		auto sval = cameraFileArg.getValue();
 		options.setCameraFile(sval);
@@ -218,6 +227,9 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		sval = testSuiteArg.getValue();
 		options.setTestSuite(sval);
+
+		sval = globNameArg.getValue();
+		options.setGlobFolder(sval);
 
 		auto ival = frameArg.getValue();
 		options.setFrames(ival);

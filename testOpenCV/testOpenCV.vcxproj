@@ -164,6 +164,7 @@
     <ClCompile Include="IO\VideoInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
     <ClInclude Include="Calc\Bezier_1.h" />
     <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />
     <ClInclude Include="CV\CannyR.h" />

@@ -232,6 +232,29 @@ double ThicknessGauge::computerBaseLine(const cv::Mat& image, double limit) {
 	//return (image.rows) - baseLineAvg / count;
 }
 
+void ThicknessGauge::generateGlob(std::string& name) {
+	if (!cap.isOpened()) // check if we succeeded
+		throw CaptureFailException("Error while attempting to open capture device.");
+
+	Util::createDirectory(name);
+	auto pbTitle = "Captuing glob " + name;
+
+	ProgressBar pb(frameCount_ * 2, pbTitle.c_str());
+	pb.SetFrequencyUpdate(10);
+	pb.SetStyle("-", " ");
+
+	cv::Mat t;
+
+	unsigned long progress = 1;
+	for (auto i = 0; i < frameCount_; ++i) {
+		pb.Progressed(progress++);
+		cap >> t;
+		pb.Progressed(progress++);
+		cv::imwrite(name + "/img" + to_string(i) + ".png", t);
+	}
+	pb.Progressed(frameCount_ * 2);
+}
+
 bool ThicknessGauge::generatePlanarImage() {
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
@@ -342,7 +365,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	while (true) {
 
 		CannyR canny(100, 150, 3, false, showWindows_);
-		HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_);
+		HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
 
 		uint64 time_begin = cv::getTickCount();
 
