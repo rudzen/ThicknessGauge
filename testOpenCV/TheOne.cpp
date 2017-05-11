@@ -85,19 +85,16 @@ int main(int argc, char** argv) {
 			c.generateGlob(globName);
 		} else if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
+			auto globName = options.getGlobFolder();
 			c.initVideoCapture();
-
 			c.addNulls();
 
-			auto bThreshold = 0;
-			//bThreshold = c.autoBinaryThreshold(25000);
-			//cout << "generating threshold : " << bThreshold << endl;
-			//returnValue = bThreshold != 0;
-
-			returnValue = c.generatePlanarImage();
-			if (returnValue) {
+			_cv::linePair result = c.findMarkingLinePairs_(globName);
+			returnValue = result.first.x != 0;
+			//returnValue = c.generatePlanarImage(globName);
+			//if (returnValue) {
 				cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
-			}
+			//}
 		} else if (options.isCalibrationMode()) {
 			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
 		} else if (options.isTestMode()) {

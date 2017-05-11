@@ -230,13 +230,13 @@
     <ClInclude Include="CV\CannyR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="CV\HoughLinesR.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\UI\CommandLine\Visitors</Filter>
     </ClInclude>
-    <ClInclude Include="Calc\Pixel.h">
+    <ClInclude Include="CV\HoughLinesR.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Pixel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

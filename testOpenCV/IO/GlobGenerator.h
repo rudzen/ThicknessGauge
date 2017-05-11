@@ -23,6 +23,8 @@ class GlobGenerator {
 
 public:
 
+	GlobGenerator() { }
+
 	GlobGenerator(const std::string pattern, const bool recursive)
 		: pattern_(pattern),
 		  recursive_(recursive) {

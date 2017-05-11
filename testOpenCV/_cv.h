@@ -5,6 +5,8 @@ namespace _cv {
 	typedef std::vector<cv::Point2d> vd;
 	typedef std::vector<cv::Point2i> vi;
 
+	typedef std::pair<cv::Point2i, cv::Point2i> linePair;
+
 	enum class Quantile { Q0, Q25, Q50, Q75, Q100 };
 
 	enum class SortBy { X, Y };

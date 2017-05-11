@@ -14,6 +14,7 @@
 #include <vector>
 #include "Line.h"
 #include "IO/GlobGenerator.h"
+#include "Pixel.h"
 
 
 using namespace _cv;
@@ -30,6 +31,7 @@ public:
 		baseColour_ = cv::Scalar(255, 255, 255);
 		settings.ddepth = CV_8S;
 	}
+
 private:
 
 	const double PIangle = CV_PI / 180;
@@ -82,6 +84,10 @@ private:
 
 	Line histoLine_;
 
+	GlobGenerator globGenerator;
+
+	Pixelz pix;
+
 public:
 	
 	// opencv and misc settings objects
@@ -90,8 +96,6 @@ public:
 	CalibrationSettings cs;
 
 	MiniCalc miniCalc;
-
-	GlobGenerator globGenerator;
 
 	void initVideoCapture();
 
@@ -105,9 +109,8 @@ public: // basic stuff to extract information
 	void addNulls();
 
 	void loadGlob(std::string& globName);
-	void captureFrames();
 
-	void gatherPixels(cv::Mat& image);
+	void captureFrames();
 
 	static void Blur(cv::Mat& image, cv::Size size);
 
@@ -119,25 +122,13 @@ public: // basic stuff to extract information
 
 	void drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const;
 
-	int getHighestYpixel(cv::Mat& image, int x) const;
-
-	int getAllPixelSum(cv::Mat& image);
-
-	static uchar getElementIntensity(cv::Mat& image, cv::Point& point);
-
-	uchar getElementIntensity(cv::Mat& image, v2<int>& point) const;
-
-	static double getYPixelsAvg(cv::Mat& image, int x);
-
-	int getAllPixelSum(cv::Mat& image, int x);
-
-	int getHighestYPixel(cv::Mat& image, int x);
-
 	double computerBaseLine(const cv::Mat& mat, double limit);
 
 	void generateGlob(std::string& name);
 
-	bool generatePlanarImage(); // <- important!
+	bool generatePlanarImage(std::string& globName); // <- important!
+
+	linePair findMarkingLinePairs_(std::string& globName);
 
 	static void addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y);
 	bool testDiff();

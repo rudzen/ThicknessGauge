@@ -55,8 +55,8 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 		setFrameCount(size);
 
 	for (auto i = 0; i < size; ++i)
-		frames[i] = cv::imread(files.at(i));
-		
+		frames[i] = cv::imread(files.at(i), CV_8UC1);
+
 	setImageSize(frames[0].size());
 
 }
@@ -73,19 +73,6 @@ void ThicknessGauge::captureFrames() {
 
 	setImageSize(t.size());
 
-}
-
-void ThicknessGauge::gatherPixels(cv::Mat& image) {
-	findNonZero(image, pixels_);
-
-	for (auto& pixel_point : pixels_) {
-		if (pixel_point.x < 50 && IsPixel(image, pixel_point)) {
-			rightSideLine_.push_back(pixel_point);
-		}
-		else if (pixel_point.x <= image.cols - 50 && IsPixel(image, pixel_point)) {
-			leftSideLine_.push_back(pixel_point);
-		}
-	}
 }
 
 void ThicknessGauge::Blur(cv::Mat& image, cv::Size size) {
@@ -108,89 +95,6 @@ void ThicknessGauge::sobel(cv::Mat& image) const {
 
 void ThicknessGauge::drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const {
 	polylines(targetImage, planarMap, false, cv::Scalar(255, 255, 255), 2);
-}
-
-int ThicknessGauge::getHighestYpixel(cv::Mat& image, int x) const {
-	auto highest = image.rows;
-	vector<cv::Point> pix;
-	findNonZero(image, pix);
-
-	sort(pix.begin(), pix.end(), miniCalc.sortX);
-
-	auto intensitySum = 0.0;
-	auto yAvg = 0.0;
-
-	vector<cv::Point> elements;
-
-	// grab all elements from the specific col
-	for (auto& p : pix) {
-		if (p.x < x)
-			continue;
-		if (p.x > x)
-			break;
-		elements.push_back(p);
-	}
-
-	auto highestIntensity = 0;
-
-	for (auto& e : elements) {
-		auto intensity = getElementIntensity(image, e);
-		intensitySum += intensity;
-		if (intensity > highestIntensity)
-			highest = e.y;
-		yAvg += e.y;
-	}
-
-	//intensitySum /= elements.size();
-	//yAvg /= elements.size();
-
-	//cout << "Intensity avg/x " << intensitySum << "/" << x << endl;
-	//cout << "yAvg/x " << yAvg << "/" << x << endl;
-
-
-	return highest;
-}
-
-int ThicknessGauge::getAllPixelSum(cv::Mat& image) {
-
-	auto sum = 0;
-	auto uc_pixel = image.data;
-	for (auto row = 0; row < image.rows; ++row) {
-		uc_pixel = image.data + row * image.step;
-		for (auto col = 0; col < image.cols; ++col) {
-			int a = uc_pixel[0];
-			int b = uc_pixel[1];
-			int c = uc_pixel[2];
-			sum += a + b + c;
-			uc_pixel += 3;
-		}
-	}
-	return sum;
-}
-
-uchar ThicknessGauge::getElementIntensity(cv::Mat& image, cv::Point& point) {
-	return image.at<uchar>(point);
-}
-
-uchar ThicknessGauge::getElementIntensity(cv::Mat& image, v2<int>& point) const {
-	cv::Point p(point.x, point.y);
-	return getElementIntensity(image, p);
-}
-
-double ThicknessGauge::getYPixelsAvg(cv::Mat& image, int x) {
-	auto sum = 0;
-	auto count = 0;
-	auto col = image.col(x);
-	auto uc_pixel = col.data;
-
-	for (auto i = col.cols; i--; ) {
-		sum += uc_pixel[0];
-		cout << "sum is now : " << sum << "\n";
-		count++;
-		uc_pixel++;
-	}
-
-	return sum / count;
 }
 
 inline void ThicknessGauge::computeAllElements(cv::Mat& image) {
@@ -285,9 +189,9 @@ void ThicknessGauge::generateGlob(std::string& name) {
 	pb.Progressed(frameCount_ * 2);
 }
 
-bool ThicknessGauge::generatePlanarImage() {
-	if (!cap.isOpened()) // check if we succeeded
-		throw CaptureFailException("Error while attempting to open capture device.");
+bool ThicknessGauge::generatePlanarImage(std::string& globName) {
+	//if (!cap.isOpened() && globName == "camera") // check if we succeeded
+	//	throw CaptureFailException("Error while attempting to open capture device.");
 
 	cv::Size blurSize(3, 3);
 
@@ -321,11 +225,11 @@ bool ThicknessGauge::generatePlanarImage() {
 
 	vi nonZero;
 
-
 	// capture first frame
-	cap >> frame;
-
-	setImageSize(frame.size());
+	if (globName == "camera")
+		captureFrames();
+	else
+		loadGlob(globName);
 
 	auto heightLine = imageSize_.width;
 
@@ -383,7 +287,7 @@ bool ThicknessGauge::generatePlanarImage() {
 	vector<cv::Point2d> test_subPix;
 
 	// configure output stuff
-	for (auto i = frameCount_; i--; )
+	for (auto i = frameCount_; i--;)
 		pix_Planarmap[i].reserve(imageSize_.width);
 
 	for (auto i = arrayLimit - 1; i > arrayLimit - frameCount_; i--)
@@ -411,7 +315,7 @@ bool ThicknessGauge::generatePlanarImage() {
 
 			//pix_Planarmap.at(i).clear();
 
-			cap >> frames[i];
+			//cap >> frames[i];
 			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
 			pix_Planarmap.at(i).clear();
 		}
@@ -476,8 +380,6 @@ bool ThicknessGauge::generatePlanarImage() {
 			//GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0, cv::BORDER_DEFAULT);
 
 
-
-
 			// perform some stuff
 			// laplace(frame);
 			// c.Sobel(frame);
@@ -505,7 +407,7 @@ bool ThicknessGauge::generatePlanarImage() {
 				//add(outputs[i], temp, outputs[i]);
 			}
 
-			auto highestPixel = outputs[i].rows - getHighestYpixel(outputs[i], heightLine);
+			auto highestPixel = outputs[i].rows - pix.getHighestYpixel(outputs[i], heightLine, miniCalc);
 
 			auto bl = computerBaseLine(outputs[i], highestPixel);
 			if (cvIsNaN(bl)) {
@@ -544,7 +446,6 @@ bool ThicknessGauge::generatePlanarImage() {
 		}
 
 
-
 		cv::Mat output = cv::Mat::zeros(imageSize_, lines.type());
 
 		//if (showWindows_) imshow(line2WindowName, output);
@@ -576,9 +477,8 @@ bool ThicknessGauge::generatePlanarImage() {
 		//resize(output, frame, frame.size() / 2, 0, 0, INTER_LANCZOS4);
 
 		// test for highest pixel for eroded image
-		auto highestPixel = output.rows - getHighestYpixel(output, heightLine) - baseLine_[0];
+		auto highestPixel = output.rows - pix.getHighestYpixel(output, heightLine, miniCalc) - baseLine_[0];
 		cout << "Highest Y in eroded line : " << highestPixel << " [mm: N/A ]" << endl;
-
 
 		/* base line etc calculations !!*/
 
@@ -631,6 +531,109 @@ bool ThicknessGauge::generatePlanarImage() {
 		is.CloseVideo();
 
 	return true;
+}
+
+linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
+
+	array<cv::Mat, 512> outputs;
+
+	// capture first frame
+	if (globName == "camera")
+		captureFrames();
+	else
+		loadGlob(globName);
+
+	linePair result(cv::Point2i(0, 0), cv::Point2i(0, 0));
+
+	while (true) {
+
+		CannyR canny(100, 150, 3, false, showWindows_);
+		HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
+
+		uint64 time_begin = cv::getTickCount();
+
+		vector<double> baseLine(frameCount_);
+
+		// capture frame amount and clear storage
+		for (auto i = 0; i < frameCount_; ++i) {
+			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
+		}
+
+		//HistoPeak hp;
+
+		for (auto i = 0; i < frameCount_; ++i) {
+
+			// just share the joy
+			cv::Mat frame = frames[i];
+
+			cv::Mat tmp;
+			cv::bilateralFilter(frame, tmp, 1, 20, 10);
+
+			canny.setImage(tmp);
+			canny.doCanny();
+
+			houghL.setOriginal(tmp);
+			houghL.setImage(canny.getEdges());
+			houghL.setAngleLimit(20);
+			houghL.doVerticalHough();
+			houghL.doHorizontalHough();
+
+			// show default input image (always shown live!)
+			if (showWindows_) {
+				imshow(windowMainTitle, tmp);
+			}
+
+			if (showWindows_) {
+				//Line l;
+				auto num(to_string(i));
+				//l.setFrame(frame);
+				//l.generateSparse();
+				//l.differentiateY();
+				//l.differentiateIntensity();
+				//l.mergeIntensity();
+				//l.saveAllData(num);
+				//l.drawPoly();
+
+				//Histogram g;
+				//g.populateHistogram(frame);
+				//cv::imshow(line2WindowName, g.histogramImage());
+				//auto filename("test_histo_" + num + ".txt");
+				//g.saveSimpleData(filename);
+
+				//auto blobs = drawBlobs(&frame);
+				//imshow("keypoints", blobs);
+
+			}
+			if (showWindows_) {
+				//hp.processImage(frame, true, i != 0);
+
+			}
+
+			//equalizeHist(frame, frame);
+
+			// do basic in-place binary threshold
+			//threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
+
+			// blur in-place
+			//GaussianBlur(frame, frame, cv::Size(7, 5), 10, 0, cv::BORDER_DEFAULT);
+			//GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0, cv::BORDER_DEFAULT);
+
+
+			// perform some stuff
+			// laplace(frame);
+			// c.Sobel(frame);
+
+			if (showWindows_) {
+				imshow(windowOutputTitle, tmp);
+			}
+
+			if (showWindows_) {
+				auto key = static_cast<char>(cv::waitKey(10));
+				if (key == 27)
+					return result; // esc
+			}
+		}
+	}
 }
 
 void ThicknessGauge::addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y) {
@@ -691,7 +694,7 @@ bool ThicknessGauge::testDiff() {
 	//progress.SetFrequencyUpdate(10);
 	//progress.SetStyle(">", "-");
 
-	for (auto i = frameCount_; i--; ) {
+	for (auto i = frameCount_; i--;) {
 		//progress.Progressed(i);
 		cap >> frames[i];
 	}
@@ -752,14 +755,14 @@ bool ThicknessGauge::testDiff() {
 	}
 
 	// configure output stuff
-	for (auto i = frameCount_; i--; ) {
+	for (auto i = frameCount_; i--;) {
 		pix_Planarmap[i].reserve(imageSize_.width);
 		sparse[i].reserve(imageSize_.width);
 	}
 
 	auto testSize = tests.size();
 
-	for (auto i = testSize; i--; ) {
+	for (auto i = testSize; i--;) {
 
 		// start the process of gathering information for set frame count
 		//	for (auto& t : tests) {
@@ -814,7 +817,7 @@ bool ThicknessGauge::testDiff() {
 
 			//}
 
-			auto highestPixel = outputs[j].rows - getHighestYpixel(outputs[j], heightLine);
+			auto highestPixel = outputs[j].rows - pix.getHighestYpixel(outputs[j], heightLine, miniCalc);
 			auto bl = computerBaseLine(outputs[j], highestPixel);
 			if (cvIsNaN(bl)) {
 				Util::loge("Error while computing baseline for frame " + to_string(j));
@@ -879,7 +882,7 @@ bool ThicknessGauge::testDiff() {
 		GaussianBlur(frame, output, tests[i].kernel(), tests[i].sigma(), 10, cv::BORDER_CONSTANT);
 
 		// test for highest pixel for eroded image
-		auto highestPixel = output.rows - getHighestYpixel(output, heightLine) - base;
+		auto highestPixel = output.rows - pix.getHighestYpixel(output, heightLine, miniCalc) - base;
 		//cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
 
 		// gather all elements from final matrix
@@ -967,7 +970,7 @@ bool ThicknessGauge::testAggressive() {
 	progress.SetFrequencyUpdate(10);
 	progress.SetStyle(">", "-");
 
-	for (auto i = frameCount_; i--; ) {
+	for (auto i = frameCount_; i--;) {
 		progress.Progressed(i);
 		cap >> frames[i];
 	}
@@ -1028,7 +1031,7 @@ bool ThicknessGauge::testAggressive() {
 	}
 
 	// configure output stuff
-	for (auto i = frameCount_; i--; ) {
+	for (auto i = frameCount_; i--;) {
 		pix_Planarmap[i].reserve(imageSize_.width);
 		sparse[i].reserve(imageSize_.width);
 	}
@@ -1084,7 +1087,7 @@ bool ThicknessGauge::testAggressive() {
 
 			//}
 
-			auto highestPixel = outputs[j].rows - getHighestYpixel(outputs[j], heightLine);
+			auto highestPixel = outputs[j].rows - pix.getHighestYpixel(outputs[j], heightLine, miniCalc);
 			auto bl = computerBaseLine(outputs[j], highestPixel);
 			if (cvIsNaN(bl)) {
 				Util::loge("Error while computing baseline for frame " + to_string(j));
@@ -1103,7 +1106,7 @@ bool ThicknessGauge::testAggressive() {
 		cv::Mat lines = cv::Mat::zeros(imageSize_, CV_8UC1);
 
 		// merge the images to target
-		for (auto k = frameCount_; k--; ) {
+		for (auto k = frameCount_; k--;) {
 			addWeighted(outputs[k], alpha, lines, beta, 0.0, lines);
 			//add(outputs[k], lines, lines);
 			outputs[k].release();
@@ -1130,7 +1133,7 @@ bool ThicknessGauge::testAggressive() {
 		frame.release();
 
 		// test for highest pixel for eroded image
-		auto highestPixel = output.rows - getHighestYpixel(output, heightLine) - base;
+		auto highestPixel = output.rows - pix.getHighestYpixel(output, heightLine, miniCalc) - base;
 		//cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
 
 		// gather all elements from final matrix
@@ -1292,7 +1295,7 @@ bool ThicknessGauge::getSparseY(cv::Mat& image, vi& output) const {
 			}
 			highest = 0;
 		}
-		auto intensity = getElementIntensity(image, p);
+		auto intensity = Pixelz::getElementIntensity(image, p);
 		if (intensity >= highest) {
 			highest = p.y;
 			x = p.x;
@@ -1360,7 +1363,6 @@ void ThicknessGauge::drawHorizontalLine(cv::Mat* image, uint pos) const {
 void ThicknessGauge::drawVerticalLine(cv::Mat* image, uint pos) const {
 	drawVerticalLine(image, pos, baseColour_);
 }
-
 
 void ThicknessGauge::GenerateInputQuad(cv::Mat* image, cv::Point2f* quad) {
 	// The 4 points that select quadilateral on the input , from top-left in clockwise order

@@ -22,6 +22,9 @@
 wawWQQQwaaQQQwawWaamQQmc_wmwayQaaaaaaamQ
 QWWQQQQWWQQQQQWQQQWQQQQQQQQWWQQQWQWQWQQQ
 */
+
+using namespace _cv;
+
 class HoughLinesR {
 
 public:
@@ -31,9 +34,6 @@ public:
 	};
 
 private:
-
-
-	typedef pair<cv::Point2i, cv::Point2i> linePair;
 
 	cv::Mat original;
 
@@ -335,7 +335,7 @@ inline void HoughLinesR::doHorizontalHough() {
 	//drawLines(linePointsHori, cv::Scalar(255, 0, 0));
 }
 
-inline HoughLinesR::linePair HoughLinesR::computeLinePair(cv::Vec2f& line) const {
+inline _cv::linePair HoughLinesR::computeLinePair(cv::Vec2f& line) const {
 	auto rho = line[0];
 	auto theta = line[1];
 	double a = cos(theta);

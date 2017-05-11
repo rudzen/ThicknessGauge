@@ -55,6 +55,8 @@ protected:
 	const int pixelChunkCount_ = 16;
 	const int pixelChunkSize_ = 153; // lowest whole number from 2448 as (2448 >> 4 = 153)
 
+	const std::string windowMainTitle = "Input";
+	const std::string windowOutputTitle = "Output";
 
 public:
 
