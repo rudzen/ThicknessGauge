@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 			c.initVideoCapture();
 			c.addNulls();
 
-			_cv::linePair result = c.findMarkingLinePairs_(globName);
+			auto result = c.findMarkingLinePairs_(globName);
 			returnValue = result.first.x != 0;
 			//returnValue = c.generatePlanarImage(globName);
 			//if (returnValue) {
