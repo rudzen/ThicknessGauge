@@ -1,6 +1,8 @@
 #pragma once
 #include <opencv2/core/mat.hpp>
 #include <opencv2/shape/hist_cost.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <iostream>
 
 /*
 (      -4QQQQQQQQQQQQQQQQQQ: jQQQQQQQQQQ
@@ -16,6 +18,8 @@
 ( )WQQQ  3QQ,   <  dQQ,   _. jQ       WW
 wawWQQQwaaQQQwawWaamQQmc_wmwayQaaaaaaamQ
 QWWQQQQWWQQQQQWQQQWQQQQQQQQWWQQQWQWQWQQQ
+QQQQQQQ (c) 2017 Rudy Alex Kohn QQQQQQQQ
+QQQQQQQ  rudyalexkohn@rudz.dk	QQQQQQQQ
 */
 
 /**
@@ -23,38 +27,125 @@ QWWQQQQWWQQQQQWQQQWQQQQQQQQWWQQQWQWQWQQQ
  */
 class FilterR {
 
+	const std::string windowName = "FilterR";
+
+	/**
+	 * \brief The original un-modified image
+	 */
 	cv::Mat original_;
 
+	/**
+	 * \brief The image to process
+	 */
 	cv::Mat image_;
 
+	/**
+	 * \brief The result of the process
+	 */
 	cv::Mat result_;
 
+	/**
+	 * \brief The kernel to use for processing the image
+	 */
 	cv::Mat kernel_;
 
+	/**
+	 * \brief The kernel anchor point.
+	 * The position of the anchor relative to its kernel. The location Point(-1, -1) indicates the center by default.
+	 */
 	cv::Point anchor_;
 
+	/**
+	 * \brief The base modifier value to add (or substract) to each value in the kernel.
+	 */
 	double delta_;
 
+	/**
+	 * \brief The depth of result_. A negative value (such as -1) indicates that the depth is the same as the source.
+	 */
 	int ddepth_;
 
+	/**
+	 * \brief The border to use in the process.
+	 */
 	int border_;
 
-public:
+	/**
+	 * \brief Show the result window
+	 */
+	bool showWindow_;
 
-	FilterR(): delta_(0.0)
-	         , ddepth_(0)
-	         , border_(cv::BORDER_DEFAULT) {
-		generateKernel(3, 3, 1.0f);
-		anchor_ = cv::Point(-1, -1);
+	// only for UI
+
+	int deltaI_ = 0;
+
+	void createWindow() {
+		cv::namedWindow(windowName, cv::WINDOW_KEEPRATIO);
+		cv::createTrackbar("delta", windowName, &deltaI_, 3, delta_cb, this);
 	}
 
-	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border) : original_(original)
-	                                                                                                                                      , image_(image)
-	                                                                                                                                      , kernel_(kernel)
-	                                                                                                                                      , anchor_(anchor)
-	                                                                                                                                      , delta_(delta)
-	                                                                                                                                      , ddepth_(ddepth)
-	                                                                                                                                      , border_(border) { }
+	static void delta_cb(int value, void* userData) {
+		auto that = static_cast<FilterR*>(userData);
+		auto oldVal = that->getDelta();
+		that->setDelta(static_cast<double>(value));
+		std::cout << that->windowName << " delta : " << oldVal << " -> " << value << '\n';
+	}
+
+public: // constructors
+
+	FilterR(): delta_(0.0)
+	         , ddepth_(-1)
+	         , border_(cv::BORDER_DEFAULT)
+	         , showWindow_(true) {
+		generateKernel(3, 3, 1.0f);
+		anchor_ = cv::Point(-1, -1);
+		createWindow();
+	}
+
+	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows) : original_(original)
+	                                                                                                                                                        , image_(image)
+	                                                                                                                                                        , kernel_(kernel)
+	                                                                                                                                                        , anchor_(anchor)
+	                                                                                                                                                        , delta_(delta)
+	                                                                                                                                                        , ddepth_(ddepth)
+	                                                                                                                                                        , border_(border)
+	                                                                                                                                                        , showWindow_(showWindows) { if (showWindows) createWindow(); }
+
+public: // getters & setters
+
+	void setOriginal(const cv::Mat& original) { original_ = original; }
+
+	const cv::Mat& getImage() const { return image_; }
+
+	void setImage(const cv::Mat& image) { image_ = image; }
+
+	const cv::Mat& getResult() const { return result_; }
+
+	const cv::Mat& getKernel() const { return kernel_; }
+
+	void setKernel(const cv::Mat& kernel) { kernel_ = kernel; }
+
+	const cv::Point& getAnchor() const { return anchor_; }
+
+	void setAnchor(const cv::Point& anchor) { anchor_ = anchor; }
+
+	double getDelta() const { return delta_; }
+
+	void setDelta(double delta) { delta_ = delta; }
+
+	int getDdepth() const { return ddepth_; }
+
+	void setDdepth(int ddepth) { ddepth_ = ddepth; }
+
+	int getBorder() const { return border_; }
+
+	void setBorder(int border) { border_ = border; }
+
+	bool getShowWindow() const { return showWindow_; }
+
+	void setShowWindow(bool showWindow) { showWindow_ = showWindow; }
+
+	// functions
 
 	void generateKernel(int width, int height, float modifier);
 
