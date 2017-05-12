@@ -21,4 +21,6 @@ namespace _cv {
 
 	enum class GlobType { Test, Calibration, Sequence };
 
+	enum class FilterKernels { Simple3x3, Horizontal10x10 };
+
 }
