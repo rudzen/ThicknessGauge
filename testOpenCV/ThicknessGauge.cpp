@@ -13,6 +13,8 @@
 #include "Histogram/HistoPeak.h"
 #include "CV/CannyR.h"
 #include "CV/HoughLinesR.h"
+#include "CV/Pixel.h"
+#include "CV/FilterR.h"
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -334,7 +336,7 @@ bool ThicknessGauge::generatePlanarImage(std::string& globName) {
 			canny.doCanny();
 
 			houghL.setOriginal(tmp);
-			houghL.setImage(canny.getEdges());
+			houghL.setImage(canny.getResult());
 			houghL.setAngleLimit(20);
 			houghL.doVerticalHough();
 			houghL.doHorizontalHough();
@@ -545,17 +547,32 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 	linePair result(cv::Point2i(0, 0), cv::Point2i(0, 0));
 
-	while (true) {
+	CannyR canny(200, 250, 3, false, showWindows_);
+	HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
+	FilterR lineFilter("LineFilter");
+	FilterR speckFilter("SpeckFilter");
 
-		CannyR canny(100, 150, 3, false, showWindows_);
-		HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
+	cv::Mat lineKernel = (cv::Mat_<char>(1, 5) << 5, 5, 0, -5, -5);
+	cv::Mat speckKernel = (cv::Mat_<char>(3, 3) <<
+						   0, 0, 0,
+						   0, 1, 0,
+						   0, 0, 0);
+
+	lineFilter.setKernel(lineKernel);
+	speckFilter.setKernel(speckKernel);
+
+	//filter.generateKernel(6, 6, 1.0f);
+
+	houghL.setAngleLimit(30);
+
+	while (true) {
 
 		uint64 time_begin = cv::getTickCount();
 
 		vector<double> baseLine(frameCount_);
 
 		// capture frame amount and clear storage
-		for (auto i = 0; i < frameCount_; ++i) {
+		for (auto i = frameCount_; i--;) {
 			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
 		}
 
@@ -564,23 +581,33 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 		for (auto i = 0; i < frameCount_; ++i) {
 
 			// just share the joy
-			cv::Mat frame = frames[i];
+			auto frame = frames[i];
 
-			cv::Mat tmp;
-			cv::bilateralFilter(frame, tmp, 1, 20, 10);
+			cv::Mat tmp = frame.clone();
+			//cv::bilateralFilter(frame, tmp, 1, 20, 10);
+
+			speckFilter.setOriginal(frames[i]);
+			speckFilter.setImage(tmp);
+			speckFilter.doFilter();
+			tmp = speckFilter.getResult();
+
+			lineFilter.setOriginal(frames[i]);
+			lineFilter.setImage(tmp);
+			lineFilter.doFilter();
+			tmp = lineFilter.getResult();
 
 			canny.setImage(tmp);
 			canny.doCanny();
+			tmp = canny.getResult();
 
-			houghL.setOriginal(tmp);
-			houghL.setImage(canny.getEdges());
-			houghL.setAngleLimit(20);
+			houghL.setOriginal(frames[i]);
+			houghL.setImage(tmp);
 			houghL.doVerticalHough();
 			houghL.doHorizontalHough();
 
-			// show default input image (always shown live!)
+			// show default input image
 			if (showWindows_) {
-				imshow(windowMainTitle, tmp);
+				imshow(windowMainTitle, frame);
 			}
 
 			if (showWindows_) {
@@ -603,28 +630,6 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 				//auto blobs = drawBlobs(&frame);
 				//imshow("keypoints", blobs);
 
-			}
-			if (showWindows_) {
-				//hp.processImage(frame, true, i != 0);
-
-			}
-
-			//equalizeHist(frame, frame);
-
-			// do basic in-place binary threshold
-			//threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
-
-			// blur in-place
-			//GaussianBlur(frame, frame, cv::Size(7, 5), 10, 0, cv::BORDER_DEFAULT);
-			//GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0, cv::BORDER_DEFAULT);
-
-
-			// perform some stuff
-			// laplace(frame);
-			// c.Sobel(frame);
-
-			if (showWindows_) {
-				imshow(windowOutputTitle, tmp);
 			}
 
 			if (showWindows_) {
@@ -1316,7 +1321,7 @@ void ThicknessGauge::setBinaryThreshold(int binaryThreshold) {
 	binaryThreshold_ = binaryThreshold;
 }
 
-void ThicknessGauge::drawText(cv::Mat* image, const string text, TextDrawPosition position) {
+void ThicknessGauge::drawText(cv::Mat* image, const string text, TextDrawPosition position) const {
 	cv::Point pos;
 	switch (position) {
 	case TextDrawPosition::UpperLeft:

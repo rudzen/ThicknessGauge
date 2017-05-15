@@ -3,6 +3,7 @@
 #include <opencv2/shape/hist_cost.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
+#include "BaseR.h"
 
 /*
 (      -4QQQQQQQQQQQQQQQQQQ: jQQQQQQQQQQ
@@ -25,19 +26,7 @@ QQQQQQQ  rudyalexkohn@rudz.dk	QQQQQQQQ
 /**
  * \brief Generic filter class with support for live changing of parameters
  */
-class FilterR {
-
-	const std::string windowName = "FilterR";
-
-	/**
-	 * \brief The original un-modified image
-	 */
-	cv::Mat original_;
-
-	/**
-	 * \brief The image to process
-	 */
-	cv::Mat image_;
+class FilterR : public BaseR {
 
 	/**
 	 * \brief The result of the process
@@ -93,33 +82,30 @@ class FilterR {
 
 public: // constructors
 
-	FilterR(): delta_(0.0)
+	explicit FilterR(std::string windowName): delta_(0.0)
 	         , ddepth_(-1)
 	         , border_(cv::BORDER_DEFAULT)
 	         , showWindow_(true) {
 		generateKernel(3, 3, 1.0f);
 		anchor_ = cv::Point(-1, -1);
+		this->windowName = windowName;
 		createWindow();
 	}
 
-	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows) : original_(original)
-	                                                                                                                                                        , image_(image)
-	                                                                                                                                                        , kernel_(kernel)
+	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows, std::string windowName) : kernel_(kernel)
 	                                                                                                                                                        , anchor_(anchor)
 	                                                                                                                                                        , delta_(delta)
 	                                                                                                                                                        , ddepth_(ddepth)
 	                                                                                                                                                        , border_(border)
-	                                                                                                                                                        , showWindow_(showWindows) { if (showWindows) createWindow(); }
+	                                                                                                                                                        , showWindow_(showWindows)
+	{
+		this->windowName = windowName;
+		if (showWindows) createWindow();
+	}
 
 public: // getters & setters
 
-	void setOriginal(const cv::Mat& original) { original_ = original; }
-
-	const cv::Mat& getImage() const { return image_; }
-
-	void setImage(const cv::Mat& image) { image_ = image; }
-
-	const cv::Mat& getResult() const { return result_; }
+	cv::Mat& getResult() { return result_; }
 
 	const cv::Mat& getKernel() const { return kernel_; }
 
@@ -175,4 +161,8 @@ inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor) { d
 
 inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta) { doFilter(depth, kernel, anchor, delta, border_); }
 
-inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border) { cv::filter2D(image_, result_, depth, kernel, anchor, delta, border); }
+inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border) {
+	cv::filter2D(image_, result_, depth, kernel, anchor, delta, border);
+	if (getShowWindow())
+		cv::imshow(windowName, result_);
+}

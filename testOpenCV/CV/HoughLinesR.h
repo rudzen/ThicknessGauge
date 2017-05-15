@@ -3,6 +3,7 @@
 #include <opencv2/videostab/inpainting.hpp>
 #include <opencv2/highgui.hpp>
 #include <iostream>
+#include "BaseR.h"
 
 /*
 (      -4QQQQQQQQQQQQQQQQQQ: jQQQQQQQQQQ
@@ -22,7 +23,7 @@ QWWQQQQWWQQQQQWQQQWQQQQQQQQWWQQQWQWQWQQQ
 
 using namespace _cv;
 
-class HoughLinesR {
+class HoughLinesR : BaseR {
 
 public:
 
@@ -31,10 +32,6 @@ public:
 	};
 
 private:
-
-	cv::Mat original;
-
-	cv::Mat image;
 
 	cv::Mat output;
 
@@ -50,7 +47,7 @@ private:
 
 	double leftY = 0.0;
 
-	const std::string windowName = "HoughLines";
+	//const std::string windowName = "HoughLines";
 
 	int rho;
 
@@ -70,6 +67,8 @@ private:
 	double minTheta;
 
 	double maxTheta;
+
+	int iAngleLimit;
 
 	double angleLimit;
 
@@ -92,11 +91,10 @@ public:
 		minTheta = 0.0;
 		maxTheta = CV_PI;
 		angleLimit = 0;
+		windowName = "HoughLines";
 		if (showWindow)
 			createWindow();
 	}
-
-
 
 private:
 	void createWindow() {
@@ -104,8 +102,7 @@ private:
 		cv::createTrackbar("rho", windowName, &rho, 3, rhocb, this);
 		cv::createTrackbar("theta", windowName, &theta, 180, thetacb, this);
 		cv::createTrackbar("threshold", windowName, &threshold, 100, thresholdcb, this);
-		//cv::createTrackbar("srn", windowName, &srn, 1, srncb, this);
-		//cv::createTrackbar("stn", windowName, &stn, 1, stncb, this);
+		cv::createTrackbar("angle/2", windowName, &iAngleLimit, 100, thresholdcb, this);
 	}
 
 	void computeBorders();
@@ -118,6 +115,8 @@ private:
 
 	static void thresholdcb(int value, void* userData);
 
+	static void limitcb(int value, void* userData);
+
 	void setRho(int rho) {
 		this->rho = rho;
 	}
@@ -126,14 +125,12 @@ private:
 		if (theta == 0)
 			theta++;
 		this->theta = theta;
-		angle = CV_PI / 180 * theta;
+		angle = degree * theta;
 	}
 
 	void setThreshold(int threshold) {
 		this->threshold = threshold;
 	}
-
-
 
 public:
 
@@ -154,17 +151,21 @@ public:
 		this->angleLimit = angleLimit / 2;
 	}
 
+	double getAngleLimit() const {
+		return angleLimit * 2;
+	}
+
 	const cv::Mat& getImage() const {
-		return image;
+		return image_;
 	}
 
 	void setImage(cv::Mat& newImage) {
-		image = newImage;
+		image_ = newImage;
 	}
 
 	void setOriginal(cv::Mat& newImage) {
-		original = newImage;
-		cv::cvtColor(original, output, CV_GRAY2BGR);
+		original_ = newImage;
+		cv::cvtColor(original_, output, CV_GRAY2BGR);
 	}
 
 	const std::vector<cv::Vec2f>& getLines() const {
@@ -214,17 +215,12 @@ inline void HoughLinesR::computeBorders() {
 
 	midX = output.rows / 2;
 
-	
-
 	cv::Point2i bestTop(output.cols, output.rows);
 	cv::Point2i bestLow(output.cols, output.rows);
 
 	double best = 0.0;
 
 	for (auto& p : linePointsVert) {
-
-
-
 
 		double dist = cv::norm(p.first - p.second);
 		if (dist > best) {
@@ -260,13 +256,20 @@ inline void HoughLinesR::thresholdcb(int value, void* userData) {
 	std::cout << "Hough threshold : " << value << std::endl;
 }
 
+inline void HoughLinesR::limitcb(int value, void* userData) {
+	auto that = static_cast<HoughLinesR*>(userData);
+
+	that->setAngleLimit(static_cast<double>(value / 10));
+	std::cout << "Angle Limit : " << value << std::endl;
+}
+
 inline void HoughLinesR::doVerticalHough() {
 
 	if (!lines.empty())
 		lines.clear();
 
 	//cv::HoughLines(image, lines, rho, angle, threshold, srn, stn, minTheta, maxTheta);
-	HoughLines(image, lines, 1, CV_PI / 180, 30, 0, 0);
+	HoughLines(image_, lines, 1, degree, threshold, 0, 0);
 
 	//std::cout << "doVerticalHough # lines : " << lines.size();
 
@@ -278,7 +281,7 @@ inline void HoughLinesR::doVerticalHough() {
 
 	for (auto& l : lines) {
 		auto theta = l[1];
-		if (theta <= CV_PI / 180 * (180 - angleLimit) && theta >= CV_PI / 180 * angleLimit)
+		if (theta <= degree * (180 - angleLimit) && theta >= degree * angleLimit)
 			continue;
 		auto p = computeLinePair(l);
 		linePointsVert.push_back(p);
@@ -296,7 +299,7 @@ inline void HoughLinesR::doHorizontalHough() {
 	if (!lines.empty())
 		lines.clear();
 
-	HoughLines(image, lines, 1, CV_PI / 180, 30, 0, 0);
+	HoughLines(image_, lines, 1, degree, threshold, 0, 0);
 	//cv::HoughLines(image, lines, rho, angle, threshold, srn, stn, minTheta, maxTheta);
 
 	//std::cout << "doHorizontalHough # lines : " << lines.size();
@@ -309,10 +312,10 @@ inline void HoughLinesR::doHorizontalHough() {
 
 	for (auto& l : lines) {
 		auto theta = l[1];
-		if (theta <= CV_PI / 180 * 89.9 || theta >= CV_PI / 180 * 90.1)
+		if (theta <= degree * 85 || theta >= degree * 90.1)
 			continue;
 		auto p = computeLinePair(l);
-		if (p.first.y > original.rows / 3)
+		if (p.first.y > original_.rows / 3)
 			linePointsHori.push_back(p);		
 	}
 
@@ -327,7 +330,6 @@ inline void HoughLinesR::doHorizontalHough() {
 	sum /= linePointsHori.size();
 
 	leftY += sum;
-
 
 	//drawLines(linePointsHori, cv::Scalar(255, 0, 0));
 }

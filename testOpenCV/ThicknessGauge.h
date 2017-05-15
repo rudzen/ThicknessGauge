@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <opencv2/opencv.hpp>
+
 #include "Calc/MiniCalc.h"
 #include "ThicknessGaugeData.h"
 
@@ -9,12 +11,10 @@
 #include "Util/Vec.h"
 #include "Util/Util.h"
 
-#include <opencv2/opencv.hpp>
 #include "Testing/TestConfig.h"
-#include <vector>
 #include "Line.h"
 #include "IO/GlobGenerator.h"
-#include "Pixel.h"
+#include "CV/Pixel.h"
 
 
 using namespace _cv;
@@ -181,7 +181,7 @@ public: // getters and setters
 
 public: // draw functions
 
-	void drawText(cv::Mat* image, const string text, TextDrawPosition position);
+	void drawText(cv::Mat* image, const string text, TextDrawPosition position) const;
 
 	/**
 	 * \brief Draws a horizontal line on the parsed image

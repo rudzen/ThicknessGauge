@@ -3,6 +3,7 @@
 #include <opencv2/videostab/inpainting.hpp>
 #include <opencv2/highgui.hpp>
 #include <iostream>
+#include "BaseR.h"
 
 /*
 (      -4QQQQQQQQQQQQQQQQQQ: jQQQQQQQQQQ
@@ -20,13 +21,9 @@ wawWQQQwaaQQQwawWaamQQmc_wmwayQaaaaaaamQ
 QWWQQQQWWQQQQQWQQQWQQQQQQQQWWQQQWQWQWQQQ
 */
 
-class CannyR {
+class CannyR : public BaseR {
 	
-	cv::Mat image;
-
 	cv::Mat edges;
-
-	const std::string windowName = "Canny";
 
 	int threshold1;
 
@@ -83,21 +80,14 @@ public:
 		  apertureSize(apertureSize),
 		  gradient(gradient),
 		  showWindow(showWindow) {
+		windowName = "Canny";
 		if (showWindow)
 			createWindow();
 	}
 
 	void doCanny();
 
-	const cv::Mat& getImage() const {
-		return image;
-	}
-
-	void setImage(cv::Mat& newImage) {
-		image = newImage;
-	}
-
-	cv::Mat& getEdges() {
+	cv::Mat& getResult() {
 		return edges;
 	}
 
@@ -130,7 +120,7 @@ inline void CannyR::gradientcb(int value, void* userData) {
 
 inline void CannyR::doCanny() {
 
-	cv::Canny(image, edges, threshold1, threshold2, apertureSize, gradient > 0);
+	cv::Canny(image_, edges, threshold1, threshold2, apertureSize, gradient > 0);
 
 	if (showWindow)
 		cv::imshow(windowName, edges);
