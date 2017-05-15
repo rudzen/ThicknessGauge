@@ -15,6 +15,7 @@
 #include "CV/HoughLinesR.h"
 #include "CV/Pixel.h"
 #include "CV/FilterR.h"
+#include "CV/HoughLinesPR.h"
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -548,11 +549,12 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 	linePair result(cv::Point2i(0, 0), cv::Point2i(0, 0));
 
 	CannyR canny(200, 250, 3, false, showWindows_);
-	HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
+	//HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
+	HoughLinesPR houghP(1, CV_PI / 180, 100, showWindows_);
 	FilterR lineFilter("LineFilter");
 	FilterR speckFilter("SpeckFilter");
 
-	cv::Mat lineKernel = (cv::Mat_<char>(1, 5) << 5, 5, 0, -5, -5);
+	cv::Mat lineKernel = (cv::Mat_<char>(1, 5) << 2, 2, 0, -2, -2);
 	cv::Mat speckKernel = (cv::Mat_<char>(3, 3) <<
 						   0, 0, 0,
 						   0, 1, 0,
@@ -563,7 +565,9 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 	//filter.generateKernel(6, 6, 1.0f);
 
-	houghL.setAngleLimit(30);
+	//houghL.setAngleLimit(30);
+
+	Pixelz pixelz;
 
 	while (true) {
 
@@ -583,13 +587,15 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			// just share the joy
 			auto frame = frames[i];
 
+			pixelz.removePepperNoise(frame);
+
 			cv::Mat tmp = frame.clone();
 			//cv::bilateralFilter(frame, tmp, 1, 20, 10);
 
-			speckFilter.setOriginal(frames[i]);
-			speckFilter.setImage(tmp);
-			speckFilter.doFilter();
-			tmp = speckFilter.getResult();
+			//speckFilter.setOriginal(frames[i]);
+			//speckFilter.setImage(tmp);
+			//speckFilter.doFilter();
+			//tmp = speckFilter.getResult();
 
 			lineFilter.setOriginal(frames[i]);
 			lineFilter.setImage(tmp);
@@ -600,10 +606,14 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			canny.doCanny();
 			tmp = canny.getResult();
 
-			houghL.setOriginal(frames[i]);
-			houghL.setImage(tmp);
-			houghL.doVerticalHough();
-			houghL.doHorizontalHough();
+			houghP.setOriginal(frames[i]);
+			houghP.setImage(tmp);
+			houghP.doHough(false);
+
+			//houghL.setOriginal(frames[i]);
+			//houghL.setImage(tmp);
+			//houghL.doVerticalHough();
+			//houghL.doHorizontalHough();
 
 			// show default input image
 			if (showWindows_) {

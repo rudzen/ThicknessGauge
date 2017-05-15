@@ -25,6 +25,8 @@ class CannyR : public BaseR {
 	
 	cv::Mat edges;
 
+	Pixelz p;
+
 	int threshold1;
 
 	int threshold2;
@@ -121,6 +123,8 @@ inline void CannyR::gradientcb(int value, void* userData) {
 inline void CannyR::doCanny() {
 
 	cv::Canny(image_, edges, threshold1, threshold2, apertureSize, gradient > 0);
+
+	p.removePepperNoise(edges);
 
 	if (showWindow)
 		cv::imshow(windowName, edges);

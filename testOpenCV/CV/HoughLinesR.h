@@ -23,7 +23,7 @@ QWWQQQQWWQQQQQWQQQWQQQQQQQQWWQQQWQWQWQQQ
 
 using namespace _cv;
 
-class HoughLinesR : BaseR {
+class HoughLinesR : public BaseR {
 
 public:
 
@@ -36,6 +36,8 @@ private:
 	cv::Mat output;
 
 	std::vector<cv::Vec2f> lines;
+
+	std::vector<cv::Vec4f> linesP;
 
 	std::vector<linePair> linePointsVert;
 
@@ -102,7 +104,6 @@ private:
 		cv::createTrackbar("rho", windowName, &rho, 3, rhocb, this);
 		cv::createTrackbar("theta", windowName, &theta, 180, thetacb, this);
 		cv::createTrackbar("threshold", windowName, &threshold, 100, thresholdcb, this);
-		cv::createTrackbar("angle/2", windowName, &iAngleLimit, 100, thresholdcb, this);
 	}
 
 	void computeBorders();
@@ -114,8 +115,6 @@ private:
 	static void thetacb(int value, void* userData);
 
 	static void thresholdcb(int value, void* userData);
-
-	static void limitcb(int value, void* userData);
 
 	void setRho(int rho) {
 		this->rho = rho;
@@ -135,9 +134,11 @@ private:
 public:
 
 	void doVerticalHough();
+
 	void doHorizontalHough();
 
 	linePair HoughLinesR::computeLinePair(cv::Vec2f& line) const;
+
 	void drawLines(std::vector<linePair>& linePairs, cv::Scalar colour);
 
 	void alignLeftY(int frameCount) {
@@ -148,19 +149,7 @@ public:
 	}
 
 	void setAngleLimit(double angleLimit) {
-		this->angleLimit = angleLimit / 2;
-	}
-
-	double getAngleLimit() const {
-		return angleLimit * 2;
-	}
-
-	const cv::Mat& getImage() const {
-		return image_;
-	}
-
-	void setImage(cv::Mat& newImage) {
-		image_ = newImage;
+		this->angleLimit = angleLimit;
 	}
 
 	void setOriginal(cv::Mat& newImage) {
@@ -172,6 +161,9 @@ public:
 		return lines;
 	}
 
+	const std::vector<cv::Vec4f>& getLinesP() const {
+		return linesP;
+	}
 };
 
 inline void HoughLinesR::computeBorders() {
@@ -234,6 +226,8 @@ inline void HoughLinesR::computeBorders() {
 			}
 		}
 	}
+
+
 	cv::line(output, bestLow, bestTop, cv::Scalar(0, 255, 255), 3);
 
 }
@@ -254,13 +248,6 @@ inline void HoughLinesR::thresholdcb(int value, void* userData) {
 	auto that = static_cast<HoughLinesR*>(userData);
 	that->setThreshold(value);
 	std::cout << "Hough threshold : " << value << std::endl;
-}
-
-inline void HoughLinesR::limitcb(int value, void* userData) {
-	auto that = static_cast<HoughLinesR*>(userData);
-
-	that->setAngleLimit(static_cast<double>(value / 10));
-	std::cout << "Angle Limit : " << value << std::endl;
 }
 
 inline void HoughLinesR::doVerticalHough() {
@@ -312,7 +299,7 @@ inline void HoughLinesR::doHorizontalHough() {
 
 	for (auto& l : lines) {
 		auto theta = l[1];
-		if (theta <= degree * 85 || theta >= degree * 90.1)
+		if (theta <= degree * 89.9 || theta >= degree * 90.1)
 			continue;
 		auto p = computeLinePair(l);
 		if (p.first.y > original_.rows / 3)
@@ -331,7 +318,7 @@ inline void HoughLinesR::doHorizontalHough() {
 
 	leftY += sum;
 
-	//drawLines(linePointsHori, cv::Scalar(255, 0, 0));
+	drawLines(linePointsHori, cv::Scalar(255, 0, 0));
 }
 
 inline _cv::linePair HoughLinesR::computeLinePair(cv::Vec2f& line) const {
