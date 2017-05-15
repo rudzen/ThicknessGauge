@@ -135,7 +135,7 @@ public: // basic stuff to extract information
 
 	bool testAggressive();
 
-	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY, std::string timeString, std::string extraInfo) const;
+	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, std::string timeString, std::string extraInfo) const;
 
 	double sumColumn(cv::Mat& image, int x);
 

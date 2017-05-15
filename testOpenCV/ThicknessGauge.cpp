@@ -549,12 +549,12 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 	linePair result(cv::Point2i(0, 0), cv::Point2i(0, 0));
 
 	CannyR canny(200, 250, 3, false, showWindows_);
-	//HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
+	HoughLinesR houghV(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
 	HoughLinesPR houghP(1, CV_PI / 180, 100, showWindows_);
 	FilterR lineFilter("LineFilter");
 	FilterR speckFilter("SpeckFilter");
 
-	cv::Mat lineKernel = (cv::Mat_<char>(1, 5) << 2, 2, 0, -2, -2);
+	cv::Mat lineKernel = (cv::Mat_<char>(1, 5) << 10, 10, 0, -10, -10);
 	cv::Mat speckKernel = (cv::Mat_<char>(3, 3) <<
 						   0, 0, 0,
 						   0, 1, 0,
@@ -565,7 +565,7 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 	//filter.generateKernel(6, 6, 1.0f);
 
-	//houghL.setAngleLimit(30);
+	houghV.setAngleLimit(30);
 
 	Pixelz pixelz;
 
@@ -587,8 +587,6 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			// just share the joy
 			auto frame = frames[i];
 
-			pixelz.removePepperNoise(frame);
-
 			cv::Mat tmp = frame.clone();
 			//cv::bilateralFilter(frame, tmp, 1, 20, 10);
 
@@ -597,23 +595,25 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			//speckFilter.doFilter();
 			//tmp = speckFilter.getResult();
 
-			lineFilter.setOriginal(frames[i]);
-			lineFilter.setImage(tmp);
-			lineFilter.doFilter();
-			tmp = lineFilter.getResult();
+			//lineFilter.setOriginal(frames[i]);
+			//lineFilter.setImage(tmp);
+			//lineFilter.doFilter();
+			//tmp = lineFilter.getResult();
+
+			//cv::threshold(tmp, tmp, 200, 255, cv::THRESH_BINARY);
 
 			canny.setImage(tmp);
 			canny.doCanny();
 			tmp = canny.getResult();
 
+			houghV.setOriginal(frames[i]);
+			houghV.setImage(tmp.clone());
+			houghV.doVerticalHough();
+
 			houghP.setOriginal(frames[i]);
 			houghP.setImage(tmp);
-			houghP.doHough(false);
-
-			//houghL.setOriginal(frames[i]);
-			//houghL.setImage(tmp);
-			//houghL.doVerticalHough();
-			//houghL.doHorizontalHough();
+			//houghP.doVerticalHough();
+			houghP.doHorizontalHough();
 
 			// show default input image
 			if (showWindows_) {
@@ -1184,7 +1184,7 @@ bool ThicknessGauge::testAggressive() {
 	return true;
 }
 
-bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, int highestY, string timeString, string extraInfo) const {
+bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, string timeString, string extraInfo) const {
 	cv::FileStorage fs(filename + ".json", cv::FileStorage::WRITE);
 
 	if (!fs.isOpened()) {

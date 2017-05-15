@@ -381,7 +381,7 @@ public:
 		return !output.empty();
 	}
 
-	static bool getActualPixels(vi& pixels, vi&target, int yLimit, int imageHeight) {
+	static bool getActualPixels(vi& pixels, vi&target, double yLimit, int imageHeight) {
 		if (!target.empty())
 			target.clear();
 
