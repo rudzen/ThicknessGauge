@@ -609,7 +609,11 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			// just share the joy
 			auto frame = frames[i].clone();
 
-			cv::Mat tmp = frame.clone();
+			cv::Mat hori = frames[i].clone();
+			cv::Mat vert = frames[i].clone();
+
+			cv::Mat tmp = frames[i].clone();
+
 			//cv::bilateralFilter(frame, tmp, 1, 20, 10);
 
 			//speckFilter.setOriginal(frames[i]);
@@ -617,16 +621,15 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			//speckFilter.doFilter();
 			//tmp = speckFilter.getResult();
 
-			lineFilter.setOriginal(frames[i]);
-			lineFilter.setImage(tmp);
+			lineFilter.setOriginal(frame);
+			lineFilter.setImage(hori);
 			lineFilter.doFilter();
-			tmp = lineFilter.getResult();
+			//tmp = lineFilter.getResult();
 
-			lineFilterV.setOriginal(frames[i]);
-			lineFilterV.setImage(frame.clone());
+			lineFilterV.setOriginal(frame);
+			lineFilterV.setImage(vert);
 			lineFilterV.doFilter();
 			tmp = lineFilterV.getResult();
-
 
 			//cv::threshold(tmp, tmp, 200, 255, cv::THRESH_BINARY);
 
@@ -634,7 +637,7 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			cannyH.doCanny();
 			tmp = cannyH.getResult();
 
-			houghP.setOriginal(frames[i]);
+			houghP.setOriginal(frame);
 			houghP.setImage(tmp);
 			houghP.doHorizontalHough();
 

@@ -569,7 +569,6 @@ inline void HoughLinesPR::drawLine(float x1, float y1, float x2, float y2, cv::S
 	drawLine(p1, p2, colour);
 }
 
-
 inline void HoughLinesPR::show() const {
 	imshow(windowName, output);
 }
