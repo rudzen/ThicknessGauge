@@ -560,6 +560,7 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 						   0, 1, 0,
 						   0, 0, 0);
 
+
 	lineFilter.setKernel(lineKernel);
 	speckFilter.setKernel(speckKernel);
 
@@ -612,7 +613,6 @@ linePair ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 			houghP.setOriginal(frames[i]);
 			houghP.setImage(tmp);
-			//houghP.doVerticalHough();
 			houghP.doHorizontalHough();
 
 			// show default input image
@@ -1283,7 +1283,7 @@ void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
 
 }
 
-// OBSOLETE - REPLACED BY LINE CLASS
+[[deprecated("Replaced by Line class, which has an improved interface")]]
 bool ThicknessGauge::getSparseY(cv::Mat& image, vi& output) const {
 
 	output.reserve(image.cols);
@@ -1379,6 +1379,7 @@ void ThicknessGauge::drawVerticalLine(cv::Mat* image, uint pos) const {
 	drawVerticalLine(image, pos, baseColour_);
 }
 
+[[deprecated("Not viable in the current setup.")]]
 void ThicknessGauge::GenerateInputQuad(cv::Mat* image, cv::Point2f* quad) {
 	// The 4 points that select quadilateral on the input , from top-left in clockwise order
 	// These four pts are the sides of the rect box used as input
@@ -1388,6 +1389,7 @@ void ThicknessGauge::GenerateInputQuad(cv::Mat* image, cv::Point2f* quad) {
 	quad[3] = cv::Point2f(0.0f, static_cast<float>(image->rows));
 }
 
+[[deprecated("Not viable in the current setup.")]]
 void ThicknessGauge::GenerateOutputQuad(cv::Mat* image, cv::Point2f* quad) {
 	// The 4 points where the mapping is to be done , from top-left in clockwise order
 	quad[0] = cv::Point2f(-image->cols / 2.0f, 0.0f);
@@ -1396,6 +1398,7 @@ void ThicknessGauge::GenerateOutputQuad(cv::Mat* image, cv::Point2f* quad) {
 	quad[3] = cv::Point2f(0.0f, static_cast<float>(image->rows));
 }
 
+[[deprecated("Not viable in the current setup.")]]
 void ThicknessGauge::FitQuad(cv::Mat* image, cv::Point2f* inputQuad, cv::Point2f* outputQuad) const {
 	// calculate transformation
 	cv::Matx33f M = getPerspectiveTransform(inputQuad, outputQuad);

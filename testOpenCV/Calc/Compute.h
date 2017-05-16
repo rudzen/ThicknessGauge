@@ -86,9 +86,6 @@ namespace utils {
 			return acos(((*a * *a) + (*b * *b) - (*c * *c)) / (2 * *a * *b));
 		}
 
-
-		
-
 	};
 
 	template <typename T>
@@ -100,6 +97,5 @@ namespace utils {
 	double Compute::triangleArea(T width, T height) {
 		return width * height * 0.5;
 	}
-
 
 }

@@ -332,6 +332,9 @@ inline void HoughLinesPR::doVerticalHough() {
 }
 
 inline void HoughLinesPR::doHorizontalHough() {
+	// not optimized what so ever..
+	// splitting things up in smaller function would help!
+
 
 	if (!linesHori.empty())
 		linesHori.clear();
@@ -461,17 +464,16 @@ inline void HoughLinesPR::doHorizontalHough() {
 	}
 
 	if (sumX != 0.0)
-		sumX /= right[1].size();
+		sumX /= right[1].size() / 2;
 
 	if (sumY != 0.0)
-		sumY /= right[1].size();
+		sumY /= right[1].size() / 2;
 
+	cout << "Right side Y sum : " << sumY << endl;
 
-	drawLine(0, cvRound(sumY), image_.cols, cvRound(sumY), cv::Scalar(0, 0, 0));
+	drawLine(0, cvRound(sumY), cvRound(maxX), cvRound(sumY), cv::Scalar(0, 0, 0));
+
 	//cout << "SumX: " << sumX << " SumY: " << sumY << " maxX: " << maxX << " maxY: " << maxY << endl;
-
-
-
 
 	show();
 }

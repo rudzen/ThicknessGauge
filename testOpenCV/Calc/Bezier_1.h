@@ -20,7 +20,6 @@ public:
 	// testing for opencv points.. meh
 	static cv::Point2d bezier3(cv::Point2d& p1, cv::Point2d& p2, cv::Point2d& p3, double mu);
 
-
 	/**
 	 * \brief Bezier 2d interpolation for 4 points
 	 * \param p1 First point
@@ -42,7 +41,6 @@ public:
 	v2<T> bezier(std::vector<v2<T>>& p, int n, double mu);
 
 };
-
 
 template <typename T>
 class Bezier3 {
