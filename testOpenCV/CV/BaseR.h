@@ -2,7 +2,6 @@
 #include <opencv2/core/cvdef.h>
 #include <string>
 
-
 class BaseR {
 	
 protected:
@@ -19,7 +18,7 @@ protected:
 
 	const double degree = CV_PI * (1.0 / 180.0);
 
-	std::string windowName;
+	string windowName;
 
 public:
 

@@ -128,7 +128,7 @@ public: // basic stuff to extract information
 
 	bool generatePlanarImage(std::string& globName); // <- important!
 
-	linePair findMarkingLinePairs_(std::string& globName);
+	std::pair<cv::Vec4f, cv::Vec4f> findMarkingLinePairs_(std::string& globName);
 
 	static void addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y);
 	bool testDiff();

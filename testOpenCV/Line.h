@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <map>
+#include <opencv2/opencv.hpp>
+
 #include "Util/Util.h"
 #include <opencv2/stitching/detail/warpers.hpp>
 
