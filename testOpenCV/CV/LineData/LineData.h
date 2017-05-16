@@ -28,6 +28,9 @@ protected:
 
 	void calcYAvg();
 
+	template <Side side>
+	void appendPoint(cv::Point2f& point);
+
 	// The left side points which makes up the left base line
 	std::vector<cv::Point2f> leftPoints_;
 
@@ -95,6 +98,21 @@ public:
 		rightAvgY_ = rightAvgY;
 	}
 };
+
+template <LineData::Side side>
+void LineData::appendPoint(cv::Point2f& point) {
+	switch (side) {
+	case Side::Left:
+		leftPoints_.push_back(point);
+		break;
+	case Side::Right:
+		rightPoints_.push_back(point);
+		break;
+	case Side::Center:
+	default:
+		std::cerr << "Error while adding point, center is not a valid side.";
+	}
+}
 
 /**
 * \brief Computes the average Y values of both lines

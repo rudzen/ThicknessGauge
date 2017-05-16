@@ -20,8 +20,10 @@ public:
 
 	void pointsToLine(cv::Mat& originalImage, Side side) override;
 
-	void LineLaserData::appendPoints(cv::Vec2f& toAppend, Side side);
+	void appendEdgePoints(cv::Vec2f& toAppend, Side side);
+
 };
+
 
 inline LineLaserData::~LineLaserData() {
 
@@ -47,7 +49,7 @@ inline void LineLaserData::pointsToLine(cv::Mat& originalImage, Side side) {
 
 }
 
-inline void LineLaserData::appendPoints(cv::Vec2f& toAppend, Side side) {
+inline void LineLaserData::appendEdgePoints(cv::Vec2f& toAppend, Side side) {
 
 	switch (side) {
 	case Side::Left:

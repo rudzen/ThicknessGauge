@@ -74,7 +74,7 @@ public:
 
 	void generatePointLines(cv::Mat& originalImage);
 
-	void appendPoints(cv::Vec4f& toAppend, Side side);
+	void appendEdgePoints(cv::Vec4f& toAppend, Side side);
 
 	const cv::Vec4f& left() const {
 		return left_;
@@ -130,8 +130,7 @@ inline void LineBaseData::generatePointLines(cv::Mat& originalImage) {
 
 }
 
-
-inline void LineBaseData::appendPoints(cv::Vec4f& toAppend, Side side) {
+inline void LineBaseData::appendEdgePoints(cv::Vec4f& toAppend, Side side) {
 
 	switch (side) {
 	case Side::Left:
