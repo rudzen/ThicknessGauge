@@ -31,6 +31,9 @@ protected:
 	template <Side side>
 	void appendPoint(cv::Point2f& point);
 
+	template <Side side>
+	void appendPoints(std::vector<cv::Point2f>& points);
+
 	// The left side points which makes up the left base line
 	std::vector<cv::Point2f> leftPoints_;
 
@@ -112,6 +115,19 @@ void LineData::appendPoint(cv::Point2f& point) {
 	default:
 		std::cerr << "Error while adding point, center is not a valid side.";
 	}
+}
+
+template <LineData::Side side>
+void LineData::appendPoints(std::vector<cv::Point2f>& points) {
+	if (side == Side::Center) {
+		std::cerr << "Error while adding points, center is not a valid side.";
+		return;
+	}
+
+	std::vector<cv::Point2f>& target = side == Side::Left ? leftPoints_ : rightPoints_;
+
+	target.reserve(target.size() + points.size());
+	target.insert(target.begin(), points.begin(), points.end());
 }
 
 /**
