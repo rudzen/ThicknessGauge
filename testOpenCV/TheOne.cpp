@@ -89,8 +89,8 @@ int main(int argc, char** argv) {
 			c.initVideoCapture();
 			c.addNulls();
 
-			auto result = c.findMarkingLinePairs_(globName);
-			returnValue = result.first.x != 0;
+			LineBaseData result = c.findMarkingLinePairs_(globName);
+			//returnValue = result.first.x != 0;
 			//returnValue = c.generatePlanarImage(globName);
 			//if (returnValue) {
 				cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
@@ -124,7 +124,10 @@ int main(int argc, char** argv) {
 	}
 	Util::log("\nSmooth operator...");
 
-	return returnValue ^ true;
+	cout << returnValue << endl;
+
+	return 0;
+	//return returnValue ^ true;
 
 	//return testBazier();
 

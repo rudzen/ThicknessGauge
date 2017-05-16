@@ -251,7 +251,13 @@
     <ClInclude Include="CV\HoughLinesPR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="CV\LineData.h">
+    <ClInclude Include="CV\LineData\LineBaseData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\LineData\LineLaserData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\LineData\LineData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

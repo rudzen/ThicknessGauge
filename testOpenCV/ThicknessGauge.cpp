@@ -16,7 +16,7 @@
 #include "CV/Pixel.h"
 #include "CV/FilterR.h"
 #include "CV/HoughLinesPR.h"
-#include "CV/LineData.h"
+#include "CV/LineData/LineBaseData.h"
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -542,7 +542,7 @@ bool ThicknessGauge::generatePlanarImage(std::string& globName) {
  * \param globName if "camera", use camera, otherwise load from glob folder
  * \return 2 Float vector with the points marking the boundries as pair, where first = left, second = right
  */
-std::pair<cv::Vec4f, cv::Vec4f> ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
+LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 	array<cv::Mat, 512> outputs;
 
@@ -576,7 +576,7 @@ std::pair<cv::Vec4f, cv::Vec4f> ThicknessGauge::findMarkingLinePairs_(std::strin
 
 	Pixelz pixelz;
 
-	LineData results;
+	LineBaseData results;
 
 
 	while (true) {
@@ -654,7 +654,7 @@ std::pair<cv::Vec4f, cv::Vec4f> ThicknessGauge::findMarkingLinePairs_(std::strin
 			if (showWindows_) {
 				auto key = static_cast<char>(cv::waitKey(10));
 				if (key == 27)
-					return LineData(); // esc
+					return LineBaseData(); // esc
 			}
 		}
 	}

@@ -15,6 +15,7 @@
 #include "Line.h"
 #include "IO/GlobGenerator.h"
 #include "CV/Pixel.h"
+#include "CV/LineData/LineBaseData.h"
 
 
 using namespace _cv;
@@ -128,7 +129,7 @@ public: // basic stuff to extract information
 
 	bool generatePlanarImage(std::string& globName); // <- important!
 
-	std::pair<cv::Vec4f, cv::Vec4f> findMarkingLinePairs_(std::string& globName);
+	LineBaseData findMarkingLinePairs_(std::string& globName);
 
 	static void addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y);
 	bool testDiff();
