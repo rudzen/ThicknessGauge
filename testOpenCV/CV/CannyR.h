@@ -40,7 +40,7 @@ class CannyR : public BaseR {
 	bool showWindow;
 
 	void createWindow() {
-		cv::namedWindow(windowName, cv::WINDOW_KEEPRATIO);
+		namedWindow(windowName, cv::WINDOW_KEEPRATIO);
 		cv::createTrackbar("threshold1", windowName, &threshold1, 200, threshold1cb, this);
 		cv::createTrackbar("threshold2", windowName, &threshold2, 200, threshold2cb, this);
 		cv::createTrackbar("apertureSize", windowName, &apertureSize, aperMax, apertureSizecb, this);
@@ -98,34 +98,34 @@ public:
 inline void CannyR::threshold1cb(int value, void* userData) {
 	auto that = static_cast<CannyR*>(userData);
 	that->setThreshold1(value);
-	std::cout << "Canny threshold 1 : " << value << std::endl;
+	cout << "Canny threshold 1 : " << value << endl;
 }
 
 inline void CannyR::threshold2cb(int value, void* userData) {
 	auto that = static_cast<CannyR*>(userData);
 	that->setThreshold2(value);
-	std::cout << "Canny threshold 2 : " << value << std::endl;
+	cout << "Canny threshold 2 : " << value << endl;
 }
 
 inline void CannyR::apertureSizecb(int value, void* userData) {
 	auto that = static_cast<CannyR*>(userData);
 	that->setApertureSize(value);
-	std::cout << "Canny apertureSize : " << value << std::endl;
+	cout << "Canny apertureSize : " << value << endl;
 }
 
 inline void CannyR::gradientcb(int value, void* userData) {
 	auto that = static_cast<CannyR*>(userData);
 	that->setGradient(value);
-	std::string boltab[2] = { "false", "true" };
-	std::cout << "Canny gradient : " <<  boltab[static_cast<bool>(value)] << std::endl;
+	string boltab[2] = { "false", "true" };
+	cout << "Canny gradient : " <<  boltab[static_cast<bool>(value)] << endl;
 }
 
 inline void CannyR::doCanny() {
 
-	cv::Canny(image_, edges, threshold1, threshold2, apertureSize, gradient > 0);
+	Canny(image_, edges, threshold1, threshold2, apertureSize, gradient > 0);
 
-	p.removePepperNoise(edges);
+	p.removePepperNoise(image_);
 
 	if (showWindow)
-		cv::imshow(windowName, edges);
+		imshow(windowName, edges);
 }

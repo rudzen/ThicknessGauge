@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 		c.initCalibrationSettings(options.getCameraFile());
 		cv::setNumThreads(options.getNumOpenCvThreads());
 
-		cout << options << endl;
+		//cout << options << endl;
 
 		if (options.isGlobMode()) {
 			c.initVideoCapture();
