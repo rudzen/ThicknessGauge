@@ -74,6 +74,8 @@ public:
 
 	void generatePointLines(cv::Mat& originalImage);
 
+	void appendPoints(cv::Vec4f& toAppend, Side side);
+
 	const cv::Vec4f& left() const {
 		return left_;
 	}
@@ -126,5 +128,21 @@ inline void LineBaseData::generatePointLines(cv::Mat& originalImage) {
 
 	calcYAvg();
 
+}
+
+
+inline void LineBaseData::appendPoints(cv::Vec4f& toAppend, Side side) {
+
+	switch (side) {
+	case Side::Left:
+		left_ += toAppend;
+		break;
+	case Side::Right:
+		right_ += toAppend;
+		break;
+	case Side::Center:
+	default:
+		std::cerr << "Error while appending points, side does not exist for this element." << std::endl;
+	}
 }
 

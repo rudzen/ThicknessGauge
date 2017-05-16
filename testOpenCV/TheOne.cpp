@@ -89,7 +89,8 @@ int main(int argc, char** argv) {
 			c.initVideoCapture();
 			c.addNulls();
 
-			LineBaseData result = c.findMarkingLinePairs_(globName);
+			auto result = c.findMarkingLinePairs_(globName);
+			cout << result << endl;
 			//returnValue = result.first.x != 0;
 			//returnValue = c.generatePlanarImage(globName);
 			//if (returnValue) {

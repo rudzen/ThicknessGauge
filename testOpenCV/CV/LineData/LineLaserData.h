@@ -20,6 +20,7 @@ public:
 
 	void pointsToLine(cv::Mat& originalImage, Side side) override;
 
+	void LineLaserData::appendPoints(cv::Vec2f& toAppend, Side side);
 };
 
 inline LineLaserData::~LineLaserData() {
@@ -45,3 +46,19 @@ inline void LineLaserData::pointsToLine(cv::Mat& originalImage, Side side) {
 		rightPoints_.push_back(itRight.pos());
 
 }
+
+inline void LineLaserData::appendPoints(cv::Vec2f& toAppend, Side side) {
+
+	switch (side) {
+	case Side::Left:
+		left_ += toAppend;
+		break;
+	case Side::Right:
+		right_ += toAppend;
+		break;
+	case Side::Center:
+		center_ += toAppend;
+		break;
+	}
+}
+

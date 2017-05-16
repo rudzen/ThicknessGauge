@@ -554,30 +554,42 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 	linePair result(cv::Point2i(0, 0), cv::Point2i(0, 0));
 
-	CannyR canny(200, 250, 3, false, showWindows_);
+	CannyR cannyH(200, 250, 3, false, showWindows_);
+	CannyR cannyV(10, 30, 3, true, false);
+
 	HoughLinesR houghV(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
 	HoughLinesPR houghP(1, CV_PI / 180, 100, showWindows_);
-	FilterR lineFilter("LineFilter");
-	FilterR speckFilter("SpeckFilter");
+	FilterR lineFilter("LineFilterH");
+	FilterR lineFilterV("LineFilterV");
 
-	cv::Mat lineKernel = (cv::Mat_<char>(1, 5) << 10, 10, 0, -10, -10);
+	//FilterR speckFilter("SpeckFilter");
+
+	cv::Mat lineHKernel = (cv::Mat_<char>(1, 5) << 3, 3, 0, -3, -3);
 	cv::Mat speckKernel = (cv::Mat_<char>(3, 3) <<
 						   0, 0, 0,
 						   0, 1, 0,
 						   0, 0, 0);
 
 
-	lineFilter.setKernel(lineKernel);
-	speckFilter.setKernel(speckKernel);
+	cv::Mat lineVKernel = (cv::Mat_<char>(4, 4) <<
+						   0, 0, 1, 1,
+						   0, 1, 1, 1,
+						   1, 1, 1, 0,
+						   1, 1, 0, 0
+						   );
+
+	lineFilter.setKernel(lineHKernel);
+	lineFilter.setKernel(lineVKernel);
+	//speckFilter.setKernel(speckKernel);
 
 	//filter.generateKernel(6, 6, 1.0f);
 
 	houghV.setAngleLimit(30);
+	houghP.setAngleLimit(30);
 
 	Pixelz pixelz;
 
 	LineBaseData results;
-
 
 	while (true) {
 
@@ -595,7 +607,7 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 		for (auto i = 0; i < frameCount_; ++i) {
 
 			// just share the joy
-			auto frame = frames[i];
+			auto frame = frames[i].clone();
 
 			cv::Mat tmp = frame.clone();
 			//cv::bilateralFilter(frame, tmp, 1, 20, 10);
@@ -605,24 +617,37 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			//speckFilter.doFilter();
 			//tmp = speckFilter.getResult();
 
-			//lineFilter.setOriginal(frames[i]);
-			//lineFilter.setImage(tmp);
-			//lineFilter.doFilter();
-			//tmp = lineFilter.getResult();
+			lineFilter.setOriginal(frames[i]);
+			lineFilter.setImage(tmp);
+			lineFilter.doFilter();
+			tmp = lineFilter.getResult();
+
+			lineFilterV.setOriginal(frames[i]);
+			lineFilterV.setImage(frame.clone());
+			lineFilterV.doFilter();
+			tmp = lineFilterV.getResult();
+
 
 			//cv::threshold(tmp, tmp, 200, 255, cv::THRESH_BINARY);
 
-			canny.setImage(tmp);
-			canny.doCanny();
-			tmp = canny.getResult();
+			cannyH.setImage(tmp);
+			cannyH.doCanny();
+			tmp = cannyH.getResult();
+
+			houghP.setOriginal(frames[i]);
+			houghP.setImage(tmp);
+			houghP.doHorizontalHough();
+
+			
+
+			//cannyV.setImage(frame);
+			//cannyV.doCanny();
 
 			houghV.setOriginal(frames[i]);
 			houghV.setImage(tmp.clone());
 			houghV.doVerticalHough();
 
-			houghP.setOriginal(frames[i]);
-			houghP.setImage(tmp);
-			houghP.doHorizontalHough();
+
 
 			// show default input image
 			if (showWindows_) {
