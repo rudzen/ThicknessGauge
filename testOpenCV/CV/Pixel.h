@@ -6,17 +6,19 @@
 
 class Pixelz {
 
-	cv::Point2i me_;
-
 public:
 
-
-	static int Pixelz::getAllPixelSum(cv::Mat& image) {
+	/**
+	 * \brief Get the pixel intensity sum of a 3 channel image
+	 * \param image The image to get the sum from
+	 * \return The total sum of pixel intensity for the whole image
+	 */
+	static unsigned int Pixelz::getAllPixelSum(cv::Mat& image) {
 
 		if (image.channels() != 3)
 			return -1;
 
-		auto sum = 0;
+		unsigned int sum = 0;
 		auto uc_pixel = image.data;
 		for (auto row = 0; row < image.rows; ++row) {
 			uc_pixel = image.data + row * image.step;
@@ -30,7 +32,6 @@ public:
 		}
 		return sum;
 	}
-
 
 	/**
 	 * \brief Get avg intensity for parsed line (0-255)
@@ -59,6 +60,12 @@ public:
 
 	}
 
+	/**
+	 * \brief Get the intensity of a specific point on a specific image
+	 * \param image The image to get the intensity from
+	 * \param point The location of the point to get the intensity from
+	 * \return The intensity ranging from 0 to 255 (uchar)
+	 */
 	static uchar Pixelz::getElementIntensity(cv::Mat& image, cv::Point& point) {
 		return image.at<uchar>(point);
 	}
@@ -68,6 +75,12 @@ public:
 		return getElementIntensity(image, p);
 	}
 
+	/**
+	 * \brief Get average intensity for all pixels located at parsed X
+	 * \param image The image to base the computation on
+	 * \param x The row for which to get the intensity from
+	 * \return The average intensity level
+	 */
 	static double Pixelz::getYPixelsAvg(cv::Mat& image, int x) {
 		auto sum = 0;
 		auto count = 0;
@@ -76,7 +89,7 @@ public:
 
 		for (auto i = col.cols; i--;) {
 			sum += uc_pixel[0];
-			cout << "sum is now : " << sum << "\n";
+			//cout << "sum is now : " << sum << "\n";
 			count++;
 			uc_pixel++;
 		}
@@ -84,6 +97,13 @@ public:
 		return sum / count;
 	}
 
+	/**
+	 * \brief Retrieve the highest located pixel in a specific coloum
+	 * \param image The image to use
+	 * \param x The coloumn to get the highest pixel from
+	 * \param miniCalc For sorting struct only
+	 * \return The location of the highest pixel location
+	 */
 	int Pixelz::getHighestYpixel(cv::Mat& image, int x, MiniCalc& miniCalc) const {
 		auto highest = image.rows;
 		vector<cv::Point> pix;
@@ -125,7 +145,13 @@ public:
 		return highest;
 	}
 
-	void removePepperNoise(cv::Mat& mask) {
+	/**
+	 * \brief Removed problematic 2 pixel radius black island pixels by filling with white
+	 * The intent for this function is to be used after a binary threshold
+	 * and to make certain algorithms work more smoothly as the islands of pixels will be more "whole".
+	 * \param mask The image to use
+	 */
+	static void removePepperNoise(cv::Mat& mask) {
 		// For simplicity, ignore the top & bottom row border.
 		for (auto y = 2; y < mask.rows - 2; y++) {
 			// Get access to each of the 5 rows near this pixel.
