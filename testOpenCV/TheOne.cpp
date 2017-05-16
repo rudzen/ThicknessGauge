@@ -253,64 +253,6 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 	}
 }
 
-
-int testBazier() {
-	// Create black empty images
-	cv::Mat image = cv::Mat::zeros(500, 800, CV_8UC3);
-
-	cv::Point2i Lp(0, 0);
-
-	vector<cv::Point2i> P(20);
-	vector<cv::Point2i> Pp(20);
-	vector<cv::Point2i> Ppp(20);
-	cv::Point2i a(0, 0), b(0, 0), c(0, 0), d(33, 0), e(0, 1), f(0, 0);// general purpose scratch registers.
-
-	unsigned int Np = 4;
-	P[0] = {133, 300};
-	P[1] = {260, 400};
-	P[2] = {555, 111};
-	P[3] = {700, 111};
-
-	//  P(5) = { , };
-	//  P(6) = { , };
-	//  P(55) = { , };
-	Np--;
-
-	Lp = P[0];
-	for (float ppercent = 0.00; ppercent < 1.0; ppercent = ppercent + 0.01) {
-		Pp = P;
-		int c2ccount = Np;
-		for (auto c1ccount = 0; c1ccount < Np; c1ccount = c1ccount + 1) {
-			for (auto cccount = 0; cccount < c2ccount; cccount = cccount + 1) {
-				a = Pp[cccount] - Pp[cccount + 1];
-				a = Pp[cccount + 1] - Pp[cccount];
-				b = ppercent * a;
-				c = Pp[cccount] + b;
-				Ppp[cccount] = c;
-			}
-			c2ccount = c2ccount - 1;
-			Pp = Ppp;
-		}
-
-		line(image, c, Lp, cv::Scalar(110, 220, 0), 1, 1);
-		Lp = c;
-	}
-
-	// P straight line generator.
-	for (auto c3ccount = 0; c3ccount < Np; c3ccount = c3ccount + 1) {
-		line(image, P[c3ccount], P[c3ccount + 1], cv::Scalar(200, 200, 200), 2, 8);
-		a = P[c3ccount] + e;
-		line(image, P[c3ccount], a, cv::Scalar(55, 55, 200), 9, 8);
-		a = P[c3ccount + 1] + e;
-		line(image, P[c3ccount + 1], a, cv::Scalar(55, 55, 200), 9, 8);
-	}
-
-	imshow("Bezier_curve", image);
-	cv::waitKey(0);
-	cout << "done\n";
-	return (0);
-}
-
 //void test_video(cv::Mat input) {
 //
 //	// Lambda Matrix
