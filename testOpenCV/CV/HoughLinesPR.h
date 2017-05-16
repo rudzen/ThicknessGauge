@@ -118,7 +118,7 @@ private:
 
 	double getAngle(int x1, int x2, int y1, int y2) const;
 
-	static bool splitX(vector<cv::Vec4f>& source, vector<cv::Vec4f>& right, vector<cv::Vec4f>& left, float x, double yMin, double *leftCenter, double *rightCenter);
+	static bool splitX(vector<cv::Vec4f>& source, vector<cv::Vec4f>& right, vector<cv::Vec4f>& left, double x, double yMin, double *leftCenter, double *rightCenter);
 
 	// callbacks
 
@@ -354,8 +354,8 @@ inline void HoughLinesPR::doHorizontalHough() {
 	linePointsHori.clear();
 	linePointsHori.reserve(count);
 
-	cv::Point center(image_.cols / 2, image_.rows / 2);
-	cv::Point third(image_.cols / 3, image_.rows / 3);
+	cv::Point2d center(image_.cols / 2, image_.rows / 2);
+	cv::Point2d third(image_.cols / 3, image_.rows / 3);
 
 	vector<linePair> linLeft;
 	vector<linePair> linRight;
@@ -467,7 +467,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 		sumY /= right[1].size();
 
 
-	drawLine(0, sumY, image_.cols, sumY, cv::Scalar(0, 0, 0));
+	drawLine(0, cvRound(sumY), image_.cols, cvRound(sumY), cv::Scalar(0, 0, 0));
 	//cout << "SumX: " << sumX << " SumY: " << sumY << " maxX: " << maxX << " maxY: " << maxY << endl;
 
 
@@ -500,7 +500,7 @@ inline double HoughLinesPR::getAngle(int x1, int x2, int y1, int y2) const {
 	return atan2(y1 - y2, x1 - x2);
 }
 
-inline bool HoughLinesPR::splitX(vector<cv::Vec4f>& source, vector<cv::Vec4f>& right, vector<cv::Vec4f>& left, float x, double yMin, double *leftCenter, double *rightCenter) {
+inline bool HoughLinesPR::splitX(vector<cv::Vec4f>& source, vector<cv::Vec4f>& right, vector<cv::Vec4f>& left, double x, double yMin, double *leftCenter, double *rightCenter) {
 
 	*leftCenter = 0.0;
 	*rightCenter = 0.0;

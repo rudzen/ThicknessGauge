@@ -58,10 +58,17 @@ public:
 
 	// OpenCV copy constructor
 #ifdef CV_VERSION
-	explicit v2(cv::Point p) {
+	explicit v2(cv::Point& p) {
 		x = p.x;
 		y = p.y;
 	}
+
+	v2 operator+(const cv::Point &that) {
+		return v2<T>(x + that.x, y + that.y);
+	}
+
+
+
 #endif
 	T x;
 	T y;
@@ -132,7 +139,7 @@ public:
 	}
 
 	virtual T len() const {
-		return abs(sqrt((x * x) + (y * y)));
+		return static_cast<T>(abs(sqrt((x * x) + (y * y))));
 	}
 
 	v2 cross() {
@@ -198,7 +205,7 @@ public:
 	}
 
 	v3 operator*(const double k) {
-		return v3<T>(k * this->x, k * this->y, k * this->z);
+		return v3<T>(static_cast<T>(k * this->x), static_cast<T>(k * this->y), static_cast<T>(k * this->z));
 	}
 
 	T len() const override {

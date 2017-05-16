@@ -28,11 +28,11 @@ class Histogram {
 
 private:
 
-	void normalizeHistogramImage(const int max) {
+	void normalizeHistogramImage(const float max) {
 
 		//auto modifier = max * hist_w;
 		for (auto i = histSize; i--;) {
-			histogram_[i] = (static_cast<double>(histogram_[i]) / max) * hist_w;
+			histogram_[i] /= max * hist_w;
 		}
 	}
 
@@ -104,7 +104,7 @@ inline void Histogram::populateHistogram(cv::Mat& image) {
 
 	auto count = max - min;
 
-	float range[] = { min, max };
+	float range[] = { static_cast<float>(min), static_cast<float>(max) };
 	const float* ranges[] = {range};
 
 	calcHist(&image, 1, nullptr, cv::Mat(), hist_, 1, &count, ranges, true, false);

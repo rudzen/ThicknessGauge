@@ -52,7 +52,7 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 	globGenerator.generateGlob();
 
 	auto files = globGenerator.getFiles();
-	auto size = files.size();
+	auto size = static_cast<int>(files.size());
 
 	if (size != frameCount_)
 		setFrameCount(size);
@@ -678,7 +678,7 @@ bool ThicknessGauge::testDiff() {
 
 	// weigthed adding boundries for alpha
 	// beta values are always 1.0 = alpha
-	float alphaBase = 0.1;
+	float alphaBase = 0.1f;
 
 	// blur sigma boundries
 	auto sigmaXBase = 5;
@@ -1266,7 +1266,7 @@ void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
 			avgGaugeHeight_ = gaugeLine_[3];
 
 			if (showWindows_) {
-				line(output, cv::Point2f(aboveLine.front().x + Util::round(gaugeLine_[0]), gaugeLine_[3]), cv::Point2f(aboveLine.back().x, Util::round(gaugeLine_[3])), baseColour_, 2, cv::LINE_AA);
+				line(output, cv::Point2f(static_cast<float>(aboveLine.front().x) + gaugeLine_[0], gaugeLine_[3]), cv::Point2f(static_cast<float>(aboveLine.back().x), gaugeLine_[3]), baseColour_, 2, cv::LINE_AA);
 
 				//cout << "Average line height : " << output.rows - avgGaugeHeight_ << " elements.\n";
 			}
