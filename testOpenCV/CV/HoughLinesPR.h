@@ -7,8 +7,6 @@
 #include "Pixel.h"
 #include "HoughLinesR.h"
 #include <opencv2/core/affine.hpp>
-#include <opencv2/core/affine.hpp>
-#include <opencv2/core/affine.hpp>
 
 /*
 (      -4QQQQQQQQQQQQQQQQQQ: jQQQQQQQQQQ

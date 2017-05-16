@@ -69,7 +69,7 @@ class FilterR : public BaseR {
 	int deltaI_ = 0;
 
 	void createWindow() {
-		cv::namedWindow(windowName, cv::WINDOW_KEEPRATIO);
+		namedWindow(windowName, cv::WINDOW_KEEPRATIO);
 		cv::createTrackbar("delta", windowName, &deltaI_, 3, delta_cb, this);
 	}
 
@@ -77,12 +77,12 @@ class FilterR : public BaseR {
 		auto that = static_cast<FilterR*>(userData);
 		auto oldVal = that->getDelta();
 		that->setDelta(static_cast<double>(value));
-		std::cout << that->windowName << " delta : " << oldVal << " -> " << value << '\n';
+		cout << that->windowName << " delta : " << oldVal << " -> " << value << '\n';
 	}
 
 public: // constructors
 
-	explicit FilterR(std::string windowName): delta_(0.0)
+	explicit FilterR(string windowName): delta_(0.0)
 	         , ddepth_(-1)
 	         , border_(cv::BORDER_DEFAULT)
 	         , showWindow_(true) {
@@ -92,7 +92,7 @@ public: // constructors
 		createWindow();
 	}
 
-	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows, std::string windowName) : kernel_(kernel)
+	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows, string windowName) : kernel_(kernel)
 	                                                                                                                                                        , anchor_(anchor)
 	                                                                                                                                                        , delta_(delta)
 	                                                                                                                                                        , ddepth_(ddepth)
@@ -162,7 +162,7 @@ inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor) { d
 inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta) { doFilter(depth, kernel, anchor, delta, border_); }
 
 inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border) {
-	cv::filter2D(image_, result_, depth, kernel, anchor, delta, border);
+	filter2D(image_, result_, depth, kernel, anchor, delta, border);
 	if (getShowWindow())
-		cv::imshow(windowName, result_);
+		imshow(windowName, result_);
 }
