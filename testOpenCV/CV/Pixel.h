@@ -123,15 +123,15 @@ public:
 					if (surroundings) {
 						// Fill the whole 5x5 block as white. Since we know the 5x5 borders
 						// are already white, just need to fill the 3x3 inner region.
-						*(pUp1 - 1) = 0;
-						*(pUp1 + 0) = 0;
-						*(pUp1 + 1) = 0;
-						*(pThis - 1) = 0;
-						*(pThis + 0) = 0;
-						*(pThis + 1) = 0;
-						*(pDown1 - 1) = 0;
-						*(pDown1 + 0) = 0;
-						*(pDown1 + 1) = 0;
+						*(pUp1 - 1) = 255;
+						*(pUp1 + 0) = 255;
+						*(pUp1 + 1) = 255;
+						*(pThis - 1) = 255;
+						*(pThis + 0) = 255;
+						*(pThis + 1) = 255;
+						*(pDown1 - 1) = 255;
+						*(pDown1 + 0) = 255;
+						*(pDown1 + 1) = 255;
 					}
 					// Since we just covered the whole 5x5 block with white, we know the next 2 pixels
 					// won't be black, so skip the next 2 pixels on the right.
