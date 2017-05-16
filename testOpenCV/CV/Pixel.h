@@ -13,6 +13,9 @@ public:
 
 	static int Pixelz::getAllPixelSum(cv::Mat& image) {
 
+		if (image.channels() != 3)
+			return -1;
+
 		auto sum = 0;
 		auto uc_pixel = image.data;
 		for (auto row = 0; row < image.rows; ++row) {
@@ -21,11 +24,39 @@ public:
 				int a = uc_pixel[0];
 				int b = uc_pixel[1];
 				int c = uc_pixel[2];
-				sum += a + b + c;
+				sum += (a + b) + c;
 				uc_pixel += 3;
 			}
 		}
 		return sum;
+	}
+
+
+	/**
+	 * \brief Get avg intensity for parsed line (0-255)
+	 * \param image The image to use as base for intensity computation
+	 * \param vector The vector to check for
+	 * \param connectivity Line connectivity, default = 8
+	 * \param leftToRight Reverse direction, default = false
+	 * \return The average intensity for the line, ranging 0-255 (uchar)
+	 */
+	static uchar Pixelz::getLineAvgIntensity(cv::Mat& image, cv::Vec4f& vector, int connectivity = 8, bool leftToRight = false) {
+
+		cv::LineIterator it(image, cv::Point(cvRound(vector[0]), cvRound(vector[1])), cv::Point(cvRound(vector[2]), cvRound(vector[3])), connectivity, leftToRight);
+
+		if (it.count == 0)
+			return 0;
+
+		auto sum = 0.0;
+		for (auto i = 0; i < it.count; i++, ++it) {
+			auto pt = it.pos();
+			sum += getElementIntensity(image, pt);
+		}
+		
+		sum /= it.count;
+
+		return static_cast<uchar>(cvRound(sum));
+
 	}
 
 	static uchar Pixelz::getElementIntensity(cv::Mat& image, cv::Point& point) {
