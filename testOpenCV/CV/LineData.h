@@ -16,39 +16,50 @@ class LineData {
 		Right
 	};
 
+	// The left side points which makes up the border of the marking
 	vector<cv::Point2f> leftPoints_;
 
+	// The right side points which makes up the border of the marking
 	vector<cv::Point2f> rightPoints_;
 
+	// The left side outer points which makes up the border of the marking
 	cv::Vec4f left_;
 
+	// The right side outer points which makes up the border of the marking
 	cv::Vec4f right_;
 
+	// The left side Y avg value
 	float leftAvgY_;
 
 	float rightAvgY_;
 
 	void pointsToLine(cv::Mat& originalImage, Side side);
 
+	void calcYAvg();
+
 public:
 
-	LineData() { }
+	LineData() {
+		leftAvgY_ = 0.0f;
+		rightAvgY_ = 0.0f;
+	}
 
 	LineData(const LineData& other)
 		: leftPoints_(other.leftPoints_),
 		  rightPoints_(other.rightPoints_),
 		  left_(other.left_),
-		  right_(other.right_) {
+		  right_(other.right_),
+		  leftAvgY_(other.leftAvgY_),
+		  rightAvgY_(other.rightAvgY_) {
 	}
 
+	// ReSharper disable CppPossiblyUninitializedMember
 	LineData(cv::Vec4f left, cv::Vec4f right)
+	// ReSharper restore CppPossiblyUninitializedMember
 		: left_(left),
 		  right_(right) {
+		LineData();
 	}
-
-	void generatePointLines(cv::Mat& originalImage);
-
-	float calcAvg();
 
 	LineData& operator=(const LineData& other) {
 		if (this == &other)
@@ -60,7 +71,6 @@ public:
 		return *this;
 	}
 
-
 	friend bool operator==(const LineData& lhs, const LineData& rhs) {
 		return lhs.left_ == rhs.left_
 			&& lhs.right_ == rhs.right_;
@@ -69,13 +79,13 @@ public:
 	friend LineData operator+(const LineData& lhs, const LineData& rhs) {
 		// lel, no + operator for vec4f
 		return LineData(cv::Vec4f(lhs.left_[0] + rhs.left_[0],
-								  lhs.left_[1] + rhs.left_[1],
-								  lhs.left_[2] + rhs.left_[2],
-								  lhs.left_[3] + rhs.left_[3]),
-						cv::Vec4f(lhs.right_[0] + rhs.right_[0],
-								  lhs.right_[1] + rhs.right_[1],
-								  lhs.right_[2] + rhs.right_[2],
-								  lhs.right_[3] + rhs.right_[3]));
+		                          lhs.left_[1] + rhs.left_[1],
+		                          lhs.left_[2] + rhs.left_[2],
+		                          lhs.left_[3] + rhs.left_[3]),
+		                cv::Vec4f(lhs.right_[0] + rhs.right_[0],
+		                          lhs.right_[1] + rhs.right_[1],
+		                          lhs.right_[2] + rhs.right_[2],
+		                          lhs.right_[3] + rhs.right_[3]));
 	}
 
 	friend bool operator!=(const LineData& lhs, const LineData& rhs) {
@@ -88,7 +98,7 @@ public:
 			<< "\nright_[pts]: " << obj.right_ << '[' << obj.rightPoints_ << ']';
 	}
 
-
+	void generatePointLines(cv::Mat& originalImage);
 
 	const cv::Vec4f& left() const {
 		return left_;
@@ -124,6 +134,11 @@ public:
 
 };
 
+/**
+ * \brief Convert both left and right vector points to vectors of regular x/y points
+ * \param originalImage PH image, not used for anything
+ * \param side The side to compute for
+ */
 inline void LineData::pointsToLine(cv::Mat& originalImage, Side side) {
 
 	auto& v = side == Side::Left ? left_ : right_;
@@ -141,20 +156,37 @@ inline void LineData::pointsToLine(cv::Mat& originalImage, Side side) {
 		l.push_back(it.pos());
 }
 
+/**
+ * \brief Generates the point lines for contained points.
+ * \param originalImage PH image, not really used
+ */
 inline void LineData::generatePointLines(cv::Mat& originalImage) {
 
 	pointsToLine(originalImage, Side::Left);
 
 	pointsToLine(originalImage, Side::Right);
 
+	calcYAvg();
+
 }
 
-inline float LineData::calcAvg() {
+/**
+ * \brief Computes the average Y values of both lines
+ */
+inline void LineData::calcYAvg() {
 
-	float sum = 0.0;
+	auto sum = 0.0f;
 
+	for (auto& p : leftPoints_)
+		sum += p.y;
 
+	leftAvgY_ = sum / static_cast<float>(leftPoints_.size());
 
+	sum = 0.0f;
 
+	for (auto& p : rightPoints_)
+		sum += p.y;
+
+	rightAvgY_ = sum / static_cast<float>(rightPoints_.size());
 
 }
