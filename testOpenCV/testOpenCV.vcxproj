@@ -213,7 +213,7 @@
     <ClInclude Include="Util\Util.h" />
     <ClInclude Include="Util\Vec.h" />
     <ClInclude Include="IO\VideoInfo.h" />
-    <ClInclude Include="_cv.h" />
+    <ClInclude Include="tg.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
 #include <opencv2/opencv.hpp>
-#include "../../_cv.h"
+#include "../../tg.h"
 #include <ostream>
 #include "LineData.h"
 
-using namespace _cv;
+using namespace tg;
 
 // super class for both line classes..
 class LineData {

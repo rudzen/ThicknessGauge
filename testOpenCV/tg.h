@@ -1,11 +1,13 @@
 #pragma once
+#include <ostream>
+#include "Util/Util.h"
 
-namespace _cv {
+namespace tg {
 
 	typedef std::vector<cv::Point2d> vd;
 	typedef std::vector<cv::Point2i> vi;
 
-	typedef std::pair<cv::Point2i, cv::Point2i> linePair;
+	typedef std::pair<cv::Point2f, cv::Point2f> linePair;
 
 	enum class Quantile { Q0, Q25, Q50, Q75, Q100 };
 

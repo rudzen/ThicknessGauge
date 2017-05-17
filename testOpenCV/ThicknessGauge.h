@@ -7,7 +7,7 @@
 #include "Calc/MiniCalc.h"
 #include "ThicknessGaugeData.h"
 
-#include "_cv.h"
+#include "tg.h"
 #include "Calibrate/CalibrationSettings.h"
 #include "Util/Vec.h"
 #include "Util/Util.h"
@@ -21,9 +21,10 @@
 #include "CV/CannyR.h"
 #include "CV/FilterR.h"
 #include "CV/HoughLinesR.h"
+#include "CV/HoughLinesPR.h"
 
 
-using namespace _cv;
+using namespace tg;
 
 /*
 The main controller class
@@ -135,8 +136,8 @@ public: // basic stuff to extract information
 	bool generatePlanarImage(std::string& globName); // <- important!
 	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right);
 	void computeMarkingHeight(std::string& globName);
-	bool computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect& output);
-	LineLaserData computerBaseLineAreas();
+	bool computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output);
+	LineLaserData computerBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, cv::Rect2f& output);
 
 	LineBaseData findMarkingLinePairs_(std::string& globName);
 

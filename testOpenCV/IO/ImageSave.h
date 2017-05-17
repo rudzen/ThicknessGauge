@@ -3,9 +3,9 @@
 #include <opencv2\opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include "VideoInfo.h"
-#include "_cv.h"
+#include "tg.h"
 
-using namespace _cv;
+using namespace tg;
 
 
 /*! \brief Simple wrapper class for image and/or video saving

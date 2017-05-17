@@ -3,13 +3,13 @@
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
-#include "_cv.h"
+#include "tg.h"
 #include "Interpolate.h"
 #include "Bezier_1.h"
 #include "LineConfig.h"
 
 using namespace std;
-using namespace _cv;
+using namespace tg;
 
 class MiniCalc {
 

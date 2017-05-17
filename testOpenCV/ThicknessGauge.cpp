@@ -342,7 +342,7 @@ bool ThicknessGauge::generatePlanarImage(std::string& globName) {
 			houghL.setImage(canny.getResult());
 			houghL.setAngleLimit(20);
 			houghL.doVerticalHough();
-			houghL.doHorizontalHough();
+			//houghL.doHorizontalHough();
 
 			// show default input image (always shown live!)
 			if (showWindows_) {
@@ -559,7 +559,7 @@ void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) 
 
 	cv::Rect leftRect2I(topLeft, buttomLeft);
 	cv::Rect rightRect2I(topRight, buttomRight);
-	
+
 	for (auto i = frameCount_; i--;) {
 		left.push_back(frames[i](leftRect2I));
 		right.push_back(frames[i](rightRect2I));
@@ -573,7 +573,7 @@ void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) 
  * \brief Main entry points for calculation of marking height
  */
 void ThicknessGauge::computeMarkingHeight(std::string& globName) {
-	
+
 	// determin where to get the frames from.
 	if (globName == "camera")
 		captureFrames();
@@ -595,31 +595,55 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	markingFilter->setShowWindow(showWindows_);
 	baselineFilter->setShowWindow(showWindows_);
 
-	cv::Rect markingRect;
+	cv::Rect2f markingRect;
 
 	auto markingOk = computerMarkingRectangle(canny, markingFilter, houghV, markingRect);
 
+	auto houghH = make_shared<HoughLinesPR>(1, static_cast<const int>(CV_PI / 180), 40, true);
+
+	houghH->setMaxLineGab(12);
+	houghH->setMinLineLen(markingRect.width / 2);
+
+
+
+
+
+	if (showWindows_) {
+		auto key = static_cast<char>(cv::waitKey(30));
+		if (key == 27)
+			return; // escape was pressed
+	}
+
+
 }
 
-bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect& output) {
+bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output) {
 
 	// build cannyfied images
 	vector<cv::Mat> candis;
 	candis.reserve(frameCount_);
 
 	cv::Mat lineVKernel = (cv::Mat_<char>(4, 4) <<
-						   0, 0, 1, 1,
-						   0, 1, 1, 1,
-						   1, 1, 1, 0,
-						   1, 1, 0, 0
-						   );
+		0 , 0 , 1 , 1 ,
+		0 , 1 , 1 , 1 ,
+		1 , 1 , 1 , 0 ,
+		1 , 1 , 0 , 0
+	);
 
 	filter->setKernel(lineVKernel);
 
 	vector<cv::Mat> cannyImages;
 
+	cv::namedWindow("test marking out", CV_WINDOW_FREERATIO);
+
+	vector<cv::Rect2f> markingRects;
+
 	while (true) {
+
+		markingRects.reserve(frameCount_);
+
 		for (auto i = frameCount_; i--;) {
+			cv::Mat markingTest = frames[i].clone();
 			cv::Mat org = frames[i].clone();
 			filter->setImage(frames[i].clone());
 			filter->doFilter();
@@ -628,20 +652,39 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 			hough->setOriginal(org);
 			hough->setImage(canny->getResult());
 			hough->doVerticalHough();
+			hough->computeBorders();
+			markingRects.push_back(hough->getMarkingRect());
 			if (showWindows_) {
+				cv::rectangle(markingTest, output, cv::Scalar(128, 128, 128), 2, cv::LINE_AA);
+				cv::imshow("test marking out", markingTest);
 				auto key = static_cast<char>(cv::waitKey(30));
 				if (key == 27)
-					break; // escape was pressed
+					return true; // escape was pressed
 			}
 		}
-
+		// calculate the avg rect
+		output.x = 0.0f;
+		output.y = 0.0f;
+		output.width = 0.0f;
+		output.height = frames[0].rows;
+		for (auto& r : markingRects) {
+			output.x += r.x;
+			output.y += r.y;
+			output.width += r.width;
+		}
+		output.x /= markingRects.size();
+		output.y /= markingRects.size();
+		output.width /= markingRects.size();
+		cout << "Final marking rect : " << output << endl;
+		if (!showWindows_)
+			break;
 	}
-	
-	return true;
+
+	return output.x > 0.0f && output.y > 0.0f && output.width > 0.0f;
 }
 
-LineLaserData ThicknessGauge::computerBaseLineAreas() {
-	
+LineLaserData ThicknessGauge::computerBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, cv::Rect2f& output) {
+
 }
 
 
@@ -666,19 +709,19 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 	//FilterR speckFilter("SpeckFilter");
 
-	cv::Mat lineHKernel = (cv::Mat_<char>(1, 5) << 3, 3, 0, -3, -3);
+	cv::Mat lineHKernel = (cv::Mat_<char>(1, 5) << 3 , 3 , 0 , -3 , -3);
 	cv::Mat speckKernel = (cv::Mat_<char>(3, 3) <<
-						   0, 0, 0,
-						   0, 1, 0,
-						   0, 0, 0);
+		0 , 0 , 0 ,
+		0 , 1 , 0 ,
+		0 , 0 , 0);
 
 
 	cv::Mat lineVKernel = (cv::Mat_<char>(4, 4) <<
-						   0, 0, 1, 1,
-						   0, 1, 1, 1,
-						   1, 1, 1, 0,
-						   1, 1, 0, 0
-						   );
+		0 , 0 , 1 , 1 ,
+		0 , 1 , 1 , 1 ,
+		1 , 1 , 1 , 0 ,
+		1 , 1 , 0 , 0
+	);
 
 	lineFilter.setKernel(lineHKernel);
 	lineFilter.setKernel(lineVKernel);
@@ -743,7 +786,6 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			houghP.setImage(tmp);
 			houghP.doHorizontalHough();
 
-			
 
 			//cannyV.setImage(frame);
 			//cannyV.doCanny();
@@ -751,7 +793,6 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			houghV.setOriginal(frames[i]);
 			houghV.setImage(tmp.clone());
 			houghV.doVerticalHough();
-
 
 
 			// show default input image

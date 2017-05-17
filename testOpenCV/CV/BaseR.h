@@ -16,6 +16,8 @@ protected:
 	*/
 	cv::Mat image_;
 
+	cv::Rect2f markingRect;
+
 	int imageOffset = 0;
 
 	const double degree = CV_PI * (1.0 / 180.0);
@@ -38,7 +40,13 @@ public:
 		imageOffset = image.rows / 2;
 		cv::Rect roi(0, 0, image.cols, imageOffset);
 		image_ = image(roi);
-
 	}
 
+	const cv::Rect2f& getMarkingRect() const {
+		return markingRect;
+	}
+
+	void setMarkingRect(const cv::Rect2f& markingRect) {
+		this->markingRect = markingRect;
+	}
 };

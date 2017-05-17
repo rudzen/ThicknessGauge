@@ -113,9 +113,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="_cv.h">
-      <Filter>Header Files\Namespaces</Filter>
-    </ClInclude>
     <ClInclude Include="ThicknessGauge.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
@@ -259,6 +256,9 @@
     </ClInclude>
     <ClInclude Include="CV\LineData\LineData.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tg.h">
+      <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

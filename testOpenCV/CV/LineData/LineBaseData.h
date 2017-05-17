@@ -1,7 +1,7 @@
 #pragma once
 #include "LineData.h"
 
-using namespace _cv;
+using namespace tg;
 
 /**
  * \brief Container class for line data

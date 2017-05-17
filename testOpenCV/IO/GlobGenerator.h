@@ -19,13 +19,13 @@ class GlobGenerator {
 
 	int type_ = CV_8UC1;
 
-	_cv::GlobType glob_;
+	tg::GlobType glob_;
 
 public:
 
 	GlobGenerator(): recursive_(false)
 	               , count_(0)
-	               , glob_(_cv::GlobType::Sequence) { }
+	               , glob_(tg::GlobType::Sequence) { }
 
 	GlobGenerator(const std::string pattern, const bool recursive)
 		: pattern_(pattern),
@@ -80,11 +80,11 @@ public:
 		recursive_ = recursive;
 	}
 
-	_cv::GlobType glob() const {
+	tg::GlobType glob() const {
 		return glob_;
 	}
 
-	void glob(_cv::GlobType glob) {
+	void glob(tg::GlobType glob) {
 		glob_ = glob;
 	}
 };

@@ -157,6 +157,12 @@ public:
 		return dist_manhattan(p1.x, p2.x, p1.y, p1.y);
 	}
 
+	static float dist_manhattan(float x1, float x2, float y1, float y2) {
+		return abs(x2 - x1 + y2 - y1);
+	}
+
+
+
 	///** Brief Is a point located within an image frame
 	//* Determines if a given point is located within image dimensions
 	//* @param PointX The X coordinate of the point

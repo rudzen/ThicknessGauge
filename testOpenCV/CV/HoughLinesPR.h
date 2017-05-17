@@ -24,7 +24,7 @@ wawWQQQwaaQQQwawWaamQQmc_wmwayQaaaaaaamQ
 QWWQQQQWWQQQQQWQQQWQQQQQQQQWWQQQWQWQWQQQ
 */
 
-using namespace _cv;
+using namespace tg;
 
 class HoughLinesPR : public BaseR {
 
@@ -156,6 +156,7 @@ public:
 	void drawLines(vector<linePair>& linePairs, cv::Scalar colour);
 
 	void drawLines(vector<cv::Vec4f>& lines, cv::Scalar colour);
+	void drawLine(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour);
 
 	void drawLine(cv::Point& p1, cv::Point& p2, cv::Scalar colour);
 
@@ -548,6 +549,9 @@ inline void HoughLinesPR::drawLines(vector<cv::Vec4f>& lines, cv::Scalar colour)
 		drawLine(l, colour);
 }
 
+inline void HoughLinesPR::drawLine(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour) {
+	line(output, p1, p2, colour, 1, CV_AA);
+}
 
 inline void HoughLinesPR::drawLine(cv::Point& p1, cv::Point& p2, cv::Scalar colour) {
 	line(output, p1, p2, colour, 1, CV_AA);
