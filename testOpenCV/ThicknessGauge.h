@@ -13,7 +13,7 @@
 #include "Util/Util.h"
 
 #include "Testing/TestConfig.h"
-#include "Line.h"
+#include "LineSparse.h"
 #include "IO/GlobGenerator.h"
 #include "CV/Pixel.h"
 #include "CV/LineData/LineBaseData.h"

@@ -195,7 +195,7 @@
     <ClInclude Include="Calc\Interpolate.h" />
     <ClInclude Include="Exceptions\InvalidFileException.h" />
     <ClInclude Include="IO\IsValidFileName.h" />
-    <ClInclude Include="Line.h" />
+    <ClInclude Include="LineSparse.h" />
     <ClInclude Include="LineConfig.h" />
     <ClInclude Include="CV\Pixel.h" />
     <ClInclude Include="UI\ProgressBar.h" />

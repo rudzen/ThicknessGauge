@@ -7,7 +7,7 @@
 #include "Exceptions/CaptureFailException.h"
 #include "Testing/TestConfig.h"
 #include "UI/ProgressBar.h"
-#include "Line.h"
+#include "LineSparse.h"
 #include "Histogram/Histogram.h"
 #include "IO/GlobGenerator.h"
 #include "Histogram/HistoPeak.h"

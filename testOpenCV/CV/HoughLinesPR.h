@@ -30,9 +30,44 @@ class HoughLinesPR : public BaseR {
 
 public:
 
-	enum class Type {
-		Regular, Properlistic
-	};
+	typedef struct LineH {
+		cv::Vec4f entry;
+		linePair points;
+		std::vector<cv::Point2f> elements;
+
+		LineH() { }
+
+		LineH(cv::Vec4f entry, linePair points)
+			: entry(entry),
+			points(points) {
+			elements.reserve(cvRound(Util::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
+		}
+
+		friend bool operator==(const LineH& lhs, const LineH& rhs) {
+			return lhs.entry == rhs.entry
+				&& lhs.points == rhs.points
+				&& lhs.elements == rhs.elements;
+		}
+
+		friend bool operator!=(const LineH& lhs, const LineH& rhs) {
+			return !(lhs == rhs);
+		}
+
+		friend std::ostream& operator<<(std::ostream& os, const LineH& obj) {
+			return os
+				<< "entry: " << obj.entry
+				<< " points(1/2): " << obj.points.first << '/' << obj.points.second
+				<< " elements: " << obj.elements;
+		}
+	} LineV;
+
+	struct lineHsizeSort {
+		bool operator()(LineV l1, LineV l2) const { return l1.elements.size() < l2.elements.size(); }
+	} lineVsizeSort;
+
+	struct lineHYSort {
+		bool operator()(cv::Point2f p1, cv::Point2f p2) const { return p1.y < p2.y; }
+	} lineVYSort;
 
 private:
 
@@ -335,7 +370,6 @@ inline void HoughLinesPR::doVerticalHough() {
 inline void HoughLinesPR::doHorizontalHough() {
 	// not optimized what so ever..
 	// splitting things up in smaller function would help!
-
 
 	if (!linesHori.empty())
 		linesHori.clear();
