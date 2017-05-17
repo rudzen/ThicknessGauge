@@ -17,6 +17,7 @@
 #include "CV/FilterR.h"
 #include "CV/HoughLinesPR.h"
 #include "CV/LineData/LineBaseData.h"
+#include "CV/LineData/LineLaserData.h"
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -301,7 +302,7 @@ bool ThicknessGauge::generatePlanarImage(std::string& globName) {
 	while (true) {
 
 		CannyR canny(100, 150, 3, false, showWindows_);
-		HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
+		HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_);
 
 		uint64 time_begin = cv::getTickCount();
 
@@ -537,6 +538,113 @@ bool ThicknessGauge::generatePlanarImage(std::string& globName) {
 	return true;
 }
 
+
+void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) {
+
+	if (!left.empty())
+		left.clear();
+
+	left.reserve(frameCount_);
+
+	if (!right.empty())
+		right.clear();
+
+	right.reserve(frameCount_);
+
+	cv::Point topLeft(0, 0);
+	cv::Point buttomLeft(frames[0].cols / 2, frames[0].rows);
+
+	cv::Point topRight(frames[0].cols / 2, 0);
+	cv::Point buttomRight(frames[0].cols, frames[0].rows);
+
+	cv::Rect leftRect2I(topLeft, buttomLeft);
+	cv::Rect rightRect2I(topRight, buttomRight);
+	
+	for (auto i = frameCount_; i--;) {
+		left.push_back(frames[i](leftRect2I));
+		right.push_back(frames[i](rightRect2I));
+	}
+
+	cout << "Frames split without crash :-)" << endl;
+
+}
+
+/**
+ * \brief Main entry points for calculation of marking height
+ */
+void ThicknessGauge::computeMarkingHeight(std::string& globName) {
+	
+	// determin where to get the frames from.
+	if (globName == "camera")
+		captureFrames();
+	else
+		loadGlob(globName);
+
+	vector<cv::Mat> leftFrames;
+	vector<cv::Mat> rightFrames;
+
+	splitFrames(leftFrames, rightFrames);
+
+	// common canny with default settings for detecting marking borders
+	auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_);
+	auto markingFilter = make_shared<FilterR>("MarkingFilter");
+	auto baselineFilter = make_shared<FilterR>("Baseline Filter");
+	auto houghV = make_shared<HoughLinesR>(1, static_cast<const int>(CV_PI / 180), 40, showWindows_);
+	houghV->setAngleLimit(30);
+
+	markingFilter->setShowWindow(showWindows_);
+	baselineFilter->setShowWindow(showWindows_);
+
+	cv::Rect markingRect;
+
+	auto markingOk = computerMarkingRectangle(canny, markingFilter, houghV, markingRect);
+
+}
+
+bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect& output) {
+
+	// build cannyfied images
+	vector<cv::Mat> candis;
+	candis.reserve(frameCount_);
+
+	cv::Mat lineVKernel = (cv::Mat_<char>(4, 4) <<
+						   0, 0, 1, 1,
+						   0, 1, 1, 1,
+						   1, 1, 1, 0,
+						   1, 1, 0, 0
+						   );
+
+	filter->setKernel(lineVKernel);
+
+	vector<cv::Mat> cannyImages;
+
+	while (true) {
+		for (auto i = frameCount_; i--;) {
+			cv::Mat org = frames[i].clone();
+			filter->setImage(frames[i].clone());
+			filter->doFilter();
+			canny->setImage(filter->getResult());
+			canny->doCanny();
+			hough->setOriginal(org);
+			hough->setImage(canny->getResult());
+			hough->doVerticalHough();
+			if (showWindows_) {
+				auto key = static_cast<char>(cv::waitKey(30));
+				if (key == 27)
+					break; // escape was pressed
+			}
+		}
+
+	}
+	
+	return true;
+}
+
+LineLaserData ThicknessGauge::computerBaseLineAreas() {
+	
+}
+
+
 /**
  * \brief Determins the marking boundries
  * \param globName if "camera", use camera, otherwise load from glob folder
@@ -546,18 +654,12 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 	array<cv::Mat, 512> outputs;
 
-	// capture first frame
-	if (globName == "camera")
-		captureFrames();
-	else
-		loadGlob(globName);
-
 	linePair result(cv::Point2i(0, 0), cv::Point2i(0, 0));
 
 	CannyR cannyH(200, 250, 3, false, showWindows_);
 	CannyR cannyV(10, 30, 3, true, false);
 
-	HoughLinesR houghV(1, CV_PI / 180, 100, showWindows_, HoughLinesR::Type::Regular);
+	HoughLinesR houghV(1, CV_PI / 180, 100, showWindows_);
 	HoughLinesPR houghP(1, CV_PI / 180, 100, showWindows_);
 	FilterR lineFilter("LineFilterH");
 	FilterR lineFilterV("LineFilterV");

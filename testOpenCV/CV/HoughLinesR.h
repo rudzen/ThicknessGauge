@@ -25,12 +25,6 @@ using namespace _cv;
 
 class HoughLinesR : public BaseR {
 
-public:
-
-	enum class Type {
-		Regular, Properlistic
-	};
-
 private:
 
 	cv::Mat output;
@@ -76,16 +70,13 @@ private:
 
 	bool showWindow;
 
-	Type properlistic;
-
 public:
 
-	HoughLinesR(const int rho, const int theta, const int threshold, const bool showWindow, const Type properlistic)
+	HoughLinesR(const int rho, const int theta, const int threshold, const bool showWindow)
 		: rho(rho),
 		  theta(theta),
 		  threshold(threshold),
-		  showWindow(showWindow),
-		  properlistic(properlistic)
+		  showWindow(showWindow)
 	{
 		angle = CV_PI / 180 * theta;
 		srn = 0;

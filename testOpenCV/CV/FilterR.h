@@ -103,6 +103,13 @@ public: // constructors
 		if (showWindows) createWindow();
 	}
 
+	/**
+	* \brief
+	*/
+	using Filters = struct Filters {
+
+	};
+
 public: // getters & setters
 
 	cv::Mat& getResult() { return result_; }

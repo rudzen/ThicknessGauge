@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include <memory>
 
 #include "Calc/MiniCalc.h"
 #include "ThicknessGaugeData.h"
@@ -16,6 +17,10 @@
 #include "IO/GlobGenerator.h"
 #include "CV/Pixel.h"
 #include "CV/LineData/LineBaseData.h"
+#include "CV/LineData/LineLaserData.h"
+#include "CV/CannyR.h"
+#include "CV/FilterR.h"
+#include "CV/HoughLinesR.h"
 
 
 using namespace _cv;
@@ -128,6 +133,10 @@ public: // basic stuff to extract information
 	void generateGlob(std::string& name);
 
 	bool generatePlanarImage(std::string& globName); // <- important!
+	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right);
+	void computeMarkingHeight(std::string& globName);
+	bool computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect& output);
+	LineLaserData computerBaseLineAreas();
 
 	LineBaseData findMarkingLinePairs_(std::string& globName);
 
