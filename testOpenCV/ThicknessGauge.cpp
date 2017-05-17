@@ -602,7 +602,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	auto houghH = make_shared<HoughLinesPR>(1, static_cast<const int>(CV_PI / 180), 40, true);
 
 	houghH->setMaxLineGab(12);
-	houghH->setMinLineLen(markingRect.width / 2);
+	houghH->setMinLineLen(cvRound(markingRect.width / 2));
 	houghH->setMarkingRect(markingRect);
 
 	std::array<cv::Rect2f, 2> baseLines;

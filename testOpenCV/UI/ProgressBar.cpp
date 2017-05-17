@@ -11,7 +11,7 @@ ProgressBar::ProgressBar(unsigned long n_, const char* description_, std::ostrea
 
 	unit_bar = "=";
 	unit_space = " ";
-	desc_width = std::strlen(description);	// character width of description field
+	desc_width = static_cast<unsigned int>(std::strlen(description));	// character width of description field
 
 }
 
