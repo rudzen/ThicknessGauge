@@ -603,8 +603,11 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	houghH->setMaxLineGab(12);
 	houghH->setMinLineLen(markingRect.width / 2);
+	houghH->setMarkingRect(markingRect);
 
+	std::array<cv::Rect2f, 2> baseLines;
 
+	computerBaseLineAreas(canny, baselineFilter, houghH, baseLines);
 
 
 
@@ -613,6 +616,13 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		if (key == 27)
 			return; // escape was pressed
 	}
+
+
+}
+
+LineLaserData ThicknessGauge::computerBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output) {
+
+	LineLaserData results;
 
 
 }
@@ -683,9 +693,6 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 	return output.x > 0.0f && output.y > 0.0f && output.width > 0.0f;
 }
 
-LineLaserData ThicknessGauge::computerBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, cv::Rect2f& output) {
-
-}
 
 
 /**
