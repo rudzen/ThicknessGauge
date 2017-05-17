@@ -5,6 +5,7 @@
 #include <iostream>
 #include "BaseR.h"
 #include "../tg.h"
+#include "Exceptions/NoLineDetectedException.h"
 
 /*
 (      -4QQQQQQQQQQQQQQQQQQ: jQQQQQQQQQQ
@@ -370,8 +371,14 @@ inline void HoughLinesR::bresenham() {
 	auto lSize = leftLines.size();
 	auto rSize = rightLines.size();
 
+	if (lSize + rSize == 0)
+		throw NoLineDetectedException("No marking lines detected.");
+
 	if (lSize == 0)
-		cerr << "FATAL, no left lines detected.." << endl;
+		throw NoLineDetectedException("No marking left line detected.");
+
+	if (rSize == 0)
+		throw NoLineDetectedException("No marking right line detected.");
 
 	for (auto& left : leftLines) {
 		cv::LineIterator it(image_, left.points.first, left.points.second, 8);
@@ -380,12 +387,8 @@ inline void HoughLinesR::bresenham() {
 			left.elements.push_back(it.pos());
 	}
 
-	if (leftLines.size() > 1) {
+	if (lSize > 1)
 		sort(leftLines.begin(), leftLines.end(), lineVsizeSort);
-	}
-
-	//for (auto& l : leftLines)
-	//	cout << "L: " << l << endl;
 
 	for (auto& right : rightLines) {
 		cv::LineIterator it(image_, right.points.first, right.points.second, 8);
@@ -394,13 +397,8 @@ inline void HoughLinesR::bresenham() {
 			right.elements.push_back(it.pos());
 	}
 
-	if (rightLines.size() > 1) {
+	if (rSize > 1)
 		sort(rightLines.begin(), rightLines.end(), lineVsizeSort);
-	}
-
-	//for (auto& l : rightLines)
-	//	cout << "R: " << l << endl;
-
 
 }
 

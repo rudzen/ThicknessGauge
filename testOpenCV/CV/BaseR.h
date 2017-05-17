@@ -32,16 +32,6 @@ public:
 
 	void setImage(const cv::Mat& image) { image_ = image; }
 
-	void setImage(const cv::Mat& image, bool lowerHalf) {
-		if (!lowerHalf) {
-			setImage(image);
-			return;
-		}
-		imageOffset = image.rows / 2;
-		cv::Rect roi(0, 0, image.cols, imageOffset);
-		image_ = image(roi);
-	}
-
 	const cv::Rect2f& getMarkingRect() const {
 		return markingRect;
 	}

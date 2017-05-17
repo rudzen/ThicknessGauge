@@ -161,7 +161,9 @@ public:
 		return abs(x2 - x1 + y2 - y1);
 	}
 
-
+	static float dist_manhattan(cv::Vec4f& line) {
+		return abs(line[2] - line[0] + line[3] - line[1]);
+	}
 
 	///** Brief Is a point located within an image frame
 	//* Determines if a given point is located within image dimensions
@@ -222,6 +224,12 @@ public:
 
 	static bool validFileName(const std::string& filename) {
 		return IsValidFileName(filename.c_str());
+	}
+
+	template <typename T>
+	static void copyVector(T& source, T& destination) {
+		destination.reserve(source.size());
+		destination.insert(destination.begin(), source.begin(), source.end());
 	}
 
 };

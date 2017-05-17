@@ -260,6 +260,9 @@
     <ClInclude Include="LineSparse.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
+    <ClInclude Include="Exceptions\NoLineDetectedException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />
