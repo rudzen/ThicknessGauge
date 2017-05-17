@@ -8,10 +8,10 @@
 #include <opencv2/core/affine.hpp>
 #include "Exceptions/NoLineDetectedException.h"
 
-/*
+   /*
 	|  __
 	| /__\
-	| X~~|			"The eternal code guard
+	| X~~|			"The eternal code god
 	|-\|//-.		 watches over this mess."
    /|`.|'.' \			- R.A.Kohn, 2017
   |,|.\~~ /||

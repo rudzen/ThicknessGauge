@@ -2,6 +2,24 @@
 #include <opencv2/core/cvdef.h>
 #include <string>
 
+   /*
+	|  __
+	| /__\
+	| X~~|			"The eternal code god
+	|-\|//-.		 watches over this mess."
+   /|`.|'.' \			- R.A.Kohn, 2017
+  |,|.\~~ /||
+  |:||   ';||
+  ||||   | ||
+  \ \|     |`.
+  |\X|     | |
+  | .'     |||
+  | |   .  |||
+  |||   |  `.| JS
+  ||||  |   ||
+  ||||  |   ||
+  `+.__._._+*/
+
 class BaseR {
 
 protected:

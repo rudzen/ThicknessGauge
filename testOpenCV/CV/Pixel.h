@@ -4,6 +4,24 @@
 #include <iostream>
 #include "Calc/MiniCalc.h"
 
+   /*
+	|  __
+	| /__\
+	| X~~|			"The eternal code god
+	|-\|//-.		 watches over this mess."
+   /|`.|'.' \			- R.A.Kohn, 2017
+  |,|.\~~ /||
+  |:||   ';||
+  ||||   | ||
+  \ \|     |`.
+  |\X|     | |
+  | .'     |||
+  | |   .  |||
+  |||   |  `.| JS
+  ||||  |   ||
+  ||||  |   ||
+  `+.__._._+*/
+
 class Pixelz {
 
 public:

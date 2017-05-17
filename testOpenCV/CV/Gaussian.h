@@ -2,6 +2,24 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/shape/hist_cost.hpp>
 
+   /*
+	|  __
+	| /__\
+	| X~~|			"The eternal code god
+	|-\|//-.		 watches over this mess."
+   /|`.|'.' \			- R.A.Kohn, 2017
+  |,|.\~~ /||
+  |:||   ';||
+  ||||   | ||
+  \ \|     |`.
+  |\X|     | |
+  | .'     |||
+  | |   .  |||
+  |||   |  `.| JS
+  ||||  |   ||
+  ||||  |   ||
+  `+.__._._+*/
+
 class Gaussian {
 	
 	cv::Mat original_;

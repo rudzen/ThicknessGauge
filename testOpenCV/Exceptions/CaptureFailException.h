@@ -1,19 +1,32 @@
 #pragma once
-
 #include <stdexcept>
 
-class CaptureFailException : public exception {
+   /*
+	|  __
+	| /__\
+	| X~~|			"The eternal code god
+	|-\|//-.		 watches over this mess."
+   /|`.|'.' \			- R.A.Kohn, 2017
+  |,|.\~~ /||
+  |:||   ';||
+  ||||   | ||
+  \ \|     |`.
+  |\X|     | |
+  | .'     |||
+  | |   .  |||
+  |||   |  `.| JS
+  ||||  |   ||
+  ||||  |   ||
+  `+.__._._+*/
+
+class CaptureFailException : public std::exception {
+
+	string message_;
 
 public:
 
-	explicit CaptureFailException(string message) : message_(message) { }
+	explicit CaptureFailException(std::string message) : message_(message) { }
 
-	const char* what() const throw() override {
-		return message_.c_str();
-	}
-
-private:
-
-	string message_;
+	const char* what() const throw() override { return message_.c_str(); }
 
 };
