@@ -607,9 +607,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	std::array<cv::Rect2f, 2> baseLines;
 
-	computerBaseLineAreas(canny, baselineFilter, houghH, baseLines);
-
-
+	computeBaseLineAreas(canny, baselineFilter, houghH, baseLines);
 
 	if (showWindows_) {
 		auto key = static_cast<char>(cv::waitKey(30));
@@ -620,9 +618,64 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 }
 
-LineLaserData ThicknessGauge::computerBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output) {
+LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output) {
 
 	LineLaserData results;
+
+	cv::Mat lineHKernel = (cv::Mat_<char>(4, 1) <<
+		0 ,
+		1 ,
+		1 ,
+		0
+	);
+
+	filter->setKernel(lineHKernel);
+
+	cv::namedWindow("test baseline left", CV_WINDOW_FREERATIO);
+	cv::namedWindow("test baseline right", CV_WINDOW_FREERATIO);
+
+	int bias = Left;
+
+	auto quarter = static_cast<float>(frames[0].rows / 4);
+	auto baseLineY = frames[0].rows - quarter;
+
+	cv::Rect2f leftBaseLine;
+	leftBaseLine.x = 0.0f;
+	leftBaseLine.y = baseLineY;
+	leftBaseLine.width = hough->getMarkingRect().x;
+	leftBaseLine.height = quarter;
+
+	cv::Rect2f rightBaseLine;
+	rightBaseLine.x = leftBaseLine.width + hough->getMarkingRect().width;
+	rightBaseLine.y = baseLineY;
+	rightBaseLine.width = frames[0].cols - rightBaseLine.x;
+	rightBaseLine.height = leftBaseLine.height;
+
+	while (true) {
+
+		for (auto i = frameCount_; i--;) {
+			cv::Mat left = frames[i](leftBaseLine);
+			cv::Mat right = frames[i](rightBaseLine);
+			if (showWindows_) {
+				cv::imshow("test baseline left", left);
+				cv::imshow("test baseline right", right);
+				auto key = static_cast<char>(cv::waitKey(30));
+				if (key == 27) {
+					showWindows_ ^= true;
+					break; // escape was pressed
+				}
+			}
+
+
+		}
+
+
+		if (!showWindows_)
+			break;
+	}
+
+
+	return LineLaserData();
 
 
 }
@@ -692,7 +745,6 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 
 	return output.x > 0.0f && output.y > 0.0f && output.width > 0.0f;
 }
-
 
 
 /**

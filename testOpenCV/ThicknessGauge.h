@@ -136,8 +136,8 @@ public: // basic stuff to extract information
 	bool generatePlanarImage(std::string& globName); // <- important!
 	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right);
 	void computeMarkingHeight(std::string& globName);
+	LineLaserData computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output);
 	bool computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output);
-	LineLaserData computerBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output);
 
 	LineBaseData findMarkingLinePairs_(std::string& globName);
 

@@ -39,7 +39,7 @@ public:
 		LineV(cv::Vec2f entry, linePair points)
 			: entry(entry),
 			points(points) {
-			elements.reserve(Util::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y));
+			elements.reserve(cvRound(Util::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
 		}
 
 		friend bool operator==(const LineV& lhs, const LineV& rhs) {
