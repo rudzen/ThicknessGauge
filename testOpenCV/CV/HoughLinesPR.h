@@ -184,9 +184,12 @@ public:
 
 	void doHorizontalHough();
 
-	void drawLines(vector<linePair>& linePairs, cv::Scalar colour);
+	void drawLine(vector<linePair>& linePairs, cv::Scalar colour);
 
 	void drawLines(vector<cv::Vec4f>& lines, cv::Scalar colour);
+
+	void drawLines(vector<LineH>& lines, cv::Scalar colour);
+
 	void drawLine(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour);
 
 	void drawLine(cv::Point& p1, cv::Point& p2, cv::Scalar colour);
@@ -235,67 +238,7 @@ public:
 
 inline void HoughLinesPR::computeBorders() {
 
-	if (linePointsVert.empty())
-		return;
 
-	auto delta = 3;
-
-	auto midX = output.cols / 2;
-	auto midY = output.rows / 2;
-
-	vector<cv::Point2i> left;
-	vector<cv::Point2i> right;
-
-	const auto linePointsSize = linePointsVert.size();
-
-	// reserve enough space
-
-	//left.reserve(linePointsSize);
-	//right.reserve(linePointsSize);
-
-	//for (auto& lp : linePointsVert) {
-	//	cv::LineIterator it(output, lp.first, lp.second, 8);
-	//	for (auto i = 0; i < it.count; i++, ++it) {
-	//		auto pt = it.pos();
-
-	//		// check could possibly be moved outside this loop
-	//		// but since there is no guarentee for anything, leave it for now
-	//		if (pt.x < midX)
-	//			left.push_back(pt);
-	//		else
-	//			right.push_back(pt);
-	//	}
-	//}
-
-	//std::cout << "left vert lines : " << left.size() << endl;
-	//std::cout << "right vert lines : " << right.size() << endl;
-
-	// test borders
-
-	midX = output.rows / 2;
-
-	cv::Point2i bestTop(output.cols, output.rows);
-	cv::Point2i bestLow(output.cols, output.rows);
-
-	double best = 0.0;
-
-	for (auto& p : linePointsVert) {
-
-		double dist = cv::norm(p.first - p.second);
-		if (dist > best) {
-			best = dist;
-			if (p.first.y < p.second.y) {
-				bestTop = p.first;
-				bestLow = p.second;
-			} else {
-				bestTop = p.second;
-				bestLow = p.first;
-			}
-		}
-	}
-
-
-	line(output, bestLow, bestTop, cv::Scalar(0, 255, 255), 3);
 
 }
 
@@ -362,25 +305,10 @@ inline void HoughLinesPR::doHorizontalHough() {
 
 	bresenham();
 
+	drawLines(leftLines, cv::Scalar(0, 0, 255));
+	drawLines(rightLines, cv::Scalar(0, 255, 0));
 
-	for (auto& line : linesHori) {
-
-		// center horizontal cutoff
-		if (line[1] < third.y || line[3] < third.y)
-			continue;
-
-		//calculate angle in radian,  if you need it in degrees just do angle * 180 / PI
-		auto angle = getAngle(line);// atan2(line[0] - line[3], line[1] - line[2]);
-		//cout << "Detected line " << line << " has angle " << angle * degree << endl;
-
-		if (line[0] <= center.x)// && line[2] <= center.x)
-			linLeft.push_back(linePair(cv::Point(line[0], line[1]), cv::Point(line[2], line[3])));
-		else
-			linRight.push_back(linePair(cv::Point(line[0], line[1]), cv::Point(line[2], line[3])));
-	}
-
-	//drawLines(linLeft, cv::Scalar(0, 0, 255));
-	//drawLines(linRight, cv::Scalar(0, 255, 0));
+	// TODO : Re-make splitX to be "recursive" with splitting depth.
 
 	double centerRight[3] = { 0.0, 0.0, 0.0 };
 	double centerLeft[3] = { 0.0, 0.0, 0.0 };
@@ -588,7 +516,7 @@ inline bool HoughLinesPR::splitX(vector<cv::Vec4f>& source, vector<cv::Vec4f>& r
 
 }
 
-inline void HoughLinesPR::drawLines(vector<linePair>& linePairs, cv::Scalar colour) {
+inline void HoughLinesPR::drawLine(vector<linePair>& linePairs, cv::Scalar colour) {
 	if (!showWindow)
 		return;
 
@@ -605,6 +533,15 @@ inline void HoughLinesPR::drawLines(vector<cv::Vec4f>& lines, cv::Scalar colour)
 	for (auto& l : lines)
 		drawLine(l, colour);
 }
+
+inline void HoughLinesPR::drawLines(vector<LineH>& lines, cv::Scalar colour) {
+	if (!showWindow)
+		return;
+
+	for (auto& l : lines)
+		drawLine(l.entry, colour);
+}
+
 
 inline void HoughLinesPR::drawLine(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour) {
 	line(output, p1, p2, colour, 1, CV_AA);
