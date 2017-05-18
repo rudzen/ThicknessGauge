@@ -59,10 +59,12 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 	if (size != frameCount_)
 		setFrameCount(size);
 
-	for (auto i = 0; i < size; ++i)
-		frames[i] = cv::imread(files.at(i), CV_8UC1);
+	frames.reserve(size);
 
-	setImageSize(frames[0].size());
+	for (auto i = 0; i < size; ++i)
+		frames.push_back(cv::imread(files.at(i), CV_8UC1));
+
+	setImageSize(frames.at(0).size());
 
 }
 
@@ -73,7 +75,7 @@ void ThicknessGauge::captureFrames() {
 	cv::Mat t;
 	for (auto i = 0; i++ < frameCount_;) {
 		cap >> t;
-		frames[i] = t;
+		frames.push_back(t);
 	}
 
 	setImageSize(t.size());
@@ -330,7 +332,7 @@ bool ThicknessGauge::generatePlanarImage(std::string& globName) {
 		for (auto i = 0; i < frameCount_; ++i) {
 
 			// just share the joy
-			frame = frames[i];
+			frame = frames.at(i);
 
 			cv::Mat tmp;
 			cv::bilateralFilter(frame, tmp, 1, 20, 10);
@@ -552,17 +554,17 @@ void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) 
 	right.reserve(frameCount_);
 
 	cv::Point topLeft(0, 0);
-	cv::Point buttomLeft(frames[0].cols / 2, frames[0].rows);
+	cv::Point buttomLeft(frames.front().cols / 2, frames.front().rows);
 
-	cv::Point topRight(frames[0].cols / 2, 0);
-	cv::Point buttomRight(frames[0].cols, frames[0].rows);
+	cv::Point topRight(frames.front().cols / 2, 0);
+	cv::Point buttomRight(frames.front().cols, frames.front().rows);
 
 	cv::Rect leftRect2I(topLeft, buttomLeft);
 	cv::Rect rightRect2I(topRight, buttomRight);
 
-	for (auto i = frameCount_; i--;) {
-		left.push_back(frames[i](leftRect2I));
-		right.push_back(frames[i](rightRect2I));
+	for (auto& f : frames) {
+		left.push_back(f(leftRect2I));
+		right.push_back(f(rightRect2I));
 	}
 
 	cout << "Frames split without crash :-)" << endl;
@@ -651,11 +653,28 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 	rightBaseLine.width = frames[0].cols - rightBaseLine.x;
 	rightBaseLine.height = leftBaseLine.height;
 
+	vector<cv::Mat> left;
+	vector<cv::Mat> right;
+
+	// generate baseline images..
+	for (auto i = frameCount_; i--;) {
+		left.push_back(frames[i](leftBaseLine));
+		right.push_back(frames[i](rightBaseLine));
+	}
+
 	while (true) {
 
 		for (auto i = frameCount_; i--;) {
-			cv::Mat left = frames[i](leftBaseLine);
-			cv::Mat right = frames[i](rightBaseLine);
+			auto org = frames.at(i).clone();
+
+			filter->setImage(frames.at(i).clone());
+			filter->doFilter();
+			canny->setImage(filter->getResult());
+			canny->doCanny();
+			hough->setOriginal(org);
+			hough->setImage(canny->getResult());
+			hough->doHorizontalHough();
+
 			if (showWindows_) {
 				cv::imshow("test baseline left", left);
 				cv::imshow("test baseline right", right);
@@ -705,10 +724,10 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 
 		markingRects.reserve(frameCount_);
 
-		for (auto i = frameCount_; i--;) {
-			cv::Mat markingTest = frames[i].clone();
-			cv::Mat org = frames[i].clone();
-			filter->setImage(frames[i].clone());
+		for (auto i = frames.size(); i--;) {
+			auto markingTest = frames.at(i).clone();
+			auto org = frames.at(i).clone();
+			filter->setImage(frames.at(i).clone());
 			filter->doFilter();
 			canny->setImage(filter->getResult());
 			canny->doCanny();
@@ -729,7 +748,7 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 		output.x = 0.0f;
 		output.y = 0.0f;
 		output.width = 0.0f;
-		output.height = frames[0].rows;
+		output.height = frames.front().rows;
 		for (auto& r : markingRects) {
 			output.x += r.x;
 			output.y += r.y;
@@ -808,19 +827,19 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 		//HistoPeak hp;
 
-		for (auto i = 0; i < frameCount_; ++i) {
+		for (auto i = 0; i < frames.size(); ++i) {
 
 			// just share the joy
-			auto frame = frames[i].clone();
+			auto frame = frames.at(i).clone();
 
-			cv::Mat hori = frames[i].clone();
-			cv::Mat vert = frames[i].clone();
+			cv::Mat hori = frames.at(i).clone();
+			cv::Mat vert = frames.at(i).clone();
 
-			cv::Mat tmp = frames[i].clone();
+			cv::Mat tmp = frames.at(i).clone();
 
 			//cv::bilateralFilter(frame, tmp, 1, 20, 10);
 
-			//speckFilter.setOriginal(frames[i]);
+			//speckFilter.setOriginal(frames.at(i));
 			//speckFilter.setImage(tmp);
 			//speckFilter.doFilter();
 			//tmp = speckFilter.getResult();
@@ -849,7 +868,7 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			//cannyV.setImage(frame);
 			//cannyV.doCanny();
 
-			houghV.setOriginal(frames[i]);
+			houghV.setOriginal(frames.at(i));
 			houghV.setImage(tmp.clone());
 			houghV.doVerticalHough();
 
@@ -930,7 +949,6 @@ bool ThicknessGauge::testDiff() {
 	cv::Mat frame;
 	vector<v2<double>> gabs(frameCount_);
 
-	array<cv::Mat, arrayLimit> frames;
 	array<cv::Mat, arrayLimit> outputs;
 	array<vi, arrayLimit> pix_Planarmap;
 
@@ -944,15 +962,11 @@ bool ThicknessGauge::testDiff() {
 
 	auto out("Capturing " + to_string(frameCount_) + " frames..");
 
-	//ProgressBar progress(frameCount_, out.c_str());
-	//progress.SetFrequencyUpdate(10);
-	//progress.SetStyle(">", "-");
-
 	for (auto i = frameCount_; i--;) {
-		//progress.Progressed(i);
-		cap >> frames[i];
+		cv::Mat t;
+		cap >> t;
+		frames.push_back(t);
 	}
-	//progress.Progressed(frameCount_);
 
 	Util::log("");
 
@@ -1037,7 +1051,7 @@ bool ThicknessGauge::testDiff() {
 			outputs[j] = cv::Mat::zeros(imageSize_, CV_8UC1);
 			pix_Planarmap.at(j).clear();
 
-			frame = frames[j].clone();
+			frame = frames.at(j).clone();
 			//cap >> frame;
 
 			// do basic in-place binary threshold
@@ -1205,7 +1219,6 @@ bool ThicknessGauge::testAggressive() {
 	cv::Mat frame;
 	vector<v2<double>> gabs(frameCount_);
 
-	array<cv::Mat, arrayLimit> frames;
 	array<cv::Mat, arrayLimit> outputs;
 	array<vi, arrayLimit> pix_Planarmap;
 
@@ -1225,8 +1238,10 @@ bool ThicknessGauge::testAggressive() {
 	progress.SetStyle(">", "-");
 
 	for (auto i = frameCount_; i--;) {
+		cv::Mat t;
+		cap >> t;
 		progress.Progressed(i);
-		cap >> frames[i];
+		frames.push_back(t);
 	}
 	progress.Progressed(frameCount_);
 
@@ -1313,7 +1328,7 @@ bool ThicknessGauge::testAggressive() {
 			outputs[j] = cv::Mat::zeros(imageSize_, CV_8UC1);
 			pix_Planarmap.at(j).clear();
 
-			frame = frames[j].clone();
+			frame = frames.at(j).clone();
 			//cap >> frame;
 
 			// do basic in-place binary threshold

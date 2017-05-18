@@ -11,7 +11,7 @@ protected:
 
 	const int arrayLimit = 512; // shit c++11 ->
 
-	array<cv::Mat, 512> frames;
+	vector<cv::Mat> frames;
 
 	// The pixels located in the image
 	vi pixels_;
