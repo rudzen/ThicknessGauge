@@ -662,20 +662,35 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 		right.push_back(frames[i](rightBaseLine));
 	}
 
+	Line sparseLine;
+
+#define _sparse_mode
+
 	while (true) {
 
 		// left
 		for (auto& l : left) {
 			auto org = l.clone();
-			filter->setImage(l);
+			filter->setImage(org);
 			filter->doFilter();
 
-			canny->setImage(filter->getResult());
-			canny->doCanny();
+			//canny->setImage(filter->getResult());
+			//canny->doCanny();
 
+#ifdef _sparse_mode
+			sparseLine.setFrame(l);
+			sparseLine.generateSparse();
+			sparseLine.generateOutput();
+			sparseLine.drawPoly();
+			cv::imshow("ko", sparseLine.getOutput());
+			//hough->setImage(sparseLine.getOutput());
+			//hough->setOriginal(org);
+			//hough->doHorizontalHough();
+#else
 			hough->setImage(canny->getResult());
 			hough->setOriginal(org);
 			hough->doHorizontalHough();
+#endif
 
 			if (showWindows_) {
 				cv::imshow("test baseline left", l);
@@ -686,6 +701,7 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 					break; // escape was pressed
 				}
 			}
+
 		}
 
 		if (!showWindows_)
@@ -722,7 +738,7 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 	while (true) {
 
 		markingRects.reserve(frameCount_);
-
+		cv::Mat sparse;
 		for (auto i = frames.size(); i--;) {
 			auto markingTest = frames.at(i).clone();
 			auto org = frames.at(i).clone();
@@ -730,8 +746,10 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 			filter->doFilter();
 			canny->setImage(filter->getResult());
 			canny->doCanny();
+
 			hough->setOriginal(org);
 			hough->setImage(canny->getResult());
+
 			hough->doVerticalHough();
 			hough->computeBorders();
 			markingRects.push_back(hough->getMarkingRect());
