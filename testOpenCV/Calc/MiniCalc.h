@@ -52,17 +52,17 @@ public:
 	// means of all Y values for each X
 	vector<cv::Point> m_PlanarPixels;
 
-	void SetMean(cv::Point2d newMean);
+	void setMean(cv::Point2d newMean);
 
-	cv::Point2d GetMean() const;
+	cv::Point2d getMean() const;
 
-	void AddMean(cv::Point2d meanToAdd);
+	void addMean(cv::Point2d meanToAdd);
 
-	void SetVariance(cv::Point2d newVariance);
+	void setVariance(cv::Point2d newVariance);
 
-	cv::Point2d GetVariance() const;
+	cv::Point2d getVariance() const;
 
-	void AddVariance(cv::Point2d varianceToAdd);
+	void addVariance(cv::Point2d varianceToAdd);
 
 	static cv::Point2d mean(vector<cv::Point2i>& pixels);
 

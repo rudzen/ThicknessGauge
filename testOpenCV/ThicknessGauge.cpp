@@ -304,7 +304,7 @@ bool ThicknessGauge::generatePlanarImage(std::string& globName) {
 	// start the process of gathering information for set frame count
 	while (true) {
 
-		CannyR canny(100, 150, 3, false, showWindows_);
+		CannyR canny(100, 150, 3, false, showWindows_, false);
 		HoughLinesR houghL(1, static_cast<const int>(CV_PI / 180), 100, showWindows_);
 
 		uint64 time_begin = cv::getTickCount();
@@ -588,7 +588,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	splitFrames(leftFrames, rightFrames);
 
 	// common canny with default settings for detecting marking borders
-	auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_);
+	auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, true);
 	auto markingFilter = make_shared<FilterR>("MarkingFilter");
 	auto baselineFilter = make_shared<FilterR>("Baseline Filter");
 	auto houghV = make_shared<HoughLinesR>(1, static_cast<const int>(CV_PI / 180), 40, showWindows_);
@@ -832,8 +832,8 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 	linePair result(cv::Point2i(0, 0), cv::Point2i(0, 0));
 
-	CannyR cannyH(200, 250, 3, false, showWindows_);
-	CannyR cannyV(10, 30, 3, true, false);
+	CannyR cannyH(200, 250, 3, false, showWindows_, true);
+	CannyR cannyV(10, 30, 3, true, false, false);
 
 	HoughLinesR houghV(1, CV_PI / 180, 100, showWindows_);
 	HoughLinesPR houghP(1, CV_PI / 180, 100, 20, showWindows_);

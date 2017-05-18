@@ -278,5 +278,6 @@
     <None Include="_run_test.bat">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

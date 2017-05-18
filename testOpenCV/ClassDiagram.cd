@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BaseR&lt;T&gt;">
+    <Position X="2.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABERAAASAAAAAARAAAAgAEAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CV\BaseR.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CannyR">
+    <Position X="4.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACKIAMAoQAAQAAQCAAEEAAGAAAQAgAAAAAAAYAAAA=</HashCode>
+      <FileName>CV\CannyR.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FilterR">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="FilterR::Filters" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CV\FilterR.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AEACIAAAAQKQAgAMQABAAARABADAQAgAgAAAAUEAAAQ=</HashCode>
+      <FileName>CV\FilterR.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Gaussian">
+    <Position X="10.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABABAAACAAAAAARBgAAQAEBCEQAkApCAAAQAAAAA=</HashCode>
+      <FileName>CV\Gaussian.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HoughLinesPR">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <NestedTypes>
+      <Typedef Name="HoughLinesPR::LineV" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CV\HoughLinesPR.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Struct Name="HoughLinesPR::LineH" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CV\HoughLinesPR.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="HoughLinesPR::lineHsizeSort" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CV\HoughLinesPR.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="HoughLinesPR::lineHYSort" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CV\HoughLinesPR.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>TBACIFJAASkXghAIMACACWAACQICQBiABAKIEQBAACA=</HashCode>
+      <FileName>CV\HoughLinesPR.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HoughLinesR">
+    <Position X="6.25" Y="1.75" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="HoughLinesR::LineV" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CV\HoughLinesR.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="HoughLinesR::lineVsizeSort" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CV\HoughLinesR.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="HoughLinesR::lineVYSort" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CV\HoughLinesR.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>SBAAIMJAMSESQgEGMBCICSAgABJCQDiAFCMAAQBAAEA=</HashCode>
+      <FileName>CV\HoughLinesR.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LaserR">
+    <Position X="2.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CV\LaserR.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Pixelz">
+    <Position X="8.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAECAAEgAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>CV\Pixel.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SparseR&lt;T&gt;">
+    <Position X="4.25" Y="1.75" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="SparseR&lt;T&gt;::elementXsort" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CV\SparseR.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAgAAAQgAAAAAAAAAEAAAAAAAAAAAAAEIAAAAAAACA=</HashCode>
+      <FileName>CV\SparseR.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ThicknessGauge">
+    <Position X="2.5" Y="4.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="ThicknessGauge::Settings" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ThicknessGauge.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>JVSYhJgAgwCQIAJCBmrIQkAAKcigsIKAILGKEgYgOEA=</HashCode>
+      <FileName>ThicknessGauge.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ThicknessGaugeData">
+    <Position X="0.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAaAgAIAAAAAQABEAAiQEAoREKoCBAgBAkJEQAAoYA=</HashCode>
+      <FileName>ThicknessGaugeData.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CalibrationException">
+    <Position X="10.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAACAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>Exceptions\CalibrationException.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CaptureFailException">
+    <Position X="10.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAACAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions\CaptureFailException.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ImageDimensionException">
+    <Position X="10.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAACAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions\ImageDimensionException.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InvalidFileException">
+    <Position X="6.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAACAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Exceptions\InvalidFileException.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InvalidMeanException">
+    <Position X="10.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAACAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions\InvalidMeanException.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NoLineDetectedException">
+    <Position X="10.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAQAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions\NoLineDetectedException.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestException">
+    <Position X="10.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAASAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions\TestException.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MiniCalc">
+    <Position X="4.25" Y="4.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="MiniCalc::pixelYsort" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Calc\MiniCalc.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="MiniCalc::pixelXsort" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Calc\MiniCalc.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>CAJoBAKAAEAEAABMFlAAAAgKECRGAEAoFQgJAIgsoCg=</HashCode>
+      <FileName>Calc\MiniCalc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

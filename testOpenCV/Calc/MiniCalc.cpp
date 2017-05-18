@@ -7,30 +7,30 @@ MiniCalc::MiniCalc() {
 MiniCalc::~MiniCalc() {
 }
 
-void MiniCalc::SetMean(cv::Point2d newMean) {
+void MiniCalc::setMean(cv::Point2d newMean) {
 	mean_ = newMean;
 }
 
-cv::Point2d MiniCalc::GetMean() const {
+cv::Point2d MiniCalc::getMean() const {
 	return mean_;
 }
 
-void MiniCalc::AddMean(cv::Point2d meanToAdd) {
+void MiniCalc::addMean(cv::Point2d meanToAdd) {
 	mean_ += meanToAdd;
 	mean_ /= 2;
 }
 
-void MiniCalc::SetVariance(cv::Point2d newVariance) {
+void MiniCalc::setVariance(cv::Point2d newVariance) {
 	variance_ = newVariance;
 }
 
-cv::Point2d MiniCalc::GetVariance() const {
+cv::Point2d MiniCalc::getVariance() const {
 	return variance_;
 }
 
-void MiniCalc::AddVariance(cv::Point2d varianceToAdd) {
+void MiniCalc::addVariance(cv::Point2d varianceToAdd) {
 	variance_ += varianceToAdd;
-	variance_ /= 2;
+	variance_ /= 2; // TODO : wrong!
 }
 
 cv::Point2d MiniCalc::mean(vector<cv::Point>& pixels) {
