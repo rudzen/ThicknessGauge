@@ -176,6 +176,7 @@
     <ClInclude Include="CV\LineData\LineBaseData.h" />
     <ClInclude Include="CV\LineData\LineData.h" />
     <ClInclude Include="CV\LineData\LineLaserData.h" />
+    <ClInclude Include="CV\SparseR.h" />
     <ClInclude Include="Exceptions\CalibrationException.h" />
     <ClInclude Include="ArgClasses\CalibrationModeVisitor.h" />
     <ClInclude Include="Calibrate\CalibrationSettings.h" />

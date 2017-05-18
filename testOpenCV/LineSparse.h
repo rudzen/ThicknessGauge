@@ -200,7 +200,7 @@ public: // getters and setter + minor functions
 	 * \brief Set the class main frame reference (no pun)
 	 * \param frameToSet The frame t
 	 */
-	void setFrame(cv::Mat& frameToSet) {
+	void setFrame(const cv::Mat& frameToSet) {
 		frameToSet.copyTo(frame_); // copy ref
 	}
 

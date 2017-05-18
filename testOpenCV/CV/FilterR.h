@@ -26,7 +26,7 @@
 /**
  * \brief Generic filter class with support for live changing of parameters
  */
-class FilterR : public BaseR {
+class FilterR : public BaseR<float> {
 
 	/**
 	 * \brief The result of the process

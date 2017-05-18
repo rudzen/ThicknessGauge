@@ -28,7 +28,7 @@
 
 using namespace tg;
 
-class HoughLinesPR : public BaseR {
+class HoughLinesPR : public BaseR<float> {
 
 public:
 
@@ -81,6 +81,21 @@ private:
 	vector<LineV> rightLines;
 	vector<LineV> leftLines;
 
+
+public:
+	const vector<LineV>& getAllLines() const {
+		return allLines;
+	}
+
+	const vector<LineV>& getRightLines() const {
+		return rightLines;
+	}
+
+	const vector<LineV>& getLeftLines() const {
+		return leftLines;
+	}
+
+private:
 	float center;
 
 	double leftY = 0.0;
@@ -113,17 +128,17 @@ private:
 
 public:
 
-	HoughLinesPR(const int rho, const int theta, const int threshold, const bool showWindow)
+	HoughLinesPR(const int rho, const int theta, const int threshold, const int minLineLen, const bool showWindow)
 		: rho(rho),
 		theta(theta),
 		threshold(threshold),
+		minLineLen(minLineLen),
 		showWindow(showWindow) {
 		angle = degree * theta;
 		minTheta = 0.0;
 		maxTheta = CV_PI;
 		angleLimit = 0;
 		windowName = "HoughLinesP";
-		minLineLen = 50;
 		maxLineGab = 10;
 		if (showWindow)
 			createWindow();
@@ -291,13 +306,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 	rightLines.clear();
 	rightLines.reserve(count);
 
-	center = output.cols / 2;
-
-	vector<linePair> linLeft;
-	vector<linePair> linRight;
-
-	linLeft.reserve(count);
-	linRight.reserve(count);
+	center = image_.cols / 2;
 
 	// insert lines into data structure.
 	for (auto& l : lines)
@@ -305,15 +314,12 @@ inline void HoughLinesPR::doHorizontalHough() {
 
 	bresenham();
 
-	cout << "line count : " << allLines.size() << endl;
-
-	drawLines(allLines, cv::Scalar(0, 0, 255));
-
+	//drawLines(allLines, cv::Scalar(0, 0, 255));
 
 	drawLines(leftLines, cv::Scalar(255, 0, 255));
 	drawLines(rightLines, cv::Scalar(0, 0, 0));
 
-		show();
+	show();
 
 	return;
 	// TODO : Re-make splitX to be "recursive" with splitting depth.
@@ -425,8 +431,7 @@ inline void HoughLinesPR::bresenham() {
 	leftLines.reserve(size);
 
 	for (auto& a : allLines) {
-		auto distm = Util::dist_manhattan(a.entry);
-		if (a.entry[0] + (distm * (1.0f / 2.0f) < center))
+		if (a.entry[0] + ((a.entry[2] - a.entry[0]) / 2) < center)
 			leftLines.push_back(a);
 		else
 			rightLines.push_back(a);

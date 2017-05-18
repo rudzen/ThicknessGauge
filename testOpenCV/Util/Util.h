@@ -228,7 +228,7 @@ public:
 
 	template <typename T>
 	static void copyVector(T& source, T& destination) {
-		destination.reserve(source.size());
+		destination.reserve(source.size() + destination.size());
 		destination.insert(destination.begin(), source.begin(), source.end());
 	}
 

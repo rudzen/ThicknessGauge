@@ -18,6 +18,7 @@
 #include "CV/HoughLinesPR.h"
 #include "CV/LineData/LineBaseData.h"
 #include "CV/LineData/LineLaserData.h"
+#include "CV/SparseR.h"
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -344,7 +345,6 @@ bool ThicknessGauge::generatePlanarImage(std::string& globName) {
 			houghL.setImage(canny.getResult());
 			houghL.setAngleLimit(20);
 			houghL.doVerticalHough();
-			//houghL.doHorizontalHough();
 
 			// show default input image (always shown live!)
 			if (showWindows_) {
@@ -601,10 +601,14 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	auto markingOk = computerMarkingRectangle(canny, markingFilter, houghV, markingRect);
 
-	auto houghH = make_shared<HoughLinesPR>(1, static_cast<const int>(CV_PI / 180), 40, true);
+	auto minLineLen = cvRound(markingRect.width / 32);
+
+	if (minLineLen < 10)
+		minLineLen = 10;
+
+	auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, true);
 
 	houghH->setMaxLineGab(12);
-	houghH->setMinLineLen(cvRound(markingRect.width / 2));
 	houghH->setMarkingRect(markingRect);
 
 	std::array<cv::Rect2f, 2> baseLines;
@@ -662,38 +666,38 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 		right.push_back(frames[i](rightBaseLine));
 	}
 
-	Line sparseLine;
+	SparseR<float> sparse;
 
+	auto imSize = left.front().size();
+	auto imType = left.front().type();
+	
 #define _sparse_mode
 
 	while (true) {
 
+		cv::Mat org;
 		// left
 		for (auto& l : left) {
-			auto org = l.clone();
+			org = l.clone();
 			filter->setImage(org);
 			filter->doFilter();
 
-			//canny->setImage(filter->getResult());
-			//canny->doCanny();
+			canny->setImage(filter->getResult());
+			canny->doCanny();
 
-#ifdef _sparse_mode
-			sparseLine.setFrame(l);
-			sparseLine.generateSparse();
-			sparseLine.generateOutput();
-			sparseLine.drawPoly();
-			cv::imshow("ko", sparseLine.getOutput());
-			//hough->setImage(sparseLine.getOutput());
-			//hough->setOriginal(org);
-			//hough->doHorizontalHough();
-#else
+			sparse.setImage(filter->getResult());
+
 			hough->setImage(canny->getResult());
 			hough->setOriginal(org);
 			hough->doHorizontalHough();
-#endif
+
+
+			vector<HoughLinesPR::LineH> lines = hough->getRightLines();
+			for (auto& h :lines) {
+				sparse.addToTotal(h.elements);
+			}
 
 			if (showWindows_) {
-				cv::imshow("test baseline left", l);
 				//cv::imshow("test baseline right", right);
 				auto key = static_cast<char>(cv::waitKey(30));
 				if (key == 27) {
@@ -703,9 +707,23 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 			}
 
 		}
-
+		
 		if (!showWindows_)
 			break;
+
+		sparse.generateSparse();
+		cv::Rect rect = cv::boundingRect(sparse.allSparse());
+		cv::Mat sparseTest = org(rect);// cv::Mat::zeros(imSize, imType);
+
+		//cv::rectangle(sparseTest, rect, cv::Scalar(255, 255, 0), 1, CV_AA);
+
+		//cv::polylines(sparseTest, sparse.allSparse(), false, cv::Scalar(255, 255, 255));
+
+		cv::imshow("test baseline left", sparseTest);
+
+
+		sparse.initialize();
+
 	}
 
 
@@ -798,7 +816,7 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 	CannyR cannyV(10, 30, 3, true, false);
 
 	HoughLinesR houghV(1, CV_PI / 180, 100, showWindows_);
-	HoughLinesPR houghP(1, CV_PI / 180, 100, showWindows_);
+	HoughLinesPR houghP(1, CV_PI / 180, 100, 20, showWindows_);
 	FilterR lineFilter("LineFilterH");
 	FilterR lineFilterV("LineFilterV");
 

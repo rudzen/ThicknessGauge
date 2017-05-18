@@ -30,14 +30,14 @@
 using namespace tg;
 using namespace std;
 
-class HoughLinesR : public BaseR {
+class HoughLinesR : public BaseR<float> {
 
 public:
 
 	typedef struct LineV {
 		cv::Vec2f entry;
 		linePair points;
-		std::vector<cv::Point2f> elements;
+		std::vector<cv::Point_<float>> elements;
 
 		LineV() { }
 
