@@ -47,7 +47,7 @@ public:
 
 	void setOriginal(const cv::Mat& original) { original_ = original; }
 
-	const cv::Mat& getImage() const { return image_; }
+	cv::Mat& getImage() { return image_; }
 
 	void setImage(const cv::Mat& image) { image_ = image; }
 

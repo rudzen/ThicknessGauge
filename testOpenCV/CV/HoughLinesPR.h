@@ -317,7 +317,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 	//drawLines(allLines, cv::Scalar(0, 0, 255));
 
 	drawLines(leftLines, cv::Scalar(255, 0, 255));
-	drawLines(rightLines, cv::Scalar(0, 0, 0));
+	drawLines(rightLines, cv::Scalar(0, 255, 0));
 
 	show();
 

@@ -615,6 +615,9 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	computeBaseLineAreas(canny, baselineFilter, houghH, baseLines);
 
+	cout << "line Y : " <<  baseLines[0].y << endl;
+
+
 	if (showWindows_) {
 		auto key = static_cast<char>(cv::waitKey(30));
 		if (key == 27)
@@ -670,7 +673,10 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 
 	auto imSize = left.front().size();
 	auto imType = left.front().type();
-	
+
+	auto lineY = 0.0f;
+	unsigned int totalY = 0;
+
 #define _sparse_mode
 
 	while (true) {
@@ -685,16 +691,22 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 			canny->setImage(filter->getResult());
 			canny->doCanny();
 
-			sparse.setImage(filter->getResult());
+			//vector<cv::Point> cannyPoints;
+			//cannyPoints.reserve(l.rows * l.cols);
+			//cv::findNonZero(canny->getResult(), cannyPoints);
+			//cv::Rect cannyRect = cv::boundingRect(cannyPoints);
+
+			//sparse.setImage(filter->getResult()(cannyRect));
 
 			hough->setImage(canny->getResult());
 			hough->setOriginal(org);
 			hough->doHorizontalHough();
 
-
-			vector<HoughLinesPR::LineH> lines = hough->getRightLines();
+			auto lines = hough->getRightLines();
 			for (auto& h :lines) {
-				sparse.addToTotal(h.elements);
+				totalY += 2;
+				lineY += (h.entry[1] + h.entry[3]) * 0.5f;
+				//sparse.addToTotal(h.elements);
 			}
 
 			if (showWindows_) {
@@ -707,24 +719,32 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 			}
 
 		}
-		
+
+		lineY /= totalY;
+
 		if (!showWindows_)
 			break;
 
-		sparse.generateSparse();
-		cv::Rect rect = cv::boundingRect(sparse.allSparse());
-		cv::Mat sparseTest = org(rect);// cv::Mat::zeros(imSize, imType);
+		lineY = 0.0f;
+		totalY = 0;
+
+		//sparse.generateSparse();
+		//cv::Rect rect = cv::boundingRect(sparse.allSparse());
+		//cv::Mat sparseTest = org(rect);// cv::Mat::zeros(imSize, imType);
 
 		//cv::rectangle(sparseTest, rect, cv::Scalar(255, 255, 0), 1, CV_AA);
 
 		//cv::polylines(sparseTest, sparse.allSparse(), false, cv::Scalar(255, 255, 255));
 
-		cv::imshow("test baseline left", sparseTest);
+		//cv::imshow("test baseline left", sparseTest);
 
 
 		sparse.initialize();
 
 	}
+
+	output[0].x = 0.0f;
+	output[0].y = lineY + (frames.front().rows - baseLineY);
 
 
 	return LineLaserData();
