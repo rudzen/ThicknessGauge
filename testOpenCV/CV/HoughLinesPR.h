@@ -151,7 +151,7 @@ private:
 
 	double getAngle(int x1, int x2, int y1, int y2) const;
 
-	static bool splitX(vector<cv::Vec4f>& source, vector<cv::Vec4f>& right, vector<cv::Vec4f>& left, double x, double yMin, double *leftCenter, double *rightCenter);
+	static bool splitX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double *leftCenter, double *rightCenter);
 
 	// callbacks
 
@@ -313,10 +313,10 @@ inline void HoughLinesPR::doHorizontalHough() {
 	double centerRight[3] = { 0.0, 0.0, 0.0 };
 	double centerLeft[3] = { 0.0, 0.0, 0.0 };
 
-	vector<cv::Vec4f> left[3];
-	vector<cv::Vec4f> right[3];
+	vector<LineH> left[3];
+	vector<LineH> right[3];
 
-	auto split = splitX(linesHori, right[0], left[0], center.x, third.y * 2, &centerLeft[0], &centerRight[0]);
+	auto split = splitX(allLines, right[0], left[0], center, &centerLeft[0], &centerRight[0]);
 
 	//cout << "Center left  0 avg: " << centerLeft[0] << endl;
 	//cout << "Center right 0 avg: " << centerRight[0] << endl;
@@ -331,7 +331,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 
 	// igen igen for HØJRE side
 
-	split = splitX(left[0], right[1], left[1], centerLeft[0], third.y * 2, &centerLeft[1], &centerRight[1]);
+	split = splitX(left[0], right[1], left[1], centerLeft[0], &centerLeft[1], &centerRight[1]);
 
 	//cout << "Center left  1 avg: " << centerLeft[1] << endl;
 	//cout << "Center right 1 avg: " << centerRight[1] << endl;
@@ -346,7 +346,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 
 	// for helvede.. igen for venstre
 
-	split = splitX(right[0], right[2], left[2], centerRight[0], third.y * 2, &centerLeft[2], &centerRight[2]);
+	split = splitX(right[0], right[2], left[2], centerRight[0], &centerLeft[2], &centerRight[2]);
 
 	//cout << "Center left  2 avg: " << centerLeft[2] << endl;
 	//cout << "Center right 2 avg: " << centerRight[2] << endl;
@@ -359,40 +359,37 @@ inline void HoughLinesPR::doHorizontalHough() {
 			drawLines(left[2], cv::Scalar(0, 0, 0));
 	}
 
-
-
 	if (right[1].empty())
 		return;
-
 
 	// find lige den mest avg
 	double sumY = 0.0;
 	double sumX = 0.0;
 
-	auto maxX = right[1].back()[2];
-	auto minX = right[1].front()[0];
-	auto maxY = right[1].back()[1];
-	auto minY = right[1].front()[1];
+	auto maxX = right[1].back().entry[2];
+	auto minX = right[1].front().entry[0];
+	auto maxY = right[1].back().entry[1];
+	auto minY = right[1].front().entry[1];
 
 	for (auto& v : right[1]) {
 
 		// check furthest point in X for max
-		if (v[2] > maxX)
-			maxX = v[2];
+		if (v.entry[2] > maxX)
+			maxX = v.entry[2];
 
 		// check closest point to 0 for min
-		if (v[0] < minX)
-			minX = v[0];
+		if (v.entry[0] < minX)
+			minX = v.entry[0];
 
-		sumX += v[0] + v[2];
-		sumY += v[1] + v[3];
+		sumX += v.entry[0] + v.entry[2];
+		sumY += v.entry[1] + v.entry[3];
 	}
 
 	if (sumX != 0.0)
-		sumX /= right[1].size() / 2;
+		sumX /= right[1].size() * 0.5f;
 
 	if (sumY != 0.0)
-		sumY /= right[1].size() / 2;
+		sumY /= right[1].size() * 0.5f;
 
 	cout << "Right side Y sum : " << sumY << endl;
 
@@ -403,6 +400,9 @@ inline void HoughLinesPR::doHorizontalHough() {
 	show();
 }
 
+/**
+ * \brief Populates the lines information for main vector and populates left and right sides
+ */
 inline void HoughLinesPR::bresenham() {
 	
 	if (allLines.empty())
@@ -488,14 +488,14 @@ inline double HoughLinesPR::getAngle(int x1, int x2, int y1, int y2) const {
 	return atan2(y1 - y2, x1 - x2);
 }
 
-inline bool HoughLinesPR::splitX(vector<cv::Vec4f>& source, vector<cv::Vec4f>& right, vector<cv::Vec4f>& left, double x, double yMin, double *leftCenter, double *rightCenter) {
+inline bool HoughLinesPR::splitX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double *leftCenter, double *rightCenter) {
 
 	*leftCenter = 0.0;
 	*rightCenter = 0.0;
 
 	for (auto& s : source) {
-		if (s[1] >= yMin && s[3] >= yMin) { // desværre, ellers bliver størrelserne og dermed pointers fucked up.
-			auto centerX = (s[2] + s[0]) / 2;
+		//if (s[1] >= yMin && s[3] >= yMin) { // desværre, ellers bliver størrelserne og dermed pointers fucked up.
+			auto centerX = (s.entry[2] + s.entry[0]) * 0.5f;
 			if (centerX <= x) {
 				left.push_back(s);
 				*leftCenter += centerX;
@@ -503,7 +503,7 @@ inline bool HoughLinesPR::splitX(vector<cv::Vec4f>& source, vector<cv::Vec4f>& r
 				right.push_back(s);
 				*rightCenter += centerX;
 			}
-		}
+		//}
 	}
 
 	if (!left.empty())
