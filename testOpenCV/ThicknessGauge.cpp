@@ -305,7 +305,7 @@ bool ThicknessGauge::generatePlanarImage(std::string& globName) {
 	while (true) {
 
 		CannyR canny(100, 150, 3, false, showWindows_);
-		HoughLinesR houghL(1, CV_PI / 180, 100, showWindows_);
+		HoughLinesR houghL(1, static_cast<const int>(CV_PI / 180), 100, showWindows_);
 
 		uint64 time_begin = cv::getTickCount();
 
@@ -803,7 +803,7 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 		output.x = 0.0f;
 		output.y = 0.0f;
 		output.width = 0.0f;
-		output.height = frames.front().rows;
+		output.height = static_cast<float>(frames.front().rows);
 		for (auto& r : markingRects) {
 			output.x += r.x;
 			output.y += r.y;

@@ -75,58 +75,58 @@ public:
 
 private:
 
-	cv::Mat output;
+	cv::Mat output_;
 
-	vector<cv::Vec2f> lines;
+	vector<cv::Vec2f> lines_;
 
-	vector<LineV> allLines;
-	vector<LineV> rightLines;
-	vector<LineV> leftLines;
+	vector<LineV> allLines_;
+	vector<LineV> rightLines_;
+	vector<LineV> leftLines_;
 
-	LineV rightBorder;
-	LineV leftBorder;
+	LineV rightBorder_;
+	LineV leftBorder_;
 
-	double leftY = 0.0;
+	double leftY_ = 0.0;
 
-	int rho;
+	int rho_;
 
-	int theta;
+	int theta_;
 
-	double angle;
+	double angle_;
 
 	int threshold;
 
 	const int aperMin = 3;
 	const int aperMax = 7;
 
-	double srn;
+	double srn_;
 
-	double stn;
+	double stn_;
 
-	double minTheta;
+	double minTheta_;
 
-	double maxTheta;
+	double maxTheta_;
 
-	int iAngleLimit;
+	int iAngleLimit_;
 
-	double angleLimit;
+	double angleLimit_;
 
-	bool showWindow;
+	bool showWindow_;
 
 public:
 
 	HoughLinesR(const int rho, const int theta, const int threshold, const bool showWindow)
-		: rho(rho),
-		  theta(theta),
+		: rho_(rho),
+		  theta_(theta),
 		  threshold(threshold),
-		  showWindow(showWindow)
+		  showWindow_(showWindow)
 	{
-		angle = CV_PI / 180 * theta;
-		srn = 0;
-		stn = 0;
-		minTheta = 0.0;
-		maxTheta = CV_PI;
-		angleLimit = 0;
+		angle_ = CV_PI / 180 * theta;
+		srn_ = 0;
+		stn_ = 0;
+		minTheta_ = 0.0;
+		maxTheta_ = CV_PI;
+		angleLimit_ = 0;
 		windowName = "HoughLines";
 		if (showWindow)
 			createWindow();
@@ -137,12 +137,12 @@ public:
 private:
 	void createWindow() {
 		namedWindow(windowName, cv::WINDOW_KEEPRATIO);
-		cv::createTrackbar("rho", windowName, &rho, 3, rhocb, this);
-		cv::createTrackbar("theta", windowName, &theta, 180, thetacb, this);
+		cv::createTrackbar("rho", windowName, &rho_, 3, rhocb, this);
+		cv::createTrackbar("theta", windowName, &theta_, 180, thetacb, this);
 		cv::createTrackbar("threshold", windowName, &threshold, 100, thresholdcb, this);
 	}
 
-	linePair HoughLinesR::computeLinePair(cv::Vec2f& line) const;
+	linePair HoughLinesR::computePointPair(cv::Vec2f& line) const;
 
 	void drawLines(vector<LineV>& linePairs, cv::Scalar colour);
 
@@ -163,14 +163,14 @@ private:
 	// getters & setters
 
 	void setRho(int rho) {
-		this->rho = rho;
+		this->rho_ = rho;
 	}
 
 	void setTheta(int theta) {
 		if (theta == 0)
 			theta++;
-		this->theta = theta;
-		angle = degree * theta;
+		this->theta_ = theta;
+		angle_ = degree * theta;
 	}
 
 	void setThreshold(int threshold) {
@@ -182,54 +182,54 @@ public:
 	void doVerticalHough();
 
 	void alignLeftY(int frameCount) {
-		leftY /= frameCount;
-		cout << "Horizontal baseline aligned to : " << leftY << " y" << endl;
-		line(output, cv::Point(0, cvRound(leftY)), cv::Point(output.cols / 2, cvRound(leftY)), cv::Scalar(0, 255, 0), 1, cv::LINE_AA);
-		imshow(windowName, output);
+		leftY_ /= frameCount;
+		cout << "Horizontal baseline aligned to : " << leftY_ << " y" << endl;
+		line(output_, cv::Point(0, cvRound(leftY_)), cv::Point(output_.cols / 2, cvRound(leftY_)), cv::Scalar(0, 255, 0), 1, cv::LINE_AA);
+		imshow(windowName, output_);
 	}
 
 	void setAngleLimit(double angleLimit) {
-		this->angleLimit = angleLimit;
+		this->angleLimit_ = angleLimit;
 	}
 
-	void setOriginal(cv::Mat& newImage) {
-		original_ = newImage;
-		cvtColor(original_, output, CV_GRAY2BGR);
+	void setOriginal(cv::Mat& original) {
+		original_ = original;
+		cvtColor(original_, output_, CV_GRAY2BGR);
 	}
 
 	const vector<cv::Vec2f>& getLines() const {
-		return lines;
+		return lines_;
 	}
 
 	const vector<LineV>& getAllLines() const {
-		return allLines;
+		return allLines_;
 	}
 
 	void setAllLines(const vector<LineV>& allLines) {
-		this->allLines = allLines;
+		this->allLines_ = allLines;
 	}
 
 	const vector<LineV>& getRightLines() const {
-		return rightLines;
+		return rightLines_;
 	}
 
 	void setRightLines(const vector<LineV>& rightLines) {
-		this->rightLines = rightLines;
+		this->rightLines_ = rightLines;
 	}
 
 	const vector<LineV>& getLeftLines() const {
-		return leftLines;
+		return leftLines_;
 	}
 
 	void setLeftLines(const vector<LineV>& leftLines) {
-		this->leftLines = leftLines;
+		this->leftLines_ = leftLines;
 	}
 };
 
 inline void HoughLinesR::computeRectFromLines(vector<LineV>& input, cv::Rect2f& output) {
 	
-	for (auto& l : input) {
-		cv::Rect2f t = cv::boundingRect(l.elements);
+	for (auto& line : input) {
+		cv::Rect2f t = cv::boundingRect(line.elements);
 		output.x += t.x;
 		output.y += t.y;
 		output.width += t.width;
@@ -248,20 +248,20 @@ inline void HoughLinesR::computeBorders() {
 	cv::Rect2f leftRoi(0.0f, 0.0f, 0.0f, static_cast<float>(image_.rows));
 	cv::Rect2f rightRoi(0.0f, 0.0f, 0.0f, static_cast<float>(image_.rows));
 
-	computeRectFromLines(leftLines, leftRoi);
-	computeRectFromLines(rightLines, rightRoi);
+	computeRectFromLines(leftLines_, leftRoi);
+	computeRectFromLines(rightLines_, rightRoi);
 
 	markingRect.x = leftRoi.x;
 	markingRect.y = leftRoi.y;
 	markingRect.width = rightRoi.x - leftRoi.x + rightRoi.width;
 	markingRect.height = static_cast<float>(image_.rows);
 
-	if (showWindow) {
-		drawLines(leftLines, cv::Scalar(0, 255, 0));
-		drawLines(rightLines, cv::Scalar(0, 0, 255));
-		cv::rectangle(output, leftRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
-		cv::rectangle(output, rightRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
-		cv::rectangle(output, markingRect, cv::Scalar(255, 0, 0), 3, CV_AA);
+	if (showWindow_) {
+		drawLines(leftLines_, cv::Scalar(0, 255, 0));
+		drawLines(rightLines_, cv::Scalar(0, 0, 255));
+		cv::rectangle(output_, leftRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
+		cv::rectangle(output_, rightRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
+		cv::rectangle(output_, markingRect, cv::Scalar(255, 0, 0), 3, CV_AA);
 		showOutput();
 	}
 
@@ -272,28 +272,28 @@ inline void HoughLinesR::computeBorders() {
 
 
 
-	leftBorder.points.first.x = 0.0f;
-	leftBorder.points.first.y = static_cast<float>(output.rows);
+	leftBorder_.points.first.x = 0.0f;
+	leftBorder_.points.first.y = static_cast<float>(output_.rows);
 
-	leftBorder.points.second.x = 0.0f;
-	leftBorder.points.second.y = 0.0f;
+	leftBorder_.points.second.x = 0.0f;
+	leftBorder_.points.second.y = 0.0f;
 
-	for (auto& l : leftLines) {
+	for (auto& l : leftLines_) {
 		cout << "F: " << l.points.first << endl;
 		cout << "S: " << l.points.second << endl;
-		leftBorder.points.first.x += l.points.first.y;
-		leftBorder.points.second.x += l.points.second.x;
+		leftBorder_.points.first.x += l.points.first.y;
+		leftBorder_.points.second.x += l.points.second.x;
 	}
 
-	leftBorder.points.first.x /= leftLines.size();
-	leftBorder.points.second.x /= leftLines.size();
+	leftBorder_.points.first.x /= leftLines_.size();
+	leftBorder_.points.second.x /= leftLines_.size();
 
 	//cout << "L avg: " << leftBorder.points.first << " / " << leftBorder.points.second << endl;
 
-	if (showWindow) {
-		drawLines(leftLines, cv::Scalar(0, 255, 0));
-		drawLines(rightLines, cv::Scalar(0, 0, 255));
-		line(output, leftBorder.points.first, leftBorder.points.second, cv::Scalar(255, 255, 0), 3, CV_AA);
+	if (showWindow_) {
+		drawLines(leftLines_, cv::Scalar(0, 255, 0));
+		drawLines(rightLines_, cv::Scalar(0, 0, 255));
+		line(output_, leftBorder_.points.first, leftBorder_.points.second, cv::Scalar(255, 255, 0), 3, CV_AA);
 		showOutput();
 	}
 
@@ -320,30 +320,30 @@ inline void HoughLinesR::thresholdcb(int value, void* userData) {
 
 inline void HoughLinesR::doVerticalHough() {
 
-	if (!lines.empty())
-		lines.clear();
+	if (!lines_.empty())
+		lines_.clear();
 
 	//cv::HoughLines(image, lines, rho, angle, threshold, srn, stn, minTheta, maxTheta);
-	HoughLines(image_, lines, 1, degree, threshold, 0, 0);
+	HoughLines(image_, lines_, 1, degree, threshold, 0, 0);
 
 	//std::cout << "doVerticalHough # lines : " << lines.size();
 
-	if (lines.empty())
+	if (lines_.empty())
 		return;
 
-	allLines.clear();
-	allLines.reserve(lines.size());
+	allLines_.clear();
+	allLines_.reserve(lines_.size());
 
-	for (auto& l : lines) {
-		auto theta = l[1];
-		if (theta <= degree * (180 - angleLimit) && theta >= degree * angleLimit)
+	for (auto& line : lines_) {
+		auto theta = line[1];
+		if (theta <= degree * (180 - angleLimit_) && theta >= degree * angleLimit_)
 			continue;
-		auto p = computeLinePair(l);
-		allLines.push_back(LineV(l, p));
+		auto p = computePointPair(line);
+		allLines_.push_back(LineV(line, p));
 		//std::cout << "vert : " << p.first << " " << p.second << endl;
 	}
 
-	if (allLines.empty())
+	if (allLines_.empty())
 		cerr << "FATAL ERROR, NO VERTICAL LINES DETECTED!";
 
 	//drawLines(allLines, cv::Scalar(255, 0, 255));
@@ -352,28 +352,28 @@ inline void HoughLinesR::doVerticalHough() {
 
 inline void HoughLinesR::bresenham() {
 	
-	if (allLines.empty())
+	if (allLines_.empty())
 		return;
 
-	auto size = allLines.size();
+	auto size = allLines_.size();
 
-	rightLines.clear();
-	rightLines.reserve(size);
+	rightLines_.clear();
+	rightLines_.reserve(size);
 
-	leftLines.clear();
-	leftLines.reserve(size);
+	leftLines_.clear();
+	leftLines_.reserve(size);
 
 	auto center = image_.cols / 2;
 
-	for (auto& a : allLines) {
+	for (auto& a : allLines_) {
 		if (a.points.first.x < center)
-			leftLines.push_back(a);
+			leftLines_.push_back(a);
 		else
-			rightLines.push_back(a);
+			rightLines_.push_back(a);
 	}
 
-	auto lSize = leftLines.size();
-	auto rSize = rightLines.size();
+	auto lSize = leftLines_.size();
+	auto rSize = rightLines_.size();
 
 	if (lSize + rSize == 0)
 		throw NoLineDetectedException("No marking lines detected.");
@@ -384,7 +384,7 @@ inline void HoughLinesR::bresenham() {
 	if (rSize == 0)
 		throw NoLineDetectedException("No marking right line detected.");
 
-	for (auto& left : leftLines) {
+	for (auto& left : leftLines_) {
 		cv::LineIterator it(image_, left.points.first, left.points.second, 8);
 		left.elements.reserve(it.count);
 		for (auto i = 0; i < it.count; i++, ++it)
@@ -392,9 +392,9 @@ inline void HoughLinesR::bresenham() {
 	}
 
 	if (lSize > 1)
-		sort(leftLines.begin(), leftLines.end(), lineVsizeSort);
+		sort(leftLines_.begin(), leftLines_.end(), lineVsizeSort);
 
-	for (auto& right : rightLines) {
+	for (auto& right : rightLines_) {
 		cv::LineIterator it(image_, right.points.first, right.points.second, 8);
 		right.elements.reserve(it.count);
 		for (auto i = 0; i < it.count; i++, ++it)
@@ -402,11 +402,11 @@ inline void HoughLinesR::bresenham() {
 	}
 
 	if (rSize > 1)
-		sort(rightLines.begin(), rightLines.end(), lineVsizeSort);
+		sort(rightLines_.begin(), rightLines_.end(), lineVsizeSort);
 
 }
 
-inline linePair HoughLinesR::computeLinePair(cv::Vec2f& line) const {
+inline linePair HoughLinesR::computePointPair(cv::Vec2f& line) const {
 	auto rho = line[0];
 	auto theta = line[1];
 	double a = cos(theta);
@@ -419,21 +419,21 @@ inline linePair HoughLinesR::computeLinePair(cv::Vec2f& line) const {
 }
 
 inline void HoughLinesR::drawLines(vector<LineV>& linePairs, cv::Scalar colour) {
-	if (!showWindow)
+	if (!showWindow_)
 		return;
 
 	if (linePairs.empty())
 		return;
 
-	for (auto& r : linePairs) {
-		line(output, r.points.first, r.points.second, colour, 1, CV_AA);
+	for (auto& lineV : linePairs) {
+		line(output_, lineV.points.first, lineV.points.second, colour, 1, CV_AA);
 		//line(original, r.first, r.second, colour, 1, CV_AA);
 	}
 }
 
 inline void HoughLinesR::showOutput() const {
-	if (!showWindow)
+	if (!showWindow_)
 		return;
 
-	imshow(windowName, output);
+	imshow(windowName, output_);
 }
