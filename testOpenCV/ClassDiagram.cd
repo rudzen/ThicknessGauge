@@ -8,14 +8,14 @@
     </TypeIdentifier>
   </Class>
   <Class Name="CannyR">
-    <Position X="4.5" Y="3.5" Width="1.5" />
+    <Position X="4.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACKIAMAoQAAQAAQCAAEEAAGAAAQAgAAAAAAAYAAAA=</HashCode>
       <FileName>CV\CannyR.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FilterR">
-    <Position X="0.5" Y="1.5" Width="1.5" />
+    <Position X="0.5" Y="0.5" Width="1.5" />
     <NestedTypes>
       <Struct Name="FilterR::Filters" Collapsed="true">
         <TypeIdentifier>
@@ -28,15 +28,15 @@
       <FileName>CV\FilterR.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Gaussian">
-    <Position X="10.25" Y="5.75" Width="1.5" />
+  <Class Name="Gaussian" Collapsed="true">
+    <Position X="12" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAABABAAACAAAAAARBgAAQAEBCEQAkApCAAAQAAAAA=</HashCode>
       <FileName>CV\Gaussian.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="HoughLinesPR">
-    <Position X="0.5" Y="3.5" Width="1.5" />
+    <Position X="0.5" Y="8.25" Width="1.5" />
     <NestedTypes>
       <Typedef Name="HoughLinesPR::LineV" Collapsed="true">
         <TypeIdentifier>
@@ -65,7 +65,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="HoughLinesR">
-    <Position X="6.25" Y="1.75" Width="1.5" />
+    <Position X="6.5" Y="0.5" Width="1.5" />
     <NestedTypes>
       <Struct Name="HoughLinesR::LineV" Collapsed="true">
         <TypeIdentifier>
@@ -89,7 +89,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="LaserR">
-    <Position X="2.5" Y="3.25" Width="1.5" />
+    <Position X="2.5" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CV\LaserR.h</FileName>
@@ -103,7 +103,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="SparseR&lt;T&gt;">
-    <Position X="4.25" Y="1.75" Width="1.5" />
+    <Position X="4.5" Y="0.75" Width="1.5" />
     <NestedTypes>
       <Struct Name="SparseR&lt;T&gt;::elementXsort" Collapsed="true">
         <TypeIdentifier>
@@ -117,7 +117,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="ThicknessGauge">
-    <Position X="2.5" Y="4.5" Width="1.5" />
+    <Position X="8.5" Y="3.5" Width="1.5" />
     <NestedTypes>
       <Struct Name="ThicknessGauge::Settings" Collapsed="true">
         <TypeIdentifier>
@@ -131,55 +131,55 @@
     </TypeIdentifier>
   </Class>
   <Class Name="ThicknessGaugeData">
-    <Position X="0.5" Y="4.5" Width="1.5" />
+    <Position X="2.5" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAaAgAIAAAAAQABEAAiQEAoREKoCBAgBAkJEQAAoYA=</HashCode>
       <FileName>ThicknessGaugeData.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CalibrationException">
+  <Class Name="CalibrationException" Collapsed="true">
     <Position X="10.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAACAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAA=</HashCode>
       <FileName>Exceptions\CalibrationException.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CaptureFailException">
+  <Class Name="CaptureFailException" Collapsed="true">
     <Position X="10.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAACAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Exceptions\CaptureFailException.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ImageDimensionException">
+  <Class Name="ImageDimensionException" Collapsed="true">
     <Position X="10.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAACAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Exceptions\ImageDimensionException.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InvalidFileException">
-    <Position X="6.25" Y="3.5" Width="1.5" />
+  <Class Name="InvalidFileException" Collapsed="true">
+    <Position X="10.25" Y="5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAACAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
       <FileName>Exceptions\InvalidFileException.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InvalidMeanException">
+  <Class Name="InvalidMeanException" Collapsed="true">
     <Position X="10.25" Y="4.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAACAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Exceptions\InvalidMeanException.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="NoLineDetectedException">
+  <Class Name="NoLineDetectedException" Collapsed="true">
     <Position X="10.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAEAAQAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Exceptions\NoLineDetectedException.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="TestException">
+  <Class Name="TestException" Collapsed="true">
     <Position X="10.25" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAASAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -187,7 +187,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="MiniCalc">
-    <Position X="4.25" Y="4.5" Width="1.5" />
+    <Position X="2.5" Y="6.5" Width="1.5" />
     <NestedTypes>
       <Struct Name="MiniCalc::pixelYsort" Collapsed="true">
         <TypeIdentifier>
@@ -203,6 +203,32 @@
     <TypeIdentifier>
       <HashCode>CAJoBAKAAEAEAABMFlAAAAgKECRGAEAoFQgJAIgsoCg=</HashCode>
       <FileName>Calc\MiniCalc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="utils::StringTools" Collapsed="true">
+    <Position X="8.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAQAAAAAAAAJBIJAAAQBBAAAAAAAggAAAAsAA=</HashCode>
+      <FileName>Util\Stringtools.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HistoPeak">
+    <Position X="12" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="HistoPeak::Length" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Histogram\HistoPeak.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="HistoPeak::PeakInfo" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Histogram\HistoPeak.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>JIAIYAgAAAAAEAAAAAAAAAABggBQAAAiAAJAAAAAAQA=</HashCode>
+      <FileName>Histogram\HistoPeak.h</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
