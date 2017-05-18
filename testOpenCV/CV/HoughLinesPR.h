@@ -291,7 +291,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 	rightLines.clear();
 	rightLines.reserve(count);
 
-	center = image_.cols / 2;
+	center = output.cols / 2;
 
 	vector<linePair> linLeft;
 	vector<linePair> linRight;
@@ -305,9 +305,17 @@ inline void HoughLinesPR::doHorizontalHough() {
 
 	bresenham();
 
-	drawLines(leftLines, cv::Scalar(0, 0, 255));
-	drawLines(rightLines, cv::Scalar(0, 255, 0));
+	cout << "line count : " << allLines.size() << endl;
 
+	drawLines(allLines, cv::Scalar(0, 0, 255));
+
+
+	drawLines(leftLines, cv::Scalar(255, 0, 255));
+	drawLines(rightLines, cv::Scalar(0, 0, 0));
+
+		show();
+
+	return;
 	// TODO : Re-make splitX to be "recursive" with splitting depth.
 
 	double centerRight[3] = { 0.0, 0.0, 0.0 };
@@ -541,7 +549,6 @@ inline void HoughLinesPR::drawLines(vector<LineH>& lines, cv::Scalar colour) {
 	for (auto& l : lines)
 		drawLine(l.entry, colour);
 }
-
 
 inline void HoughLinesPR::drawLine(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour) {
 	line(output, p1, p2, colour, 1, CV_AA);

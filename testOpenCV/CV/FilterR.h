@@ -70,7 +70,7 @@ class FilterR : public BaseR {
 
 	void createWindow() {
 		namedWindow(windowName, cv::WINDOW_KEEPRATIO);
-		cv::createTrackbar("delta", windowName, &deltaI_, 3, delta_cb, this);
+		cv::createTrackbar("delta", windowName, &deltaI_, 100, delta_cb, this);
 	}
 
 	static void delta_cb(int value, void* userData) {
@@ -107,7 +107,7 @@ public: // constructors
 	* \brief
 	*/
 	using Filters = struct Filters {
-
+		// TODO : Add base filters here
 	};
 
 public: // getters & setters
@@ -124,7 +124,10 @@ public: // getters & setters
 
 	double getDelta() const { return delta_; }
 
-	void setDelta(double delta) { delta_ = delta; }
+	void setDelta(double delta) {
+		//kernel_ += delta;
+		delta_ = delta;
+	}
 
 	int getDdepth() const { return ddepth_; }
 

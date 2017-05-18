@@ -664,30 +664,29 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 
 	while (true) {
 
-		for (auto i = frameCount_; i--;) {
-			auto org = frames.at(i).clone();
-
-			filter->setImage(frames.at(i).clone());
+		// left
+		for (auto& l : left) {
+			auto org = l.clone();
+			filter->setImage(l);
 			filter->doFilter();
+
 			canny->setImage(filter->getResult());
 			canny->doCanny();
-			hough->setOriginal(org);
+
 			hough->setImage(canny->getResult());
+			hough->setOriginal(org);
 			hough->doHorizontalHough();
 
 			if (showWindows_) {
-				cv::imshow("test baseline left", left);
-				cv::imshow("test baseline right", right);
+				cv::imshow("test baseline left", l);
+				//cv::imshow("test baseline right", right);
 				auto key = static_cast<char>(cv::waitKey(30));
 				if (key == 27) {
 					showWindows_ ^= true;
 					break; // escape was pressed
 				}
 			}
-
-
 		}
-
 
 		if (!showWindows_)
 			break;
@@ -922,6 +921,7 @@ void ThicknessGauge::addKernelTests(vector<TestConfig>& tests, float alpha, int 
 	}
 }
 
+[[deprecated("Replaced by superior structure, flagged for deletion.")]]
 bool ThicknessGauge::testDiff() {
 
 	if (!cap.isOpened()) // check if we succeeded
@@ -1193,6 +1193,7 @@ bool ThicknessGauge::testDiff() {
  * \brief Performs multi testing
  * \return true if everything went ok, false if a recoverable failure occoured.
  */
+[[deprecated("Flagged for deletion.")]]
 bool ThicknessGauge::testAggressive() {
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
@@ -1692,9 +1693,11 @@ void ThicknessGauge::FitQuad(cv::Mat* image, cv::Point2f* inputQuad, cv::Point2f
 	cv::waitKey(3);
 }
 
+[[deprecated("Flagged for deletion.")]]
 void ThicknessGauge::WarpImage(cv::Mat* input, cv::Mat* output) {
 }
 
+[[deprecated("Flagged for deletion.")]]
 void ThicknessGauge::WarpMeSomeCookies(cv::Mat* image, cv::Mat* output) {
 	vector<cv::Point2f> points2D;
 	points2D.push_back(cv::Point2f(0, 0));
