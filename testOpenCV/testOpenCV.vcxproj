@@ -173,6 +173,7 @@
     <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />
     <ClInclude Include="CV\CannyR.h" />
     <ClInclude Include="CV\HoughLinesR.h" />
+    <ClInclude Include="CV\LaserR.h" />
     <ClInclude Include="CV\LineData\LineBaseData.h" />
     <ClInclude Include="CV\LineData\LineData.h" />
     <ClInclude Include="CV\LineData\LineLaserData.h" />
