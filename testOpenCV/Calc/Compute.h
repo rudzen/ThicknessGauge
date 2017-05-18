@@ -95,7 +95,7 @@ namespace utils {
 
 	template <typename T>
 	double Compute::triangleArea(T width, T height) {
-		return width * height * 0.5;
+		return (static_cast<double>(width) * static_cast<double>(height)) * 0.5;
 	}
 
 }
