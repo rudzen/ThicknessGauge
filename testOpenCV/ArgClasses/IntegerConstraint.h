@@ -10,9 +10,9 @@ class IntegerConstraint : public TCLAP::Constraint<int> {
 
 public:
 
-	IntegerConstraint(std::string name, const int min, const int max) : name_(name), min_(min), max_(max) { }
+	IntegerConstraint(std::string name, const int min, const int max) : min_(min), max_(max), name_(name) { }
 
-	IntegerConstraint(): name_("value constraint"), min_(5), max_(200) { }
+	IntegerConstraint(): min_(5), max_(200), name_("value constraint") { }
 
 	/**
 	* Returns a description of the Constraint.
