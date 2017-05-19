@@ -139,7 +139,7 @@ public: // basic stuff to extract information
 	void computeMarkingHeight(std::string& globName);
 	LineLaserData computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output);
 	bool computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output);
-	template <typename T> void computeLaserLocations(cv::Rect_<T>& markingLocation, std::vector < cv::Point_<T>>& result);
+	template <typename T> void computeLaserLocations(T baseLine, cv::Rect_<T>& markingLocation, std::vector<cv::Point_<T>>& result);
 
 	LineBaseData findMarkingLinePairs_(std::string& globName);
 

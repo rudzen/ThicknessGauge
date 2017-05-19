@@ -630,8 +630,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	// work on laser location on marking..
 	std::vector<cv::Point2f> laserLine;
 
-	computeLaserLocations<float>(markingRect, laserLine);
-
+	computeLaserLocations<float>(baseLines[0].y, markingRect, laserLine);
 
 	if (showWindows_) {
 		auto key = static_cast<char>(cv::waitKey(30));
@@ -643,7 +642,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 }
 
 template <typename T>
-void ThicknessGauge::computeLaserLocations(cv::Rect_<T>& markingLocation, std::vector<cv::Point_<T>>& result) {
+void ThicknessGauge::computeLaserLocations(T baseLine, cv::Rect_<T>& markingLocation, std::vector<cv::Point_<T>>& result) {
 
 	Pixelz pixelz;
 
@@ -652,21 +651,26 @@ void ThicknessGauge::computeLaserLocations(cv::Rect_<T>& markingLocation, std::v
 	std::vector<cv::Mat> outputs;
 	std::vector<cv::Point_<T>> pixPlanar;
 	std::vector<cv::Point_<T>> test_subPix;
+	std::vector<cv::Point> nonZeroes;
 
 	markingFrames.reserve(frameCount_);
 	outputs.reserve(frameCount_);
 	pixPlanar.reserve(frameCount_);
+	test_subPix.reserve(frameCount_);
 
-	for (auto& frame : frames) {
-		markingFrames.push_back(frame(markingLocation));
-		outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
+	for (auto i = frameCount_; i--;) {
+		markingFrames.push_back(frames.at(i)(markingLocation));
+		outputs[i] = cv::Mat::zeros(markingFrames.back().size(), CV_8UC1);
 	}
 
 	while (true) {
 
 		for (auto i = markingFrames.size(); i--;) {
 		//for (auto& frame : markingFrames) {
-			auto baseFrame = markingFrames.at(i).clone();
+			cv::Mat baseFrame;
+
+			// TODO : replace with custom filter if needed
+			cv::bilateralFilter(markingFrames.at(i), baseFrame, 1, 20, 10);
 
 			threshold(baseFrame, baseFrame, binaryThreshold_, 255, CV_THRESH_BINARY);
 
@@ -676,8 +680,18 @@ void ThicknessGauge::computeLaserLocations(cv::Rect_<T>& markingLocation, std::v
 
 			auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs[i], pixPlanar.at(i), test_subPix);
 
+			if (!generateOk) {
+				Util::loge("Error while attempting to generate pixelmap");
+				continue;
+			}
 
+			findNonZero(outputs[i], nonZeroes);
 
+			auto heightLine = baseFrame.cols / 2;
+			
+			auto highestPixel = baseLine - static_cast<T>(pix.getHighestYpixel(outputs[i], heightLine, miniCalc));
+
+			drawHorizontalLine(baseFrame, cvRound(highestPixel));
 
 			if (showWindows_) {
 				//cv::imshow("test marking", marking);
