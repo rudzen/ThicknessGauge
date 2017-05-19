@@ -200,7 +200,7 @@ void ThicknessGauge::generateGlob(std::string& name) {
 bool ThicknessGauge::generatePlanarImage(std::string& globName) {
 	//if (!cap.isOpened() && globName == "camera") // check if we succeeded
 	//	throw CaptureFailException("Error while attempting to open capture device.");
-
+	
 	cv::Size blurSize(3, 3);
 
 	const auto alpha = 0.5;
@@ -645,16 +645,37 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 template <typename T>
 void ThicknessGauge::computeLaserLocations(cv::Rect_<T>& markingLocation, std::vector<cv::Point_<T>>& result) {
 
-	// generate frames with marking
-	std::vector<cv::Mat> markingFrames(frameCount_);
+	Pixelz pixelz;
 
-	for (auto& frame : frames)
+	// generate frames with marking
+	std::vector<cv::Mat> markingFrames;
+	std::vector<cv::Mat> outputs;
+	std::vector<cv::Point_<T>> pixPlanar;
+	std::vector<cv::Point_<T>> test_subPix;
+
+	markingFrames.reserve(frameCount_);
+	outputs.reserve(frameCount_);
+	pixPlanar.reserve(frameCount_);
+
+	for (auto& frame : frames) {
 		markingFrames.push_back(frame(markingLocation));
+		outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
+	}
 
 	while (true) {
 
-		for (auto& frame : markingFrames) {
-			auto baseFrame = frame.clone();
+		for (auto i = markingFrames.size(); i--;) {
+		//for (auto& frame : markingFrames) {
+			auto baseFrame = markingFrames.at(i).clone();
+
+			threshold(baseFrame, baseFrame, binaryThreshold_, 255, CV_THRESH_BINARY);
+
+			pixelz.removePepperNoise(baseFrame);
+
+			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
+
+			auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs[i], pixPlanar.at(i), test_subPix);
+
 
 
 
