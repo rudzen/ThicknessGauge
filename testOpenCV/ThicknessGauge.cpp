@@ -328,8 +328,7 @@ void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> f
 		std::cout << "time : " << (end - start) / cv::getTickFrequency() << endl;
 		if (showWindows_) {
 			drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
-			drawHorizontalLine(&tmpOut, cvRound(tmpOut.rows - baseLine), cv::Scalar(0, 0, 255));
-			drawHorizontalLine(&tmpOut, cvRound(tmpOut.rows - diff), cv::Scalar(255, 0, 255));
+			drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
 			cv::imshow("test height", tmpOut);
 			auto key = static_cast<char>(cv::waitKey(30));
 			if (key == 27) /* escape was pressed */ {
