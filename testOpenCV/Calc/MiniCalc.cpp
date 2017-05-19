@@ -244,6 +244,8 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 
 	gradientPixels.clear();
 	gradientPixels.reserve(input.cols);
+	for (auto x = input.cols; x--;)
+		gradientPixels.push_back(cv::Point2d(0.0, 0.0));
 
 	pixels.clear();
 	pixels.reserve(input.cols);
@@ -263,10 +265,10 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 	for (auto& p : pix) {
 		if (p.x != x) {
 			if (count > 0) {
-				pixels.push_back(cv::Point(x, static_cast<int>(round(ySum / static_cast<double>(count)))));
-				auto gradient = static_cast<unsigned char>(round(gradientSum / count));
+				pixels.push_back(cv::Point(x, static_cast<int>(cvRound(ySum / static_cast<double>(count)))));
+				auto gradient = static_cast<unsigned char>(cvRound(gradientSum / count));
 				output.at<unsigned char>(pixels.back()) = gradient;
-				gradientPixels.push_back(cv::Point2d(static_cast<double>(x), gradient));
+				gradientPixels.at(x).y = gradient;
 				count = 0;
 			}
 			ySum = 0;

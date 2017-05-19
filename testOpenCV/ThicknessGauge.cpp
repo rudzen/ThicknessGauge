@@ -302,8 +302,6 @@ void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> f
 
 			auto heightLine = baseFrame.rows / 2;
 
-			//cout << "heightLine: " << heightLine << endl;
-
 			highestPixel += static_cast<float>(baseFrame.rows) - static_cast<float>(pix.getHighestYpixel(outputs.at(i), heightLine, miniCalc));
 
 			//float highestPixel = 0.0f;
@@ -325,10 +323,13 @@ void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> f
 		auto diff = baseLine - highestPixelTotal;
 		std::cout << "diff: " << diff << endl;
 
-		std::cout << "time : " << (end - start) / cv::getTickFrequency() << endl;
+		auto time = (end - start) / cv::getTickFrequency();
+		std::cout << "time : " << time << endl;
 		if (showWindows_) {
-			drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
-			drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
+			//drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
+			//drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
+			//drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
+			//drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
 			cv::imshow("test height", tmpOut);
 			auto key = static_cast<char>(cv::waitKey(30));
 			if (key == 27) /* escape was pressed */ {
@@ -387,7 +388,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	computeBaseLineAreas(canny, baselineFilter, houghH, baseLines);
 
-	cout << "line Y : " << baseLines[0].y << endl;
+	std::cout << "line Y : " << baseLines[0].y << endl;
 
 	// work on laser location on marking..
 	std::vector<cv::Point2f> laserLine;
@@ -899,8 +900,8 @@ void ThicknessGauge::drawText(cv::Mat* image, const string text, TextDrawPositio
 		pos.y = image->rows >> 2;
 		break;
 	case TextDrawPosition::LowerLeft:
-		pos.x = image->cols - image->cols / 3;
-		pos.y = image->rows - (image->rows >> 2);
+		pos.x = image->cols / 3;
+		pos.y = image->rows - 3 * (image->rows >> 2);
 		break;
 	case TextDrawPosition::LowerRight:
 		pos.x = image->cols - image->cols / 3;
