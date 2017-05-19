@@ -223,7 +223,7 @@ void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) 
 		right.push_back(f(rightRect2I));
 	}
 
-	cout << "Frames split without crash :-)" << endl;
+	std::cout << "Frames split without crash :-)" << endl;
 
 }
 
@@ -263,7 +263,16 @@ void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> f
 
 	showWindows_ = true;
 
+	cv::Mat tmpOut;
+
+	float highestPixelTotal = 0.0f;
+
+
 	while (true) {
+
+		auto start = cv::getTickCount();
+
+		float highestPixel = 0.0f;
 
 		for (auto i = frameCount_; i--;) {
 			//for (auto& frame : markingFrames) {
@@ -293,10 +302,10 @@ void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> f
 
 			auto heightLine = baseFrame.rows / 2;
 
-			cout << "heightLine: " << heightLine << endl;
+			//cout << "heightLine: " << heightLine << endl;
 
-			auto highestPixel = static_cast<float>(baseFrame.rows) - static_cast<float>(pix.getHighestYpixel(outputs.at(i), heightLine, miniCalc));
-			
+			highestPixel += static_cast<float>(baseFrame.rows) - static_cast<float>(pix.getHighestYpixel(outputs.at(i), heightLine, miniCalc));
+
 			//float highestPixel = 0.0f;
 			//for (auto& p : pixPlanar) {
 			//	if (p.y > highestPixel)
@@ -305,22 +314,28 @@ void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> f
 
 			//highestPixel -= baseLine;
 
-			cout << "highestPixel: " << highestPixel << endl;
-
-
-			drawHorizontalLine(&outputs.at(i), cvRound(highestPixel));
-
-			if (showWindows_) {
-				cv::imshow("test height", outputs.at(i));
-				auto key = static_cast<char>(cv::waitKey(30));
-				if (key == 27) /* escape was pressed */ {
-					showWindows_ ^= true;
-					break;
-				}
-			}
-
+			if (!i)
+				cv::cvtColor(outputs.at(i), tmpOut, CV_GRAY2BGR);
 		}
 
+		highestPixelTotal = highestPixel / frameCount_;
+		auto end = cv::getTickCount();
+		std::cout << "highestPixelTotal: " << highestPixelTotal << endl;
+
+		auto diff = baseLine - highestPixelTotal;
+		std::cout << "diff: " << diff << endl;
+
+		std::cout << "time : " << (end - start) / cv::getTickFrequency() << endl;
+		if (showWindows_) {
+			drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
+			drawHorizontalLine(&tmpOut, cvRound(tmpOut.rows - baseLine), cv::Scalar(0, 0, 255));
+			drawHorizontalLine(&tmpOut, cvRound(tmpOut.rows - diff), cv::Scalar(255, 0, 255));
+			cv::imshow("test height", tmpOut);
+			auto key = static_cast<char>(cv::waitKey(30));
+			if (key == 27) /* escape was pressed */ {
+				showWindows_ ^= true;
+			}
+		}
 
 		if (!showWindows_)
 			break;
