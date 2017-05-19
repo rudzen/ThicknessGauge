@@ -179,12 +179,6 @@
     <ClInclude Include="Calc\Compute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Calc\Interpolate.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
-    <ClInclude Include="Calc\Bezier_1.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
     <ClInclude Include="Calc\MiniCalc.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
@@ -207,9 +201,6 @@
       <Filter>Header Files\CV</Filter>
     </ClInclude>
     <ClInclude Include="Util\Stringtools.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\Q.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Testing\TestConfig.h">
@@ -267,6 +258,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CV\LaserR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="_unused_crap\temp_unused.txt">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="_unused_crap\temp_mains.txt">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

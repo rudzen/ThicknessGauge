@@ -102,8 +102,8 @@ int main(int argc, char** argv) {
 		} else if (options.isCalibrationMode()) {
 			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
 		} else if (options.isTestMode()) {
-			c.initVideoCapture();
-			c.testAggressive();
+			//c.initVideoCapture();
+			//c.testAggressive();
 		}
 	}
 	catch (ArgException& ae) {

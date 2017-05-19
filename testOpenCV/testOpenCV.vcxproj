@@ -173,7 +173,6 @@
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
     <ClInclude Include="CV\BaseR.h" />
-    <ClInclude Include="Calc\Bezier_1.h" />
     <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />
     <ClInclude Include="CV\CannyR.h" />
     <ClInclude Include="CV\HoughLinesR.h" />
@@ -198,14 +197,12 @@
     <ClInclude Include="Histogram\Histogram.h" />
     <ClInclude Include="Histogram\HistoPeak.h" />
     <ClInclude Include="ArgClasses\IntegerConstraint.h" />
-    <ClInclude Include="Calc\Interpolate.h" />
     <ClInclude Include="Exceptions\InvalidFileException.h" />
     <ClInclude Include="IO\IsValidFileName.h" />
     <ClInclude Include="LineSparse.h" />
     <ClInclude Include="LineConfig.h" />
     <ClInclude Include="CV\Pixel.h" />
     <ClInclude Include="UI\ProgressBar.h" />
-    <ClInclude Include="Util\Q.h" />
     <ClInclude Include="Testing\TestConfig.h" />
     <ClInclude Include="Exceptions\TestException.h" />
     <ClInclude Include="ArgClasses\DemoModeVisitor.h" />
@@ -223,6 +220,8 @@
     <ClInclude Include="Util\Vec.h" />
     <ClInclude Include="IO\VideoInfo.h" />
     <ClInclude Include="tg.h" />
+    <ClInclude Include="_unused_crap\temp_mains.txt" />
+    <ClInclude Include="_unused_crap\temp_unused.txt" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

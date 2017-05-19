@@ -234,7 +234,7 @@ bool MiniCalc::saveData(string filename) const {
 	return true;
 }
 
-bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point>& pixels, vector<cv::Point2d>& gradientPixels) const {
+bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point2f>& pixels, vector<cv::Point2f>& gradientPixels) const {
 
 	vector<cv::Point> pix;
 
@@ -243,6 +243,10 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 	findNonZero(input, pix);
 
 	gradientPixels.clear();
+	gradientPixels.reserve(input.cols);
+
+	pixels.clear();
+	pixels.reserve(input.cols);
 
 	// sort the list in X
 	sort(pix.begin(), pix.end(), sortX);
@@ -278,14 +282,6 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 		return false;
 
 	totalYMean /= pixels.size();
-
-	// remove any weird stuff
-	for (auto& p : pixels) {
-		if (p.y > totalYMean + 100) {
-
-		}
-	}
-
 
 	return true;
 }

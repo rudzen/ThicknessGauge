@@ -197,350 +197,6 @@ void ThicknessGauge::generateGlob(std::string& name) {
 	pb.Progressed(frameCount_ * 2);
 }
 
-bool ThicknessGauge::generatePlanarImage(std::string& globName) {
-	//if (!cap.isOpened() && globName == "camera") // check if we succeeded
-	//	throw CaptureFailException("Error while attempting to open capture device.");
-	
-	cv::Size blurSize(3, 3);
-
-	const auto alpha = 0.5;
-	const auto beta = 1.0 - alpha;
-
-	auto line_fraction = 0;
-	auto line_thickness = 1;
-
-	/* erosion and dilation trackbar settings */
-	auto erosion_type = 2;
-	auto erosion_size = 3;
-
-	auto dilation_type = 0;
-	auto dilation_size = 1;
-
-	auto const max_ed_elem = 2;
-	auto const max_ed_kernel_size = 21;
-	/* end */
-
-	ImageSave is("pic_x", SaveType::Image_Png, Information::Basic);
-
-	cv::Mat frame;
-	//vector<Mat> outputs(frameCount_);
-	//vector<vi> pix_Planarmap(frameCount_ * 2); // using double of these for testing
-	vector<v2<double>> gabs(frameCount_);
-
-	array<cv::Mat, 512> outputs;
-	array<vi, 512> pix_Planarmap;
-	//array<v2<int>, 512> gabs;
-
-	vi nonZero;
-
-	// capture first frame
-	if (globName == "camera")
-		captureFrames();
-	else
-		loadGlob(globName);
-
-	auto heightLine = imageSize_.width;
-
-	const string inputWindowName = "GC2450 feed";
-	const string outputWindowName = "GC2450 manipulated";
-	const string line1WindowName = "frame";
-	const string line2WindowName = "sparse y";
-	const string line3WindowName = "GC2450 weighted means over time";
-	const string cornerWindowName = "GC2450 Corner View";
-	const string erodeWindowName = "Erosion";
-	const string dilationWindowName = "Dilation";
-
-	if (showWindows_) {
-		namedWindow(inputWindowName, cv::WINDOW_KEEPRATIO);
-		cv::createTrackbar("BThreshold", inputWindowName, &binaryThreshold_, 254);
-		cv::createTrackbar("HThreshold", inputWindowName, &lineThreshold_, 255);
-		//createTrackbar("Base Line", inputWindowName, &baseLine_, imageSize_.height);
-		cv::createTrackbar("Height Line", inputWindowName, &heightLine, (imageSize_.width * 2) - 1);
-
-		namedWindow(outputWindowName, cv::WINDOW_KEEPRATIO);
-
-		//namedWindow(line1WindowName, cv::WINDOW_KEEPRATIO);
-
-		////createTrackbar("Frac", line1WindowName, &line_fraction, 4);
-		////createTrackbar("Thick", line1WindowName, &line_thickness, 5);
-
-		//namedWindow(line2WindowName, cv::WINDOW_KEEPRATIO);
-
-
-		//namedWindow(line3WindowName, WINDOW_AUTOSIZE);
-
-		//namedWindow(cornerWindowName, WINDOW_AUTOSIZE);
-
-		namedWindow(erodeWindowName, cv::WINDOW_KEEPRATIO);
-		//createTrackbar("Element:", erodeWindowName, &erosion_type, max_ed_elem);
-		//createTrackbar("Kernel size: 2n +1", erodeWindowName, &erosion_size, max_ed_kernel_size);
-
-		//namedWindow(dilationWindowName, WINDOW_AUTOSIZE);
-		//createTrackbar("Element:", dilationWindowName, &dilation_type, max_ed_elem);
-		//createTrackbar("Kernel size: 2n +1", dilationWindowName, &dilation_size, max_ed_kernel_size);
-	}
-
-	// test for video recording
-	if (saveVideo_) {
-		is.SetInformation(Information::Full);
-		is.SetSaveType(SaveType::Video);
-		is.SetCodec(VideoCodec::Mjpeg);
-		is.SetFPS(25.0f);
-		is.SetSize(frame.cols, frame.rows);
-		is.SetColour(VideoColour::Colour);
-		is.SetFileName("_testvideo");
-		is.OpenVideo();
-	}
-
-	vector<cv::Point2d> test_subPix;
-
-	// configure output stuff
-	for (auto i = frameCount_; i--;)
-		pix_Planarmap[i].reserve(imageSize_.width);
-
-	for (auto i = arrayLimit - 1; i > arrayLimit - frameCount_; i--)
-		pix_Planarmap[i].reserve(imageSize_.width);
-
-	// start the process of gathering information for set frame count
-	while (true) {
-
-		CannyR canny(100, 150, 3, false, showWindows_, false);
-		HoughLinesR houghL(1, static_cast<const int>(CV_PI / 180), 100, showWindows_);
-
-		uint64 time_begin = cv::getTickCount();
-
-		vector<double> baseLine(frameCount_);
-
-		// capture frame amount and clear storage
-		for (auto i = 0; i < frameCount_; ++i) {
-
-			//cap >> frame;
-			//frames[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
-			//outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
-
-			//for (auto& n : nulls_)
-			//	frames[i] = frame - n;
-
-			//pix_Planarmap.at(i).clear();
-
-			//cap >> frames[i];
-			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
-			pix_Planarmap.at(i).clear();
-		}
-
-		//HistoPeak hp;
-
-		for (auto i = 0; i < frameCount_; ++i) {
-
-			// just share the joy
-			frame = frames.at(i);
-
-			cv::Mat tmp;
-			cv::bilateralFilter(frame, tmp, 1, 20, 10);
-
-			canny.setImage(tmp);
-			canny.doCanny();
-
-			houghL.setOriginal(tmp);
-			houghL.setImage(canny.getResult());
-			houghL.setAngleLimit(20);
-			houghL.doVerticalHough();
-
-			// show default input image (always shown live!)
-			if (showWindows_) {
-				imshow(inputWindowName, tmp);
-			}
-
-			if (showWindows_) {
-				//Line l;
-				auto num(to_string(i));
-				//l.setFrame(frame);
-				//l.generateSparse();
-				//l.differentiateY();
-				//l.differentiateIntensity();
-				//l.mergeIntensity();
-				//l.saveAllData(num);
-				//l.drawPoly();
-
-				//Histogram g;
-				//g.populateHistogram(frame);
-				//cv::imshow(line2WindowName, g.histogramImage());
-				//auto filename("test_histo_" + num + ".txt");
-				//g.saveSimpleData(filename);
-
-				//auto blobs = drawBlobs(&frame);
-				//imshow("keypoints", blobs);
-
-			}
-			if (showWindows_) {
-				//hp.processImage(frame, true, i != 0);
-
-			}
-
-			//equalizeHist(frame, frame);
-
-			// do basic in-place binary threshold
-			//threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
-
-			// blur in-place
-			//GaussianBlur(frame, frame, cv::Size(7, 5), 10, 0, cv::BORDER_DEFAULT);
-			//GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0, cv::BORDER_DEFAULT);
-
-
-			// perform some stuff
-			// laplace(frame);
-			// c.Sobel(frame);
-
-			if (showWindows_) {
-				imshow(outputWindowName, tmp);
-			}
-			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
-			auto generateOk = miniCalc.generatePlanarPixels(tmp, outputs[i], pix_Planarmap.at(i), test_subPix);
-
-			if (!generateOk) {
-				cout << "Failed to map pixels to 2D plane for frame #" << to_string(i + 1) << " of " << to_string(frameCount_) << endl;
-				continue;
-			}
-
-			findNonZero(outputs[i], pix_Planarmap[arrayLimit - (1 + i)]);
-			//gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i], baseLine_));
-			gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i]));
-			if (gabs.back().hasValue()) {
-				// at least one gab was filled..
-
-				//Mat temp(pix_planarMap[arrayLimit - (1 + i)]);
-				//cout << "TEMP cols " << temp.cols << endl;
-				//imshow("temp", temp);
-				//add(outputs[i], temp, outputs[i]);
-			}
-
-			auto highestPixel = outputs[i].rows - pix.getHighestYpixel(outputs[i], heightLine, miniCalc);
-
-			auto bl = computerBaseLine(outputs[i], highestPixel);
-			if (cvIsNaN(bl)) {
-				cerr << "Error while computing baseline for frame " << to_string(i) << '\n';
-				continue;
-			}
-
-			baseLine.push_back(bl);
-
-			if (showWindows_) {
-				auto key = static_cast<char>(cv::waitKey(10));
-				if (key == 27)
-					return true; // esc
-			}
-
-
-		}
-
-		houghL.alignLeftY(frameCount_);
-
-
-		//cout << hp << endl;
-
-		baseLine_[0] = miniCalc.mean(baseLine);
-		//cout << "baseline real : " << baseLine_ << endl;
-
-		frame = cv::Mat::zeros(imageSize_, CV_8UC1);
-		cv::Mat lines = cv::Mat::zeros(imageSize_, CV_8UC1);
-
-		// merge the images to target
-		for (auto i = 0; i < frameCount_; ++i) {
-			addWeighted(outputs[i], alpha, lines, beta, 0.0, lines);
-			//add(outputs[i], lines, lines);
-			outputs[i].release();
-			if (saveVideo_) is.SaveVideoFrame(lines);
-		}
-
-
-		cv::Mat output = cv::Mat::zeros(imageSize_, lines.type());
-
-		//if (showWindows_) imshow(line2WindowName, output);
-		//if (showWindows_) imshow(line3WindowName, lines);
-
-		//is.UpdateTimeStamp();
-		//is.SaveImage(&lines);
-
-		//auto corner_image = cornerHarris_test(lines, 200);
-		//if (showWindows_) imshow(cornerWindowName, corner_image);
-
-		/* test stuff for filtering out crap pixels */
-		addWeighted(lines, 1.5, lines, -0.5, 0, output);
-
-		//skeleton(&output);
-		auto erosion_image = this->erosion(output, erosion_type, erosion_size);
-		bilateralFilter(erosion_image, output, 1, 20, 10);
-		//bilateralFilter(erosion_image, output, 1, 80, 20);
-		erosion_image.release();
-
-		/* end test stuff */
-
-		resize(output, frame, output.size() * 2, 0, 0, cv::INTER_LANCZOS4);
-
-		GaussianBlur(frame, output, blurSize, 10, 10, cv::BORDER_CONSTANT);
-
-		frame.release();
-
-		//resize(output, frame, frame.size() / 2, 0, 0, INTER_LANCZOS4);
-
-		// test for highest pixel for eroded image
-		auto highestPixel = output.rows - pix.getHighestYpixel(output, heightLine, miniCalc) - baseLine_[0];
-		cout << "Highest Y in eroded line : " << highestPixel << " [mm: N/A ]" << endl;
-
-		/* base line etc calculations !!*/
-
-		// gather all elements from final matrix
-		computeAllElements(output);
-
-		computerGaugeLine(output);
-
-		frameTime_ = cv::getTickCount() - time_begin;
-
-		if (showWindows_) {
-			drawVerticalLine(&output, heightLine);
-			// calculated baseline test drawing
-			drawHorizontalLine(&output, Util::round(baseLine_[0]));
-		}
-
-		if (showWindows_) {
-			imshow(erodeWindowName, output);
-		}
-
-
-		//cout << "Y avr for heightline : " << getYPixelsAvg(frame, heightLine) << endl;
-
-		//cout << "Saving image...\n";
-		//is.UpdateTimeStamp();
-		//is.SaveImage(&output, "_testoutput" + to_string(frameCount_));
-		//savePlanarImageData("_testoutput", allPixels_, output, highestPixel);
-
-		if (showWindows_) {
-			auto key = static_cast<char>(cv::waitKey(10));
-			if (key == 27)
-				break; // esc
-		}
-
-		output.release();
-
-	}
-
-	cap.release();
-
-	if (showWindows_) {
-		cv::destroyWindow(inputWindowName);
-		cv::destroyWindow(outputWindowName);
-		cv::destroyWindow(line1WindowName);
-		cv::destroyWindow(line2WindowName);
-		cv::destroyWindow(line3WindowName);
-	}
-
-	if (saveVideo_)
-		is.CloseVideo();
-
-	return true;
-}
-
-
 void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) {
 
 	if (!left.empty())
@@ -579,6 +235,98 @@ inline int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 		minLineLen = minLen;
 
 	return minLineLen;
+}
+
+void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
+	Pixelz pixelz;
+
+	Util::log("Laser enter");
+
+	// generate frames with marking
+	std::vector<cv::Mat> markingFrames;
+	std::vector<cv::Mat> outputs;
+	std::vector<cv::Point2f> pixPlanar;
+	std::vector<cv::Point2f> test_subPix;
+	std::vector<cv::Point> nonZeroes;
+
+	pixPlanar.reserve(frameCount_);
+	test_subPix.reserve(frameCount_);
+
+	for (auto& frame : frames) {
+		markingFrames.push_back(frame(markingLocation));
+		outputs.push_back(cv::Mat::zeros(markingFrames.back().size(), CV_8UC1));
+	}
+
+	Util::log("Laser configured");
+
+	cv::namedWindow("test height", CV_WINDOW_AUTOSIZE);
+
+	showWindows_ = true;
+
+	while (true) {
+
+		for (auto i = frameCount_; i--;) {
+			//for (auto& frame : markingFrames) {
+
+			cv::Mat baseFrame;
+			outputs[i] = cv::Mat::zeros(markingFrames.back().size(), CV_8UC1);
+
+			// TODO : replace with custom filter if needed
+			cv::bilateralFilter(markingFrames.at(i), baseFrame, 1, 20, 10);
+
+			threshold(baseFrame, baseFrame, 100, 255, CV_THRESH_BINARY);
+
+			pixelz.removePepperNoise(baseFrame);
+
+			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
+
+			auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs.at(i), pixPlanar, test_subPix);
+
+			if (!generateOk) {
+				Util::loge("Error while attempting to generate pixelmap");
+				continue;
+			}
+
+			nonZeroes.reserve(baseFrame.cols * baseFrame.rows);
+
+			findNonZero(outputs.at(i), nonZeroes);
+
+			auto heightLine = baseFrame.rows / 2;
+
+			cout << "heightLine: " << heightLine << endl;
+
+			auto highestPixel = static_cast<float>(baseFrame.rows) - static_cast<float>(pix.getHighestYpixel(outputs.at(i), heightLine, miniCalc));
+			
+			//float highestPixel = 0.0f;
+			//for (auto& p : pixPlanar) {
+			//	if (p.y > highestPixel)
+			//		highestPixel = p.y;
+			//}
+
+			//highestPixel -= baseLine;
+
+			cout << "highestPixel: " << highestPixel << endl;
+
+
+			drawHorizontalLine(&outputs.at(i), cvRound(highestPixel));
+
+			if (showWindows_) {
+				cv::imshow("test height", outputs.at(i));
+				auto key = static_cast<char>(cv::waitKey(30));
+				if (key == 27) /* escape was pressed */ {
+					showWindows_ ^= true;
+					break;
+				}
+			}
+
+		}
+
+
+		if (!showWindows_)
+			break;
+
+
+	}
 }
 
 /**
@@ -630,7 +378,10 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	// work on laser location on marking..
 	std::vector<cv::Point2f> laserLine;
 
-	computeLaserLocations<float>(baseLines[0].y, markingRect, laserLine);
+	auto laserFilter = make_shared<FilterR>("LaserFilter");
+	laserFilter->setShowWindow(showWindows_);
+
+	computeLaserLocations(baseLines[0].y, laserFilter, markingRect, laserLine);
 
 	if (showWindows_) {
 		auto key = static_cast<char>(cv::waitKey(30));
@@ -641,78 +392,8 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 }
 
-template <typename T>
-void ThicknessGauge::computeLaserLocations(T baseLine, cv::Rect_<T>& markingLocation, std::vector<cv::Point_<T>>& result) {
 
-	Pixelz pixelz;
-
-	// generate frames with marking
-	std::vector<cv::Mat> markingFrames;
-	std::vector<cv::Mat> outputs;
-	std::vector<cv::Point_<T>> pixPlanar;
-	std::vector<cv::Point_<T>> test_subPix;
-	std::vector<cv::Point> nonZeroes;
-
-	markingFrames.reserve(frameCount_);
-	outputs.reserve(frameCount_);
-	pixPlanar.reserve(frameCount_);
-	test_subPix.reserve(frameCount_);
-
-	for (auto i = frameCount_; i--;) {
-		markingFrames.push_back(frames.at(i)(markingLocation));
-		outputs[i] = cv::Mat::zeros(markingFrames.back().size(), CV_8UC1);
-	}
-
-	while (true) {
-
-		for (auto i = markingFrames.size(); i--;) {
-		//for (auto& frame : markingFrames) {
-			cv::Mat baseFrame;
-
-			// TODO : replace with custom filter if needed
-			cv::bilateralFilter(markingFrames.at(i), baseFrame, 1, 20, 10);
-
-			threshold(baseFrame, baseFrame, binaryThreshold_, 255, CV_THRESH_BINARY);
-
-			pixelz.removePepperNoise(baseFrame);
-
-			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
-
-			auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs[i], pixPlanar.at(i), test_subPix);
-
-			if (!generateOk) {
-				Util::loge("Error while attempting to generate pixelmap");
-				continue;
-			}
-
-			findNonZero(outputs[i], nonZeroes);
-
-			auto heightLine = baseFrame.cols / 2;
-			
-			auto highestPixel = baseLine - static_cast<T>(pix.getHighestYpixel(outputs[i], heightLine, miniCalc));
-
-			drawHorizontalLine(baseFrame, cvRound(highestPixel));
-
-			if (showWindows_) {
-				//cv::imshow("test marking", marking);
-				auto key = static_cast<char>(cv::waitKey(30));
-				if (key == 27) /* escape was pressed */ {
-					showWindows_ ^= true;
-					break;
-				}
-			}
-
-		}
-
-
-		if (!showWindows_)
-			break;
-	}
-
-
-}
-
-LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output) {
+void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output) {
 
 	LineLaserData results;
 
@@ -830,10 +511,6 @@ LineLaserData ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, sha
 
 	output[0].x = 0.0f;
 	output[0].y = lineY + (frames.front().rows - baseLineY);
-
-
-	return LineLaserData();
-
 
 }
 
@@ -1049,537 +726,6 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 	}
 }
 
-void ThicknessGauge::addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y) {
-	for (auto j = x; j <= y; j += 2) {
-		for (auto i = 1; i <= 10; ++i) {
-			if (x == j)
-				continue;
-			auto sig = baseSigmaX * i;
-			tests.push_back(TestConfig(alpha, sig, i, cv::Size(x, x)));
-			tests.push_back(TestConfig(alpha, sig, i, cv::Size(x, j)));
-			tests.push_back(TestConfig(alpha, sig, i, cv::Size(j, x)));
-		}
-	}
-}
-
-[[deprecated("Replaced by superior structure, flagged for deletion.")]]
-bool ThicknessGauge::testDiff() {
-
-	if (!cap.isOpened()) // check if we succeeded
-		throw CaptureFailException("Error while attempting to open capture device.");
-
-	Util::log("Initiating test mode.. please wait...");
-
-	ImageSave is("test_x", SaveType::Image_Png, Information::Basic);
-
-	// kernel size vector
-	const vector<cv::Size> kernels_ = {cv::Size(0, 0), cv::Size(3, 3), cv::Size(5, 5), cv::Size(7, 7), cv::Size(9, 9)};
-
-	// weigthed adding boundries for alpha
-	// beta values are always 1.0 = alpha
-	float alphaBase = 0.1f;
-
-	// blur sigma boundries
-	auto sigmaXBase = 5;
-
-	// each test is put here, to better control the flow
-	vector<TestConfig> tests;
-
-	const auto arrayLimit = 1024; // shit c++11 ->
-
-	cv::Mat frame;
-	vector<v2<double>> gabs(frameCount_);
-
-	array<cv::Mat, arrayLimit> outputs;
-	array<vi, arrayLimit> pix_Planarmap;
-
-	array<vi, arrayLimit> sparse;
-
-	vi nonZero;
-
-	cv::Mat first;
-	// capture first frame, only to get sizes etc.
-	cap >> first;
-
-	auto out("Capturing " + to_string(frameCount_) + " frames..");
-
-	for (auto i = frameCount_; i--;) {
-		cv::Mat t;
-		cap >> t;
-		frames.push_back(t);
-	}
-
-	Util::log("");
-
-	cap.release();
-
-	setImageSize(first.size());
-
-	auto heightLine = imageSize_.width;
-
-	vector<cv::Point2d> test_subPix;
-
-	auto sigmaY = 2;
-	auto currentTest = 1;
-
-	auto kernelMin = 3;
-	auto kernelMax = 31;
-
-	addKernelTests(tests, alphaBase, sigmaXBase, kernelMin, kernelMax);
-
-	// auto kernel from sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase * i, i, cv::Size(0, 0)));
-
-	// start the process of gathering information for set frame count
-	cv::Size blurSize(3, 3);
-
-	const auto alpha = 0.5;
-	const auto beta = 1.0 - alpha;
-
-	auto line_fraction = 0;
-	auto line_thickness = 1;
-
-	/* erosion and dilation trackbar settings */
-	auto erosion_type = 2;
-	auto erosion_size = 3;
-
-	auto dilation_type = 0;
-	auto dilation_size = 1;
-
-	auto const max_ed_elem = 2;
-	auto const max_ed_kernel_size = 21;
-	/* end */
-
-	// test for video recording
-	if (saveVideo_) {
-		is.SetInformation(Information::Full);
-		is.SetSaveType(SaveType::Video);
-		is.SetCodec(VideoCodec::Mjpeg);
-		is.SetFPS(25.0f);
-		is.SetSize(frame.cols, frame.rows);
-		is.SetColour(VideoColour::Colour);
-		is.SetFileName("_testvideo");
-		is.OpenVideo();
-	}
-
-	// configure output stuff
-	for (auto i = frameCount_; i--;) {
-		pix_Planarmap[i].reserve(imageSize_.width);
-		sparse[i].reserve(imageSize_.width);
-	}
-
-	auto testSize = tests.size();
-
-	for (auto i = testSize; i--;) {
-
-		// start the process of gathering information for set frame count
-		//	for (auto& t : tests) {
-		Util::log("Running test " + to_string(currentTest) + " of " + to_string(tests.size()));
-		cout << "Config : " << tests[i] << endl;
-
-		uint64 time_begin = cv::getTickCount();
-
-		vector<double> baseLine(frameCount_);
-
-		//ProgressBar progressFrames(100, "Computing frames..");
-		//progressFrames.SetFrequencyUpdate(10);
-		//progressFrames.SetStyle(">", "-");
-		//progressFrames.Progressed(0);
-
-		for (auto j = 0; j < frameCount_; ++j) {
-
-			outputs[j] = cv::Mat::zeros(imageSize_, CV_8UC1);
-			pix_Planarmap.at(j).clear();
-
-			frame = frames.at(j).clone();
-			//cap >> frame;
-
-			// do basic in-place binary threshold
-			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
-
-			equalizeHist(frame, frame);
-
-			// blur in-place
-			GaussianBlur(frame, frame, tests[i].kernel(), tests[i].sigma(), 2, cv::BORDER_DEFAULT);
-
-			auto generateOk = getSparseY(frame, sparse[j]);
-			if (!generateOk) {
-				Util::loge("Failed to generate sparse vector for frame #" + to_string(j + 1) + " of " + to_string(frameCount_));
-				continue;
-			}
-
-			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
-			generateOk = miniCalc.generatePlanarPixels(frame, outputs[j], pix_Planarmap.at(j), test_subPix);
-
-			if (!generateOk) {
-				Util::loge("Failed to map pixels to 2D plane for frame #" + to_string(j + 1) + " of " + to_string(frameCount_));
-				continue;
-			}
-
-			// temporary disabled gab filling !!!
-
-			//findNonZero(outputs[j], pix_Planarmap[arrayLimit - (1 + j)]);
-			////gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i], baseLine_));
-			//gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + j)], outputs[j]));
-			//if (gabs.back().hasValue()) {
-
-			//}
-
-			auto highestPixel = outputs[j].rows - pix.getHighestYpixel(outputs[j], heightLine, miniCalc);
-			auto bl = computerBaseLine(outputs[j], highestPixel);
-			if (cvIsNaN(bl)) {
-				Util::loge("Error while computing baseline for frame " + to_string(j));
-				continue;
-			}
-
-			baseLine.push_back(bl);
-
-			//progressFrames.Progressed(i);
-
-		}
-
-		// generate combined sparse vector for all computed frames
-		//auto added = 0;
-		//for (auto k = 0; k < frameCount_; ++k) {
-		//	if (sparse[k].empty())
-		//		continue;
-		//	for (auto& p : sparse[k]) {
-		//		
-		//	}
-		//}
-
-		auto base = miniCalc.mean(baseLine);
-
-		frame = cv::Mat::zeros(imageSize_, CV_8UC1);
-		cv::Mat lines = cv::Mat::zeros(imageSize_, CV_8UC1);
-
-		// merge the images to target
-		for (auto j = 0; j < frameCount_; ++j) {
-			addWeighted(outputs[j], alpha, lines, beta, 0.0, lines);
-			//add(outputs[j], lines, lines);
-			outputs[j].release();
-			if (saveVideo_) is.SaveVideoFrame(lines);
-
-		}
-
-		//for (auto o = 0; o < frameCount_; ++o) {
-		//	vi diffFirst, diffSecond;
-		//	miniCalc.diffirentiateSparse(sparse[o], diffFirst);
-		//	miniCalc.diffirentiateSparse(diffFirst, diffSecond);
-		//	miniCalc.splitSparse(diffSecond, leftSideLine_, rightSideLine_, lines.cols >> 1);
-		//	//Util::log("sparse: " + to_string(sparse[o].size()));
-		//	//Util::log("Left: " + to_string(leftSideLine_.size()) + " Right: " + to_string(rightSideLine_.size()));
-		//}
-
-
-		cv::Mat output = cv::Mat::zeros(imageSize_, lines.type());
-
-		/* test stuff for filtering out crap pixels */
-		addWeighted(lines, 1.5, lines, -0.5, 0, output);
-
-		//skeleton(&output);
-		auto erosion_image = this->erosion(output, erosion_type, erosion_size);
-		bilateralFilter(erosion_image, output, 1, 20, 10);
-		//bilateralFilter(erosion_image, output, 1, 80, 20);
-		erosion_image.release();
-
-		/* end test stuff */
-
-		resize(output, frame, output.size() * 2, 0, 0, cv::INTER_LANCZOS4);
-
-		GaussianBlur(frame, output, tests[i].kernel(), tests[i].sigma(), 10, cv::BORDER_CONSTANT);
-
-		// test for highest pixel for eroded image
-		auto highestPixel = output.rows - pix.getHighestYpixel(output, heightLine, miniCalc) - base;
-		//cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
-
-		// gather all elements from final matrix
-		computeAllElements(output);
-		computerGaugeLine(output);
-
-		frameTime_ = cv::getTickCount() - time_begin;
-		is.UpdateTimeStamp();
-
-		//if (showWindows_) {
-		//	imshow(erodeWindowName, output);
-		//}
-
-		auto timeString = to_string(getFrameTime() / getTickFrequency());
-		ostringstream testInfo;
-		testInfo << tests[i];
-		Util::log("Saving image..");
-		is.SaveImage(&output, "_test" + to_string(currentTest));
-		Util::log("Saving test data..");
-		savePlanarImageData("_test" + to_string(currentTest) + "_data", allPixels_, output, highestPixel, timeString, testInfo.str());
-
-		drawVerticalLine(&output, heightLine);
-		drawHorizontalLine(&output, Util::round(base));
-		is.SaveImage(&output, "_test_full" + to_string(currentTest));
-
-		Util::log("Test " + to_string(currentTest) + " completed, took " + timeString + " seconds");
-
-		currentTest++;
-	}
-
-	Util::log("Test session completed.. a total of " + to_string(currentTest - 1) + " tests..");
-
-	return true;
-
-}
-
-/**
- * Performs multi testing with different settings based on user command line input.\n
- * Performance is not considered, so don't expect magic :)\n
- * \brief Performs multi testing
- * \return true if everything went ok, false if a recoverable failure occoured.
- */
-[[deprecated("Flagged for deletion.")]]
-bool ThicknessGauge::testAggressive() {
-	if (!cap.isOpened()) // check if we succeeded
-		throw CaptureFailException("Error while attempting to open capture device.");
-
-	Util::log("Initiating test mode.. please wait...");
-
-	ImageSave is("test_x", SaveType::Image_Png, Information::Basic);
-
-	// kernel size vector
-	const vector<cv::Size> kernels_ = {cv::Size(0, 0), cv::Size(3, 3), cv::Size(5, 5), cv::Size(7, 7), cv::Size(9, 9)};
-
-	// weigthed adding boundries for alpha
-	// beta values are always 1.0 = alpha
-	float alphaBase = 0.1f;
-
-	// blur sigma boundries
-	auto sigmaXBase = 5;
-
-	// each test is put here, to better control the flow
-	vector<TestConfig> tests;
-
-	const auto arrayLimit = 1024; // shit c++11 ->
-
-	cv::Mat frame;
-	vector<v2<double>> gabs(frameCount_);
-
-	array<cv::Mat, arrayLimit> outputs;
-	array<vi, arrayLimit> pix_Planarmap;
-
-	array<vi, arrayLimit> sparse;
-
-	vi nonZero;
-
-	cv::Mat first;
-	// capture first frame, only to get sizes etc.
-	cap >> first;
-
-
-	auto out("Capturing " + to_string(frameCount_) + " frames..");
-
-	ProgressBar progress(frameCount_, out.c_str());
-	progress.SetFrequencyUpdate(10);
-	progress.SetStyle(">", "-");
-
-	for (auto i = frameCount_; i--;) {
-		cv::Mat t;
-		cap >> t;
-		progress.Progressed(i);
-		frames.push_back(t);
-	}
-	progress.Progressed(frameCount_);
-
-	Util::log("");
-
-	cap.release();
-
-	setImageSize(first.size());
-
-	auto heightLine = imageSize_.width;
-
-	vector<cv::Point2d> test_subPix;
-
-	auto sigmaY = 2;
-	auto currentTest = 1;
-
-	auto kernelMin = 3;
-	auto kernelMax = 31;
-
-	addKernelTests(tests, alphaBase, sigmaXBase, kernelMin, kernelMax);
-
-	// auto kernel from sigma
-	for (auto i = currentTest; i <= 10; ++i)
-		tests.push_back(TestConfig(alphaBase, sigmaXBase * i, i, cv::Size(0, 0)));
-
-	// start the process of gathering information for set frame count
-	cv::Size blurSize(3, 3);
-
-	const auto alpha = 0.5;
-	const auto beta = 1.0 - alpha;
-
-	auto line_fraction = 0;
-	auto line_thickness = 1;
-
-	/* erosion and dilation trackbar settings */
-	auto erosion_type = 2;
-	auto erosion_size = 3;
-
-	auto dilation_type = 0;
-	auto dilation_size = 1;
-
-	auto const max_ed_elem = 2;
-	auto const max_ed_kernel_size = 21;
-	/* end */
-
-	// test for video recording
-	if (saveVideo_) {
-		is.SetInformation(Information::Full);
-		is.SetSaveType(SaveType::Video);
-		is.SetCodec(VideoCodec::Mjpeg);
-		is.SetFPS(25.0f);
-		is.SetSize(frame.cols, frame.rows);
-		is.SetColour(VideoColour::Colour);
-		is.SetFileName("_testvideo");
-		is.OpenVideo();
-	}
-
-	// configure output stuff
-	for (auto i = frameCount_; i--;) {
-		pix_Planarmap[i].reserve(imageSize_.width);
-		sparse[i].reserve(imageSize_.width);
-	}
-
-	auto testSize = tests.size();
-
-	for (auto i = 0; i < testSize; ++i) {
-
-		// start the process of gathering information for set frame count
-		//	for (auto& t : tests) {
-		Util::log("Running test " + to_string(currentTest) + " of " + to_string(tests.size()));
-		cout << "Config : " << tests[i] << endl;
-
-		uint64 time_begin = cv::getTickCount();
-
-		vector<double> baseLine(frameCount_);
-
-		//ProgressBar progressFrames(100, "Computing frames..");
-		//progressFrames.SetFrequencyUpdate(10);
-		//progressFrames.SetStyle(">", "-");
-		//progressFrames.Progressed(0);
-
-		for (auto j = 0; j < frameCount_; ++j) {
-
-			outputs[j] = cv::Mat::zeros(imageSize_, CV_8UC1);
-			pix_Planarmap.at(j).clear();
-
-			frame = frames.at(j).clone();
-			//cap >> frame;
-
-			// do basic in-place binary threshold
-			threshold(frame, frame, binaryThreshold_, 255, CV_THRESH_BINARY);
-
-			equalizeHist(frame, frame);
-
-			// blur in-place
-			GaussianBlur(frame, frame, tests[i].kernel(), tests[i].sigma(), 2, cv::BORDER_DEFAULT);
-
-			// extract information from the image, and make new output based on pixel intensity mean in Y-axis for each X point
-			auto generateOk = miniCalc.generatePlanarPixels(frame, outputs[j], pix_Planarmap.at(j), test_subPix);
-
-			if (!generateOk) {
-				Util::loge("Failed to map pixels to 2D plane for frame #" + to_string(j + 1) + " of " + to_string(frameCount_));
-				continue;
-			}
-
-			// temporary disabled gab filling !!!
-
-			//findNonZero(outputs[j], pix_Planarmap[arrayLimit - (1 + j)]);
-			////gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + i)], outputs[i], baseLine_));
-			//gabs.push_back(miniCalc.fillElementGabs(pix_Planarmap[arrayLimit - (1 + j)], outputs[j]));
-			//if (gabs.back().hasValue()) {
-
-			//}
-
-			auto highestPixel = outputs[j].rows - pix.getHighestYpixel(outputs[j], heightLine, miniCalc);
-			auto bl = computerBaseLine(outputs[j], highestPixel);
-			if (cvIsNaN(bl)) {
-				Util::loge("Error while computing baseline for frame " + to_string(j));
-				continue;
-			}
-
-			baseLine.push_back(bl);
-
-			//progressFrames.Progressed(i);
-
-		}
-
-		auto base = miniCalc.mean(baseLine);
-
-		frame = cv::Mat::zeros(imageSize_, CV_8UC1);
-		cv::Mat lines = cv::Mat::zeros(imageSize_, CV_8UC1);
-
-		// merge the images to target
-		for (auto k = frameCount_; k--;) {
-			addWeighted(outputs[k], alpha, lines, beta, 0.0, lines);
-			//add(outputs[k], lines, lines);
-			outputs[k].release();
-			if (saveVideo_) is.SaveVideoFrame(lines);
-		}
-
-		cv::Mat output = cv::Mat::zeros(imageSize_, lines.type());
-
-		/* test stuff for filtering out crap pixels */
-		addWeighted(lines, 1.5, lines, -0.5, 0, output);
-
-		//skeleton(&output);
-		auto erosion_image = this->erosion(output, erosion_type, erosion_size);
-		bilateralFilter(erosion_image, output, 1, 20, 10);
-		//bilateralFilter(erosion_image, output, 1, 80, 20);
-		erosion_image.release();
-
-		/* end test stuff */
-
-		resize(output, frame, output.size() * 2, 0, 0, cv::INTER_LANCZOS4);
-
-		GaussianBlur(frame, output, tests[i].kernel(), tests[i].sigma(), 10, cv::BORDER_CONSTANT);
-
-		frame.release();
-
-		// test for highest pixel for eroded image
-		auto highestPixel = output.rows - pix.getHighestYpixel(output, heightLine, miniCalc) - base;
-		//cout << "Highest Y in eroded line : " << highestPixel << " [mm: " << to_string(miniCalc.calculatePixelToMm(highestPixel)) << "]" << endl;
-
-		// gather all elements from final matrix
-		computeAllElements(output);
-		computerGaugeLine(output);
-
-		frameTime_ = cv::getTickCount() - time_begin;
-		is.UpdateTimeStamp();
-
-		//if (showWindows_) {
-		//	imshow(erodeWindowName, output);
-		//}
-
-		auto timeString = to_string(getFrameTime() / getTickFrequency());
-		ostringstream testInfo;
-		testInfo << tests[i];
-		Util::log("Saving image..");
-		is.SaveImage(&output, "_test" + to_string(currentTest));
-		Util::log("Saving test data..");
-		savePlanarImageData("_test" + to_string(currentTest) + "_data", allPixels_, output, static_cast<int>(highestPixel), timeString, testInfo.str());
-
-		drawVerticalLine(&output, heightLine);
-		drawHorizontalLine(&output, Util::round(base));
-		is.SaveImage(&output, "_test_full" + to_string(currentTest));
-
-		Util::log("Test " + to_string(currentTest) + " completed, took " + timeString + " seconds");
-
-		currentTest++;
-	}
-
-	Util::log("Test session completed.. a total of " + to_string(currentTest - 1) + " tests..");
-
-	return true;
-}
-
 bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, string timeString, string extraInfo) const {
 	cv::FileStorage fs(filename + ".json", cv::FileStorage::WRITE);
 
@@ -1775,108 +921,6 @@ void ThicknessGauge::drawVerticalLine(cv::Mat* image, uint pos) const {
 	drawVerticalLine(image, pos, baseColour_);
 }
 
-[[deprecated("Not viable in the current setup.")]]
-void ThicknessGauge::GenerateInputQuad(cv::Mat* image, cv::Point2f* quad) {
-	// The 4 points that select quadilateral on the input , from top-left in clockwise order
-	// These four pts are the sides of the rect box used as input
-	quad[0] = cv::Point2f(0.0f, 0.0f);
-	quad[1] = cv::Point2f(static_cast<float>(image->cols), 0.0f);
-	quad[2] = cv::Point2f(static_cast<float>(image->cols), static_cast<float>(image->rows));
-	quad[3] = cv::Point2f(0.0f, static_cast<float>(image->rows));
-}
-
-[[deprecated("Not viable in the current setup.")]]
-void ThicknessGauge::GenerateOutputQuad(cv::Mat* image, cv::Point2f* quad) {
-	// The 4 points where the mapping is to be done , from top-left in clockwise order
-	quad[0] = cv::Point2f(-image->cols / 2.0f, 0.0f);
-	quad[1] = cv::Point2f(static_cast<float>(image->cols) + image->cols / 2.0f, 0.0f);
-	quad[2] = cv::Point2f(static_cast<float>(image->cols), static_cast<float>(image->rows));
-	quad[3] = cv::Point2f(0.0f, static_cast<float>(image->rows));
-}
-
-[[deprecated("Not viable in the current setup.")]]
-void ThicknessGauge::FitQuad(cv::Mat* image, cv::Point2f* inputQuad, cv::Point2f* outputQuad) const {
-	// calculate transformation
-	cv::Matx33f M = getPerspectiveTransform(inputQuad, outputQuad);
-
-	// calculate warped position of all corners
-	auto a = M.inv() * cv::Point3f(0.0f, 0.0f, 1.0f);
-	auto b = M.inv() * cv::Point3f(0.0f, static_cast<float>(image->rows), 1.0f);
-	auto c = M.inv() * cv::Point3f(static_cast<float>(image->cols), static_cast<float>(image->rows), 1.0f);
-	auto d = M.inv() * cv::Point3f(static_cast<float>(image->cols), 0.0f, 1.0f);
-
-	a *= (1.0f / a.z);
-	b *= (1.0f / b.z);
-	c *= (1.0f / c.z);
-	d *= (1.0f / d.z);
-
-	// to make sure all corners are in the image, every position must be > (0, 0)
-	auto x = ceil(abs(min(min(a.x, b.x), min(c.x, d.x))));
-	auto y = ceil(abs(min(min(a.y, b.y), min(c.y, d.y))));
-
-	// and also < (width, height)
-	auto width = ceil(abs(max(max(a.x, b.x), max(c.x, d.x)))) + x;
-	auto height = ceil(abs(max(max(a.y, b.y), max(c.y, d.y)))) + y;
-
-	// adjust target points accordingly
-	for (auto i = 0; i < 4; i++)
-		inputQuad[i] += cv::Point2f(x, y);
-
-	// recalculate transformation
-	M = getPerspectiveTransform(inputQuad, outputQuad);
-
-	// get result
-	cv::Mat result;
-	warpPerspective(*image, result, M, cv::Size(static_cast<int>(width), static_cast<int>(height)), cv::WARP_INVERSE_MAP);
-
-	imshow("quadfit", result);
-
-	cv::waitKey(3);
-}
-
-[[deprecated("Flagged for deletion.")]]
-void ThicknessGauge::WarpImage(cv::Mat* input, cv::Mat* output) {
-}
-
-[[deprecated("Flagged for deletion.")]]
-void ThicknessGauge::WarpMeSomeCookies(cv::Mat* image, cv::Mat* output) {
-	vector<cv::Point2f> points2D;
-	points2D.push_back(cv::Point2f(0, 0));
-	points2D.push_back(cv::Point2f(50, 0));
-	points2D.push_back(cv::Point2f(50, 50));
-	points2D.push_back(cv::Point2f(0, 50));
-
-	//cv::Mat perspectiveMat = cv::getPerspectiveTransform(points2D, *image);
-	//cv::warpPerspective(*_image, *_undistortedImage, M, cv::Size(_image->cols, _image->rows));
-}
-
-cv::Mat ThicknessGauge::cornerHarris_test(cv::Mat& image, int threshold) const {
-
-	cv::Mat dst_norm, dst_norm_scaled;
-	cv::Mat dst = cv::Mat::zeros(image.size(), CV_32FC1);
-
-	/// Detector parameters
-	auto blockSize = 2;
-	auto apertureSize = 3;
-	auto k = 0.04;
-
-	/// Detecting corners
-	cornerHarris(image, dst, blockSize, apertureSize, k, cv::BORDER_DEFAULT);
-
-	/// Normalizing
-	normalize(dst, dst_norm, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());
-	convertScaleAbs(dst_norm, dst_norm_scaled);
-
-	/// Drawing a circle around corners
-	for (auto j = 0; j < dst_norm.rows; j++) {
-		for (auto i = 0; i < dst_norm.cols; i++) {
-			if (static_cast<int>(dst_norm.at<float>(j, i)) > threshold)
-				circle(dst_norm_scaled, cv::Point(i, j), 5, cv::Scalar(0), 2, 8, 0);
-		}
-	}
-	return dst_norm_scaled;
-}
-
 cv::Mat ThicknessGauge::erosion(cv::Mat& input, int element, int size) const {
 	cv::MorphShapes erosion_type;
 	if (element == 0)
@@ -1893,24 +937,6 @@ cv::Mat ThicknessGauge::erosion(cv::Mat& input, int element, int size) const {
 	cv::Mat erosion_dst = cv::Mat::zeros(input.size(), input.type());
 	erode(input, erosion_dst, element, cv::Point(-1, -1), 1, cv::BORDER_DEFAULT);
 	return erosion_dst;
-}
-
-cv::Mat ThicknessGauge::dilation(cv::Mat& input, int dilation, int size) const {
-	cv::MorphShapes dilation_type;
-	if (dilation == 0)
-		dilation_type = cv::MORPH_RECT;
-	else if (dilation == 1)
-		dilation_type = cv::MORPH_CROSS;
-	else if (dilation == 2)
-		dilation_type = cv::MORPH_ELLIPSE;
-	else
-		dilation_type = cv::MORPH_RECT;
-
-	auto element = getStructuringElement(dilation_type, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
-	cv::Mat dilation_dst = cv::Mat::zeros(input.size(), input.type());
-
-	dilate(input, dilation_dst, element);
-	return dilation_dst;
 }
 
 int ThicknessGauge::getFrameCount() const {
