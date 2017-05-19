@@ -30,8 +30,9 @@
 //
 // Created by rudz on 6/9/16.
 //
-#ifndef VEC_H
-#define VEC_H
+
+#pragma once
+
 #include <ostream>
 
 using namespace std;
@@ -51,6 +52,26 @@ public:
 		y = y_;
 	}
 
+	v2(const v2& other) : x(other.x)
+	                    , y(other.y) {}
+
+	v2(v2&& other) noexcept : x(std::move(other.x))
+	                        , y(std::move(other.y)) {}
+
+	v2& operator=(const v2& other) {
+		if (this == &other) return *this;
+		x = other.x;
+		y = other.y;
+		return *this;
+	}
+
+	v2& operator=(v2&& other) noexcept {
+		if (this == &other) return *this;
+		x = std::move(other.x);
+		y = std::move(other.y);
+		return *this;
+	}
+
 	v2() {
 		x = 0;
 		y = 0;
@@ -58,6 +79,11 @@ public:
 
 	// OpenCV copy constructor
 #ifdef CV_VERSION
+	explicit v2(cv::Point_<T>& p) {
+		x = p.x;
+		y = p.y;
+	}
+
 	explicit v2(cv::Point& p) {
 		x = p.x;
 		y = p.y;
@@ -67,11 +93,16 @@ public:
 		return v2<T>(x + that.x, y + that.y);
 	}
 
-
-
 #endif
 	T x;
 	T y;
+
+	friend bool operator==(const v2& lhs, const v2& rhs) {
+		return lhs.x == rhs.x
+				&& lhs.y == rhs.y;
+	}
+
+	friend bool operator!=(const v2& lhs, const v2& rhs) { return !(lhs == rhs); }
 
 	v2 operator+(const v2 &that) {
 		return v2<T>(x + that.x, y + that.y);
@@ -189,9 +220,36 @@ public:
 		z = 0;
 	}
 
+	v3(const v3& other) : v2<T>(other)
+	                    , z(other.z) {}
+
+	v3(v3&& other) noexcept : v2<T>(std::move(other))
+	                        , z(std::move(other.z)) {}
+
+	v3& operator=(const v3& other) {
+		if (this == &other) return *this;
+		v2<T>::operator =(other);
+		z = other.z;
+		return *this;
+	}
+
+	v3& operator=(v3&& other) noexcept {
+		if (this == &other) return *this;
+		v2<T>::operator =(std::move(other));
+		z = std::move(other.z);
+		return *this;
+	}
+
 	T z;
 
-	v3 operator+(const v3 &that) {
+	friend bool operator==(const v3& lhs, const v3& rhs) {
+		return static_cast<const v2<T>&>(lhs) == static_cast<const v2<T>&>(rhs)
+				&& lhs.z == rhs.z;
+	}
+
+	friend bool operator!=(const v3& lhs, const v3& rhs) { return !(lhs == rhs); }
+
+	virtual v3 operator+(const v3 &that) {
 		return v3<T>(this->x + that.x, this->y + that.y, this->z + that.z);
 	}
 
@@ -243,4 +301,100 @@ ostream &operator<<(ostream &stream, v3<T> v) {
 }
 
 
-#endif //VEC_H
+/////////////////////////////////////
+
+template<class T>
+class v4 : public v3<T> {
+public:
+
+	v4(T x1, T y1, T z1, T w1, T x2, T y2, T z2, T w2) : v3<T>(x1, y1, z1, x2, y2, z2) {
+		w = z2 - z1;
+	}
+
+	v4(T x_, T y_, T z_, T w_) : v3<T>(x_, y_, z_) {
+		w = w_;
+	}
+
+	v4() : v3<T>(0, 0, 0) {
+		w = 0;
+	}
+
+	v4(const v4& other) : v3<T>(other)
+	                    , w(other.w) {}
+
+	v4(v4&& other) noexcept : v3<T>(std::move(other))
+	                        , w(std::move(other.w)) {}
+
+	v4& operator=(const v4& other) {
+		if (this == &other) return *this;
+		v3<T>::operator =(other);
+		w = other.w;
+		return *this;
+	}
+
+	v4& operator=(v4&& other) noexcept {
+		if (this == &other) return *this;
+		v3<T>::operator =(std::move(other));
+		w = std::move(other.w);
+		return *this;
+	}
+
+	T w;
+
+	friend bool operator==(const v4& lhs, const v4& rhs) {
+		return static_cast<const v3<T>&>(lhs) == static_cast<const v3<T>&>(rhs)
+				&& lhs.w == rhs.w;
+	}
+
+	friend bool operator!=(const v4& lhs, const v4& rhs) { return !(lhs == rhs); }
+
+	v4 operator+(const v4 &that) {
+		return v4<T>(this->x + that.x, this->y + that.y, this->z + that.z, this->w + that.w);
+	}
+
+	v4 operator-(const v4 &that) {
+		return v4<T>(this->x - that.x, this->y - that.y, this->z - that.z, this->w - that.w);
+	}
+
+	// Operator : Scalarproduct (dotproduct)
+	T operator*(const v4 &that) override {
+		return (this->x * that.x) + (this->y * that.y) + (this->z * that.z) + (this->w * that->);
+	}
+
+	v4 operator*(const double k) {
+		return v4<T>(static_cast<T>(k * this->x), static_cast<T>(k * this->y), static_cast<T>(k * this->z), static_cast<T>(k * this->w));
+	}
+
+	T len() const override {
+		return abs(sqrt(this->x * this->x + this->y * this->y + this->z * this->z));
+	}
+
+	v4 cross(const v4 &that) {
+		return v4<T>(this->y * that.z - this->z * this->y, this->z * that.x - this->x * that.z, this->x * that.y - that.y - this->x);
+	}
+
+	T parallelogram_area(const v4 &that) {
+		return abs(cross(that).len());
+	}
+
+	T angle(const v4 &that) {
+		return v4<T>(this->x, this->y, this->z) * that / (len() * that.len());
+	}
+
+	bool hasValue() override {
+		return this->x != 0 || this->y != 0 || this->z != 0 || this->w != 0;
+	}
+
+	friend std::size_t hash_value(const v4& obj) {
+		std::size_t seed = 0x021F39B2;
+		seed ^= (seed << 6) + (seed >> 2) + 0x0AB3178C + hash_value(static_cast<const v3<T>&>(obj));
+		seed ^= (seed << 6) + (seed >> 2) + 0x41691B84 + hash_value(obj.w);
+		return seed;
+	}
+};
+
+template<class T>
+ostream &operator<<(ostream &stream, v4<T> v) {
+	stream << '[' << v.x << ',' << v.y << ',' << v.z << ',' << v.w << ']';
+	return stream;
+}
