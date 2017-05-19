@@ -571,6 +571,16 @@ void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) 
 
 }
 
+template <int minLen>
+inline int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
+	auto minLineLen = cvRound(rect.width / 32);
+
+	if (minLineLen < minLen)
+		minLineLen = minLen;
+
+	return minLineLen;
+}
+
 /**
  * \brief Main entry points for calculation of marking height
  */
@@ -601,10 +611,10 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	auto markingOk = computerMarkingRectangle(canny, markingFilter, houghV, markingRect);
 
-	auto minLineLen = cvRound(markingRect.width / 32);
+	if (!markingOk)
+		Util::loge("Error while computing marking rectangle.");
 
-	if (minLineLen < 10)
-		minLineLen = 10;
+	auto minLineLen = computeHoughPMinLine<10>(markingRect);
 
 	auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, true);
 
@@ -615,13 +625,53 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	computeBaseLineAreas(canny, baselineFilter, houghH, baseLines);
 
-	cout << "line Y : " <<  baseLines[0].y << endl;
+	cout << "line Y : " << baseLines[0].y << endl;
+
+	// work on laser location on marking..
+	std::vector<cv::Point2f> laserLine;
+
+	computeLaserLocations<float>(markingRect, laserLine);
 
 
 	if (showWindows_) {
 		auto key = static_cast<char>(cv::waitKey(30));
 		if (key == 27)
 			return; // escape was pressed
+	}
+
+
+}
+
+template <typename T>
+void ThicknessGauge::computeLaserLocations(cv::Rect_<T>& markingLocation, std::vector<cv::Point_<T>>& result) {
+
+	// generate frames with marking
+	std::vector<cv::Mat> markingFrames(frameCount_);
+
+	for (auto& frame : frames)
+		markingFrames.push_back(frame(markingLocation));
+
+	while (true) {
+
+		for (auto& frame : markingFrames) {
+			auto baseFrame = frame.clone();
+
+
+
+			if (showWindows_) {
+				//cv::imshow("test marking", marking);
+				auto key = static_cast<char>(cv::waitKey(30));
+				if (key == 27) /* escape was pressed */ {
+					showWindows_ ^= true;
+					break;
+				}
+			}
+
+		}
+
+
+		if (!showWindows_)
+			break;
 	}
 
 

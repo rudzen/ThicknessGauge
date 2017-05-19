@@ -29,7 +29,8 @@ using namespace TCLAP;
  */
 
 #define _USE_MATH_DEFINES
-cv::RNG rng(12345);
+#define _CRT_SECURE_NO_WARNINGS
+
 const string default_camera_calibration_file = "C2450.json";
 
 bool parseArgs(int argc, char** argv, CommandLineOptions& options);
