@@ -88,7 +88,7 @@ inline bool LaserR::computeXLine() {
 		if (xl.v.empty()) continue;
 
 		auto sum = 0.0f;
-		for (auto& y : xl.v) { sum += y; }
+		for (auto& intensity : xl.v) { sum += xl.v.size() * intensity; }
 		xl.y = 100.0f / sum;
 		ok = true;
 		cout << "x / y: " << xl.x << " / " << xl.y << endl;
@@ -143,30 +143,7 @@ inline bool LaserR::intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2,
 
 #endif
 
-inline bool LaserR::computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output) {
-
-	// accu non-zero pixels.
-	vector<cv::Point2i> nonZero;
-	nonZero.reserve(image.cols * image.rows);
-
-	cv::findNonZero(image, nonZero);
-
-	// guard
-	if (nonZero.empty()) return false;
-
-	// clear if not empty
-	if (!output.empty()) output.clear();
-
-	// reserve enough space to avoid automatic resizing
-	output.reserve(nonZero.size());
-
-	configureXLine(image, nonZero, output);
-
-	return !output.empty();
-
-}
-
-/*
+  /*
    |  __
    | /__\
    | X~~|			"The eternal code god

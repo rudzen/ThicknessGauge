@@ -263,6 +263,9 @@ inline void HoughLinesR::computeBorders() {
 	markingRect.width = rightRoi.x - leftRoi.x + rightRoi.width;
 	markingRect.height = static_cast<float>(image_.rows);
 
+
+
+
 	if (showWindow_) {
 		drawLines(leftLines_, cv::Scalar(0, 255, 0));
 		drawLines(rightLines_, cv::Scalar(0, 0, 255));

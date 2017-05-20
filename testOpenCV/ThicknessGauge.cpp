@@ -344,6 +344,31 @@ void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> f
 	}
 }
 
+void ThicknessGauge::computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& lines, cv::Rect& markingRect) {
+	
+	cv::Point2f avgTop(0.0f, markingRect.height);
+	cv::Point2f avgButtom(0.0f, 0.0f);
+	auto halfPoint = static_cast<float>(markingRect.y / 2);
+
+	for (auto& line : lines) {
+		float sumButtom = 0.0f;
+		float sumTop = 0.0f;
+		for (auto& point : line.elements) {
+			if (point.y < halfPoint) {
+				sumButtom += point.x;
+			} else {
+				sumTop += point.x;
+			}
+		}
+		avgTop.x += (sumTop / line.elements.size());
+		avgButtom.x += (sumButtom / line.elements.size());
+	}
+
+
+
+
+}
+
 /**
  * \brief Main entry points for calculation of marking height
  */
@@ -376,6 +401,8 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	if (!markingOk)
 		Util::loge("Error while computing marking rectangle.");
+
+	
 
 	auto minLineLen = computeHoughPMinLine<10>(markingRect);
 

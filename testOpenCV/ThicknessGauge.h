@@ -141,6 +141,8 @@ public: // basic stuff to extract information
 	bool computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output);
 	void computeLaserLocations(float baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result);
 
+	void computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& lines, cv::Rect& markingRect);
+
 	LineBaseData findMarkingLinePairs_(std::string& globName);
 
 	static void addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y);

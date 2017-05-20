@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
+    <ClCompile Include="CV\LaserR.cpp" />
     <ClCompile Include="IO\IsValidFileName.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
