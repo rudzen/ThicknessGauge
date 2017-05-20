@@ -26,7 +26,11 @@ class LaserR : public BaseR<float> {
 		// where x is zero
 		float cut;
 
-		xLine() { x = 0; y = 0.0f; cut = 0.0f; }
+		xLine() {
+			x = 0;
+			y = 0.0f;
+			cut = 0.0f;
+		}
 
 		explicit xLine(int x) : x(x) {
 			y = 0.0f;
@@ -51,8 +55,7 @@ class LaserR : public BaseR<float> {
 			os << " y: " << obj.y;
 			os << " cut:" << obj.cut;
 			os << "\nv: (" << obj.v.size() << ") {\n";
-			for (auto i = 0; i < obj.v.size(); i++)
-				os << i << ' ' << obj.v.at(i) << '\n';
+			for (auto i = 0; i < obj.v.size(); i++) os << i << ' ' << obj.v.at(i) << '\n';
 			os << '}';
 			return os;
 		}
@@ -69,6 +72,11 @@ class LaserR : public BaseR<float> {
 
 	static void computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal);
 
+	template <class T>
+	bool intersection(v2<T> o1, v2<T> p1, v2<T> o2, v2<T> p2, v2<T>& r);
+
+	bool intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f& r) const;
+
 public:
 
 	bool computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output);
@@ -80,13 +88,10 @@ inline bool LaserR::computeXLine() {
 	auto ok = false;
 
 	for (auto& xl : lines_) {
-		if (xl.v.empty())
-			continue;
+		if (xl.v.empty()) continue;
 
 		auto sum = 0.0f;
-		for (auto& y : xl.v) {
-			sum += y;
-		}
+		for (auto& y : xl.v) { sum += y; }
 		xl.y = 100.0f / sum;
 		ok = true;
 		cout << "x / y: " << xl.x << " / " << xl.y << endl;
@@ -97,19 +102,16 @@ inline bool LaserR::computeXLine() {
 }
 
 inline void LaserR::configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroes, vector<v3<float>>& output) {
-	
-	if (!lines_.empty())
-		lines_.clear();
+
+	if (!lines_.empty()) lines_.clear();
 
 	lines_.reserve(image.cols);
 
 	// populate xLine vector
-	for (auto i = 0; i < image.cols; i++)
-		lines_.push_back(xLine(i));
+	for (auto i = 0; i < image.cols; i++) lines_.push_back(xLine(i));
 
 	// copy the values from nonZero vector
-	for (auto& nz : nonZeroes)
-		lines_[nz.x].v.push_back(image.at<unsigned char>(nz));
+	for (auto& nz : nonZeroes) lines_[nz.x].v.push_back(image.at<unsigned char>(nz));
 
 	auto ok = computeXLine();
 
@@ -118,23 +120,43 @@ inline void LaserR::configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroe
 		return;
 	}
 
-	for (auto& line : lines_)
-		output.push_back(v3<float>(static_cast<float>(line.x), line.y, static_cast<float>(line.v.size())));
+	for (auto& line : lines_) output.push_back(v3<float>(static_cast<float>(line.x), line.y, static_cast<float>(line.v.size())));
 
 }
 
-inline float LaserR::computeIntersect(float *__restrict y, float *__restrict a, int x) {
-	return *y - (*a * static_cast<unsigned int>(x));
+inline float LaserR::computeIntersect(float*__restrict y, float*__restrict a, int x) { return *y - (*a * static_cast<unsigned int>(x)); }
+
+inline void LaserR::computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal) { diagonal.cut = computeIntersect(&diagonal.y, &horizontal.slobe, diagonal.x); }
+
+template <typename T>
+bool LaserR::intersection(v2<T> o1 ,v2<T> p1, v2<T> o2, v2<T> p2, v2<T>& r) {
+	v2<T> x = o2 - o1;
+	v2<T> d1 = p1 - o1;
+	v2<T> d2 = p2 - o2;
+
+	auto cross = d1.x * d2.y - d1.y * d2.x;
+	if (abs(cross) < /*EPS*/1e-8) return false;
+
+	double t1 = (x.x * d2.y - x.y * d2.x) / cross;
+	r = o1 + d1 * t1;
+	return true;
 }
 
-inline void LaserR::computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal) {
-	
-	diagonal.cut = computeIntersect(&diagonal.y, &horizontal.slobe, diagonal.x);
+inline bool LaserR::intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f& r) const {
+	auto x = o2 - o1;
+	auto d1 = p1 - o1;
+	auto d2 = p2 - o2;
 
+	auto cross = d1.x * d2.y - d1.y * d2.x;
+	if (abs(cross) < /*EPS*/1e-8) return false;
+
+	double t1 = (x.x * d2.y - x.y * d2.x) / cross;
+	r = o1 + d1 * t1;
+	return true;
 }
 
 bool LaserR::computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output) {
-	
+
 	// accu non-zero pixels.
 	vector<cv::Point2i> nonZero;
 	nonZero.reserve(image.cols * image.rows);
@@ -142,12 +164,10 @@ bool LaserR::computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output) {
 	cv::findNonZero(image, nonZero);
 
 	// guard
-	if (nonZero.empty())
-		return false;
+	if (nonZero.empty()) return false;
 
 	// clear if not empty
-	if (!output.empty())
-		output.clear();
+	if (!output.empty()) output.clear();
 
 	// reserve enough space to avoid automatic resizing
 	output.reserve(nonZero.size());
@@ -158,22 +178,20 @@ bool LaserR::computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output) {
 
 }
 
-
-   /*
-	|  __
-	| /__\
-	| X~~|			"The eternal code god
-	|-\|//-.		 watches over this mess."
-   /|`.|'.' \			- R.A.Kohn, 2017
-  |,|.\~~ /||
-  |:||   ';||
-  ||||   | ||
-  \ \|     |`.
-  |\X|     | |
-  | .'     |||
-  | |   .  |||
-  |||   |  `.| JS
-  ||||  |   ||
-  ||||  |   ||
-  `+.__._._+*/
-
+/*
+   |  __
+   | /__\
+   | X~~|			"The eternal code god
+   |-\|//-.		 watches over this mess."
+/|`.|'.' \			- R.A.Kohn, 2017
+|,|.\~~ /||
+|:||   ';||
+||||   | ||
+\ \|     |`.
+|\X|     | |
+| .'     |||
+| |   .  |||
+|||   |  `.| JS
+||||  |   ||
+||||  |   ||
+`+.__._._+*/
