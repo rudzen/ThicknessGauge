@@ -82,18 +82,30 @@ public:
 
 private:
 
+	// the output for visual display ONLY!
 	cv::Mat output_;
 
+	// the line output for the houghlines algorithm
 	vector<cv::Vec2f> lines_;
 
+	// the lines with all information
 	vector<LineV> allLines_;
+
+	// the lines located on the right side of the image
 	vector<LineV> rightLines_;
+
+	// the lines location on the left side of the image
 	vector<LineV> leftLines_;
 
-	LineV rightBorder_;
-	LineV leftBorder_;
+	// the x coordinates of the left "border" of the marking
+	cv::Vec2f leftBorder_;
+
+	// the x coordinates of the right "border" of the marking
+	cv::Vec2f rightBorder_;
 
 	double leftY_ = 0.0;
+
+	/* only used for UI display through open cv*/
 
 	int rho_;
 
@@ -231,6 +243,15 @@ public:
 	void setLeftLines(const vector<LineV>& leftLines) {
 		this->leftLines_ = leftLines;
 	}
+
+	const cv::Vec2f& getLeftBorder() const {
+		return leftBorder_;
+	}
+
+	const cv::Vec2f& getRightBorder() const {
+		return rightBorder_;
+	}
+
 };
 
 inline void HoughLinesR::computeRectFromLines(vector<LineV>& input, cv::Rect2f& output) {
@@ -263,8 +284,11 @@ inline void HoughLinesR::computeBorders() {
 	markingRect.width = rightRoi.x - leftRoi.x + rightRoi.width;
 	markingRect.height = static_cast<float>(image_.rows);
 
+	leftBorder_[0] = leftRoi.x;
+	leftBorder_[1] = leftRoi.x + leftRoi.width;
 
-
+	rightBorder_[0] = rightRoi.x;
+	rightBorder_[1] = rightRoi.x + rightRoi.width;
 
 	if (showWindow_) {
 		drawLines(leftLines_, cv::Scalar(0, 255, 0));
@@ -274,39 +298,6 @@ inline void HoughLinesR::computeBorders() {
 		cv::rectangle(output_, markingRect, cv::Scalar(255, 0, 0), 3, CV_AA);
 		showOutput();
 	}
-
-	return;
-
-
-
-
-
-
-	leftBorder_.points.first.x = 0.0f;
-	leftBorder_.points.first.y = static_cast<float>(output_.rows);
-
-	leftBorder_.points.second.x = 0.0f;
-	leftBorder_.points.second.y = 0.0f;
-
-	for (auto& l : leftLines_) {
-		cout << "F: " << l.points.first << endl;
-		cout << "S: " << l.points.second << endl;
-		leftBorder_.points.first.x += l.points.first.y;
-		leftBorder_.points.second.x += l.points.second.x;
-	}
-
-	leftBorder_.points.first.x /= leftLines_.size();
-	leftBorder_.points.second.x /= leftLines_.size();
-
-	//cout << "L avg: " << leftBorder.points.first << " / " << leftBorder.points.second << endl;
-
-	if (showWindow_) {
-		drawLines(leftLines_, cv::Scalar(0, 255, 0));
-		drawLines(rightLines_, cv::Scalar(0, 0, 255));
-		line(output_, leftBorder_.points.first, leftBorder_.points.second, cv::Scalar(255, 255, 0), 3, CV_AA);
-		showOutput();
-	}
-
 
 }
 
