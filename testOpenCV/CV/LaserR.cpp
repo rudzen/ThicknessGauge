@@ -1,3 +1,4 @@
+#include <opencv2/stitching/detail/warpers.hpp>
 #include "LaserR.h"
 
 

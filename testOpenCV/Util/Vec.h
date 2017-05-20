@@ -253,9 +253,9 @@ public:
 	}
 
 	// Operator : Scalarproduct (dotproduct)
-	T operator*(const v3 &that) override {
-		return (this->x * that.x) + (this->y * that.y) + (this->z * that.z);
-	}
+	//T operator*(const v3 &that) override {
+	//	return (this->x * that.x) + (this->y * that.y) + (this->z * that.z);
+	//}
 
 	v3 operator*(const double k) {
 		return v3<T>(static_cast<T>(k * this->x), static_cast<T>(k * this->y), static_cast<T>(k * this->z));

@@ -41,7 +41,7 @@ protected:
 
 	const double degree = CV_PI * (1.0 / 180.0);
 
-	string windowName;
+	std::string windowName;
 
 public:
 

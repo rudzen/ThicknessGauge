@@ -2,7 +2,7 @@
 #include "BaseR.h"
 #include <vector>
 #include "../Util/Vec.h"
-#include <opencv2/core/mat.hpp>
+//#include <opencv2/core/mat.hpp>
 #include <opencv2/stitching/detail/warpers.hpp>
 #include <unordered_map>
 #include <iostream>
