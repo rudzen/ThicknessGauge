@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <iostream>
 #include "Util/Util.h"
+#include <ostream>
 
 class LaserR : public BaseR<float> {
 
@@ -15,11 +16,33 @@ class LaserR : public BaseR<float> {
 		int x;
 		float y;
 
-		xLine() { x = 0; y = 0; }
+		xLine() { x = 0; y = 0.0f; }
 
 		explicit xLine(int x) : x(x) {
 			y = 0;
 			v.reserve(x);
+		}
+
+		friend bool operator==(const xLine& lhs, const xLine& rhs) { return lhs.y == rhs.y; }
+
+		friend bool operator!=(const xLine& lhs, const xLine& rhs) { return !(lhs == rhs); }
+
+		friend bool operator<(const xLine& lhs, const xLine& rhs) { return lhs.y < rhs.y; }
+
+		friend bool operator<=(const xLine& lhs, const xLine& rhs) { return !(rhs < lhs); }
+
+		friend bool operator>(const xLine& lhs, const xLine& rhs) { return rhs < lhs; }
+
+		friend bool operator>=(const xLine& lhs, const xLine& rhs) { return !(lhs < rhs); }
+
+		friend std::ostream& operator<<(std::ostream& os, const xLine& obj) {
+			os << "x: " << obj.x;
+			os << "y: " << obj.y;
+			os << "\nv: (" << obj.v.size() << ") {\n";
+			for (auto i = 0; i < obj.v.size(); i++)
+				os << i << ' ' << obj.v.at(i) << '\n';
+			os << '}';
+			return os;
 		}
 
 	} xLine;
@@ -108,3 +131,23 @@ bool LaserR::computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output) {
 	return !output.empty();
 
 }
+
+
+   /*
+	|  __
+	| /__\
+	| X~~|			"The eternal code god
+	|-\|//-.		 watches over this mess."
+   /|`.|'.' \			- R.A.Kohn, 2017
+  |,|.\~~ /||
+  |:||   ';||
+  ||||   | ||
+  \ \|     |`.
+  |\X|     | |
+  | .'     |||
+  | |   .  |||
+  |||   |  `.| JS
+  ||||  |   ||
+  ||||  |   ||
+  `+.__._._+*/
+

@@ -106,6 +106,9 @@ public:
 		auto uc_pixel = col.data;
 
 		for (auto i = col.cols; i--;) {
+			if (uc_pixel[0] == 0)
+				continue;
+
 			sum += uc_pixel[0];
 			//cout << "sum is now : " << sum << "\n";
 			count++;
