@@ -39,16 +39,22 @@ public:
 		linePair points;
 		std::vector<cv::Point_<float>> elements;
 
-		LineV() { }
+		float slobe;
+
+		LineV() {
+			slobe = 0.0f;
+		}
 
 		LineV(cv::Vec2f entry, linePair points)
 			: entry(entry),
 			points(points) {
 			elements.reserve(cvRound(Util::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
+			LineV();
 		}
 
 		friend bool operator==(const LineV& lhs, const LineV& rhs) {
-			return lhs.entry == rhs.entry
+			return lhs.slobe == rhs.slobe
+				&& lhs.entry == rhs.entry
 				&& lhs.points == rhs.points
 				&& lhs.elements == rhs.elements;
 		}
@@ -60,6 +66,7 @@ public:
 		friend std::ostream& operator<<(std::ostream& os, const LineV& obj) {
 			return os
 				<< "entry: " << obj.entry
+				<< "slobe: " << obj.slobe
 				<< " points(1/2): " << obj.points.first << '/' << obj.points.second
 				<< " elements: " << obj.elements;
 		}
@@ -148,7 +155,7 @@ private:
 
 	void showOutput() const;
 
-	void bresenham();
+	void computeMeta();
 
 	static void computeRectFromLines(vector<LineV>& input, cv::Rect2f& output);
 
@@ -347,10 +354,11 @@ inline void HoughLinesR::doVerticalHough() {
 		cerr << "FATAL ERROR, NO VERTICAL LINES DETECTED!";
 
 	//drawLines(allLines, cv::Scalar(255, 0, 255));
-	bresenham();
+	computeMeta();
+
 }
 
-inline void HoughLinesR::bresenham() {
+inline void HoughLinesR::computeMeta() {
 	
 	if (allLines_.empty())
 		return;
@@ -366,6 +374,7 @@ inline void HoughLinesR::bresenham() {
 	auto center = image_.cols / 2;
 
 	for (auto& a : allLines_) {
+		a.slobe = (a.entry[3] - a.entry[1]) / (a.entry[2] - a.entry[0]);
 		if (a.points.first.x < center)
 			leftLines_.push_back(a);
 		else
