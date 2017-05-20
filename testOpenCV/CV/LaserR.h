@@ -70,10 +70,6 @@ class LaserR : public BaseR<float> {
 
 	static void computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal);
 
-	bool intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f& r) const;
-
-	bool LaserR::intersection(cv::Vec4f& o, cv::Vec2f& p, cv::Vec4f& r);
-
 public:
 
 	bool computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output);
@@ -125,23 +121,7 @@ inline void LaserR::configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroe
 
 //inline void LaserR::computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal) { diagonal.cut = computeIntersect(&diagonal.y, &horizontal.slobe, diagonal.x); }
 
-#ifdef CV_VERSION
 
-inline bool LaserR::intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f& r) const {
-	auto d1 = p1 - o1;
-	auto d2 = p2 - o2;
-
-	auto cross = d1.x * d2.y - d1.y * d2.x;
-	if (abs(cross) < /*EPS*/1e-8) return false;
-
-	auto x = o2 - o1;
-
-	double t1 = (x.x * d2.y - x.y * d2.x) / cross;
-	r = o1 + d1 * t1;
-	return true;
-}
-
-#endif
 
   /*
    |  __

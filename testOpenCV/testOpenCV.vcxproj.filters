@@ -114,6 +114,9 @@
     <ClCompile Include="CV\LaserR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Calc\LineCalc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -267,6 +270,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="_unused_crap\temp_mains.txt">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Calc\LineCalc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

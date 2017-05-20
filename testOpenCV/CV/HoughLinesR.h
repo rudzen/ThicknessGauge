@@ -98,10 +98,10 @@ private:
 	vector<LineV> leftLines_;
 
 	// the x coordinates of the left "border" of the marking
-	cv::Vec2f leftBorder_;
+	cv::Vec4f leftBorder_;
 
 	// the x coordinates of the right "border" of the marking
-	cv::Vec2f rightBorder_;
+	cv::Vec4f rightBorder_;
 
 	double leftY_ = 0.0;
 
@@ -244,11 +244,11 @@ public:
 		this->leftLines_ = leftLines;
 	}
 
-	const cv::Vec2f& getLeftBorder() const {
+	const cv::Vec4f& getLeftBorder() const {
 		return leftBorder_;
 	}
 
-	const cv::Vec2f& getRightBorder() const {
+	const cv::Vec4f& getRightBorder() const {
 		return rightBorder_;
 	}
 
@@ -279,16 +279,22 @@ inline void HoughLinesR::computeBorders() {
 	computeRectFromLines(leftLines_, leftRoi);
 	computeRectFromLines(rightLines_, rightRoi);
 
+	auto imgHeight = static_cast<float>(image_.rows);
+
 	markingRect.x = leftRoi.x;
 	markingRect.y = leftRoi.y;
 	markingRect.width = rightRoi.x - leftRoi.x + rightRoi.width;
-	markingRect.height = static_cast<float>(image_.rows);
+	markingRect.height = imgHeight;
 
 	leftBorder_[0] = leftRoi.x;
-	leftBorder_[1] = leftRoi.x + leftRoi.width;
+	leftBorder_[1] = imgHeight;
+	leftBorder_[2] = leftRoi.x + leftRoi.width;
+	leftBorder_[3] = 0.0f;
 
 	rightBorder_[0] = rightRoi.x;
-	rightBorder_[1] = rightRoi.x + rightRoi.width;
+	rightBorder_[1] = 0.0f;
+	rightBorder_[2] = rightRoi.x + rightRoi.width;
+	rightBorder_[3] = imgHeight;
 
 	if (showWindow_) {
 		drawLines(leftLines_, cv::Scalar(0, 255, 0));
