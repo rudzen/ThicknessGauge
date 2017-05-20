@@ -5,8 +5,9 @@
 #include "BaseR.h"
 #include <opencv2/core/affine.hpp>
 #include "Exceptions/NoLineDetectedException.h"
+#include "HoughLinesR.h"
 
-   /*
+/*
 	|  __
 	| /__\
 	| X~~|			"The eternal code god
@@ -325,8 +326,8 @@ inline void HoughLinesPR::doHorizontalHough() {
 	double centerRight[3] = { 0.0, 0.0, 0.0 };
 	double centerLeft[3] = { 0.0, 0.0, 0.0 };
 
-	vector<LineH> left[3];
-	vector<LineH> right[3];
+	std::vector<LineH> left[3];
+	std::vector<LineH> right[3];
 
 	auto split = splitLinesInX(allLines, right[0], left[0], center_, &centerLeft[0], &centerRight[0]);
 
@@ -403,7 +404,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 	if (sumY != 0.0)
 		sumY /= right[1].size() * 0.5f;
 
-	cout << "Right side Y sum : " << sumY << endl;
+	std::cout << "Right side Y sum : " << sumY << std::endl;
 
 	drawLine(0, cvRound(sumY), cvRound(maxX), cvRound(sumY), cv::Scalar(0, 0, 0));
 

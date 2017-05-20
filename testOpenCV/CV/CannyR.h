@@ -4,8 +4,9 @@
 #include <opencv2/highgui.hpp>
 #include <iostream>
 #include "BaseR.h"
+#include "Pixel.h"
 
-   /*
+/*
 	|  __
 	| /__\
 	| X~~|			"The eternal code god

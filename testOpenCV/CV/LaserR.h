@@ -68,14 +68,11 @@ class LaserR : public BaseR<float> {
 
 	void configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroes, vector<v3<float>>& output);
 
-	static float computeIntersect(float* y, float* a, int x);
-
 	static void computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal);
 
-	template <class T>
-	bool intersection(v2<T> o1, v2<T> p1, v2<T> o2, v2<T> p2, v2<T>& r);
-
 	bool intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f& r) const;
+
+	bool LaserR::intersection(cv::Vec4f& o, cv::Vec2f& p, cv::Vec4f& r);
 
 public:
 
@@ -124,23 +121,11 @@ inline void LaserR::configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroe
 
 }
 
-inline float LaserR::computeIntersect(float*__restrict y, float*__restrict a, int x) { return *y - (*a * static_cast<unsigned int>(x)); }
+//inline float LaserR::computeIntersect(float*__restrict y, float*__restrict a, int x) { return *y - (*a * static_cast<unsigned int>(x)); }
 
-inline void LaserR::computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal) { diagonal.cut = computeIntersect(&diagonal.y, &horizontal.slobe, diagonal.x); }
+//inline void LaserR::computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal) { diagonal.cut = computeIntersect(&diagonal.y, &horizontal.slobe, diagonal.x); }
 
-template <typename T>
-bool LaserR::intersection(v2<T> o1 ,v2<T> p1, v2<T> o2, v2<T> p2, v2<T>& r) {
-	v2<T> x = o2 - o1;
-	v2<T> d1 = p1 - o1;
-	v2<T> d2 = p2 - o2;
-
-	auto cross = d1.x * d2.y - d1.y * d2.x;
-	if (abs(cross) < /*EPS*/1e-8) return false;
-
-	double t1 = (x.x * d2.y - x.y * d2.x) / cross;
-	r = o1 + d1 * t1;
-	return true;
-}
+#ifdef CV_VERSION
 
 inline bool LaserR::intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f& r) const {
 	auto x = o2 - o1;
@@ -155,7 +140,9 @@ inline bool LaserR::intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2,
 	return true;
 }
 
-bool LaserR::computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output) {
+#endif
+
+inline bool LaserR::computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output) {
 
 	// accu non-zero pixels.
 	vector<cv::Point2i> nonZero;

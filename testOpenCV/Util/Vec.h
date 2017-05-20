@@ -84,12 +84,7 @@ public:
 		y = p.y;
 	}
 
-	explicit v2(cv::Point& p) {
-		x = p.x;
-		y = p.y;
-	}
-
-	v2 operator+(const cv::Point &that) {
+	v2 operator+(const cv::Point_<T> &that) {
 		return v2<T>(x + that.x, y + that.y);
 	}
 
