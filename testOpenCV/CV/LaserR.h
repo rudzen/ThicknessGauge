@@ -8,18 +8,29 @@
 #include <iostream>
 #include "Util/Util.h"
 #include <ostream>
+#include "HoughLinesR.h"
 
 class LaserR : public BaseR<float> {
 
 	typedef struct xLine {
+
+		// intensity vector
 		vector<unsigned char> v;
+
+		// the x pos
 		int x;
+
+		// the calculated avg y pos
 		float y;
 
-		xLine() { x = 0; y = 0.0f; }
+		// where x is zero
+		float cut;
+
+		xLine() { x = 0; y = 0.0f; cut = 0.0f; }
 
 		explicit xLine(int x) : x(x) {
-			y = 0;
+			y = 0.0f;
+			cut = 0.0f;
 			v.reserve(x);
 		}
 
@@ -37,7 +48,8 @@ class LaserR : public BaseR<float> {
 
 		friend std::ostream& operator<<(std::ostream& os, const xLine& obj) {
 			os << "x: " << obj.x;
-			os << "y: " << obj.y;
+			os << " y: " << obj.y;
+			os << " cut:" << obj.cut;
 			os << "\nv: (" << obj.v.size() << ") {\n";
 			for (auto i = 0; i < obj.v.size(); i++)
 				os << i << ' ' << obj.v.at(i) << '\n';
@@ -52,6 +64,10 @@ class LaserR : public BaseR<float> {
 	bool computeXLine();
 
 	void configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroes, vector<v3<float>>& output);
+
+	static float computeIntersect(float* y, float* a, int x);
+
+	static void computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal);
 
 public:
 
@@ -104,6 +120,16 @@ inline void LaserR::configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroe
 
 	for (auto& line : lines_)
 		output.push_back(v3<float>(static_cast<float>(line.x), line.y, static_cast<float>(line.v.size())));
+
+}
+
+inline float LaserR::computeIntersect(float *__restrict y, float *__restrict a, int x) {
+	return *y - (*a * static_cast<unsigned int>(x));
+}
+
+inline void LaserR::computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal) {
+	
+	diagonal.cut = computeIntersect(&diagonal.y, &horizontal.slobe, diagonal.x);
 
 }
 
