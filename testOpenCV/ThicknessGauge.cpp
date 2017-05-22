@@ -233,8 +233,6 @@ inline int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
 	Pixelz pixelz;
 
-	Util::log("Laser enter");
-
 	// generate frames with marking
 	std::vector<cv::Mat> markingFrames;
 	std::vector<cv::Mat> outputs;
@@ -249,8 +247,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		markingFrames.push_back(frame(markingLocation));
 		outputs.push_back(cv::Mat::zeros(markingFrames.back().size(), CV_8UC1));
 	}
-
-	Util::log("Laser configured");
 
 	cv::namedWindow("test height", CV_WINDOW_AUTOSIZE);
 
@@ -517,7 +513,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	while (true) {
 
-		cv::Mat sparseTest;
 
 		auto avg = 0.0;
 
@@ -525,7 +520,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		// left
 		for (auto& l : left) {
 			org = l.clone();
-			cv::Mat sparseTest = l.clone();
 			filter->setImage(org);
 			filter->doFilter();
 
@@ -554,14 +548,14 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			}
 
 			if (showWindows_) {
-				// generate boundry off the elements
-				cv::Point2f vertices[4];
-				cv::RotatedRect boundry = cv::minAreaRect(allElements);
-				boundry.points(vertices);
-				for (int i = 0; i < 4; ++i)
-					cv::line(sparseTest, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0), 1, CV_AA);
+				//// generate boundry off the elements
+				//cv::Point2f vertices[4];
+				//cv::RotatedRect boundry = cv::minAreaRect(allElements);
+				//boundry.points(vertices);
+				//for (int i = 0; i < 4; ++i)
+				//	cv::line(sparseTest, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0), 1, CV_AA);
 
-				cv::imshow("test baseline left", sparseTest);
+				//cv::imshow("test baseline left", sparseTest);
 				//cv::imshow("test baseline right", right);
 				auto key = static_cast<char>(cv::waitKey(30));
 				if (key == 27) {
@@ -572,41 +566,58 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		}
 
-		auto print = [&]() {
-			for (const auto& point : allElements) {
-				std::cout << "(" << point.x << " " << point.y << ") ";
-			}
-			std::cout << std::endl;
-		};
+		//auto print = [&]() {
+		//	for (const auto& point : allElements) {
+		//		std::cout << "(" << point.x << " " << point.y << ") ";
+		//	}
+		//	std::cout << std::endl;
+		//};
 
-		cout << "as is...\n";
-		print();
+		//cout << "as is...\n";
+		//print();
 
-		// sort all elements
-		std::sort(allElements.begin(), allElements.end(), [](const cv::Point2f& lhs, const cv::Point2f& rhs) {
-	          return lhs.x < rhs.x && lhs.y < rhs.y;
-          });
+		//// sort all elements
+		//std::sort(allElements.begin(), allElements.end(), [](const cv::Point2f& lhs, const cv::Point2f& rhs) {
+		//         return lhs.x < rhs.x && lhs.y < rhs.y;
+		//        });
 
-		cout << "after sort:\n";
-		print();
+		//cout << "after sort:\n";
+		//print();
 
-		// remove dupes
-		auto it = std::unique(allElements.begin(), allElements.end(), [](const cv::Point2f& lhs, const cv::Point2f& rhs) {
-	                      return lhs.x == rhs.x && lhs.y == rhs.y;
-                      });
+		//// remove dupes
+		//auto it = std::unique(allElements.begin(), allElements.end(), [](const cv::Point2f& lhs, const cv::Point2f& rhs) {
+		//                     return lhs.x == rhs.x && lhs.y == rhs.y;
+		//                    });
 
-		cout << "no dupes:\n";
-		print();
+		//cout << "no dupes:\n";
+		//print();
 
-		// resize
-		allElements.resize(std::distance(allElements.begin(), it));
+		//// resize
+		//allElements.resize(std::distance(allElements.begin(), it));
 
 		// generate real boundry
 		auto boundry = cv::minAreaRect(allElements);
 		auto boundryRect = boundry.boundingRect2f();
 
-		avg += LineCalc::computeRealIntensityLine(sparseTest, tmp, boundryRect.y, boundryRect.y + boundryRect.height, "left");
-		//cv::rectangle(sparseTest, boundry, cv::Scalar(255, 255, 0), 1, CV_AA);
+		if (showWindows_) {
+
+			cv::rectangle(org, boundryRect, cv::Scalar(255, 255, 0), 1, CV_AA);
+			// generate boundry off the elements
+			//cv::Point2f vertices[4];
+			//boundry.points(vertices);
+			//for (auto i = 0; i < 4; ++i)
+			//	cv::line(org, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0), 1, CV_AA);
+
+			cv::imshow("test baseline left", org);
+			//cv::imshow("test baseline right", right);
+			auto key = static_cast<char>(cv::waitKey(30));
+			if (key == 27) {
+				showWindows_ ^= true;
+				break; // escape was pressed
+			}
+		}
+
+		//avg += LineCalc::computeRealIntensityLine(org, tmp, boundryRect.y, boundryRect.y + boundryRect.height, "left");
 
 		lineY /= totalY;
 
