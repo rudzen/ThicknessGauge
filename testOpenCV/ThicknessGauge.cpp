@@ -477,14 +477,16 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	auto quarter = static_cast<float>(frames[0].rows / 4);
 	auto baseLineY = frames[0].rows - quarter;
 
+	cv::Rect2f markingRect = hough->getMarkingRect();
+
 	cv::Rect2f leftBaseLine;
 	leftBaseLine.x = 0.0f;
 	leftBaseLine.y = baseLineY;
-	leftBaseLine.width = hough->getMarkingRect().x;
+	leftBaseLine.width = markingRect.x;
 	leftBaseLine.height = quarter;
 
 	cv::Rect2f rightBaseLine;
-	rightBaseLine.x = leftBaseLine.width + hough->getMarkingRect().width;
+	rightBaseLine.x = leftBaseLine.width + markingRect.width;
 	rightBaseLine.y = baseLineY;
 	rightBaseLine.width = frames[0].cols - rightBaseLine.x;
 	rightBaseLine.height = leftBaseLine.height;
@@ -570,9 +572,34 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		}
 
-		// clear out any duplicate points (there are a lot !)
-		set<cv::Point2f> s(allElements.begin(), allElements.end(), miniCalc.sortX);
-		allElements.assign(s.begin(), s.end());
+		auto print = [&]() {
+			for (const auto& point : allElements) {
+				std::cout << "(" << point.x << " " << point.y << ") ";
+			}
+			std::cout << std::endl;
+		};
+
+		cout << "as is...\n";
+		print();
+
+		// sort all elements
+		std::sort(allElements.begin(), allElements.end(), [](const cv::Point2f& lhs, const cv::Point2f& rhs) {
+	          return lhs.x < rhs.x && lhs.y < rhs.y;
+          });
+
+		cout << "after sort:\n";
+		print();
+
+		// remove dupes
+		auto it = std::unique(allElements.begin(), allElements.end(), [](const cv::Point2f& lhs, const cv::Point2f& rhs) {
+	                      return lhs.x == rhs.x && lhs.y == rhs.y;
+                      });
+
+		cout << "no dupes:\n";
+		print();
+
+		// resize
+		allElements.resize(std::distance(allElements.begin(), it));
 
 		// generate real boundry
 		auto boundry = cv::minAreaRect(allElements);
