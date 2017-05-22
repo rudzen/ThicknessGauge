@@ -521,12 +521,15 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	while (true) {
 
+		cv::Mat sparseTest;
+
 		auto avg = 0.0;
 
 		cv::Mat org;
 		// left
 		for (auto& l : left) {
 			org = l.clone();
+			cv::Mat sparseTest = l.clone();
 			filter->setImage(org);
 			filter->doFilter();
 
@@ -544,19 +547,24 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			hough->setOriginal(org);
 			hough->doHorizontalHough();
 
+
+			cv::RotatedRect boundryTemp;
+
 			const vector<HoughLinesPR::LineH>& lines = hough->getRightLines();
 			for (auto& h :lines) {
 				totalY += 2;
 				auto t = (h.entry[1] + h.entry[3]) * 0.5f;
 				lineY += t;
-				cv::RotatedRect boundryTemp = cv::minAreaRect(h.elements);
-				boundry.x += boundryTemp.boundingRect2f().x / h.elements.size();
-				boundry.y += boundryTemp.boundingRect2f().y / h.elements.size();
-				boundry.width += boundryTemp.boundingRect2f().width  / h.elements.size();
-				boundry.height += boundryTemp.boundingRect2f().height  / h.elements.size();
+				boundryTemp = cv::minAreaRect(h.elements);
 			}
 
 			if (showWindows_) {
+				cv::Point2f vertices[4];
+				boundryTemp.points(vertices);
+				for (int i = 0; i < 4; ++i)
+					cv::line(sparseTest, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0), 1, CV_AA);
+
+				cv::imshow("test baseline left", sparseTest);
 				//cv::imshow("test baseline right", right);
 				auto key = static_cast<char>(cv::waitKey(30));
 				if (key == 27) {
@@ -573,10 +581,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		boundry.y /= lineSize;
 		boundry.width /= lineSize;
 		boundry.height /= lineSize;
-		cv::Mat sparseTest = left.front().clone();
 		avg += LineCalc::computeRealIntensityLine(sparseTest, tmp, boundry.y, boundry.y + boundry.height, "left");
-		cv::rectangle(sparseTest, boundry, cv::Scalar(255, 255, 0), 1, CV_AA);
-		cv::imshow("test baseline left", sparseTest);
+		//cv::rectangle(sparseTest, boundry, cv::Scalar(255, 255, 0), 1, CV_AA);
 
 		lineY /= totalY;
 
