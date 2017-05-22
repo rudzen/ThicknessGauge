@@ -57,9 +57,6 @@ bool LineCalc::adjustMarkingRect(cv::Rect2f& markingRect, cv::Vec4f intersection
 	if (markingRect.width == 0)
 		return false;
 
-	if (markingRect.y == 0)
-		return false;
-
 	markingRect.x = intersectionPoints[0] + buffer;
 	markingRect.width = intersectionPoints[2] - markingRect.x - buffer;
 
