@@ -15,7 +15,7 @@ class LaserR : public BaseR<float> {
 	typedef struct xLine {
 
 		// intensity vector
-		vector<unsigned char> v;
+		vector<unsigned char> i;
 
 		// the x pos
 		int x;
@@ -35,7 +35,7 @@ class LaserR : public BaseR<float> {
 		explicit xLine(int x) : x(x) {
 			y = 0.0f;
 			cut = 0.0f;
-			v.reserve(x);
+			i.reserve(x);
 		}
 
 		friend bool operator==(const xLine& lhs, const xLine& rhs) { return lhs.y == rhs.y; }
@@ -54,10 +54,14 @@ class LaserR : public BaseR<float> {
 			os << "x: " << obj.x;
 			os << " y: " << obj.y;
 			os << " cut:" << obj.cut;
-			os << "\nv: (" << obj.v.size() << ") {\n";
-			for (auto i = 0; i < obj.v.size(); i++) os << i << ' ' << obj.v.at(i) << '\n';
+			os << "\nv: (" << obj.i.size() << ") {\n";
+			for (auto i = 0; i < obj.i.size(); i++) os << i << ' ' << obj.i.at(i) << '\n';
 			os << '}';
 			return os;
+		}
+
+		const cv::Point2f& xy() const {
+			return cv::Point2f(static_cast<float>(x), y);
 		}
 
 	} xLine;
@@ -81,10 +85,10 @@ inline bool LaserR::computeXLine() {
 	auto ok = false;
 
 	for (auto& xl : lines_) {
-		if (xl.v.empty()) continue;
+		if (xl.i.empty()) continue;
 
 		auto sum = 0.0f;
-		for (auto& intensity : xl.v) { sum += xl.v.size() * intensity; }
+		for (auto& intensity : xl.i) { sum += xl.i.size() * intensity; }
 		xl.y = 100.0f / sum;
 		ok = true;
 		cout << "x / y: " << xl.x << " / " << xl.y << endl;
@@ -104,7 +108,7 @@ inline void LaserR::configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroe
 	for (auto i = 0; i < image.cols; i++) lines_.push_back(xLine(i));
 
 	// copy the values from nonZero vector
-	for (auto& nz : nonZeroes) lines_[nz.x].v.push_back(image.at<unsigned char>(nz));
+	for (auto& nz : nonZeroes) lines_[nz.x].i.push_back(image.at<unsigned char>(nz));
 
 	auto ok = computeXLine();
 
@@ -113,13 +117,9 @@ inline void LaserR::configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroe
 		return;
 	}
 
-	for (auto& line : lines_) output.push_back(v3<float>(static_cast<float>(line.x), line.y, static_cast<float>(line.v.size())));
+	for (auto& line : lines_) output.push_back(v3<float>(static_cast<float>(line.x), line.y, static_cast<float>(line.i.size())));
 
 }
-
-//inline float LaserR::computeIntersect(float*__restrict y, float*__restrict a, int x) { return *y - (*a * static_cast<unsigned int>(x)); }
-
-//inline void LaserR::computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal) { diagonal.cut = computeIntersect(&diagonal.y, &horizontal.slobe, diagonal.x); }
 
 
 
