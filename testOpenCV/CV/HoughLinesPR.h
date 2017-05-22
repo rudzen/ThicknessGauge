@@ -60,10 +60,10 @@ public:
 				<< " points(1/2): " << obj.points.first << '/' << obj.points.second
 				<< " elements: " << obj.elements;
 		}
-	} LineV;
+	} LineH;
 
 	struct lineHsizeSort {
-		bool operator()(LineV l1, LineV l2) const { return l1.elements.size() < l2.elements.size(); }
+		bool operator()(LineH l1, LineH l2) const { return l1.elements.size() < l2.elements.size(); }
 	} lineHsizeSort;
 
 	struct lineHYSort {
@@ -76,21 +76,21 @@ private:
 
 	vector<cv::Vec4f> lines;
 
-	vector<LineV> allLines;
-	vector<LineV> rightLines;
-	vector<LineV> leftLines;
+	vector<LineH> allLines;
+	vector<LineH> rightLines;
+	vector<LineH> leftLines;
 
 
 public:
-	const vector<LineV>& getAllLines() const {
+	const vector<LineH>& getAllLines() const {
 		return allLines;
 	}
 
-	const vector<LineV>& getRightLines() const {
+	const vector<LineH>& getRightLines() const {
 		return rightLines;
 	}
 
-	const vector<LineV>& getLeftLines() const {
+	const vector<LineH>& getLeftLines() const {
 		return leftLines;
 	}
 

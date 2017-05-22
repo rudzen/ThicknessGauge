@@ -230,7 +230,7 @@ inline int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 	return minLineLen;
 }
 
-void ThicknessGauge::computeLaserLocations(cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
+void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
 	Pixelz pixelz;
 
 	Util::log("Laser enter");
@@ -258,17 +258,19 @@ void ThicknessGauge::computeLaserLocations(cv::Vec4f& baseLine, shared_ptr<Filte
 
 	cv::Mat tmpOut;
 
-	float highestPixelTotal = 0.0f;
+	auto highestPixelTotal = 0.0;
+
+	std::vector<cv::Point2d> tmp;
 
 
 	while (true) {
 
 		auto start = cv::getTickCount();
 
-		float highestPixel = 0.0f;
+		auto highestPixel = 0.0;
 
 		for (auto i = frameCount_; i--;) {
-			//for (auto& frame : markingFrames) {
+
 
 			cv::Mat baseFrame;
 			outputs[i] = cv::Mat::zeros(markingFrames.back().size(), CV_8UC1);
@@ -278,38 +280,32 @@ void ThicknessGauge::computeLaserLocations(cv::Vec4f& baseLine, shared_ptr<Filte
 
 			threshold(baseFrame, baseFrame, 100, 255, CV_THRESH_BINARY);
 
-			pixelz.removePepperNoise(baseFrame);
+			//pixelz.removePepperNoise(baseFrame);
 
 			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
-			auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs.at(i), pixPlanar, test_subPix);
+			highestPixel += LineCalc::computeRealIntensityLine(baseFrame, tmp, baseFrame.rows, 0, "_marking");
 
-			if (!generateOk) {
-				Util::loge("Error while attempting to generate pixelmap");
-				continue;
-			}
+			//auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs.at(i), pixPlanar, test_subPix);
 
-			nonZeroes.reserve(baseFrame.cols * baseFrame.rows);
-
-			findNonZero(outputs.at(i), nonZeroes);
-
-			auto heightLine = baseFrame.rows / 2;
-
-			highestPixel += static_cast<float>(baseFrame.rows) - static_cast<float>(pix.getHighestYpixel(outputs.at(i), heightLine, miniCalc));
-
-			//float highestPixel = 0.0f;
-			//for (auto& p : pixPlanar) {
-			//	if (p.y > highestPixel)
-			//		highestPixel = p.y;
+			//if (!generateOk) {
+			//	Util::loge("Error while attempting to generate pixelmap");
+			//	continue;
 			//}
 
-			//highestPixel -= baseLine;
+			//nonZeroes.reserve(baseFrame.cols * baseFrame.rows);
+
+			//findNonZero(outputs.at(i), nonZeroes);
+
+			//auto heightLine = baseFrame.rows / 2;
+
+			//highestPixel += static_cast<float>(baseFrame.rows) - static_cast<float>(pix.getHighestYpixel(outputs.at(i), heightLine, miniCalc));
 
 			if (!i)
 				cv::cvtColor(outputs.at(i), tmpOut, CV_GRAY2BGR);
 		}
 
-		highestPixelTotal = highestPixel / frameCount_;
+		highestPixelTotal = highestPixel / static_cast<unsigned int>(frameCount_);
 		auto end = cv::getTickCount();
 		std::cout << "highestPixelTotal: " << highestPixelTotal << endl;
 
@@ -319,10 +315,10 @@ void ThicknessGauge::computeLaserLocations(cv::Vec4f& baseLine, shared_ptr<Filte
 		auto time = (end - start) / cv::getTickFrequency();
 		std::cout << "time : " << time << endl;
 		if (showWindows_) {
-			//drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
-			//drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
-			//drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
-			//drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
+			drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
+			drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
+			drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
+			drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
 			cv::imshow("test height", tmpOut);
 			auto key = static_cast<char>(cv::waitKey(30));
 			if (key == 27) /* escape was pressed */ {
@@ -450,8 +446,11 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	auto laserFilter = make_shared<FilterR>("LaserFilter");
 	laserFilter->setShowWindow(showWindows_);
 
+	// main laser class
+	auto laser = make_shared<LaserR>();
+
 	// computes the Y locations of the laserline inside the marking rect
-	computeLaserLocations(baseLines, laserFilter, markingRect, laserLine);
+	computeLaserLocations(laser, baseLines, laserFilter, markingRect, laserLine);
 
 	if (showWindows_) {
 		auto key = static_cast<char>(cv::waitKey(30));
@@ -513,9 +512,16 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	auto lineY = 0.0f;
 	unsigned int totalY = 0;
 
+	cv::Rect2f boundry(0.0f, 0.0f, 0.0f, 0.0f);
+
+	auto avgTotal = 0.0;
+	std::vector<cv::Point2d> tmp;
+
 #define _sparse_mode
 
 	while (true) {
+
+		auto avg = 0.0;
 
 		cv::Mat org;
 		// left
@@ -538,11 +544,16 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			hough->setOriginal(org);
 			hough->doHorizontalHough();
 
-			auto lines = hough->getRightLines();
+			const vector<HoughLinesPR::LineH>& lines = hough->getRightLines();
 			for (auto& h :lines) {
 				totalY += 2;
-				lineY += (h.entry[1] + h.entry[3]) * 0.5f;
-				//sparse.addToTotal(h.elements);
+				auto t = (h.entry[1] + h.entry[3]) * 0.5f;
+				lineY += t;
+				cv::RotatedRect boundryTemp = cv::minAreaRect(h.elements);
+				boundry.x += boundryTemp.boundingRect2f().x / h.elements.size();
+				boundry.y += boundryTemp.boundingRect2f().y / h.elements.size();
+				boundry.width += boundryTemp.boundingRect2f().width  / h.elements.size();
+				boundry.height += boundryTemp.boundingRect2f().height  / h.elements.size();
 			}
 
 			if (showWindows_) {
@@ -554,7 +565,18 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 				}
 			}
 
+
 		}
+
+		auto lineSize = hough->getRightLines().size();
+		boundry.x /= lineSize;
+		boundry.y /= lineSize;
+		boundry.width /= lineSize;
+		boundry.height /= lineSize;
+		cv::Mat sparseTest = left.front().clone();
+		avg += LineCalc::computeRealIntensityLine(sparseTest, tmp, boundry.y, boundry.y + boundry.height, "left");
+		cv::rectangle(sparseTest, boundry, cv::Scalar(255, 255, 0), 1, CV_AA);
+		cv::imshow("test baseline left", sparseTest);
 
 		lineY /= totalY;
 
@@ -566,16 +588,11 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		//sparse.generateSparse();
 		//cv::Rect rect = cv::boundingRect(sparse.allSparse());
-		//cv::Mat sparseTest = org(rect);// cv::Mat::zeros(imSize, imType);
-
-		//cv::rectangle(sparseTest, rect, cv::Scalar(255, 255, 0), 1, CV_AA);
 
 		//cv::polylines(sparseTest, sparse.allSparse(), false, cv::Scalar(255, 255, 255));
 
-		//cv::imshow("test baseline left", sparseTest);
 
-
-		sparse.initialize();
+		//sparse.initialize();
 
 	}
 

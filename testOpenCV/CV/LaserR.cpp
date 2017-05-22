@@ -2,13 +2,17 @@
 #include "LaserR.h"
 
 
-bool LaserR::computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output) {
+bool LaserR::doLaser() {
+
+}
+
+bool LaserR::computeIntensityWeigth(vector<v3<float>>& output) {
 
 	// accu non-zero pixels.
 	vector<cv::Point2i> nonZero;
-	nonZero.reserve(image.cols * image.rows);
+	nonZero.reserve(image_.cols * image_.rows);
 
-	cv::findNonZero(image, nonZero);
+	cv::findNonZero(image_, nonZero);
 
 	// guard
 	if (nonZero.empty()) return false;
@@ -19,7 +23,7 @@ bool LaserR::computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output) {
 	// reserve enough space to avoid automatic resizing
 	output.reserve(nonZero.size());
 
-	configureXLine(image, nonZero, output);
+	configureXLine(nonZero, output);
 
 	return !output.empty();
 

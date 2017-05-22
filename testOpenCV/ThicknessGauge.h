@@ -22,6 +22,7 @@
 #include "CV/FilterR.h"
 #include "CV/HoughLinesR.h"
 #include "CV/HoughLinesPR.h"
+#include "CV/LaserR.h"
 
 
 using namespace tg;
@@ -139,7 +140,7 @@ public: // basic stuff to extract information
 	void computeMarkingHeight(std::string& globName);
 	void computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, cv::Vec4f& output);
 	bool computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output);
-	void computeLaserLocations(cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result);
+	void computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result);
 
 	void computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& lines, cv::Rect& markingRect);
 

@@ -66,17 +66,21 @@ class LaserR : public BaseR<float> {
 
 	} xLine;
 
+private:
+
 	vector<xLine> lines_;
 
 	bool computeXLine();
 
-	void configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroes, vector<v3<float>>& output);
+	void configureXLine(vector<cv::Point2i>& nonZeroes, vector<v3<float>>& output);
 
 	static void computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal);
 
 public:
 
-	bool computeIntensityWeigth(cv::Mat& image, vector<v3<float>>& output);
+	bool doLaser();
+
+	bool computeIntensityWeigth(vector<v3<float>>& output);
 
 };
 
@@ -98,17 +102,17 @@ inline bool LaserR::computeXLine() {
 
 }
 
-inline void LaserR::configureXLine(cv::Mat& image, vector<cv::Point2i>& nonZeroes, vector<v3<float>>& output) {
+inline void LaserR::configureXLine(vector<cv::Point2i>& nonZeroes, vector<v3<float>>& output) {
 
 	if (!lines_.empty()) lines_.clear();
 
-	lines_.reserve(image.cols);
+	lines_.reserve(image_.cols);
 
 	// populate xLine vector
-	for (auto i = 0; i < image.cols; i++) lines_.push_back(xLine(i));
+	for (auto i = 0; i < image_.cols; i++) lines_.push_back(xLine(i));
 
 	// copy the values from nonZero vector
-	for (auto& nz : nonZeroes) lines_[nz.x].i.push_back(image.at<unsigned char>(nz));
+	for (auto& nz : nonZeroes) lines_[nz.x].i.push_back(image_.at<unsigned char>(nz));
 
 	auto ok = computeXLine();
 
