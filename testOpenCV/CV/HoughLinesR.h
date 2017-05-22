@@ -7,24 +7,23 @@
 #include "../tg.h"
 #include "Exceptions/NoLineDetectedException.h"
 
-   /*
-	|  __
-	| /__\
-	| X~~|			"The eternal code god
-	|-\|//-.		 watches over this mess."
-   /|`.|'.' \			- R.A.Kohn, 2017
-  |,|.\~~ /||
-  |:||   ';||
-  ||||   | ||
-  \ \|     |`.
-  |\X|     | |
-  | .'     |||
-  | |   .  |||
-  |||   |  `.| JS
-  ||||  |   ||
-  ||||  |   ||
-  `+.__._._+*/
-
+/*
+   |  __
+   | /__\
+   | X~~|			"The eternal code god
+   |-\|//-.		 watches over this mess."
+/|`.|'.' \			- R.A.Kohn, 2017
+|,|.\~~ /||
+|:||   ';||
+||||   | ||
+\ \|     |`.
+|\X|     | |
+| .'     |||
+| |   .  |||
+|||   |  `.| JS
+||||  |   ||
+||||  |   ||
+`+.__._._+*/
 
 
 using namespace tg;
@@ -47,7 +46,7 @@ public:
 
 		LineV(cv::Vec2f entry, linePair points)
 			: entry(entry),
-			points(points) {
+			  points(points) {
 			elements.reserve(cvRound(Util::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
 			LineV();
 		}
@@ -138,8 +137,7 @@ public:
 		: rho_(rho),
 		  theta_(theta),
 		  threshold(threshold),
-		  showWindow_(showWindow)
-	{
+		  showWindow_(showWindow) {
 		angle_ = CV_PI / 180 * theta;
 		srn_ = 0;
 		stn_ = 0;
@@ -161,9 +159,13 @@ private:
 		cv::createTrackbar("threshold", windowName, &threshold, 100, thresholdcb, this);
 	}
 
-	linePair HoughLinesR::computePointPair(cv::Vec2f& line) const;
+	linePair computePointPair(cv::Vec2f& line) const;
+
+	linePair computePointPair2(cv::Vec2f& line) const;
 
 	void drawLines(vector<LineV>& linePairs, cv::Scalar colour);
+
+	void drawLine(cv::Vec4f & line);
 
 	void showOutput() const;
 
@@ -255,7 +257,7 @@ public:
 };
 
 inline void HoughLinesR::computeRectFromLines(vector<LineV>& input, cv::Rect2f& output) {
-	
+
 	for (auto& line : input) {
 		cv::Rect2f t = cv::boundingRect(line.elements);
 		output.x += t.x;
@@ -297,8 +299,10 @@ inline void HoughLinesR::computeBorders() {
 	rightBorder_[3] = imgHeight;
 
 	if (showWindow_) {
-		drawLines(leftLines_, cv::Scalar(0, 255, 0));
-		drawLines(rightLines_, cv::Scalar(0, 0, 255));
+		drawLine(leftBorder_);
+		drawLine(rightBorder_);
+		//drawLines(leftLines_, cv::Scalar(0, 255, 0));
+		//drawLines(rightLines_, cv::Scalar(0, 0, 255));
 		cv::rectangle(output_, leftRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
 		cv::rectangle(output_, rightRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
 		cv::rectangle(output_, markingRect, cv::Scalar(255, 0, 0), 3, CV_AA);
@@ -358,63 +362,6 @@ inline void HoughLinesR::doVerticalHough() {
 
 }
 
-inline void HoughLinesR::computeMeta() {
-	
-	if (allLines_.empty())
-		return;
-
-	auto size = allLines_.size();
-
-	rightLines_.clear();
-	rightLines_.reserve(size);
-
-	leftLines_.clear();
-	leftLines_.reserve(size);
-
-	auto center = image_.cols / 2;
-
-	for (auto& a : allLines_) {
-		a.slobe = (a.entry[3] - a.entry[1]) / (a.entry[2] - a.entry[0]);
-		if (a.points.first.x < center)
-			leftLines_.push_back(a);
-		else
-			rightLines_.push_back(a);
-	}
-
-	auto lSize = leftLines_.size();
-	auto rSize = rightLines_.size();
-
-	if (lSize + rSize == 0)
-		throw NoLineDetectedException("No marking lines detected.");
-
-	if (lSize == 0)
-		throw NoLineDetectedException("No marking left line detected.");
-
-	if (rSize == 0)
-		throw NoLineDetectedException("No marking right line detected.");
-
-	for (auto& left : leftLines_) {
-		cv::LineIterator it(image_, left.points.first, left.points.second, 8);
-		left.elements.reserve(it.count);
-		for (auto i = 0; i < it.count; i++, ++it)
-			left.elements.push_back(it.pos());
-	}
-
-	if (lSize > 1)
-		sort(leftLines_.begin(), leftLines_.end(), lineVsizeSort);
-
-	for (auto& right : rightLines_) {
-		cv::LineIterator it(image_, right.points.first, right.points.second, 8);
-		right.elements.reserve(it.count);
-		for (auto i = 0; i < it.count; i++, ++it)
-			right.elements.push_back(it.pos());
-	}
-
-	if (rSize > 1)
-		sort(rightLines_.begin(), rightLines_.end(), lineVsizeSort);
-
-}
-
 inline linePair HoughLinesR::computePointPair(cv::Vec2f& line) const {
 	auto rho = line[0];
 	auto theta = line[1];
@@ -422,9 +369,62 @@ inline linePair HoughLinesR::computePointPair(cv::Vec2f& line) const {
 	double b = sin(theta);
 	auto x0 = a * rho;
 	auto y0 = b * rho;
-	cv::Point pt1(cvRound(x0 + 1000 * (-b)), cvRound(y0 + 1000 * (a)));
-	cv::Point pt2(cvRound(x0 - 1000 * (-b)), cvRound(y0 - 1000 * (a)));
+	cv::Point2f pt1(static_cast<float>(x0 + 1000 * (-b)), static_cast<float>(y0 + 1000 * (a)));
+	cv::Point2f pt2(static_cast<float>(x0 - 1000 * (-b)), static_cast<float>(y0 - 1000 * (a)));
+	//cv::Point2f pt1(cvRound(x0 + 1000 * (-b)), cvRound(y0 + 1000 * (a)));
+	//cv::Point2f pt2(cvRound(x0 - 1000 * (-b)), cvRound(y0 - 1000 * (a)));
 	return linePair(pt1, pt2);
+}
+
+inline linePair HoughLinesR::computePointPair2(cv::Vec2f& line) const {
+	auto rho = line[0];
+	auto theta = line[1];
+
+	// detect lower part of image
+	if (rho < 0) {
+		theta += 180.0f;
+		rho = -rho;
+	}
+
+	// convert
+	theta = static_cast<float>(theta * (1.0f / 180.0f) * CV_PI);
+
+	auto imgCenterX = static_cast<unsigned int>(image_.cols) * 0.5f;
+	auto imgCenterY = static_cast<unsigned int>(image_.rows) * 0.5f;
+
+	double x0;
+	double x1;
+	double y0;
+	double y1;
+
+	if (line[1] != 0) {
+		// non-vertical line
+		x0 = -imgCenterX;
+		x1 = imgCenterX;
+
+		double cosTheta = cos(theta);
+		double sinTheta = sin(theta);
+		y0 = (-cosTheta * x0 + rho) / sinTheta;
+		y1 = (-cosTheta * x1 + rho) / sinTheta;
+
+	} else {
+		// vertical line
+		
+		x0 = line[0];
+		x1 = line[0];
+
+		y0 = imgCenterY;
+		y1 = -imgCenterY;
+
+	}
+
+	auto p0x = static_cast<float>(x0);
+	auto p1x = static_cast<float>(x1);
+	auto p0y = static_cast<float>(y0);
+	auto p1y = static_cast<float>(y1);
+
+	return linePair(cv::Point2f(p0x, p0y), cv::Point2f(p1x, p1y));
+
 }
 
 inline void HoughLinesR::drawLines(vector<LineV>& linePairs, cv::Scalar colour) {
@@ -438,6 +438,12 @@ inline void HoughLinesR::drawLines(vector<LineV>& linePairs, cv::Scalar colour) 
 		line(output_, lineV.points.first, lineV.points.second, colour, 1, CV_AA);
 		//line(original, r.first, r.second, colour, 1, CV_AA);
 	}
+}
+
+inline void HoughLinesR::drawLine(cv::Vec4f& line) {
+	cv::Point2f p1(line[0], line[1]);
+	cv::Point2f p2(line[2], line[3]);
+	cv::line(output_, p1, p2, cv::Scalar(120, 120, 255), 2);
 }
 
 inline void HoughLinesR::showOutput() const {

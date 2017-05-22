@@ -137,9 +137,9 @@ public: // basic stuff to extract information
 	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right);
 	template <int minLen> int computeHoughPMinLine(cv::Rect2f& rect) const;
 	void computeMarkingHeight(std::string& globName);
-	void computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output);
+	void computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, cv::Vec4f& output);
 	bool computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output);
-	void computeLaserLocations(float baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result);
+	void computeLaserLocations(cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result);
 
 	void computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& lines, cv::Rect& markingRect);
 

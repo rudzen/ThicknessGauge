@@ -19,6 +19,9 @@
 #include "CV/LineData/LineBaseData.h"
 #include "CV/LineData/LineLaserData.h"
 #include "CV/SparseR.h"
+#include "Calc/LineCalc.h"
+#include <opencv2/core/base.hpp>
+#include <opencv2/core/base.hpp>
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -237,7 +240,7 @@ inline int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 	return minLineLen;
 }
 
-void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
+void ThicknessGauge::computeLaserLocations(cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
 	Pixelz pixelz;
 
 	Util::log("Laser enter");
@@ -320,7 +323,7 @@ void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> f
 		auto end = cv::getTickCount();
 		std::cout << "highestPixelTotal: " << highestPixelTotal << endl;
 
-		auto diff = baseLine - highestPixelTotal;
+		auto diff = baseLine[1] - highestPixelTotal;
 		std::cout << "diff: " << diff << endl;
 
 		auto time = (end - start) / cv::getTickFrequency();
@@ -345,7 +348,7 @@ void ThicknessGauge::computeLaserLocations(float baseLine, shared_ptr<FilterR> f
 }
 
 void ThicknessGauge::computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& lines, cv::Rect& markingRect) {
-	
+
 	cv::Point2f avgTop(0.0f, markingRect.height);
 	cv::Point2f avgButtom(0.0f, 0.0f);
 	auto halfPoint = static_cast<float>(markingRect.y / 2);
@@ -356,15 +359,14 @@ void ThicknessGauge::computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& l
 		for (auto& point : line.elements) {
 			if (point.y < halfPoint) {
 				sumButtom += point.x;
-			} else {
+			}
+			else {
 				sumTop += point.x;
 			}
 		}
 		avgTop.x += (sumTop / line.elements.size());
 		avgButtom.x += (sumButtom / line.elements.size());
 	}
-
-
 
 
 }
@@ -402,8 +404,6 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	if (!markingOk)
 		Util::loge("Error while computing marking rectangle.");
 
-	
-
 	auto minLineLen = computeHoughPMinLine<10>(markingRect);
 
 	auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, true);
@@ -411,11 +411,30 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	houghH->setMaxLineGab(12);
 	houghH->setMarkingRect(markingRect);
 
-	std::array<cv::Rect2f, 2> baseLines;
+	// TODO : To Vec4f instead of array of Rect2f
+	cv::Vec4f baseLines;
 
 	computeBaseLineAreas(canny, baselineFilter, houghH, baseLines);
 
-	std::cout << "line Y : " << baseLines[0].y << endl;
+	std::cout << "left  base line Y : " << baseLines[1] << std::endl;
+	std::cout << "right base line Y : " << baseLines[3] << std::endl;
+
+	// TODO : Compute marking rect offsets based on intersections
+	cv::Vec4f intersections;
+	LineCalc lineCalc;
+	lineCalc.computeIntersectionPoints(baseLines, houghV->getLeftBorder(), houghV->getRightBorder(), intersections);
+
+	std::cout << "intersection points: " << intersections << std::endl;
+
+	// TODO : figure out a clever way to calculate this..
+	const uint pixelCutoff = 40;
+
+	lineCalc.adjustMarkingRect(markingRect, intersections, pixelCutoff);
+	lineCalc.adjustBaseLines(baseLines, intersections, pixelCutoff);
+
+	std::cout << "adjusted marking rect: " << markingRect << std::endl;
+	std::cout << "adjusted left  base line Y : " << baseLines[1] << std::endl;
+	std::cout << "adjusted right base line Y : " << baseLines[3] << std::endl;
 
 	// work on laser location on marking..
 	std::vector<cv::Point2f> laserLine;
@@ -423,7 +442,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	auto laserFilter = make_shared<FilterR>("LaserFilter");
 	laserFilter->setShowWindow(showWindows_);
 
-	computeLaserLocations(baseLines[0].y, laserFilter, markingRect, laserLine);
+	computeLaserLocations(baseLines, laserFilter, markingRect, laserLine);
 
 	if (showWindows_) {
 		auto key = static_cast<char>(cv::waitKey(30));
@@ -435,7 +454,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 }
 
 
-void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, std::array<cv::Rect2f, 2>& output) {
+void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, cv::Vec4f& output) {
 
 	LineLaserData results;
 
@@ -551,8 +570,14 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	}
 
-	output[0].x = 0.0f;
-	output[0].y = lineY + (frames.front().rows - baseLineY);
+	output[0] = 0.0f;
+	output[1] = lineY + (frames.front().rows - baseLineY);
+
+	// TODO : Add right side line computation
+	// just clone left to right for now
+	output[2] = output[0];
+	output[3] = output[1];
+
 
 }
 

@@ -161,6 +161,7 @@
     <ClCompile Include="Calc\LineCalc.cpp" />
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
+    <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
     <ClCompile Include="IO\IsValidFileName.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
