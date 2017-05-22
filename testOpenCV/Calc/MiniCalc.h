@@ -33,11 +33,13 @@ public:
 	struct pixelYsort {
 		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
 		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
+		bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.y < pt2.y; }
 	} sortY;
 
 	struct pixelXsort {
 		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
 		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
+		bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.x < pt2.x; }
 	} sortX;
 
 	void sortContours(vector<vector<cv::Point>>& contours) {

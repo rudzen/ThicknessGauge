@@ -232,4 +232,10 @@ public:
 		destination.insert(destination.begin(), source.begin(), source.end());
 	}
 
+	template <typename T>
+	static void copyVector(const T& source, T& destination) {
+		destination.reserve(source.size() + destination.size());
+		destination.insert(destination.begin(), source.begin(), source.end());
+	}
+
 };

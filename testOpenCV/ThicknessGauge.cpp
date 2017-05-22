@@ -262,7 +262,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 
 	std::vector<cv::Point2d> tmp;
 
-
 	while (true) {
 
 		auto start = cv::getTickCount();
@@ -270,7 +269,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		auto highestPixel = 0.0;
 
 		for (auto i = frameCount_; i--;) {
-
 
 			cv::Mat baseFrame;
 			outputs[i] = cv::Mat::zeros(markingFrames.back().size(), CV_8UC1);
@@ -329,7 +327,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		if (!showWindows_)
 			break;
 
-
 	}
 }
 
@@ -353,7 +350,6 @@ void ThicknessGauge::computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& l
 		avgTop.x += (sumTop / line.elements.size());
 		avgButtom.x += (sumButtom / line.elements.size());
 	}
-
 
 }
 
@@ -458,9 +454,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 			return; // escape was pressed
 	}
 
-
 }
-
 
 void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, cv::Vec4f& output) {
 
@@ -512,10 +506,10 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	auto lineY = 0.0f;
 	unsigned int totalY = 0;
 
-	cv::Rect2f boundry(0.0f, 0.0f, 0.0f, 0.0f);
-
 	auto avgTotal = 0.0;
 	std::vector<cv::Point2d> tmp;
+
+	std::vector<cv::Point2f> allElements;
 
 #define _sparse_mode
 
@@ -547,20 +541,21 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			hough->setOriginal(org);
 			hough->doHorizontalHough();
 
-
-			cv::RotatedRect boundryTemp;
+			allElements.clear();
 
 			const vector<HoughLinesPR::LineH>& lines = hough->getRightLines();
 			for (auto& h :lines) {
 				totalY += 2;
 				auto t = (h.entry[1] + h.entry[3]) * 0.5f;
 				lineY += t;
-				boundryTemp = cv::minAreaRect(h.elements);
+				Util::copyVector(h.elements, allElements);
 			}
 
 			if (showWindows_) {
+				// generate boundry off the elements
 				cv::Point2f vertices[4];
-				boundryTemp.points(vertices);
+				cv::RotatedRect boundry = cv::minAreaRect(allElements);
+				boundry.points(vertices);
 				for (int i = 0; i < 4; ++i)
 					cv::line(sparseTest, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0), 1, CV_AA);
 
@@ -573,15 +568,17 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 				}
 			}
 
-
 		}
 
-		auto lineSize = hough->getRightLines().size();
-		boundry.x /= lineSize;
-		boundry.y /= lineSize;
-		boundry.width /= lineSize;
-		boundry.height /= lineSize;
-		avg += LineCalc::computeRealIntensityLine(sparseTest, tmp, boundry.y, boundry.y + boundry.height, "left");
+		// clear out any duplicate points (there are a lot !)
+		set<cv::Point2f> s(allElements.begin(), allElements.end(), miniCalc.sortX);
+		allElements.assign(s.begin(), s.end());
+
+		// generate real boundry
+		auto boundry = cv::minAreaRect(allElements);
+		auto boundryRect = boundry.boundingRect2f();
+
+		avg += LineCalc::computeRealIntensityLine(sparseTest, tmp, boundryRect.y, boundryRect.y + boundryRect.height, "left");
 		//cv::rectangle(sparseTest, boundry, cv::Scalar(255, 255, 0), 1, CV_AA);
 
 		lineY /= totalY;
@@ -597,7 +594,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		//cv::polylines(sparseTest, sparse.allSparse(), false, cv::Scalar(255, 255, 255));
 
-
 		//sparse.initialize();
 
 	}
@@ -609,7 +605,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	// just clone left to right for now
 	output[2] = output[0];
 	output[3] = output[1];
-
 
 }
 
@@ -681,7 +676,6 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 	return output.x > 0.0f && output.y > 0.0f && output.width > 0.0f;
 }
 
-
 /**
  * \brief Determins the marking boundries
  * \param globName if "camera", use camera, otherwise load from glob folder
@@ -708,7 +702,6 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 		0 , 0 , 0 ,
 		0 , 1 , 0 ,
 		0 , 0 , 0);
-
 
 	cv::Mat lineVKernel = (cv::Mat_<char>(4, 4) <<
 		0 , 0 , 1 , 1 ,
@@ -780,14 +773,12 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			houghP.setImage(tmp);
 			houghP.doHorizontalHough();
 
-
 			//cannyV.setImage(frame);
 			//cannyV.doCanny();
 
 			houghV.setOriginal(frames.at(i));
 			houghV.setImage(tmp.clone());
 			houghV.doVerticalHough();
-
 
 			// show default input image
 			if (showWindows_) {
@@ -975,25 +966,25 @@ void ThicknessGauge::setBinaryThreshold(int binaryThreshold) {
 void ThicknessGauge::drawText(cv::Mat* image, const string text, TextDrawPosition position) const {
 	cv::Point pos;
 	switch (position) {
-	case TextDrawPosition::UpperLeft:
-		pos.x = image->cols / 3;
-		pos.y = image->rows >> 2;
-		break;
-	case TextDrawPosition::UpperRight:
-		pos.x = image->cols - image->cols / 3;
-		pos.y = image->rows >> 2;
-		break;
-	case TextDrawPosition::LowerLeft:
-		pos.x = image->cols / 3;
-		pos.y = image->rows - 3 * (image->rows >> 2);
-		break;
-	case TextDrawPosition::LowerRight:
-		pos.x = image->cols - image->cols / 3;
-		pos.y = image->rows - (image->rows >> 2);
-		break;
-	default:
-		// oh noes..
-		break;
+		case TextDrawPosition::UpperLeft:
+			pos.x = image->cols / 3;
+			pos.y = image->rows >> 2;
+			break;
+		case TextDrawPosition::UpperRight:
+			pos.x = image->cols - image->cols / 3;
+			pos.y = image->rows >> 2;
+			break;
+		case TextDrawPosition::LowerLeft:
+			pos.x = image->cols / 3;
+			pos.y = image->rows - 3 * (image->rows >> 2);
+			break;
+		case TextDrawPosition::LowerRight:
+			pos.x = image->cols - image->cols / 3;
+			pos.y = image->rows - (image->rows >> 2);
+			break;
+		default:
+			// oh noes..
+			break;
 	}
 	putText(*image, text, pos, 1, 1.0, baseColour_, 2);
 }
