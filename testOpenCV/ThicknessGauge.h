@@ -134,7 +134,6 @@ public: // basic stuff to extract information
 
 	void generateGlob(std::string& name);
 
-	bool generatePlanarImage(std::string& globName); // <- important!
 	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right);
 	template <int minLen> int computeHoughPMinLine(cv::Rect2f& rect) const;
 	void computeMarkingHeight(std::string& globName);
@@ -145,11 +144,6 @@ public: // basic stuff to extract information
 	void computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& lines, cv::Rect& markingRect);
 
 	LineBaseData findMarkingLinePairs_(std::string& globName);
-
-	static void addKernelTests(vector<TestConfig>& tests, float alpha, int baseSigmaX, int x, int y);
-	bool testDiff();
-
-	bool testAggressive();
 
 	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, std::string timeString, std::string extraInfo) const;
 
@@ -195,45 +189,9 @@ public: // getters and setters
 
 	void setBinaryThreshold(int binaryThreshold);
 
-public: // draw functions
-
-	void drawText(cv::Mat* image, const string text, TextDrawPosition position) const;
-
-	/**
-	 * \brief Draws a horizontal line on the parsed image
-	 * \param image The image to draw the line on
-	 * \param pos The position in Y where the line should be drawn
-	 * \param colour The scalar colour of the line
-	 */
-	static void drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar colour);
-
-	static void drawVerticalLine(cv::Mat* image, uint pos, cv::Scalar colour);
-
-	static void drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour);
-
-	void drawHorizontalLine(cv::Mat* image, uint pos) const;
-
-	void drawVerticalLine(cv::Mat* image, uint pos) const;
-
-public: // generate meta stuff
-
-	static void GenerateInputQuad(cv::Mat* image, cv::Point2f* quad);
-
-	static void GenerateOutputQuad(cv::Mat* image, cv::Point2f* quad);
-
 public: // misc quad temp stuff
 
-	void FitQuad(cv::Mat* image, cv::Point2f* inputQuad, cv::Point2f* outputQuad) const;
-
-	static void WarpImage(cv::Mat* input, cv::Mat* output);
-
-	static void WarpMeSomeCookies(cv::Mat* image, cv::Mat* output);
-
-	cv::Mat cornerHarris_test(cv::Mat& image, int threshold) const;
-
 	cv::Mat erosion(cv::Mat& input, int element, int size) const;
-
-	cv::Mat dilation(cv::Mat& input, int dilation, int size) const;
 
 private: // generic helper methods
 
@@ -266,60 +224,5 @@ private: // generic helper methods
 
 	}
 
-	cv::Mat drawBlobs(cv::Mat* image) const {
-		// Setup SimpleBlobDetector parameters.
-		cv::SimpleBlobDetector::Params params;
-
-		// Change thresholds
-		params.minThreshold = 10;
-		params.maxThreshold = 200;
-
-		// Filter by Area.
-		params.filterByArea = true;
-		params.minArea = 1500;
-
-		// Filter by Circularity
-		params.filterByCircularity = true;
-		params.minCircularity = 0.1f;
-
-		// Filter by Convexity
-		params.filterByConvexity = true;
-		params.minConvexity = 0.87f;
-
-		// Filter by Inertia
-		params.filterByInertia = true;
-		params.minInertiaRatio = 0.01f;
-
-
-		// Storage for blobs
-		vector<cv::KeyPoint> keypoints;
-
-
-#if CV_MAJOR_VERSION < 3   // If you are using OpenCV 2
-
-		// Set up detector with params
-		SimpleBlobDetector detector(params);
-
-		// Detect blobs
-		detector.detect(image, keypoints);
-#else 
-
-		// Set up detector with params
-		auto detector = cv::SimpleBlobDetector::create(params);
-
-		// Detect blobs
-		detector->detect(*image, keypoints);
-#endif 
-
-		// Draw detected blobs as red circles.
-		// DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures
-		// the size of the circle corresponds to the size of blob
-
-		cv::Mat im_with_keypoints;
-		drawKeypoints(*image, keypoints, im_with_keypoints, cv::Scalar(255, 255, 255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
-		// Show blobs
-		return im_with_keypoints;
-	}
 
 };

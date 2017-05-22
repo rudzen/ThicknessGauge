@@ -22,6 +22,7 @@
 #include "Calc/LineCalc.h"
 #include <opencv2/core/base.hpp>
 #include <opencv2/core/base.hpp>
+#include "CV/DrawHelpers.h"
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -309,10 +310,10 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		auto time = (end - start) / cv::getTickFrequency();
 		std::cout << "time : " << time << endl;
 		if (showWindows_) {
-			drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
-			drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
-			drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
-			drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
+			DrawHelpers::drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
+			DrawHelpers::drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
+			DrawHelpers::drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
+			DrawHelpers::drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
 			cv::imshow("test height", tmpOut);
 			auto key = static_cast<char>(cv::waitKey(30));
 			if (key == 27) /* escape was pressed */ {
@@ -1001,53 +1002,6 @@ void ThicknessGauge::setBinaryThreshold(int binaryThreshold) {
 	binaryThreshold_ = binaryThreshold;
 }
 
-void ThicknessGauge::drawText(cv::Mat* image, const string text, TextDrawPosition position) const {
-	cv::Point pos;
-	switch (position) {
-		case TextDrawPosition::UpperLeft:
-			pos.x = image->cols / 3;
-			pos.y = image->rows >> 2;
-			break;
-		case TextDrawPosition::UpperRight:
-			pos.x = image->cols - image->cols / 3;
-			pos.y = image->rows >> 2;
-			break;
-		case TextDrawPosition::LowerLeft:
-			pos.x = image->cols / 3;
-			pos.y = image->rows - 3 * (image->rows >> 2);
-			break;
-		case TextDrawPosition::LowerRight:
-			pos.x = image->cols - image->cols / 3;
-			pos.y = image->rows - (image->rows >> 2);
-			break;
-		default:
-			// oh noes..
-			break;
-	}
-	putText(*image, text, pos, 1, 1.0, baseColour_, 2);
-}
-
-void ThicknessGauge::drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar colour) {
-	//cout << "line drawn at : " << pos << endl;
-	line(*image, cv::Point(0, image->rows - pos), cv::Point(image->cols, image->rows - pos), colour, 1, cv::LINE_AA);
-}
-
-void ThicknessGauge::drawVerticalLine(cv::Mat* image, uint pos, cv::Scalar colour) {
-	line(*image, cv::Point(pos, 0), cv::Point(pos, image->rows), colour);
-}
-
-void ThicknessGauge::drawCenterAxisLines(cv::Mat* image, cv::Scalar& colour) {
-	line(*image, cv::Point(0, image->rows >> 1), cv::Point(image->cols, image->rows >> 1), colour);
-	line(*image, cv::Point(image->cols >> 1, 0), cv::Point(image->cols >> 1, image->rows), colour);
-}
-
-void ThicknessGauge::drawHorizontalLine(cv::Mat* image, uint pos) const {
-	drawHorizontalLine(image, pos, baseColour_);
-}
-
-void ThicknessGauge::drawVerticalLine(cv::Mat* image, uint pos) const {
-	drawVerticalLine(image, pos, baseColour_);
-}
 
 cv::Mat ThicknessGauge::erosion(cv::Mat& input, int element, int size) const {
 	cv::MorphShapes erosion_type;

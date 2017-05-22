@@ -120,6 +120,12 @@
     <ClCompile Include="CV\HoughLinesR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CV\DrawHelpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CV\GenericCV.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -276,6 +282,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Calc\LineCalc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\DrawHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\GenericCV.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
