@@ -202,16 +202,6 @@ void ThicknessGauge::generateGlob(std::string& name) {
 
 void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) {
 
-	if (!left.empty())
-		left.clear();
-
-	left.reserve(frameCount_);
-
-	if (!right.empty())
-		right.clear();
-
-	right.reserve(frameCount_);
-
 	cv::Point topLeft(0, 0);
 	cv::Point buttomLeft(frames.front().cols / 2, frames.front().rows);
 
@@ -382,21 +372,30 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	else
 		loadGlob(globName);
 
-	vector<cv::Mat> leftFrames;
-	vector<cv::Mat> rightFrames;
+	// configure frames based on center vertical splitting of the original frames
+	vector<cv::Mat> leftFrames(frameCount_);
+	vector<cv::Mat> rightFrames(frameCount_);
 
 	splitFrames(leftFrames, rightFrames);
 
 	// common canny with default settings for detecting marking borders
 	auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, true);
-	auto markingFilter = make_shared<FilterR>("MarkingFilter");
-	auto baselineFilter = make_shared<FilterR>("Baseline Filter");
-	auto houghV = make_shared<HoughLinesR>(1, static_cast<const int>(CV_PI / 180), 40, showWindows_);
-	houghV->setAngleLimit(30);
 
+	// the filter used to determin the marking location in the frame
+	auto markingFilter = make_shared<FilterR>("MarkingFilter");
+
+	// filter to enhance the base line
+	auto baselineFilter = make_shared<FilterR>("Baseline Filter");
+
+	// houghlines to determin where the actual marking is in the frame
+	auto houghV = make_shared<HoughLinesR>(1, static_cast<const int>(CV_PI / 180), 40, showWindows_);
+
+	// configure the diffrent functionalities
+	houghV->setAngleLimit(30);
 	markingFilter->setShowWindow(showWindows_);
 	baselineFilter->setShowWindow(showWindows_);
 
+	// the marking rect determins where in the frame the marking is located.
 	cv::Rect2f markingRect;
 
 	auto markingOk = computerMarkingRectangle(canny, markingFilter, houghV, markingRect);
@@ -404,14 +403,16 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	if (!markingOk)
 		Util::loge("Error while computing marking rectangle.");
 
+	// make sure the minimum is at least 10 pixels.
 	auto minLineLen = computeHoughPMinLine<10>(markingRect);
 
+	// horizontal houghline class
 	auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, true);
 
 	houghH->setMaxLineGab(12);
 	houghH->setMarkingRect(markingRect);
 
-	// TODO : To Vec4f instead of array of Rect2f
+	// the baselines, which are located outside the marking
 	cv::Vec4f baseLines;
 
 	computeBaseLineAreas(canny, baselineFilter, houghH, baseLines);
@@ -419,17 +420,23 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	std::cout << "left  base line Y : " << baseLines[1] << std::endl;
 	std::cout << "right base line Y : " << baseLines[3] << std::endl;
 
-	// TODO : Compute marking rect offsets based on intersections
+	// the locations for where the base lines intersect with the marking border
 	cv::Vec4f intersections;
+
 	LineCalc lineCalc;
+
+	// compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
 	lineCalc.computeIntersectionPoints(baseLines, houghV->getLeftBorder(), houghV->getRightBorder(), intersections);
 
 	std::cout << "intersection points: " << intersections << std::endl;
 
 	// TODO : figure out a clever way to calculate this..
-	const uint pixelCutoff = 40;
+	const uint pixelCutoff = 40; // must never be higher than marking rect width
 
+	// adjust the marking rect according to the intersection points
 	lineCalc.adjustMarkingRect(markingRect, intersections, pixelCutoff);
+
+	// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
 	lineCalc.adjustBaseLines(baseLines, intersections, pixelCutoff);
 
 	std::cout << "adjusted marking rect: " << markingRect << std::endl;
@@ -439,9 +446,11 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	// work on laser location on marking..
 	std::vector<cv::Point2f> laserLine;
 
+	// filter for laser detection
 	auto laserFilter = make_shared<FilterR>("LaserFilter");
 	laserFilter->setShowWindow(showWindows_);
 
+	// computes the Y locations of the laserline inside the marking rect
 	computeLaserLocations(baseLines, laserFilter, markingRect, laserLine);
 
 	if (showWindows_) {
