@@ -204,7 +204,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			findNonZero(baseFrame, nonZero);
 			cv::Rect laserArea = cv::boundingRect(nonZero);
 			cv::Mat t = baseFrame(laserArea);
-			highestPixel += LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "_marking");
+			highestPixel += LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "_marking", laserArea.y);
 			highestPixel += (laserArea.y);
 
 			/* FULL COLUMN METHOD */
@@ -493,7 +493,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		boundryRect.width -= 40;
 
 		cv::Mat t = org(boundryRect);
-		lineY = frames.front().rows - quarter + boundryRect.y + LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "left");
+		lineY = frames.front().rows - quarter + boundryRect.y + LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "_left_baseline", frames.front().rows - quarter + boundryRect.y);
 		//cout << "baseline new: " << lineY << endl;
 		//cout << "baseline org: " << lineY + (frames.front().rows - baseLineY) << endl;
 

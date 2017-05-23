@@ -26,7 +26,7 @@ public:
 
 	static bool adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoints, uint buffer);
 
-	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, float upperLimit, float lowerLimit, std::string filename) {
+	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, float upperLimit, float lowerLimit, std::string filename, float fileOffsetY) {
 
 		// generate vector with all X
 		if (!output.empty())
@@ -63,14 +63,14 @@ public:
 		std::ofstream file(filename + ".intensitet.txt");
 		std::ofstream fileY(filename + ".intensitet_y.txt");
 		std::ofstream fileButt(filename + ".intensitet_y_korigeret.txt");
-		double avg[2] = { 0.0, 0.0 };
+		double avg[2] = {0.0, 0.0};
 		for (auto& h : output) {
 			//out = to_string(h.y);
-			file << h.x << ' ' << h.y << '\n';
-			fileY << h.y << '\n';
-			fileButt << rows - h.y << '\n';
 			avg[0] += h.y;
 			avg[1] += rows - h.y;
+			file << h.x << ' ' << (h.y + fileOffsetY) << '\n';
+			fileY << h.y + fileOffsetY << '\n';
+			fileButt << rows - (h.y + fileOffsetY) << '\n';
 		}
 
 		avg[0] /= output.size();
@@ -88,8 +88,6 @@ public:
 	}
 
 #endif
-
-
 
 
 };
