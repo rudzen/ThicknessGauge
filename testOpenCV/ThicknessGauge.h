@@ -131,8 +131,6 @@ public: // basic stuff to extract information
 
 	void drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const;
 
-	double computerBaseLine(const cv::Mat& mat, double limit);
-
 	void generateGlob(std::string& name);
 
 	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right);
