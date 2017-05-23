@@ -184,21 +184,35 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 
 		auto highestPixel = 0.0;
 
+		cv::Mat target; // the laser is herby contained!!!
+
+
 		for (auto i = frameCount_; i--;) {
 
 			cv::Mat baseFrame;
 			outputs[i] = cv::Mat::zeros(markingFrames.back().size(), CV_8UC1);
+
+			std::vector<cv::Point> nonZero(outputs.at(i).rows * outputs.at(i).cols);
 
 			// TODO : replace with custom filter if needed
 			cv::bilateralFilter(markingFrames.at(i), baseFrame, 1, 20, 10);
 
 			threshold(baseFrame, baseFrame, 100, 255, CV_THRESH_BINARY);
 
-			//pix.removePepperNoise(baseFrame);
+			findNonZero(baseFrame, nonZero);
+
+			cv::Rect laserArea = cv::boundingRect(nonZero);
 
 			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
-			highestPixel += LineCalc::computeRealIntensityLine(baseFrame, tmp, baseFrame.rows, 0, "_marking");
+			highestPixel += LineCalc::computeRealIntensityLine(baseFrame(laserArea), tmp, laserArea.height, 0, "_marking");
+			highestPixel += (laserArea.x + laserArea.height);
+
+			//highestPixel += LineCalc::computeRealIntensityLine(baseFrame, tmp, baseFrame.rows, 0, "_marking");
+
+
+
+
 
 			//auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs.at(i), pixPlanar, test_subPix);
 
