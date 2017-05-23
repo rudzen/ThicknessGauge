@@ -181,6 +181,7 @@
     <ClInclude Include="CV\CannyR.h" />
     <ClInclude Include="CV\GenericCV.h" />
     <ClInclude Include="CV\HoughLinesR.h" />
+    <ClInclude Include="CV\Kernels.h" />
     <ClInclude Include="CV\LaserR.h" />
     <ClInclude Include="CV\LineData\LineBaseData.h" />
     <ClInclude Include="CV\LineData\LineData.h" />

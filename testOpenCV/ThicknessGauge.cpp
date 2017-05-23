@@ -24,14 +24,26 @@
 #include <opencv2/core/base.hpp>
 #include "UI/DrawHelper.h"
 
+
+/**
+ * \brief Initializes the capture device using PV_API constant
+ * (requires that OpenCV is compiled with the location of the PvAPI, deprecated version)
+ */
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
 }
 
+/**
+ * \brief Initializes the calibration settings
+ * \param fileName The filename for the calibration settings
+ */
 void ThicknessGauge::initCalibrationSettings(string fileName) {
 	cs.readSettings(fileName);
 }
 
+/**
+ * \brief Adds the existing null images to the null_ vector for later substraction
+ */
 void ThicknessGauge::addNulls() {
 	std::vector<cv::String> files;
 	cv::String folder = "./nulls/";
@@ -53,6 +65,10 @@ void ThicknessGauge::addNulls() {
 
 }
 
+/**
+ * \brief Loads a glob from disk and stores them in a vector
+ * \param globName The name of the glob to load (foldername)
+ */
 void ThicknessGauge::loadGlob(std::string& globName) {
 	globGenerator.setPattern(globName);
 	globGenerator.setRecursive(false);
@@ -73,6 +89,9 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 
 }
 
+/**
+ * \brief Capture frameCount_ amount of frames from the capture device and stores them in a vector
+ */
 void ThicknessGauge::captureFrames() {
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
@@ -97,6 +116,10 @@ void ThicknessGauge::sobel(cv::Mat& image) const {
 	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, cv::BORDER_DEFAULT);
 }
 
+/**
+ * \brief Generates a custom glob
+ * \param name The name of the glob, let it be a valid foldername!!!
+ */
 void ThicknessGauge::generateGlob(std::string& name) {
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
@@ -120,6 +143,12 @@ void ThicknessGauge::generateGlob(std::string& name) {
 	pb.Progressed(frameCount_ * 2);
 }
 
+/**
+ * \brief Split the original frames into two vectors based on the center of the matrix size in X.
+ * Note that the resulting vectors only contains references to the original frames.
+ * \param left The output left side of the frames
+ * \param right The output right side of the frames
+ */
 void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) {
 
 	cv::Point topLeft(0, 0);
@@ -140,6 +169,12 @@ void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) 
 
 }
 
+/**
+ * \brief Computes the minimum houghline lenght for properlistic houghline
+ * \tparam minLen The minimim length of the line
+ * \param rect The rectangle of the marking location
+ * \return the computed value, but not less than minLen
+ */
 template <int minLen>
 int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 	auto minLineLen = cvRound(rect.width / 32);
@@ -150,6 +185,14 @@ int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 	return minLineLen;
 }
 
+/**
+ * \brief Computes the laser line location on the marking in Y
+ * \param laser The laser class
+ * \param baseLine The baseline vector
+ * \param filter The custom filter class
+ * \param markingLocation The marking location rectangle
+ * \param result The resulting laser line centroid points, with one for each x based on the weigth of their intensity for each X
+ */
 void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
 
 	// generate frames with marking
@@ -202,8 +245,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 
 			/* RECT CUT METHOD */
 			findNonZero(baseFrame, nonZero);
-			cv::Rect laserArea = cv::boundingRect(nonZero);
-			cv::Mat t = baseFrame(laserArea);
+			auto laserArea = cv::boundingRect(nonZero);
+			auto t = baseFrame(laserArea);
 			highestPixel += LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "_marking", laserArea.y);
 			highestPixel += (laserArea.y);
 
@@ -261,7 +304,9 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 }
 
 /**
- * \brief Main entry points for calculation of marking height
+ * \brief Determins the marking boundries
+ * \param globName if "camera", use camera, otherwise load from glob folder
+ * \return 2 Float vector with the points marking the boundries as pair, where first = left, second = right
  */
 void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
@@ -365,6 +410,14 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 }
 
+/**
+ * \brief Computes the base line areas and determine the actual base line.
+ * \param canny The canny filter class
+ * \param filter The custom filter class
+ * \param hough The houghlines class
+ * \param morph The morphology class
+ * \param output 4-sized float vector descriping the base line locations in x/y with index 0 + 1 = left side and 2 + 3 = right side
+ */
 void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph, cv::Vec4f& output) {
 
 	LineLaserData results;
@@ -406,8 +459,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	rightBaseLine.width = frames[0].cols - rightBaseLine.x;
 	rightBaseLine.height = leftBaseLine.height;
 
-	vector<cv::Mat> left;
-	vector<cv::Mat> right;
+	vector<cv::Mat> left(frameCount_);
+	vector<cv::Mat> right(frameCount_);
 
 	// generate baseline images..
 	for (auto i = frameCount_; i--;) {
@@ -492,10 +545,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		boundryRect.width -= 40;
 
-		cv::Mat t = org(boundryRect);
+		auto t = org(boundryRect);
 		lineY = frames.front().rows - quarter + boundryRect.y + LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "_left_baseline", frames.front().rows - quarter + boundryRect.y);
-		//cout << "baseline new: " << lineY << endl;
-		//cout << "baseline org: " << lineY + (frames.front().rows - baseLineY) << endl;
 
 		if (!showWindows_)
 			break;
@@ -507,7 +558,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	output[0] = 0.0f;
 	output[1] = lineY;
-	//output[1] = lineY + (frames.front().rows - baseLineY);
 
 	// TODO : Add right side line computation
 	// just clone left to right for now
@@ -518,6 +568,14 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	draw->removeWindow(rightWindow);
 }
 
+/**
+ * \brief Computes the location of the marking rectangle, this rectangle is used to determin the location where the laser is actually on the marking.
+ * \param canny The canny filter class
+ * \param filter The custom filter class
+ * \param hough The houghline class
+ * \param output The rectangle vector
+ * \return true if ok, otherwise false
+ */
 bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output) {
 
 	// build cannyfied images
@@ -553,7 +611,7 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 			canny->setImage(filter->getResult());
 			canny->doCanny();
 
-			cv::Mat t = canny->getResult();
+			auto t = canny->getResult();
 
 			hough->setOriginal(t);
 			hough->setImage(t);
@@ -590,144 +648,9 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 	return output.x > 0.0f && output.y > 0.0f && output.width > 0.0f;
 }
 
-/**
- * \brief Determins the marking boundries
- * \param globName if "camera", use camera, otherwise load from glob folder
- * \return 2 Float vector with the points marking the boundries as pair, where first = left, second = right
- */
-LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
-
-	array<cv::Mat, 512> outputs;
-
-	linePair result(cv::Point2i(0, 0), cv::Point2i(0, 0));
-
-	CannyR cannyH(200, 250, 3, false, showWindows_, true);
-	CannyR cannyV(10, 30, 3, true, false, false);
-
-	HoughLinesR houghV(1, CV_PI / 180, 100, showWindows_);
-	HoughLinesPR houghP(1, CV_PI / 180, 100, 20, showWindows_);
-	FilterR lineFilter("LineFilterH");
-	FilterR lineFilterV("LineFilterV");
-
-	//FilterR speckFilter("SpeckFilter");
-
-	cv::Mat lineHKernel = (cv::Mat_<char>(1, 5) << 3 , 3 , 0 , -3 , -3);
-	cv::Mat speckKernel = (cv::Mat_<char>(3, 3) <<
-		0 , 0 , 0 ,
-		0 , 1 , 0 ,
-		0 , 0 , 0);
-
-	cv::Mat lineVKernel = (cv::Mat_<char>(4, 4) <<
-		0 , 0 , 1 , 1 ,
-		0 , 1 , 1 , 1 ,
-		1 , 1 , 1 , 0 ,
-		1 , 1 , 0 , 0
-	);
-
-	lineFilter.setKernel(lineHKernel);
-	lineFilter.setKernel(lineVKernel);
-	//speckFilter.setKernel(speckKernel);
-
-	//filter.generateKernel(6, 6, 1.0f);
-
-	houghV.setAngleLimit(30);
-	houghP.setAngleLimit(30);
-
-	Pixelz pixelz;
-
-	LineBaseData results;
-
-	while (true) {
-
-		uint64 time_begin = cv::getTickCount();
-
-		vector<double> baseLine(frameCount_);
-
-		// capture frame amount and clear storage
-		for (auto i = frameCount_; i--;) {
-			outputs[i] = cv::Mat::zeros(imageSize_, CV_8UC1);
-		}
-
-		//HistoPeak hp;
-
-		for (auto i = 0; i < frames.size(); ++i) {
-
-			// just share the joy
-			auto frame = frames.at(i).clone();
-
-			cv::Mat hori = frames.at(i).clone();
-			cv::Mat vert = frames.at(i).clone();
-
-			cv::Mat tmp = frames.at(i).clone();
-
-			//cv::bilateralFilter(frame, tmp, 1, 20, 10);
-
-			//speckFilter.setOriginal(frames.at(i));
-			//speckFilter.setImage(tmp);
-			//speckFilter.doFilter();
-			//tmp = speckFilter.getResult();
-
-			lineFilter.setOriginal(frame);
-			lineFilter.setImage(hori);
-			lineFilter.doFilter();
-			//tmp = lineFilter.getResult();
-
-			lineFilterV.setOriginal(frame);
-			lineFilterV.setImage(vert);
-			lineFilterV.doFilter();
-			tmp = lineFilterV.getResult();
-
-			//cv::threshold(tmp, tmp, 200, 255, cv::THRESH_BINARY);
-
-			cannyH.setImage(tmp);
-			cannyH.doCanny();
-			tmp = cannyH.getResult();
-
-			houghP.setOriginal(frame);
-			houghP.setImage(tmp);
-			houghP.doHorizontalHough();
-
-			//cannyV.setImage(frame);
-			//cannyV.doCanny();
-
-			houghV.setOriginal(frames.at(i));
-			houghV.setImage(tmp.clone());
-			houghV.doVerticalHough();
-
-			// show default input image
-			if (showWindows_) {
-				imshow(windowMainTitle, frame);
-			}
-
-			if (showWindows_) {
-				//Line l;
-				auto num(to_string(i));
-				//l.setFrame(frame);
-				//l.generateSparse();
-				//l.differentiateY();
-				//l.differentiateIntensity();
-				//l.mergeIntensity();
-				//l.saveAllData(num);
-				//l.drawPoly();
-
-				//Histogram g;
-				//g.populateHistogram(frame);
-				//cv::imshow(line2WindowName, g.histogramImage());
-				//auto filename("test_histo_" + num + ".txt");
-				//g.saveSimpleData(filename);
-
-				//auto blobs = drawBlobs(&frame);
-				//imshow("keypoints", blobs);
-
-			}
-
-			if (draw->isEscapePressed(10))
-				return LineBaseData(); // esc
-		}
-	}
-}
-
 bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, string timeString, string extraInfo) const {
+	// TODO : needs to be updated + documented
+
 	cv::FileStorage fs(filename + ".json", cv::FileStorage::WRITE);
 
 	if (!fs.isOpened()) {
@@ -758,6 +681,12 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pix
 	return true;
 }
 
+/**
+ * \brief Sums the intensity for a specific coloumn in a matrix
+ * \param image The image matrix to sum from
+ * \param x The X column to sum
+ * \return The avg intensity for specified column
+ */
 double ThicknessGauge::sumColumn(cv::Mat& image, int x) {
 
 	auto sum = 0;
