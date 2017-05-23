@@ -186,7 +186,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 
 		cv::Mat target; // the laser is herby contained!!!
 
-
 		for (auto i = frameCount_; i--;) {
 
 			cv::Mat baseFrame;
@@ -195,25 +194,22 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			std::vector<cv::Point> nonZero(outputs.at(i).rows * outputs.at(i).cols);
 
 			// TODO : replace with custom filter if needed
-			cv::bilateralFilter(markingFrames.at(i), baseFrame, 1, 20, 10);
+			cv::bilateralFilter(markingFrames.at(i), baseFrame, 3, 20, 10);
 
 			threshold(baseFrame, baseFrame, 100, 255, CV_THRESH_BINARY);
 
-			findNonZero(baseFrame, nonZero);
-
-			cv::Rect laserArea = cv::boundingRect(nonZero);
-
 			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
-			highestPixel += LineCalc::computeRealIntensityLine(baseFrame(laserArea), tmp, laserArea.height, 0, "_marking");
-			highestPixel += (laserArea.x + laserArea.height);
+			/* RECT CUT METHOD */
+			//findNonZero(baseFrame, nonZero);
+			//cv::Rect laserArea = cv::boundingRect(nonZero);
+			//highestPixel += LineCalc::computeRealIntensityLine(baseFrame(laserArea), tmp, laserArea.height, 0, "_marking");
+			//highestPixel += (laserArea.x + laserArea.height);
 
-			//highestPixel += LineCalc::computeRealIntensityLine(baseFrame, tmp, baseFrame.rows, 0, "_marking");
+			/* FULL COLUMN METHOD */
+			highestPixel += LineCalc::computeRealIntensityLine(baseFrame, tmp, baseFrame.rows, 0, "_marking");
 
-
-
-
-
+			/* OBSOLUTE? METHOD */
 			//auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs.at(i), pixPlanar, test_subPix);
 
 			//if (!generateOk) {
@@ -222,11 +218,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			//}
 
 			//nonZeroes.reserve(baseFrame.cols * baseFrame.rows);
-
 			//findNonZero(outputs.at(i), nonZeroes);
-
 			//auto heightLine = baseFrame.rows / 2;
-
 			//highestPixel += static_cast<float>(baseFrame.rows) - static_cast<float>(pix.getHighestYpixel(outputs.at(i), heightLine, miniCalc));
 
 			if (!i)
