@@ -4,9 +4,8 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include "tg.h"
-#include "Interpolate.h"
-#include "Bezier_1.h"
 #include "LineConfig.h"
+#include "../Util/Vec.h"
 
 using namespace std;
 using namespace tg;
@@ -24,10 +23,6 @@ private:
 
 	cv::Point2d variance_;
 
-	Interpolate<double> interpolate_;
-
-	Bezier<double> bezier_;
-	
 public:
 
 	struct pixelYsort {

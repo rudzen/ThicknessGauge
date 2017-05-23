@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include "Stringtools.h"
-#include "IO/IsValidFileName.h"
 #include <sys/stat.h>
 
 #ifdef __unix__
@@ -223,7 +222,8 @@ public:
 
 
 	static bool validFileName(const std::string& filename) {
-		return IsValidFileName(filename.c_str());
+		return true;
+		//return IsValidFileName(filename.c_str());
 	}
 
 	template <typename T>

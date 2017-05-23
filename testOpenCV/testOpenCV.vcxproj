@@ -164,13 +164,11 @@
     <ClCompile Include="CV\GenericCV.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
-    <ClCompile Include="IO\IsValidFileName.cpp" />
     <ClCompile Include="UI\DrawHelper.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
     <ClCompile Include="IO\ImageSave.cpp" />
     <ClCompile Include="Calc\MiniCalc.cpp" />
-    <ClCompile Include="UI\PrettyMenu.cpp" />
     <ClCompile Include="TheOne.cpp" />
     <ClCompile Include="Util\Util.cpp" />
     <ClCompile Include="IO\VideoInfo.cpp" />
@@ -194,7 +192,6 @@
     <ClInclude Include="Calibrate\CalibrationSettings.h" />
     <ClInclude Include="Exceptions\CaptureFailException.h" />
     <ClInclude Include="ArgClasses\CommandLineOptions.h" />
-    <ClInclude Include="Calc\Compute.h" />
     <ClInclude Include="ArgClasses\FileConstraint.h" />
     <ClInclude Include="ArgClasses\FolderConstraint.h" />
     <ClInclude Include="CV\FilterR.h" />
@@ -206,7 +203,6 @@
     <ClInclude Include="Histogram\HistoPeak.h" />
     <ClInclude Include="ArgClasses\IntegerConstraint.h" />
     <ClInclude Include="Exceptions\InvalidFileException.h" />
-    <ClInclude Include="IO\IsValidFileName.h" />
     <ClInclude Include="LineSparse.h" />
     <ClInclude Include="LineConfig.h" />
     <ClInclude Include="CV\Pixel.h" />
@@ -222,7 +218,6 @@
     <ClInclude Include="IO\ImageSave.h" />
     <ClInclude Include="Exceptions\InvalidMeanException.h" />
     <ClInclude Include="Calc\MiniCalc.h" />
-    <ClInclude Include="UI\PrettyMenu.h" />
     <ClInclude Include="Util\Stringtools.h" />
     <ClInclude Include="ThicknessGaugeData.h" />
     <ClInclude Include="Util\Util.h" />

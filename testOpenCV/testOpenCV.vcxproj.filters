@@ -93,16 +93,10 @@
     <ClCompile Include="Calc\MiniCalc.cpp">
       <Filter>Source Files\CV</Filter>
     </ClCompile>
-    <ClCompile Include="UI\PrettyMenu.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
     <ClCompile Include="UI\ProgressBar.cpp">
       <Filter>Source Files\UI\ProgressBar</Filter>
     </ClCompile>
     <ClCompile Include="IO\VideoInfo.cpp">
-      <Filter>Source Files\File</Filter>
-    </ClCompile>
-    <ClCompile Include="IO\IsValidFileName.cpp">
       <Filter>Source Files\File</Filter>
     </ClCompile>
     <ClCompile Include="IO\ImageSave.cpp">
@@ -191,22 +185,13 @@
     <ClInclude Include="Calibrate\CalibrationSettings.h">
       <Filter>Header Files\Camera\Calibrate</Filter>
     </ClInclude>
-    <ClInclude Include="Calc\Compute.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Calc\MiniCalc.h">
       <Filter>Header Files\CV</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\PrettyMenu.h">
-      <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="UI\ProgressBar.h">
       <Filter>Header Files\UI\ProgressBar</Filter>
     </ClInclude>
     <ClInclude Include="IO\VideoInfo.h">
-      <Filter>Header Files\File</Filter>
-    </ClInclude>
-    <ClInclude Include="IO\IsValidFileName.h">
       <Filter>Header Files\File</Filter>
     </ClInclude>
     <ClInclude Include="IO\ImageSave.h">

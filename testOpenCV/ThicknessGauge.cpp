@@ -141,7 +141,7 @@ void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) 
 }
 
 template <int minLen>
-inline int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
+int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 	auto minLineLen = cvRound(rect.width / 32);
 
 	if (minLineLen < minLen)
