@@ -167,7 +167,6 @@ inline int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 }
 
 void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
-	Pixelz pixelz;
 
 	// generate frames with marking
 	std::vector<cv::Mat> markingFrames;
@@ -211,7 +210,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 
 			threshold(baseFrame, baseFrame, 100, 255, CV_THRESH_BINARY);
 
-			//pixelz.removePepperNoise(baseFrame);
+			//pix.removePepperNoise(baseFrame);
 
 			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
@@ -869,24 +868,6 @@ int ThicknessGauge::getBinaryThreshold() const {
 
 void ThicknessGauge::setBinaryThreshold(int binaryThreshold) {
 	binaryThreshold_ = binaryThreshold;
-}
-
-cv::Mat ThicknessGauge::erosion(cv::Mat& input, int element, int size) const {
-	cv::MorphShapes erosion_type;
-	if (element == 0)
-		erosion_type = cv::MORPH_RECT;
-	else if (element == 1)
-		erosion_type = cv::MORPH_CROSS;
-	else if (element == 2)
-		erosion_type = cv::MORPH_ELLIPSE;
-	else
-		erosion_type = cv::MORPH_RECT;
-
-	auto input_element = getStructuringElement(erosion_type, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
-
-	cv::Mat erosion_dst = cv::Mat::zeros(input.size(), input.type());
-	erode(input, erosion_dst, element, cv::Point(-1, -1), 1, cv::BORDER_DEFAULT);
-	return erosion_dst;
 }
 
 int ThicknessGauge::getFrameCount() const {

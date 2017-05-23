@@ -189,10 +189,6 @@ public: // getters and setters
 
 	void setBinaryThreshold(int binaryThreshold);
 
-public: // misc quad temp stuff
-
-	cv::Mat erosion(cv::Mat& input, int element, int size) const;
-
 private: // generic helper methods
 
 	static bool IsPixel(cv::Mat& image, cv::Point& pixel) {
