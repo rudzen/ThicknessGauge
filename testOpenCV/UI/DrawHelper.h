@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include "tg.h"
 #include <opencv2/videostab/ring_buffer.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 class DrawHelper {
 
@@ -13,15 +14,40 @@ private:
 
 	cv::Scalar colour_;
 
+	bool showWindows_;
+
 public:
+
+	explicit DrawHelper(cv::Scalar colour)
+		: colour_(colour), showWindows_(false) {
+		cv::startWindowThread();
+	}
 
 	static void makeWindow(std::string name);
 
 	static void removeWindow(std::string& name);
 	static void removeWindow(const std::string& name);
 
+	static void removeAllWindows();
+
 	void showImage(std::string& windowName, cv::Mat& image) const;
 	void showImage(const std::string& name, cv::Mat& image) const;
+
+	static char getKey(const int delay) {
+		return static_cast<char>(cv::waitKey(delay));
+	}
+
+	bool isEscapePressed(const int delay) const {
+		return showWindows_ && getKey(delay) == 27;
+	}
+
+	void drawLine(cv::Mat& image, cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour) const {
+		drawLine(image, p1, p2, colour, 1);
+	}
+
+	static void drawLine(cv::Mat& image, cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour, int thickness) {
+		cv::line(image, p1, p2, colour, thickness, CV_AA);
+	}
 
 	void drawHorizontalLine(cv::Mat* image, uint pos) const {
 		drawHorizontalLine(image, pos, colour_);
@@ -58,6 +84,10 @@ public:
 
 	static void drawText(cv::Mat* image, const std::string text, tg::TextDrawPosition position, cv::Scalar colour);
 
+	void drawRectangle(cv::Mat& image, cv::Rect2f& rectangle, cv::Scalar colour) const {
+		cv::rectangle(image, rectangle, colour, 1, CV_AA);
+	}
+
 	const cv::Scalar& colour() const {
 		return colour_;
 	}
@@ -65,4 +95,13 @@ public:
 	void colour(const cv::Scalar& colour) {
 		colour_ = colour;
 	}
+
+	const bool& showWindows() const {
+		return showWindows_;
+	}
+
+	void showWindows(bool showWindows) {
+		showWindows_ = showWindows;
+	}
+
 };

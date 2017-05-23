@@ -1,11 +1,11 @@
 #pragma once
 #include <opencv2/core/mat.hpp>
-#include <opencv2/shape/hist_cost.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 #include "BaseR.h"
+#include "UI/DrawHelper.h"
 
-   /*
+/*
 	|  __
 	| /__\
 	| X~~|			"The eternal code god
@@ -69,7 +69,7 @@ class FilterR : public BaseR<float> {
 	int deltaI_ = 0;
 
 	void createWindow() {
-		namedWindow(windowName, cv::WINDOW_KEEPRATIO);
+		cv::namedWindow(windowName, cv::WINDOW_FREERATIO | cv::WINDOW_GUI_EXPANDED);
 		cv::createTrackbar("delta", windowName, &deltaI_, 100, delta_cb, this);
 	}
 
@@ -77,12 +77,12 @@ class FilterR : public BaseR<float> {
 		auto that = static_cast<FilterR*>(userData);
 		auto oldVal = that->getDelta();
 		that->setDelta(static_cast<double>(value));
-		cout << that->windowName << " delta : " << oldVal << " -> " << value << '\n';
+		std::cout << that->windowName << " delta : " << oldVal << " -> " << value << '\n';
 	}
 
 public: // constructors
 
-	explicit FilterR(string windowName): delta_(0.0)
+	explicit FilterR(std::string windowName): delta_(0.0)
 	         , ddepth_(-1)
 	         , border_(cv::BORDER_DEFAULT)
 	         , showWindow_(true) {
@@ -92,7 +92,7 @@ public: // constructors
 		createWindow();
 	}
 
-	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows, string windowName) : kernel_(kernel)
+	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows, std::string windowName) : kernel_(kernel)
 	                                                                                                                                                        , anchor_(anchor)
 	                                                                                                                                                        , delta_(delta)
 	                                                                                                                                                        , ddepth_(ddepth)

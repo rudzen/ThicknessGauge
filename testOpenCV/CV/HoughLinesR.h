@@ -303,9 +303,9 @@ inline void HoughLinesR::computeBorders() {
 		drawLine(rightBorder_);
 		//drawLines(leftLines_, cv::Scalar(0, 255, 0));
 		//drawLines(rightLines_, cv::Scalar(0, 0, 255));
-		cv::rectangle(output_, leftRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
-		cv::rectangle(output_, rightRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
-		cv::rectangle(output_, markingRect, cv::Scalar(255, 0, 0), 3, CV_AA);
+		//cv::rectangle(output_, leftRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
+		//cv::rectangle(output_, rightRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
+		//cv::rectangle(output_, markingRect, cv::Scalar(255, 0, 0), 3, CV_AA);
 		showOutput();
 	}
 

@@ -166,7 +166,7 @@ inline int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 	return minLineLen;
 }
 
-void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result, shared_ptr<DrawHelper> draw) {
+void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
 	Pixelz pixelz;
 
 	// generate frames with marking
@@ -251,10 +251,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			draw->drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
 			draw->drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
 			draw->showImage(windowName, tmpOut);
-			auto key = static_cast<char>(cv::waitKey(30));
-			if (key == 27) /* escape was pressed */ {
+			if (draw->isEscapePressed(30))
 				showWindows_ ^= true;
-			}
 		}
 
 		if (!showWindows_)
@@ -263,29 +261,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 	}
 
 	draw->removeWindow(windowName);
-
-}
-
-void ThicknessGauge::computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& lines, cv::Rect& markingRect) {
-
-	cv::Point2f avgTop(0.0f, markingRect.height);
-	cv::Point2f avgButtom(0.0f, 0.0f);
-	auto halfPoint = static_cast<float>(markingRect.y / 2);
-
-	for (auto& line : lines) {
-		auto sumButtom = 0.0f;
-		auto sumTop = 0.0f;
-		for (auto& point : line.elements) {
-			if (point.y < halfPoint) {
-				sumButtom += point.x;
-			}
-			else {
-				sumTop += point.x;
-			}
-		}
-		avgTop.x += (sumTop / line.elements.size());
-		avgButtom.x += (sumButtom / line.elements.size());
-	}
 
 }
 
@@ -299,8 +274,6 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		captureFrames();
 	else
 		loadGlob(globName);
-
-	auto drawHelper = make_shared<DrawHelper>();
 
 	// configure frames based on center vertical splitting of the original frames
 	vector<cv::Mat> leftFrames(frameCount_);
@@ -377,20 +350,19 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	std::vector<cv::Point2f> laserLine;
 
 	// filter for laser detection
-	auto laserFilter = make_shared<FilterR>("LaserFilter");
+	auto laserFilter = make_shared<FilterR>("Laser Filter");
 	laserFilter->setShowWindow(showWindows_);
 
 	// main laser class
 	auto laser = make_shared<LaserR>();
 
 	// computes the Y locations of the laserline inside the marking rect
-	computeLaserLocations(laser, baseLines, laserFilter, markingRect, laserLine, drawHelper);
+	computeLaserLocations(laser, baseLines, laserFilter, markingRect, laserLine);
 
-	if (showWindows_) {
-		auto key = static_cast<char>(cv::waitKey(30));
-		if (key == 27)
-			return; // escape was pressed
-	}
+	draw->removeAllWindows();
+
+	if (draw->isEscapePressed(30))
+		return;
 
 }
 
@@ -407,15 +379,18 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	filter->setKernel(lineHKernel);
 
-	cv::namedWindow("test baseline left", CV_WINDOW_FREERATIO);
-	cv::namedWindow("test baseline right", CV_WINDOW_FREERATIO);
+	const std::string leftWindow = "test baseline left";
+	const std::string rightWindow = "test baseline right";
+
+	draw->makeWindow(leftWindow);
+	draw->makeWindow(rightWindow);
 
 	int bias = Left;
 
 	auto quarter = static_cast<float>(frames[0].rows / 4);
 	auto baseLineY = frames[0].rows - quarter;
 
-	cv::Rect2f markingRect = hough->getMarkingRect();
+	auto markingRect = hough->getMarkingRect();
 
 	cv::Rect2f leftBaseLine;
 	leftBaseLine.x = 0.0f;
@@ -481,31 +456,18 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 			allElements.clear();
 
-			const vector<HoughLinesPR::LineH>& lines = hough->getRightLines();
-			for (auto& h :lines) {
+			const auto& lines = hough->getRightLines();
+			for (auto& h : lines) {
 				totalY += 2;
 				auto t = (h.entry[1] + h.entry[3]) * 0.5f;
 				lineY += t;
 				Util::copyVector(h.elements, allElements);
 			}
 
-			if (showWindows_) {
-				//// generate boundry off the elements
-				//cv::Point2f vertices[4];
-				//cv::RotatedRect boundry = cv::minAreaRect(allElements);
-				//boundry.points(vertices);
-				//for (int i = 0; i < 4; ++i)
-				//	cv::line(sparseTest, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0), 1, CV_AA);
-
-				//cv::imshow("test baseline left", sparseTest);
-				//cv::imshow("test baseline right", right);
-				auto key = static_cast<char>(cv::waitKey(30));
-				if (key == 27) {
-					showWindows_ ^= true;
-					break; // escape was pressed
-				}
+			if (draw->isEscapePressed(30)) {
+				showWindows_ ^= true;
+				break;
 			}
-
 		}
 
 		// generate real boundry
@@ -513,18 +475,16 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		auto boundryRect = boundry.boundingRect2f();
 
 		if (showWindows_) {
-
-			cv::rectangle(org, boundryRect, cv::Scalar(255, 255, 0), 1, CV_AA);
 			// generate boundry off the elements
-			//cv::Point2f vertices[4];
-			//boundry.points(vertices);
-			//for (auto i = 0; i < 4; ++i)
-			//	cv::line(org, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0), 1, CV_AA);
+			cv::Point2f vertices[4];
+			boundry.points(vertices);
+			for (auto i = 0; i < 4; ++i)
+				draw->drawLine(org, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0));
 
-			cv::imshow("test baseline left", org);
-			//cv::imshow("test baseline right", right);
-			auto key = static_cast<char>(cv::waitKey(30));
-			if (key == 27) {
+			draw->drawRectangle(org, boundryRect, cv::Scalar(255, 255, 255));
+			draw->showImage(leftWindow, org);
+			//draw->showImage(rightWindow, right);
+			if (draw->isEscapePressed(30)) {
 				showWindows_ ^= true;
 				break; // escape was pressed
 			}
@@ -540,13 +500,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		lineY = 0.0f;
 		totalY = 0;
 
-		//sparse.generateSparse();
-		//cv::Rect rect = cv::boundingRect(sparse.allSparse());
-
-		//cv::polylines(sparseTest, sparse.allSparse(), false, cv::Scalar(255, 255, 255));
-
-		//sparse.initialize();
-
 	}
 
 	output[0] = 0.0f;
@@ -556,7 +509,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	// just clone left to right for now
 	output[2] = output[0];
 	output[3] = output[1];
-
+	
+	draw->removeWindow(leftWindow);
+	draw->removeWindow(rightWindow);
 }
 
 bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output) {
@@ -576,16 +531,18 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 
 	vector<cv::Mat> cannyImages;
 
-	cv::namedWindow("test marking out", CV_WINDOW_FREERATIO);
+	const std::string windowName = "test marking out";
+	draw->makeWindow(windowName);
 
 	vector<cv::Rect2f> markingRects;
 
 	while (true) {
 
+		cv::Mat markingTest;
 		markingRects.reserve(frameCount_);
 		cv::Mat sparse;
 		for (auto i = frames.size(); i--;) {
-			auto markingTest = frames.at(i).clone();
+			markingTest = frames.at(i).clone();
 			auto org = frames.at(i).clone();
 			filter->setImage(frames.at(i).clone());
 			filter->doFilter();
@@ -598,13 +555,8 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 			hough->doVerticalHough();
 			hough->computeBorders();
 			markingRects.push_back(hough->getMarkingRect());
-			if (showWindows_) {
-				cv::rectangle(markingTest, output, cv::Scalar(128, 128, 128), 2, cv::LINE_AA);
-				cv::imshow("test marking out", markingTest);
-				auto key = static_cast<char>(cv::waitKey(30));
-				if (key == 27)
-					return true; // escape was pressed
-			}
+			if (draw->isEscapePressed(30))
+				return true;
 		}
 		// calculate the avg rect
 		output.x = 0.0f;
@@ -622,7 +574,12 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 		cout << "Final marking rect : " << output << endl;
 		if (!showWindows_)
 			break;
+
+		draw->drawRectangle(markingTest, output, cv::Scalar(128, 128, 128));
+		draw->showImage(windowName, markingTest);
 	}
+
+	draw->removeWindow(windowName);
 
 	return output.x > 0.0f && output.y > 0.0f && output.width > 0.0f;
 }
@@ -758,11 +715,8 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 
 			}
 
-			if (showWindows_) {
-				auto key = static_cast<char>(cv::waitKey(10));
-				if (key == 27)
+			if (draw->isEscapePressed(10))
 					return LineBaseData(); // esc
-			}
 		}
 	}
 }
@@ -914,7 +868,6 @@ void ThicknessGauge::setBinaryThreshold(int binaryThreshold) {
 	binaryThreshold_ = binaryThreshold;
 }
 
-
 cv::Mat ThicknessGauge::erosion(cv::Mat& input, int element, int size) const {
 	cv::MorphShapes erosion_type;
 	if (element == 0)
@@ -970,4 +923,5 @@ bool ThicknessGauge::isShowWindows() const {
 
 void ThicknessGauge::setShowWindows(bool showWindows) {
 	showWindows_ = showWindows;
+	draw->showWindows(showWindows);
 }
