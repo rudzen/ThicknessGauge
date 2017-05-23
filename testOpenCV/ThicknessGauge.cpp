@@ -23,7 +23,7 @@
 #include <opencv2/core/base.hpp>
 #include <opencv2/core/base.hpp>
 #include "UI/DrawHelper.h"
-
+#include "CV/GenericCV.h"
 
 /**
  * \brief Initializes the capture device using PV_API constant
@@ -221,6 +221,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 
 	std::vector<cv::Point2d> tmp;
 
+	auto thresholdLevel = 100.0;
+
 	while (true) {
 
 		auto start = cv::getTickCount();
@@ -239,6 +241,9 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			// TODO : replace with custom filter if needed
 			cv::bilateralFilter(markingFrames.at(i), baseFrame, 3, 20, 10);
 
+			//cv::Mat t;
+			//GenericCV::adaptiveThreshold(baseFrame, t, &thresholdLevel);
+
 			threshold(baseFrame, baseFrame, 100, 255, CV_THRESH_BINARY);
 
 			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
@@ -247,7 +252,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			findNonZero(baseFrame, nonZero);
 			auto laserArea = cv::boundingRect(nonZero);
 			auto t = baseFrame(laserArea);
-			highestPixel += LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "_marking", laserArea.y);
+			highestPixel += LineCalc::computeRealIntensityLine(t, tmp, static_cast<float>(t.rows), 0.0f, "_marking", static_cast<float>(laserArea.y));
 			highestPixel += (laserArea.y);
 
 			/* FULL COLUMN METHOD */
@@ -317,10 +322,10 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		loadGlob(globName);
 
 	// configure frames based on center vertical splitting of the original frames
-	vector<cv::Mat> leftFrames(frameCount_);
-	vector<cv::Mat> rightFrames(frameCount_);
+	//vector<cv::Mat> leftFrames(frameCount_);
+	//vector<cv::Mat> rightFrames(frameCount_);
 
-	splitFrames(leftFrames, rightFrames);
+	//splitFrames(leftFrames, rightFrames);
 
 	// morph extension class for easy use
 	auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
@@ -361,6 +366,8 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	// the baselines, which are located outside the marking
 	cv::Vec4f baseLines;
+
+	cout << "1" << endl;
 
 	computeBaseLineAreas(canny, baselineFilter, houghH, morph, baseLines);
 
@@ -459,8 +466,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	rightBaseLine.width = frames[0].cols - rightBaseLine.x;
 	rightBaseLine.height = leftBaseLine.height;
 
-	vector<cv::Mat> left(frameCount_);
-	vector<cv::Mat> right(frameCount_);
+	vector<cv::Mat> left;
+	vector<cv::Mat> right;
 
 	// generate baseline images..
 	for (auto i = frameCount_; i--;) {
@@ -468,25 +475,18 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		right.push_back(frames[i](rightBaseLine));
 	}
 
-	SparseR<float> sparse;
-
 	auto imSize = left.front().size();
-	auto imType = left.front().type();
 
 	auto lineY = 0.0f;
-	unsigned int totalY = 0;
-
-	auto avgTotal = 0.0;
 	std::vector<cv::Point2d> tmp;
 
 	std::vector<cv::Point2f> allElements;
 
+	allElements.reserve(imSize.width * imSize.height);
 
 #define _sparse_mode
 
 	while (true) {
-
-		auto avg = 0.0;
 
 		allElements.clear();
 
@@ -494,6 +494,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		// left
 		for (auto& l : left) {
 			org = l.clone();
+
 			filter->setImage(org);
 			filter->doFilter();
 
@@ -546,7 +547,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		boundryRect.width -= 40;
 
 		auto t = org(boundryRect);
-		lineY = frames.front().rows - quarter + boundryRect.y + LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "_left_baseline", frames.front().rows - quarter + boundryRect.y);
+		lineY = frames.front().rows - quarter + boundryRect.y + LineCalc::computeRealIntensityLine(t, tmp, static_cast<float>(t.rows), 0.0f, "_left_baseline", static_cast<float>(frames.front().rows) - quarter + boundryRect.y);
 
 		if (!showWindows_)
 			break;
