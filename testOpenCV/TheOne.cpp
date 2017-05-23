@@ -31,6 +31,8 @@ using namespace TCLAP;
 #define _USE_MATH_DEFINES
 #define _CRT_SECURE_NO_WARNINGS
 
+#define RUDZ_DEBUG
+
 const string default_camera_calibration_file = "C2450.json";
 
 bool parseArgs(int argc, char** argv, CommandLineOptions& options);
@@ -38,8 +40,7 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options);
 void saveNull(std::string filename) {
 
 	// quick and dirty hack to save null image quickly
-
-	cout << "Enter delay in seconds before capture to " << filename << "\n>";
+	cout << cv::format("Enter delay in seconds before capture to %s\n>", filename);
 	int t;
 	cin >> t;
 	cv::setNumThreads(2);
@@ -50,7 +51,6 @@ void saveNull(std::string filename) {
 	cv::imwrite(filename, nullImage);
 	cap.release();
 }
-
 
 int main(int argc, char** argv) {
 
@@ -84,7 +84,8 @@ int main(int argc, char** argv) {
 			c.initVideoCapture();
 			auto globName = options.getGlobFolder();
 			c.generateGlob(globName);
-		} else if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
+		}
+		else if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
 			auto globName = options.getGlobFolder();
 			c.initVideoCapture();
@@ -97,11 +98,17 @@ int main(int argc, char** argv) {
 			//returnValue = result.first.x != 0;
 			//returnValue = c.generatePlanarImage(globName);
 			//if (returnValue) {
-				cout << "Planar image generated in " << c.getFrameTime() / c.getTickFrequency() << " seconds, processing..\n";
+#ifdef RUDZ_DEBUG
+			cout << cv::format("Planar image generated in %l seconds, processing..\n", c.getFrameTime() / c.getTickFrequency());
+#else
+				cout << "done..\n";
+#endif
 			//}
-		} else if (options.isCalibrationMode()) {
+		}
+		else if (options.isCalibrationMode()) {
 			throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
-		} else if (options.isTestMode()) {
+		}
+		else if (options.isTestMode()) {
 			//c.initVideoCapture();
 			//c.testAggressive();
 		}
@@ -223,7 +230,6 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		}
 		else if (globSwitch.isSet())
 			options.setGlobMode(true); // glob mode
-
 
 		auto sval = cameraFileArg.getValue();
 		options.setCameraFile(sval);

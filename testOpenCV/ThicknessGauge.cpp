@@ -367,12 +367,10 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	// the baselines, which are located outside the marking
 	cv::Vec4f baseLines;
 
-	cout << "1" << endl;
-
 	computeBaseLineAreas(canny, baselineFilter, houghH, morph, baseLines);
 
-	std::cout << "left  base line Y : " << baseLines[1] << std::endl;
-	std::cout << "right base line Y : " << baseLines[3] << std::endl;
+	cout << cv::format("Left base line Y : %f\n", baseLines[1]);
+	cout << cv::format("Right base line Y: %f\n", baseLines[2]);
 
 	// the locations for where the base lines intersect with the marking border
 	cv::Vec4f intersections;
