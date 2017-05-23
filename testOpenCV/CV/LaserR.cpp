@@ -1,6 +1,5 @@
-#include <opencv2/stitching/detail/warpers.hpp>
+#include <opencv2/core.hpp>
 #include "LaserR.h"
-
 
 bool LaserR::doLaser() {
 

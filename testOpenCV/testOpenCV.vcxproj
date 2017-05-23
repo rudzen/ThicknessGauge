@@ -161,11 +161,11 @@
     <ClCompile Include="Calc\LineCalc.cpp" />
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
-    <ClCompile Include="CV\DrawHelpers.cpp" />
     <ClCompile Include="CV\GenericCV.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
     <ClCompile Include="IO\IsValidFileName.cpp" />
+    <ClCompile Include="UI\DrawHelper.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
     <ClCompile Include="IO\ImageSave.cpp" />
@@ -181,7 +181,6 @@
     <ClInclude Include="CV\BaseR.h" />
     <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />
     <ClInclude Include="CV\CannyR.h" />
-    <ClInclude Include="CV\DrawHelpers.h" />
     <ClInclude Include="CV\GenericCV.h" />
     <ClInclude Include="CV\HoughLinesR.h" />
     <ClInclude Include="CV\LaserR.h" />
@@ -210,6 +209,7 @@
     <ClInclude Include="LineSparse.h" />
     <ClInclude Include="LineConfig.h" />
     <ClInclude Include="CV\Pixel.h" />
+    <ClInclude Include="UI\DrawHelper.h" />
     <ClInclude Include="UI\ProgressBar.h" />
     <ClInclude Include="Testing\TestConfig.h" />
     <ClInclude Include="Exceptions\TestException.h" />

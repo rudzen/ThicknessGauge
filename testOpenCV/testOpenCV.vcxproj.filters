@@ -120,10 +120,10 @@
     <ClCompile Include="CV\HoughLinesR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CV\DrawHelpers.cpp">
+    <ClCompile Include="CV\GenericCV.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CV\GenericCV.cpp">
+    <ClCompile Include="UI\DrawHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -284,10 +284,10 @@
     <ClInclude Include="Calc\LineCalc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CV\DrawHelpers.h">
+    <ClInclude Include="CV\GenericCV.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CV\GenericCV.h">
+    <ClInclude Include="UI\DrawHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

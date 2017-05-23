@@ -22,7 +22,7 @@
 #include "Calc/LineCalc.h"
 #include <opencv2/core/base.hpp>
 #include <opencv2/core/base.hpp>
-#include "CV/DrawHelpers.h"
+#include "UI/DrawHelper.h"
 
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
@@ -231,7 +231,7 @@ inline int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
 	return minLineLen;
 }
 
-void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
+void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result, shared_ptr<DrawHelper> draw) {
 	Pixelz pixelz;
 
 	// generate frames with marking
@@ -249,7 +249,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		outputs.push_back(cv::Mat::zeros(markingFrames.back().size(), CV_8UC1));
 	}
 
-	cv::namedWindow("test height", CV_WINDOW_AUTOSIZE);
+	const std::string windowName = "test height";
+	draw->makeWindow(windowName);
 
 	showWindows_ = true;
 
@@ -310,11 +311,11 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		auto time = (end - start) / cv::getTickFrequency();
 		std::cout << "time : " << time << endl;
 		if (showWindows_) {
-			DrawHelpers::drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
-			DrawHelpers::drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
-			DrawHelpers::drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
-			DrawHelpers::drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
-			cv::imshow("test height", tmpOut);
+			draw->drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
+			draw->drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
+			draw->drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
+			draw->drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
+			draw->showImage(windowName, tmpOut);
 			auto key = static_cast<char>(cv::waitKey(30));
 			if (key == 27) /* escape was pressed */ {
 				showWindows_ ^= true;
@@ -325,6 +326,9 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			break;
 
 	}
+
+	draw->removeWindow(windowName);
+
 }
 
 void ThicknessGauge::computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& lines, cv::Rect& markingRect) {
@@ -334,8 +338,8 @@ void ThicknessGauge::computeMarkingRectOffset(std::vector<HoughLinesR::LineV>& l
 	auto halfPoint = static_cast<float>(markingRect.y / 2);
 
 	for (auto& line : lines) {
-		float sumButtom = 0.0f;
-		float sumTop = 0.0f;
+		auto sumButtom = 0.0f;
+		auto sumTop = 0.0f;
 		for (auto& point : line.elements) {
 			if (point.y < halfPoint) {
 				sumButtom += point.x;
@@ -361,6 +365,8 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	else
 		loadGlob(globName);
 
+	auto drawHelper = make_shared<DrawHelper>();
+
 	// configure frames based on center vertical splitting of the original frames
 	vector<cv::Mat> leftFrames(frameCount_);
 	vector<cv::Mat> rightFrames(frameCount_);
@@ -371,7 +377,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, true);
 
 	// the filter used to determin the marking location in the frame
-	auto markingFilter = make_shared<FilterR>("MarkingFilter");
+	auto markingFilter = make_shared<FilterR>("Marking Filter");
 
 	// filter to enhance the base line
 	auto baselineFilter = make_shared<FilterR>("Baseline Filter");
@@ -443,7 +449,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	auto laser = make_shared<LaserR>();
 
 	// computes the Y locations of the laserline inside the marking rect
-	computeLaserLocations(laser, baseLines, laserFilter, markingRect, laserLine);
+	computeLaserLocations(laser, baseLines, laserFilter, markingRect, laserLine, drawHelper);
 
 	if (showWindows_) {
 		auto key = static_cast<char>(cv::waitKey(30));
@@ -566,35 +572,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			}
 
 		}
-
-		//auto print = [&]() {
-		//	for (const auto& point : allElements) {
-		//		std::cout << "(" << point.x << " " << point.y << ") ";
-		//	}
-		//	std::cout << std::endl;
-		//};
-
-		//cout << "as is...\n";
-		//print();
-
-		//// sort all elements
-		//std::sort(allElements.begin(), allElements.end(), [](const cv::Point2f& lhs, const cv::Point2f& rhs) {
-		//         return lhs.x < rhs.x && lhs.y < rhs.y;
-		//        });
-
-		//cout << "after sort:\n";
-		//print();
-
-		//// remove dupes
-		//auto it = std::unique(allElements.begin(), allElements.end(), [](const cv::Point2f& lhs, const cv::Point2f& rhs) {
-		//                     return lhs.x == rhs.x && lhs.y == rhs.y;
-		//                    });
-
-		//cout << "no dupes:\n";
-		//print();
-
-		//// resize
-		//allElements.resize(std::distance(allElements.begin(), it));
 
 		// generate real boundry
 		auto boundry = cv::minAreaRect(allElements);
