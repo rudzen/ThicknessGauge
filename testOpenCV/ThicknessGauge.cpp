@@ -281,6 +281,9 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	splitFrames(leftFrames, rightFrames);
 
+	// morph extension class for easy use
+	auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
+
 	// common canny with default settings for detecting marking borders
 	auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, true);
 
@@ -318,7 +321,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 	// the baselines, which are located outside the marking
 	cv::Vec4f baseLines;
 
-	computeBaseLineAreas(canny, baselineFilter, houghH, baseLines);
+	computeBaseLineAreas(canny, baselineFilter, houghH, morph, baseLines);
 
 	std::cout << "left  base line Y : " << baseLines[1] << std::endl;
 	std::cout << "right base line Y : " << baseLines[3] << std::endl;
@@ -366,7 +369,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 }
 
-void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, cv::Vec4f& output) {
+void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph, cv::Vec4f& output) {
 
 	LineLaserData results;
 
@@ -378,6 +381,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	);
 
 	filter->setKernel(lineHKernel);
+
+	morph->setMethod(cv::MORPH_GRADIENT);
+	morph->setIterations(1);
 
 	const std::string leftWindow = "test baseline left";
 	const std::string rightWindow = "test baseline right";
@@ -430,8 +436,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	while (true) {
 
-
 		auto avg = 0.0;
+
+		allElements.clear();
 
 		cv::Mat org;
 		// left
@@ -443,14 +450,12 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			canny->setImage(filter->getResult());
 			canny->doCanny();
 
-			cv::Mat t;
-			cv::morphologyEx(canny->getResult(), t, cv::MORPH_GRADIENT, cv::Mat(), cv::Point(-1, -1), 1);
+			morph->setImage(canny->getResult());
+			morph->doMorph();
 
-			hough->setImage(t);
-			hough->setOriginal(t);
+			hough->setImage(morph->getResult());
+			hough->setOriginal(org);
 			hough->doHorizontalHough();
-
-			allElements.clear();
 
 			const auto& lines = hough->getRightLines();
 			for (auto& h : lines) {
