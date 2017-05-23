@@ -87,14 +87,6 @@ void ThicknessGauge::captureFrames() {
 
 }
 
-void ThicknessGauge::Blur(cv::Mat& image, cv::Size size) {
-	GaussianBlur(image, image, size, 1.5, 1.5);
-}
-
-void ThicknessGauge::MeanReduction(cv::Mat& image) {
-	MeanReduction(image);
-}
-
 void ThicknessGauge::laplace(cv::Mat& image) const {
 	cv::Mat tmp;
 	Laplacian(image, tmp, settings.ddepth, settings.kernelSize); // , scale, delta, BORDER_DEFAULT);
@@ -103,14 +95,6 @@ void ThicknessGauge::laplace(cv::Mat& image) const {
 
 void ThicknessGauge::sobel(cv::Mat& image) const {
 	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, cv::BORDER_DEFAULT);
-}
-
-void ThicknessGauge::drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const {
-	polylines(targetImage, planarMap, false, cv::Scalar(255, 255, 255), 2);
-}
-
-inline void ThicknessGauge::computeAllElements(cv::Mat& image) {
-	findNonZero(image, allPixels_);
 }
 
 void ThicknessGauge::generateGlob(std::string& name) {

@@ -122,15 +122,9 @@ public: // basic stuff to extract information
 
 	void captureFrames();
 
-	static void Blur(cv::Mat& image, cv::Size size);
-
-	static void MeanReduction(cv::Mat& image);
-
 	void laplace(cv::Mat& image) const;
 
 	void sobel(cv::Mat& image) const;
-
-	void drawPlarnarPixels(cv::Mat& targetImage, vector<cv::Point>& planarMap) const;
 
 	void generateGlob(std::string& name);
 
@@ -148,8 +142,6 @@ public: // basic stuff to extract information
 	double sumColumn(cv::Mat& image, int x);
 
 	void sumColumns(cv::Mat& image, cv::Mat& target);
-
-	void computeAllElements(cv::Mat& image);
 
 	void computerGaugeLine(cv::Mat& output);
 
