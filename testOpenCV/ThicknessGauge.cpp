@@ -201,13 +201,14 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
 			/* RECT CUT METHOD */
-			//findNonZero(baseFrame, nonZero);
-			//cv::Rect laserArea = cv::boundingRect(nonZero);
-			//highestPixel += LineCalc::computeRealIntensityLine(baseFrame(laserArea), tmp, laserArea.height, 0, "_marking");
-			//highestPixel += (laserArea.x + laserArea.height);
+			findNonZero(baseFrame, nonZero);
+			cv::Rect laserArea = cv::boundingRect(nonZero);
+			cv::Mat t = baseFrame(laserArea);
+			highestPixel += LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "_marking");
+			highestPixel += (laserArea.y);
 
 			/* FULL COLUMN METHOD */
-			highestPixel += LineCalc::computeRealIntensityLine(baseFrame, tmp, baseFrame.rows, 0, "_marking");
+			//highestPixel += LineCalc::computeRealIntensityLine(baseFrame, tmp, baseFrame.rows, 0, "_marking");
 
 			/* OBSOLUTE? METHOD */
 			//auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs.at(i), pixPlanar, test_subPix);
@@ -221,12 +222,16 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			//findNonZero(outputs.at(i), nonZeroes);
 			//auto heightLine = baseFrame.rows / 2;
 			//highestPixel += static_cast<float>(baseFrame.rows) - static_cast<float>(pix.getHighestYpixel(outputs.at(i), heightLine, miniCalc));
+			if (draw->isEscapePressed(30)) {
+				showWindows_ = false;
+				break;
+			}
 
 			if (!i)
 				cv::cvtColor(outputs.at(i), tmpOut, CV_GRAY2BGR);
 		}
 
-		highestPixelTotal = highestPixel / static_cast<unsigned int>(frameCount_);
+		highestPixelTotal = frames.front().rows - (highestPixel / static_cast<unsigned int>(frameCount_));
 		auto end = cv::getTickCount();
 		std::cout << "highestPixelTotal: " << highestPixelTotal << endl;
 
@@ -237,7 +242,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		std::cout << "time : " << time << endl;
 		if (showWindows_) {
 			draw->drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
-			draw->drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
+			//draw->drawHorizontalLine(&tmpOut, cvRound(diff), cv::Scalar(0, 0, 255));
+			draw->drawHorizontalLine(&tmpOut, cvRound(frames.front().rows - baseLine[1]), cv::Scalar(0, 0, 255));
 			draw->drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
 			draw->drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
 			draw->showImage(windowName, tmpOut);
@@ -422,6 +428,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	std::vector<cv::Point2f> allElements;
 
+
 #define _sparse_mode
 
 	while (true) {
@@ -449,9 +456,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 			const auto& lines = hough->getRightLines();
 			for (auto& h : lines) {
-				totalY += 2;
-				auto t = (h.entry[1] + h.entry[3]) * 0.5f;
-				lineY += t;
+				//totalY += 2;
+				//auto t = (h.entry[1] + h.entry[3]) * 0.5f;
+				//lineY += t;
 				Util::copyVector(h.elements, allElements);
 			}
 
@@ -467,10 +474,10 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		if (showWindows_) {
 			// generate boundry off the elements
-			cv::Point2f vertices[4];
-			boundry.points(vertices);
-			for (auto i = 0; i < 4; ++i)
-				draw->drawLine(org, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0));
+			//cv::Point2f vertices[4];
+			//boundry.points(vertices);
+			//for (auto i = 0; i < 4; ++i)
+			//	draw->drawLine(org, vertices[i], vertices[(i + 1) % 4], cv::Scalar(255, 0, 0));
 
 			draw->drawRectangle(org, boundryRect, cv::Scalar(255, 255, 255));
 			draw->showImage(leftWindow, org);
@@ -481,26 +488,32 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			}
 		}
 
-		//avg += LineCalc::computeRealIntensityLine(org, tmp, boundryRect.y, boundryRect.y + boundryRect.height, "left");
+		/*lineY /= totalY;*/
 
-		lineY /= totalY;
+		boundryRect.width -= 40;
+
+		cv::Mat t = org(boundryRect);
+		lineY = frames.front().rows - quarter + boundryRect.y + LineCalc::computeRealIntensityLine(t, tmp, t.rows, 0, "left");
+		//cout << "baseline new: " << lineY << endl;
+		//cout << "baseline org: " << lineY + (frames.front().rows - baseLineY) << endl;
 
 		if (!showWindows_)
 			break;
 
 		lineY = 0.0f;
-		totalY = 0;
+		//totalY = 0;
 
 	}
 
 	output[0] = 0.0f;
-	output[1] = lineY + (frames.front().rows - baseLineY);
+	output[1] = lineY;
+	//output[1] = lineY + (frames.front().rows - baseLineY);
 
 	// TODO : Add right side line computation
 	// just clone left to right for now
 	output[2] = output[0];
 	output[3] = output[1];
-	
+
 	draw->removeWindow(leftWindow);
 	draw->removeWindow(rightWindow);
 }
@@ -709,7 +722,7 @@ LineBaseData ThicknessGauge::findMarkingLinePairs_(std::string& globName) {
 			}
 
 			if (draw->isEscapePressed(10))
-					return LineBaseData(); // esc
+				return LineBaseData(); // esc
 		}
 	}
 }
