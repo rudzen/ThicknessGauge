@@ -191,10 +191,6 @@ public: // getters and setters
 
 private: // generic helper methods
 
-	static bool IsPixel(cv::Mat& image, cv::Point& pixel) {
-		return image.at<uchar>(pixel) < 255;
-	}
-
 	void generateVectors(vi& pix) {
 
 		// make center		

@@ -27,6 +27,24 @@ class Pixelz {
 public:
 
 	/**
+	 * \brief Determine if a pixel is not zero
+	 * \param image The image
+	 * \param pixel The point of the pixel
+	 * \return true if > 0 otherwise false
+	 */
+	template <typename T>
+	static bool isPixel(cv::Mat& image, cv::Point_<T>& pixel) {
+		if (pixel.x > image.cols)
+			return false;
+
+		if (pixel.y > image.rows)
+			return false;
+
+		return image.at<uchar>(pixel) > 0;
+	}
+
+
+	/**
 	 * \brief Get the pixel intensity sum of a 3 channel image
 	 * \param image The image to get the sum from
 	 * \return The total sum of pixel intensity for the whole image

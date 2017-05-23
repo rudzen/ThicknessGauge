@@ -43,7 +43,7 @@ public:
 
 		for (auto i = 0; i < image.cols; i++) {
 			output.push_back(cv::Point2f(static_cast<float>(i), 0.0f));
-			auto B = cv::Mat(image, cv::Rect2f(i, lowerLimit, 1, upperLimit));
+			auto B = cv::Mat(image, cv::Rect2f(static_cast<float>(i), lowerLimit, 1.0f, upperLimit));
 			B.copyTo(C);
 			auto m = cv::moments(C, false);
 			//int x = m.m10 / m.m00;
