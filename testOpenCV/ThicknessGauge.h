@@ -46,8 +46,6 @@ private:
 
 	const double PIangle = CV_PI / 180;
 
-	map<WindowType, string> m_WindowNames = {{WindowType::Input, "Camera Input"},{WindowType::Output, "Output"},{WindowType::Temp, "Temp"}};
-
 	uint64 frameTime_;
 
 	int frameCount_;
@@ -188,33 +186,5 @@ public: // getters and setters
 	int getBinaryThreshold() const;
 
 	void setBinaryThreshold(int binaryThreshold);
-
-private: // generic helper methods
-
-	void generateVectors(vi& pix) {
-
-		// make center		
-		center_.x = imageSize_.width >> 1;
-		center_.y = imageSize_.height;
-
-		lines_.clear();
-		lines_.reserve(pix.size());
-
-		//cout << "Center : " << center_ << endl;
-
-		sort(pix.begin(), pix.end(), this->miniCalc.sortY);
-
-		// populate lines
-		for (auto& p : pix) {
-
-			// TODO : Get the center Y point of each X position
-			lines_.push_back(v2<int>(center_.x, p.y));
-			//cout << "line : " << lines_.back() << endl;
-			//cout << "Manhattan : " << Util::dist_manhattan(center_.x, p.x, center_.y, p.y) << '\n';
-		}
-
-
-	}
-
 
 };
