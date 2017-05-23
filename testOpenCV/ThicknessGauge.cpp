@@ -443,15 +443,11 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			canny->setImage(filter->getResult());
 			canny->doCanny();
 
-			//vector<cv::Point> cannyPoints;
-			//cannyPoints.reserve(l.rows * l.cols);
-			//cv::findNonZero(canny->getResult(), cannyPoints);
-			//cv::Rect cannyRect = cv::boundingRect(cannyPoints);
+			cv::Mat t;
+			cv::morphologyEx(canny->getResult(), t, cv::MORPH_GRADIENT, cv::Mat(), cv::Point(-1, -1), 1);
 
-			//sparse.setImage(filter->getResult()(cannyRect));
-
-			hough->setImage(canny->getResult());
-			hough->setOriginal(org);
+			hough->setImage(t);
+			hough->setOriginal(t);
 			hough->doHorizontalHough();
 
 			allElements.clear();
@@ -549,8 +545,10 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 			canny->setImage(filter->getResult());
 			canny->doCanny();
 
-			hough->setOriginal(org);
-			hough->setImage(canny->getResult());
+			cv::Mat t = canny->getResult();
+
+			hough->setOriginal(t);
+			hough->setImage(t);
 
 			hough->doVerticalHough();
 			hough->computeBorders();
