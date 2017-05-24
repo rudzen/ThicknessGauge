@@ -441,7 +441,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 
 	cv::Mat tmpOut;
 
-	std::vector<cv::Point2d> tmp;
+	std::vector<cv::Point2d> pixelsOutput;
 
 	auto thresholdLevel = 100.0;
 
@@ -472,7 +472,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			findNonZero(baseFrame, nonZero);
 			auto laserArea = cv::boundingRect(nonZero);
 			auto t = baseFrame(laserArea);
-			highestPixel += LineCalc::computeRealIntensityLine(t, tmp, static_cast<float>(t.rows), 0.0f, "_marking", static_cast<float>(laserArea.y));
+			highestPixel += LineCalc::computeRealIntensityLine(t, pixelsOutput, static_cast<float>(t.rows), 0.0f, "_marking", static_cast<float>(laserArea.y));
 			highestPixel += (laserArea.y);
 
 			if (draw->isEscapePressed(30))
@@ -495,8 +495,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		if (running && showWindows_) {
 			draw->drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
 			draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
-			draw->drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
-			draw->drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
+			draw->drawText(&tmpOut, cv::format("%f pixels", diff), TextDrawPosition::UpperLeft);
+			draw->drawText(&tmpOut, cv::format("%f s",time), TextDrawPosition::UpperRight);
 			draw->showImage(windowName, tmpOut);
 			if (draw->isEscapePressed(30))
 				running = false;
@@ -602,8 +602,9 @@ void ThicknessGauge::loadGlob(std::string& globName) {
  * \brief Capture frameCount_ amount of frames from the capture device and stores them in a vector
  */
 void ThicknessGauge::captureFrames() {
-	if (!cap.isOpened()) // check if we succeeded
-		throw CaptureFailException("Error while attempting to open capture device.");
+	// check if we succeeded
+	if (!cap.isOpened())
+		CV_Error(cv::Error::StsError, "Error while attempting to open capture device.");
 
 	cv::Mat t;
 	for (auto i = 0; i++ < frameCount_;) {
@@ -614,6 +615,11 @@ void ThicknessGauge::captureFrames() {
 	setImageSize(t.size());
 
 }
+
+bool ThicknessGauge::saveData(string filename, std::vector<cv::Point2f>& baseLineLeft, std::vector<cv::Point2f>& baseLineRight, std::vector<cv::Point2f>& mainLine) {
+	return true;
+}
+
 
 bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, string timeString, string extraInfo) const {
 	// TODO : needs to be updated + documented
@@ -702,35 +708,35 @@ void ThicknessGauge::sumColumns(cv::Mat& image, cv::Mat& target) {
 }
 
 void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
-	vi aboveLine;
+	//vi aboveLine;
 
-	if (miniCalc.getActualPixels(allPixels_, aboveLine, baseLine_[0], output.rows)) {
-		//cout << "Retrived " << aboveLine.size() << " elements above line.\n";
-		if (miniCalc.computerCompleteLine(aboveLine, gaugeLine_, lineConfig_)) {
-			//cout << "Computed line fitting... " << gaugeLine_ << "\n";
+	//if (miniCalc.getActualPixels(allPixels_, aboveLine, baseLine_[0], output.rows)) {
+	//	//cout << "Retrived " << aboveLine.size() << " elements above line.\n";
+	//	if (miniCalc.computerCompleteLine(aboveLine, gaugeLine_, lineConfig_)) {
+	//		//cout << "Computed line fitting... " << gaugeLine_ << "\n";
 
-			gaugeLineSet_ = true;
+	//		gaugeLineSet_ = true;
 
-			// sort the elements for quick access to first and last (outer points in line)
-			sort(aboveLine.begin(), aboveLine.end(), miniCalc.sortX);
+	//		// sort the elements for quick access to first and last (outer points in line)
+	//		sort(aboveLine.begin(), aboveLine.end(), miniCalc.sortX);
 
-			avgGaugeHeight_ = gaugeLine_[3];
+	//		avgGaugeHeight_ = gaugeLine_[3];
 
-			if (showWindows_) {
-				line(output, cv::Point2f(static_cast<float>(aboveLine.front().x) + gaugeLine_[0], gaugeLine_[3]), cv::Point2f(static_cast<float>(aboveLine.back().x), gaugeLine_[3]), baseColour_, 2, cv::LINE_AA);
+	//		if (showWindows_) {
+	//			line(output, cv::Point2f(static_cast<float>(aboveLine.front().x) + gaugeLine_[0], gaugeLine_[3]), cv::Point2f(static_cast<float>(aboveLine.back().x), gaugeLine_[3]), baseColour_, 2, cv::LINE_AA);
 
-				//cout << "Average line height : " << output.rows - avgGaugeHeight_ << " elements.\n";
-			}
-		}
-		else {
-			gaugeLineSet_ = false;
-			Util::loge("Failed to generate fitted line.");
-		}
-	}
-	else {
-		gaugeLineSet_ = false;
-		Util::loge("Failed to retrive elements above line.");
-	}
+	//			//cout << "Average line height : " << output.rows - avgGaugeHeight_ << " elements.\n";
+	//		}
+	//	}
+	//	else {
+	//		gaugeLineSet_ = false;
+	//		Util::loge("Failed to generate fitted line.");
+	//	}
+	//}
+	//else {
+	//	gaugeLineSet_ = false;
+	//	Util::loge("Failed to retrive elements above line.");
+	//}
 
 }
 

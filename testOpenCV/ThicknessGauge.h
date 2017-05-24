@@ -135,6 +135,8 @@ private: /* helper functions */
 
 	void captureFrames();
 
+	bool saveData(string filename, std::vector<cv::Point2f>& baseLineLeft, std::vector<cv::Point2f>& baseLineRight, std::vector<cv::Point2f>& mainLine);
+
 	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, std::string timeString, std::string extraInfo) const;
 
 private: /* old functions, might be deleted */

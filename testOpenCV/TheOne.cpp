@@ -81,6 +81,7 @@ int main(int argc, char** argv) {
 		//cout << options << endl;
 
 		if (options.isGlobMode()) {
+			// TODO : use capture for file reading?!
 			c.initVideoCapture();
 			auto globName = options.getGlobFolder();
 			c.generateGlob(globName);
