@@ -49,13 +49,13 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec
 
 #endif
 
-bool LineCalc::adjustMarkingRect(cv::Rect2f& markingRect, cv::Vec4f intersectionPoints, uint buffer) {
+bool LineCalc::adjustMarkingRect(cv::Rect2f& markingRect, cv::Vec4f& intersectionPoints, double buffer) {
 
-	if (markingRect.x == 0)
-		return false;
+	//if (markingRect.x == 0)
+	//	return false;
 
-	if (markingRect.width == 0)
-		return false;
+	//if (markingRect.width == 0)
+	//	return false;
 
 	markingRect.x = intersectionPoints[0] + buffer;
 	markingRect.width = intersectionPoints[2] - markingRect.x - buffer;
@@ -63,7 +63,7 @@ bool LineCalc::adjustMarkingRect(cv::Rect2f& markingRect, cv::Vec4f intersection
 	return true;
 }
 
-bool LineCalc::adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoints, uint buffer) {
+bool LineCalc::adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoints, double buffer) {
 	
 	baseLines[0] = intersectionPoints[0] - buffer;
 	baseLines[2] = intersectionPoints[2] + buffer;

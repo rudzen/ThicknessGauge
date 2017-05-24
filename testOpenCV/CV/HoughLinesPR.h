@@ -218,7 +218,7 @@ public:
 
 	void alignLeftY(int frameCount) {
 		leftY_ /= frameCount;
-		cout << "Horizontal baseline aligned to : " << leftY_ << " y" << endl;
+		cout << cv::format("Horizontal baseline Y aligned to : %i\n", leftY_);
 		line(output, cv::Point(0, cvRound(leftY_)), cv::Point(output.cols / 2, cvRound(leftY_)), cv::Scalar(0, 255, 0), 1, cv::LINE_AA);
 		imshow(windowName, output);
 	}
@@ -259,31 +259,31 @@ inline void HoughLinesPR::computeBorders() {
 inline void HoughLinesPR::rhocb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setTheta(value);
-	cout << "Hough rho : " << value << endl;
+	cout << cv::format("%s rho : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::thetacb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setTheta(value);
-	cout << "Hough theta : " << value << endl;
+	cout << cv::format("%s theta : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::thresholdcb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setThreshold(value);
-	cout << "Hough threshold : " << value << endl;
+	cout << cv::format("%s threshold : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::maxLineGabcb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setMaxLineGab(value);
-	cout << "maxLineGabcb : " << value << endl;
+	cout << cv::format("%s maxLineGab : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::minLineLencb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setMinLineLen(value);
-	cout << "minLineLencb : " << value << endl;
+	cout << cv::format("%s minLineLen : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::doHorizontalHough() {

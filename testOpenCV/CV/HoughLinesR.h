@@ -48,7 +48,7 @@ public:
 			: entry(entry),
 			  points(points) {
 			elements.reserve(cvRound(Util::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
-			LineV();
+			slobe = 0.0f;
 		}
 
 		friend bool operator==(const LineV& lhs, const LineV& rhs) {
@@ -204,7 +204,7 @@ public:
 
 	void alignLeftY(int frameCount) {
 		leftY_ /= frameCount;
-		cout << "Horizontal baseline aligned to : " << leftY_ << " y" << endl;
+		cout << cv::format("Horizontal baseline Y aligned to : %i\n", leftY_);
 		line(output_, cv::Point(0, cvRound(leftY_)), cv::Point(output_.cols / 2, cvRound(leftY_)), cv::Scalar(0, 255, 0), 1, cv::LINE_AA);
 		imshow(windowName, output_);
 	}
@@ -314,19 +314,19 @@ inline void HoughLinesR::computeBorders() {
 inline void HoughLinesR::rhocb(int value, void* userData) {
 	auto that = static_cast<HoughLinesR*>(userData);
 	that->setTheta(value);
-	cout << "Hough rho : " << value << endl;
+	cout << cv::format("%s rho : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesR::thetacb(int value, void* userData) {
 	auto that = static_cast<HoughLinesR*>(userData);
 	that->setTheta(value);
-	cout << "Hough theta : " << value << endl;
+	cout << cv::format("%s theta : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesR::thresholdcb(int value, void* userData) {
 	auto that = static_cast<HoughLinesR*>(userData);
 	that->setThreshold(value);
-	cout << "Hough threshold : " << value << endl;
+	cout << cv::format("%s threshold : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesR::doVerticalHough() {

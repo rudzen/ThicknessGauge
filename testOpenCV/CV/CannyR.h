@@ -105,26 +105,26 @@ public:
 inline void CannyR::threshold1cb(int value, void* userData) {
 	auto that = static_cast<CannyR*>(userData);
 	that->setThreshold1(value);
-	cout << "Canny threshold 1 : " << value << endl;
+	cout << cv::format("Canny threshold 1 : %i\n", value);
 }
 
 inline void CannyR::threshold2cb(int value, void* userData) {
 	auto that = static_cast<CannyR*>(userData);
 	that->setThreshold2(value);
-	cout << "Canny threshold 2 : " << value << endl;
+	cout << cv::format("Canny threshold 2 : %i\n", value);
 }
 
 inline void CannyR::apertureSizecb(int value, void* userData) {
 	auto that = static_cast<CannyR*>(userData);
 	that->setApertureSize(value);
-	cout << "Canny apertureSize : " << value << endl;
+	cout << cv::format("Canny apertureSize : %i\n", value);
 }
 
 inline void CannyR::gradientcb(int value, void* userData) {
 	auto that = static_cast<CannyR*>(userData);
 	that->setGradient(value);
 	string boltab[2] = { "false", "true" };
-	cout << "Canny gradient : " <<  boltab[static_cast<bool>(value)] << endl;
+	cout << cv::format("Canny gradient : %s\n", boltab[static_cast<bool>(value)]);
 }
 
 inline void CannyR::doCanny() {

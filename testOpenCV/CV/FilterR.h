@@ -77,7 +77,7 @@ class FilterR : public BaseR<float> {
 		auto that = static_cast<FilterR*>(userData);
 		auto oldVal = that->getDelta();
 		that->setDelta(static_cast<double>(value));
-		std::cout << that->windowName << " delta : " << oldVal << " -> " << value << '\n';
+		cout << cv::format("%s delta : %i -> %i\n", that->windowName, oldVal, value);
 	}
 
 public: // constructors

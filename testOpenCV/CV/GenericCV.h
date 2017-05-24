@@ -11,5 +11,4 @@ public:
 		cv::adaptiveThreshold(input, output, *maxVal, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 5, 10);
 	}
 
-
 };
