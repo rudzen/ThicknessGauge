@@ -42,79 +42,6 @@ void ThicknessGauge::initCalibrationSettings(string fileName) {
 }
 
 /**
- * \brief Adds the existing null images to the null_ vector for later substraction
- */
-void ThicknessGauge::addNulls() {
-	std::vector<cv::String> files;
-	cv::String folder = "./nulls/";
-
-	cv::glob(folder, files);
-
-	nulls_.clear();
-	nulls_.reserve(files.size());
-
-	for (auto& file : files) {
-		std::cout << cv::format("loading null file : %s\n", file.c_str());
-		nulls_.push_back(cv::imread(file, CV_8UC1));
-	}
-
-	for (auto& n : nulls_)
-		std::cout << n.size() << endl;
-
-}
-
-/**
- * \brief Loads a glob from disk and stores them in a vector
- * \param globName The name of the glob to load (foldername)
- */
-void ThicknessGauge::loadGlob(std::string& globName) {
-	globGenerator.setPattern(globName);
-	globGenerator.setRecursive(false);
-	globGenerator.generateGlob();
-
-	auto files = globGenerator.getFiles();
-	auto size = static_cast<int>(files.size());
-
-	if (size != frameCount_)
-		setFrameCount(size);
-
-	frames.reserve(size);
-
-	for (auto i = 0; i < size; ++i)
-		frames.push_back(cv::imread(files.at(i), CV_8UC1));
-
-	setImageSize(frames.at(0).size());
-
-}
-
-/**
- * \brief Capture frameCount_ amount of frames from the capture device and stores them in a vector
- */
-void ThicknessGauge::captureFrames() {
-	if (!cap.isOpened()) // check if we succeeded
-		throw CaptureFailException("Error while attempting to open capture device.");
-
-	cv::Mat t;
-	for (auto i = 0; i++ < frameCount_;) {
-		cap >> t;
-		frames.push_back(t);
-	}
-
-	setImageSize(t.size());
-
-}
-
-void ThicknessGauge::laplace(cv::Mat& image) const {
-	cv::Mat tmp;
-	Laplacian(image, tmp, settings.ddepth, settings.kernelSize); // , scale, delta, BORDER_DEFAULT);
-	convertScaleAbs(tmp, image);
-}
-
-void ThicknessGauge::sobel(cv::Mat& image) const {
-	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, cv::BORDER_DEFAULT);
-}
-
-/**
  * \brief Generates a custom glob
  * \param name The name of the glob, let it be a valid foldername!!!
  */
@@ -142,167 +69,6 @@ void ThicknessGauge::generateGlob(std::string& name) {
 }
 
 /**
- * \brief Split the original frames into two vectors based on the center of the matrix size in X.
- * Note that the resulting vectors only contains references to the original frames.
- * \param left The output left side of the frames
- * \param right The output right side of the frames
- */
-void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) {
-
-	cv::Point topLeft(0, 0);
-	cv::Point buttomLeft(frames.front().cols / 2, frames.front().rows);
-
-	cv::Point topRight(frames.front().cols / 2, 0);
-	cv::Point buttomRight(frames.front().cols, frames.front().rows);
-
-	cv::Rect leftRect2I(topLeft, buttomLeft);
-	cv::Rect rightRect2I(topRight, buttomRight);
-
-	for (auto& f : frames) {
-		left.push_back(f(leftRect2I));
-		right.push_back(f(rightRect2I));
-	}
-
-}
-
-/**
- * \brief Computes the minimum houghline lenght for properlistic houghline
- * \tparam minLen The minimim length of the line
- * \param rect The rectangle of the marking location
- * \return the computed value, but not less than minLen
- */
-template <int minLen>
-int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
-	auto minLineLen = cvRound(rect.width / 32);
-
-	if (minLineLen < minLen)
-		minLineLen = minLen;
-
-	return minLineLen;
-}
-
-/**
- * \brief Computes the laser line location on the marking in Y
- * \param laser The laser class
- * \param baseLine The baseline vector
- * \param filter The custom filter class
- * \param markingLocation The marking location rectangle
- * \param result The resulting laser line centroid points, with one for each x based on the weigth of their intensity for each X
- */
-void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
-
-	// generate frames with marking
-	std::vector<cv::Mat> markingFrames;
-	std::vector<cv::Mat> outputs;
-	std::vector<cv::Point2f> pixPlanar;
-	std::vector<cv::Point2f> test_subPix;
-	std::vector<cv::Point> nonZeroes;
-
-	pixPlanar.reserve(frameCount_);
-	test_subPix.reserve(frameCount_);
-
-	for (auto& frame : frames) {
-		markingFrames.push_back(frame(markingLocation));
-		outputs.push_back(cv::Mat::zeros(markingFrames.back().size(), CV_8UC1));
-	}
-
-	const std::string windowName = "test height";
-	draw->makeWindow(windowName);
-
-	// local copy of real baseline
-	auto base = frames.front().rows - baseLine[1];
-
-	cv::Mat tmpOut;
-
-	auto highestPixelTotal = 0.0;
-
-	std::vector<cv::Point2d> tmp;
-
-	auto thresholdLevel = 100.0;
-
-	auto running = true;
-
-	while (running) {
-
-		auto start = cv::getTickCount();
-
-		auto highestPixel = 0.0;
-
-		cv::Mat target; // the laser is herby contained!!!
-
-		for (auto i = frameCount_; i--;) {
-
-			cv::Mat baseFrame;
-			outputs[i] = cv::Mat::zeros(markingFrames.back().size(), CV_8UC1);
-
-			std::vector<cv::Point> nonZero(outputs.at(i).rows * outputs.at(i).cols);
-
-			// TODO : replace with custom filter if needed
-			cv::bilateralFilter(markingFrames.at(i), baseFrame, 3, 20, 10);
-
-			//cv::Mat t;
-			//GenericCV::adaptiveThreshold(baseFrame, t, &thresholdLevel);
-
-			threshold(baseFrame, baseFrame, 100, 255, CV_THRESH_BINARY);
-
-			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
-
-			/* RECT CUT METHOD */
-			findNonZero(baseFrame, nonZero);
-			auto laserArea = cv::boundingRect(nonZero);
-			auto t = baseFrame(laserArea);
-			highestPixel += LineCalc::computeRealIntensityLine(t, tmp, static_cast<float>(t.rows), 0.0f, "_marking", static_cast<float>(laserArea.y));
-			highestPixel += (laserArea.y);
-
-			/* FULL COLUMN METHOD */
-			//highestPixel += LineCalc::computeRealIntensityLine(baseFrame, tmp, baseFrame.rows, 0, "_marking");
-
-			/* OBSOLUTE? METHOD */
-			//auto generateOk = miniCalc.generatePlanarPixels(baseFrame, outputs.at(i), pixPlanar, test_subPix);
-
-			//if (!generateOk) {
-			//	Util::loge("Error while attempting to generate pixelmap");
-			//	continue;
-			//}
-
-			//nonZeroes.reserve(baseFrame.cols * baseFrame.rows);
-			//findNonZero(outputs.at(i), nonZeroes);
-			//auto heightLine = baseFrame.rows / 2;
-			//highestPixel += static_cast<float>(baseFrame.rows) - static_cast<float>(pix.getHighestYpixel(outputs.at(i), heightLine, miniCalc));
-			if (draw->isEscapePressed(30))
-				running = false;
-
-			if (!i && running)
-				cv::cvtColor(outputs.at(i), tmpOut, CV_GRAY2BGR);
-		}
-
-		highestPixelTotal = frames.front().rows - (highestPixel / static_cast<unsigned int>(frameCount_));
-		auto end = cv::getTickCount();
-		std::cout << cv::format("highestPixelTotal: %f\n", highestPixelTotal);
-
-		auto diff = abs(base - highestPixelTotal);
-		std::cout << cv::format("diff from baseline: %f\n", diff);
-
-		auto time = (end - start) / cv::getTickFrequency();
-		std::cout << cv::format("time for laser detection (s) : %f\n", time);
-
-		if (running && showWindows_) {
-			draw->drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
-			draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
-			draw->drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
-			draw->drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
-			draw->showImage(windowName, tmpOut);
-			if (draw->isEscapePressed(30))
-				running = false;
-		}
-
-	}
-
-	draw->removeWindow(windowName);
-
-}
-
-/**
  * \brief Determins the marking boundries
  * \param globName if "camera", use camera, otherwise load from glob folder
  * \return 2 Float vector with the points marking the boundries as pair, where first = left, second = right
@@ -324,11 +90,8 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 		//splitFrames(leftFrames, rightFrames);
 
-		// morph extension class for easy use
-		auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
-
 		// common canny with default settings for detecting marking borders
-		auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, true);
+		auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, false);
 
 		// the filter used to determin the marking location in the frame
 		auto markingFilter = make_shared<FilterR>("Marking Filter");
@@ -353,7 +116,10 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		auto minLineLen = computeHoughPMinLine<10>(markingRect);
 
 		// horizontal houghline class
-		auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, true);
+		auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, showWindows_);
+
+		// morph extension class for easy use
+		auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
 
 		houghH->setMaxLineGab(12);
 		houghH->setMarkingRect(markingRect);
@@ -376,13 +142,13 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 		std::cout << "intersection points: " << intersections << std::endl;
 
-		// TODO : figure out a clever way to calculate this..
-		const auto pixelCutoff = 40.0; // must never be higher than marking rect width
+		// pixel cut off is based on the border of the marking..
+		cv::Vec2f intersectionCutoff = computeIntersectionCut(houghV);
 
-		lineCalc.adjustMarkingRect(markingRect, intersections, pixelCutoff);
+		lineCalc.adjustMarkingRect(markingRect, intersections, intersectionCutoff[0]);
 
 		// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
-		lineCalc.adjustBaseLines(baseLines, intersections, pixelCutoff);
+		lineCalc.adjustBaseLines(baseLines, intersections, intersectionCutoff[0]);
 
 		std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", markingRect.x, markingRect.y, markingRect.width, markingRect.height);
 		std::cout << cv::format("Adjusted base line Y [left] : %f\n", baseLines[1]);
@@ -476,6 +242,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	auto imSize = left.front().size();
 
 	auto lineY = 0.0f;
+
 	std::vector<cv::Point2d> tmp;
 
 	std::vector<cv::Point2f> allElements;
@@ -533,9 +300,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
-
-
-		/*lineY /= totalY;*/
 
 		boundryRect.width -= 40;
 
@@ -614,6 +378,8 @@ void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
+
+
 		// calculate the avg rect
 		output.x = 0.0f;
 		output.y = 0.0f;
@@ -646,7 +412,220 @@ void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 	if (output.width > 0.0f && output.height > 0.0f)
 		return;
 
-	CV_Error(cv::Error::StsBadSize, "Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", output.x, output.y, output.width, output.height);
+	CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", output.x, output.y, output.width, output.height));
+}
+
+/**
+ * \brief Computes the laser line location on the marking in Y
+ * \param laser The laser class
+ * \param baseLine The baseline vector
+ * \param filter The custom filter class
+ * \param markingLocation The marking location rectangle
+ * \param result The resulting laser line centroid points, with one for each x based on the weigth of their intensity for each X
+ */
+void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
+
+	// generate frames with marking
+	std::vector<cv::Mat> markingFrames;
+	std::vector<cv::Mat> outputs;
+	std::vector<cv::Point2f> pixPlanar;
+	std::vector<cv::Point2f> test_subPix;
+	std::vector<cv::Point> nonZeroes;
+
+	pixPlanar.reserve(frameCount_);
+	test_subPix.reserve(frameCount_);
+
+	for (auto& frame : frames) {
+		markingFrames.push_back(frame(markingLocation));
+		outputs.push_back(cv::Mat::zeros(markingFrames.back().size(), CV_8UC1));
+	}
+
+	const std::string windowName = "test height";
+	draw->makeWindow(windowName);
+
+	// local copy of real baseline
+	auto base = frames.front().rows - baseLine[1];
+
+	cv::Mat tmpOut;
+
+	std::vector<cv::Point2d> tmp;
+
+	auto highestPixelTotal = 0.0;
+
+	auto thresholdLevel = 100.0;
+
+	auto running = true;
+
+	while (running) {
+
+		auto start = cv::getTickCount();
+
+		auto highestPixel = 0.0;
+
+		cv::Mat target; // the laser is herby contained!!!
+
+		for (auto i = frameCount_; i--;) {
+
+			cv::Mat baseFrame;
+			outputs[i] = cv::Mat::zeros(markingFrames.back().size(), CV_8UC1);
+
+			std::vector<cv::Point> nonZero(outputs.at(i).rows * outputs.at(i).cols);
+
+			// TODO : replace with custom filter if needed
+			cv::bilateralFilter(markingFrames.at(i), baseFrame, 3, 20, 10);
+
+			//cv::Mat t;
+			//GenericCV::adaptiveThreshold(baseFrame, t, &thresholdLevel);
+
+			threshold(baseFrame, baseFrame, thresholdLevel, 255, CV_THRESH_BINARY);
+
+			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
+
+			/* RECT CUT METHOD */
+			findNonZero(baseFrame, nonZero);
+			auto laserArea = cv::boundingRect(nonZero);
+			auto t = baseFrame(laserArea);
+			highestPixel += LineCalc::computeRealIntensityLine(t, tmp, static_cast<float>(t.rows), 0.0f, "_marking", static_cast<float>(laserArea.y));
+			highestPixel += (laserArea.y);
+
+			if (draw->isEscapePressed(30))
+				running = false;
+
+			if (!i && running)
+				cv::cvtColor(outputs.at(i), tmpOut, CV_GRAY2BGR);
+		}
+
+		highestPixelTotal = frames.front().rows - (highestPixel / static_cast<unsigned int>(frameCount_));
+		auto end = cv::getTickCount();
+		std::cout << cv::format("highestPixelTotal: %f\n", highestPixelTotal);
+
+		auto diff = abs(base - highestPixelTotal);
+		std::cout << cv::format("diff from baseline: %f\n", diff);
+
+		auto time = (end - start) / cv::getTickFrequency();
+		std::cout << cv::format("time for laser detection (s) : %f\n", time);
+
+		if (running && showWindows_) {
+			draw->drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
+			draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
+			draw->drawText(&tmpOut, to_string(diff) + " pixels", TextDrawPosition::UpperLeft);
+			draw->drawText(&tmpOut, to_string(time) + "s", TextDrawPosition::UpperRight);
+			draw->showImage(windowName, tmpOut);
+			if (draw->isEscapePressed(30))
+				running = false;
+		}
+
+	}
+
+	draw->removeWindow(windowName);
+
+}
+
+cv::Vec2f ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR> hough) {
+	return cv::Vec2f(40.0f, 40.0f);
+}
+
+/**
+ * \brief Computes the minimum houghline lenght for properlistic houghline
+ * \tparam minLen The minimim length of the line
+ * \param rect The rectangle of the marking location
+ * \return the computed value, but not less than minLen
+ */
+template <int minLen>
+int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
+	auto minLineLen = cvRound(rect.width / 32);
+
+	if (minLineLen < minLen)
+		minLineLen = minLen;
+
+	return minLineLen;
+}
+
+/**
+ * \brief Split the original frames into two vectors based on the center of the matrix size in X.
+ * Note that the resulting vectors only contains references to the original frames.
+ * \param left The output left side of the frames
+ * \param right The output right side of the frames
+ */
+void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) {
+
+	cv::Point topLeft(0, 0);
+	cv::Point buttomLeft(frames.front().cols / 2, frames.front().rows);
+
+	cv::Point topRight(frames.front().cols / 2, 0);
+	cv::Point buttomRight(frames.front().cols, frames.front().rows);
+
+	cv::Rect leftRect2I(topLeft, buttomLeft);
+	cv::Rect rightRect2I(topRight, buttomRight);
+
+	for (auto& f : frames) {
+		left.push_back(f(leftRect2I));
+		right.push_back(f(rightRect2I));
+	}
+
+}
+
+/**
+ * \brief Adds the existing null images to the null_ vector for later substraction
+ */
+void ThicknessGauge::addNulls() {
+	std::vector<cv::String> files;
+	cv::String folder = "./nulls/";
+
+	cv::glob(folder, files);
+
+	nulls_.clear();
+	nulls_.reserve(files.size());
+
+	for (auto& file : files) {
+		std::cout << cv::format("loading null file : %s\n", file.c_str());
+		nulls_.push_back(cv::imread(file, CV_8UC1));
+	}
+
+	for (auto& n : nulls_)
+		std::cout << n.size() << endl;
+
+}
+
+/**
+ * \brief Loads a glob from disk and stores them in a vector
+ * \param globName The name of the glob to load (foldername)
+ */
+void ThicknessGauge::loadGlob(std::string& globName) {
+	globGenerator.setPattern(globName);
+	globGenerator.setRecursive(false);
+	globGenerator.generateGlob();
+
+	auto files = globGenerator.getFiles();
+	auto size = static_cast<int>(files.size());
+
+	if (size != frameCount_)
+		setFrameCount(size);
+
+	frames.reserve(size);
+
+	for (auto i = 0; i < size; ++i)
+		frames.push_back(cv::imread(files.at(i), CV_8UC1));
+
+	setImageSize(frames.at(0).size());
+
+}
+
+/**
+ * \brief Capture frameCount_ amount of frames from the capture device and stores them in a vector
+ */
+void ThicknessGauge::captureFrames() {
+	if (!cap.isOpened()) // check if we succeeded
+		throw CaptureFailException("Error while attempting to open capture device.");
+
+	cv::Mat t;
+	for (auto i = 0; i++ < frameCount_;) {
+		cap >> t;
+		frames.push_back(t);
+	}
+
+	setImageSize(t.size());
+
 }
 
 bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, string timeString, string extraInfo) const {
@@ -681,6 +660,18 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pix
 
 	return true;
 }
+
+
+void ThicknessGauge::laplace(cv::Mat& image) const {
+	cv::Mat tmp;
+	Laplacian(image, tmp, settings.ddepth, settings.kernelSize); // , scale, delta, BORDER_DEFAULT);
+	convertScaleAbs(tmp, image);
+}
+
+void ThicknessGauge::sobel(cv::Mat& image) const {
+	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, cv::BORDER_DEFAULT);
+}
+
 
 /**
  * \brief Sums the intensity for a specific coloumn in a matrix
