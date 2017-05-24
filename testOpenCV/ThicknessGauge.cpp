@@ -427,18 +427,9 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 
 	// generate frames with marking
 	std::vector<cv::Mat> markingFrames;
-	std::vector<cv::Mat> outputs;
-	std::vector<cv::Point2f> pixPlanar;
-	std::vector<cv::Point2f> test_subPix;
-	std::vector<cv::Point> nonZeroes;
 
-	pixPlanar.reserve(frameCount_);
-	test_subPix.reserve(frameCount_);
-
-	for (auto& frame : frames) {
+	for (auto& frame : frames)
 		markingFrames.push_back(frame(markingLocation));
-		outputs.push_back(cv::Mat::zeros(markingFrames.back().size(), CV_8UC1));
-	}
 
 	const std::string windowName = "test height";
 	draw->makeWindow(windowName);
@@ -449,8 +440,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 	cv::Mat tmpOut;
 
 	std::vector<cv::Point2d> tmp;
-
-	auto highestPixelTotal = 0.0;
 
 	auto thresholdLevel = 100.0;
 
@@ -467,9 +456,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		for (auto i = frameCount_; i--;) {
 
 			cv::Mat baseFrame;
-			outputs[i] = cv::Mat::zeros(markingFrames.back().size(), CV_8UC1);
-
-			std::vector<cv::Point> nonZero(outputs.at(i).rows * outputs.at(i).cols);
 
 			// TODO : replace with custom filter if needed
 			cv::bilateralFilter(markingFrames.at(i), baseFrame, 3, 20, 10);
@@ -482,6 +468,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
 			/* RECT CUT METHOD */
+			std::vector<cv::Point> nonZero(baseFrame.rows * baseFrame.cols);
 			findNonZero(baseFrame, nonZero);
 			auto laserArea = cv::boundingRect(nonZero);
 			auto t = baseFrame(laserArea);
@@ -492,10 +479,10 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 				running = false;
 
 			if (!i && running)
-				cv::cvtColor(outputs.at(i), tmpOut, CV_GRAY2BGR);
+				cv::cvtColor(markingFrames.at(i), tmpOut, CV_GRAY2BGR);
 		}
 
-		highestPixelTotal = frames.front().rows - (highestPixel / static_cast<unsigned int>(frameCount_));
+		auto highestPixelTotal = frames.front().rows - (highestPixel / static_cast<unsigned int>(frameCount_));
 		auto end = cv::getTickCount();
 		std::cout << cv::format("highestPixelTotal: %f\n", highestPixelTotal);
 
