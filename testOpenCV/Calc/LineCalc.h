@@ -22,9 +22,9 @@ public:
 
 	bool computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec4f& leftBorder, const cv::Vec4f& rightBorder, cv::Vec4f& output) const;
 
-	static bool adjustMarkingRect(cv::Rect2f& markingRect, cv::Vec4f& intersectionPoints, double buffer);
+	static void adjustMarkingRect(cv::Rect2f& markingRect, cv::Vec4f& intersectionPoints, double buffer);
 
-	static bool adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoints, double buffer);
+	static void adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoints, double buffer);
 
 	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, float upperLimit, float lowerLimit, std::string filename, float fileOffsetY) {
 

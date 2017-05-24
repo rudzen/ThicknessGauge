@@ -35,6 +35,7 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec
 
 	if (!intersectsLeft & intersectsRight) {
 		Util::loge("Error in intersection detection.");
+		CV_Error(cv::Error::StsAssert, "Intersection points are invalid.");
 		return false;
 	}
 
@@ -49,25 +50,21 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec
 
 #endif
 
-bool LineCalc::adjustMarkingRect(cv::Rect2f& markingRect, cv::Vec4f& intersectionPoints, double buffer) {
+void LineCalc::adjustMarkingRect(cv::Rect2f& markingRect, cv::Vec4f& intersectionPoints, double buffer) {
 
-	//if (markingRect.x == 0)
-	//	return false;
-
-	//if (markingRect.width == 0)
-	//	return false;
+	if (markingRect.x == 0)
+		CV_Error(cv::Error::BadROISize, "Marketing rectangle start position is zero.");		
+	else if (markingRect.width == 0)
+		CV_Error(cv::Error::BadROISize, "Marketing rectangle width is zero.");
 
 	markingRect.x = intersectionPoints[0] + buffer;
 	markingRect.width = intersectionPoints[2] - markingRect.x - buffer;
 
-	return true;
 }
 
-bool LineCalc::adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoints, double buffer) {
+void LineCalc::adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoints, double buffer) {
 	
 	baseLines[0] = intersectionPoints[0] - buffer;
 	baseLines[2] = intersectionPoints[2] + buffer;
-
-	return true;
 
 }

@@ -219,7 +219,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 	std::vector<cv::Point2d> tmp;
 
 	auto thresholdLevel = 100.0;
-	
+
 	auto running = true;
 
 	while (running) {
@@ -309,103 +309,107 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
  */
 void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
-	// determin where to get the frames from.
-	if (globName == "camera")
-		captureFrames();
-	else
-		loadGlob(globName);
+	try {
 
-	// configure frames based on center vertical splitting of the original frames
-	//vector<cv::Mat> leftFrames(frameCount_);
-	//vector<cv::Mat> rightFrames(frameCount_);
 
-	//splitFrames(leftFrames, rightFrames);
+		// determin where to get the frames from.
+		if (globName == "camera")
+			captureFrames();
+		else
+			loadGlob(globName);
 
-	// morph extension class for easy use
-	auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
+		// configure frames based on center vertical splitting of the original frames
+		//vector<cv::Mat> leftFrames(frameCount_);
+		//vector<cv::Mat> rightFrames(frameCount_);
 
-	// common canny with default settings for detecting marking borders
-	auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, true);
+		//splitFrames(leftFrames, rightFrames);
 
-	// the filter used to determin the marking location in the frame
-	auto markingFilter = make_shared<FilterR>("Marking Filter");
+		// morph extension class for easy use
+		auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
 
-	// filter to enhance the base line
-	auto baselineFilter = make_shared<FilterR>("Baseline Filter");
+		// common canny with default settings for detecting marking borders
+		auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, true);
 
-	// houghlines to determin where the actual marking is in the frame
-	auto houghV = make_shared<HoughLinesR>(1, static_cast<const int>(CV_PI / 180), 40, showWindows_);
+		// the filter used to determin the marking location in the frame
+		auto markingFilter = make_shared<FilterR>("Marking Filter");
 
-	// configure the diffrent functionalities
-	houghV->setAngleLimit(30);
-	markingFilter->setShowWindow(showWindows_);
-	baselineFilter->setShowWindow(showWindows_);
+		// filter to enhance the base line
+		auto baselineFilter = make_shared<FilterR>("Baseline Filter");
 
-	// the marking rect determins where in the frame the marking is located.
-	cv::Rect2f markingRect;
+		// houghlines to determin where the actual marking is in the frame
+		auto houghV = make_shared<HoughLinesR>(1, static_cast<const int>(CV_PI / 180), 40, showWindows_);
 
-	auto markingOk = computerMarkingRectangle(canny, markingFilter, houghV, markingRect);
+		// configure the diffrent functionalities
+		houghV->setAngleLimit(30);
+		markingFilter->setShowWindow(showWindows_);
+		baselineFilter->setShowWindow(showWindows_);
 
-	if (!markingOk)
-		Util::loge("Error while computing marking rectangle.");
+		// the marking rect determins where in the frame the marking is located.
+		cv::Rect2f markingRect;
 
-	// make sure the minimum is at least 10 pixels.
-	auto minLineLen = computeHoughPMinLine<10>(markingRect);
+		computerMarkingRectangle(canny, markingFilter, houghV, markingRect);
 
-	// horizontal houghline class
-	auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, true);
+		// make sure the minimum is at least 10 pixels.
+		auto minLineLen = computeHoughPMinLine<10>(markingRect);
 
-	houghH->setMaxLineGab(12);
-	houghH->setMarkingRect(markingRect);
+		// horizontal houghline class
+		auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, true);
 
-	// the baselines, which are located outside the marking
-	cv::Vec4f baseLines;
+		houghH->setMaxLineGab(12);
+		houghH->setMarkingRect(markingRect);
 
-	computeBaseLineAreas(canny, baselineFilter, houghH, morph, baseLines);
+		// the baselines, which are located outside the marking
+		cv::Vec4f baseLines;
 
-	std::cout << cv::format("Base line Y [left] : %f\n", baseLines[1]);
-	std::cout << cv::format("Base line Y [right]: %f\n", baseLines[2]);
+		computeBaseLineAreas(canny, baselineFilter, houghH, morph, baseLines);
 
-	// the locations for where the base lines intersect with the marking border
-	cv::Vec4f intersections;
+		std::cout << cv::format("Base line Y [left] : %f\n", baseLines[1]);
+		std::cout << cv::format("Base line Y [right]: %f\n", baseLines[2]);
 
-	LineCalc lineCalc;
+		// the locations for where the base lines intersect with the marking border
+		cv::Vec4f intersections;
 
-	// compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
-	lineCalc.computeIntersectionPoints(baseLines, houghV->getLeftBorder(), houghV->getRightBorder(), intersections);
+		LineCalc lineCalc;
 
-	std::cout << "intersection points: " << intersections << std::endl;
+		// compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
+		lineCalc.computeIntersectionPoints(baseLines, houghV->getLeftBorder(), houghV->getRightBorder(), intersections);
 
-	// TODO : figure out a clever way to calculate this..
-	const double pixelCutoff = 40.0; // must never be higher than marking rect width
+		std::cout << "intersection points: " << intersections << std::endl;
 
-	// adjust the marking rect according to the intersection points
-	lineCalc.adjustMarkingRect(markingRect, intersections, pixelCutoff);
+		// TODO : figure out a clever way to calculate this..
+		const auto pixelCutoff = 40.0; // must never be higher than marking rect width
 
-	// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
-	lineCalc.adjustBaseLines(baseLines, intersections, pixelCutoff);
+		lineCalc.adjustMarkingRect(markingRect, intersections, pixelCutoff);
 
-	std::cout << cv::format("Adjusted marking rect: [x: %i | y: %i | w: %i | h: %i]\n", markingRect.x, markingRect.y, markingRect.width, markingRect.height);
-	std::cout << cv::format("Adjusted base line Y [left] : %f\n", baseLines[1]);
-	std::cout << cv::format("Adjusted base line Y [right]: %f\n", baseLines[3]);
+		// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
+		lineCalc.adjustBaseLines(baseLines, intersections, pixelCutoff);
 
-	// work on laser location on marking..
-	std::vector<cv::Point2f> laserLine;
+		std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", markingRect.x, markingRect.y, markingRect.width, markingRect.height);
+		std::cout << cv::format("Adjusted base line Y [left] : %f\n", baseLines[1]);
+		std::cout << cv::format("Adjusted base line Y [right]: %f\n", baseLines[3]);
 
-	// filter for laser detection
-	auto laserFilter = make_shared<FilterR>("Laser Filter");
-	laserFilter->setShowWindow(showWindows_);
+		// work on laser location on marking..
+		std::vector<cv::Point2f> laserLine;
 
-	// main laser class
-	auto laser = make_shared<LaserR>();
+		// filter for laser detection
+		auto laserFilter = make_shared<FilterR>("Laser Filter");
+		laserFilter->setShowWindow(showWindows_);
 
-	// computes the Y locations of the laserline inside the marking rect
-	computeLaserLocations(laser, baseLines, laserFilter, markingRect, laserLine);
+		// main laser class
+		auto laser = make_shared<LaserR>();
 
-	draw->removeAllWindows();
+		// computes the Y locations of the laserline inside the marking rect
+		computeLaserLocations(laser, baseLines, laserFilter, markingRect, laserLine);
 
-	if (draw->isEscapePressed(30))
-		return;
+		draw->removeAllWindows();
+
+		if (draw->isEscapePressed(30))
+			return;
+
+	}
+	catch (cv::Exception& e) {
+		cerr << cv::format("Exception caught in computeMarkingHeight().\n%s\n", e.msg);
+	}
 
 }
 
@@ -562,7 +566,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
  * \param output The rectangle vector
  * \return true if ok, otherwise false
  */
-bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output) {
+void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output) {
 
 	// build cannyfied images
 	vector<cv::Mat> candis;
@@ -639,7 +643,10 @@ bool ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 	if (showWindows_)
 		draw->removeWindow(windowName);
 
-	return output.width > 0.0f && output.height > 0.0f;
+	if (output.width > 0.0f && output.height > 0.0f)
+		return;
+
+	CV_Error(cv::Error::StsBadSize, "Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", output.x, output.y, output.width, output.height);
 }
 
 bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, string timeString, string extraInfo) const {
