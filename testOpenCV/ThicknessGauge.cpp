@@ -354,9 +354,10 @@ void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 
 	auto running = true;
 
+	cv::Mat markingTest;
+
 	while (running) {
 
-		cv::Mat markingTest;
 		markingRects.reserve(frameCount_);
 		cv::Mat sparse;
 		for (auto i = frames.size(); i--;) {
@@ -377,6 +378,7 @@ void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 			markingRects.push_back(hough->getMarkingRect());
 			if (draw->isEscapePressed(30))
 				running = false;
+
 		}
 
 
@@ -450,8 +452,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		auto start = cv::getTickCount();
 
 		auto highestPixel = 0.0;
-
-		cv::Mat target; // the laser is herby contained!!!
 
 		for (auto i = frameCount_; i--;) {
 

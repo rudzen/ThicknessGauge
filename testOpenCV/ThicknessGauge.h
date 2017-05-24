@@ -72,27 +72,21 @@ private:
 
 	Settings settings;
 
-	// laplace/sobel settings
-	//int kernelSize_ = 3;
-	//int scale_ = 1;
-	//int delta_ = 0;
-	//int ddepth_ = CV_16S;
-
 	int binaryThreshold_;
 
 	int lineThreshold_;
-
+	
 	vi line_[2];
 
+#ifdef CV_VERSION
+	cv::Vec2d baseLine_;
+#else
 	double baseLine_[2];
+#endif
 
 	cv::Scalar baseColour_;
 
-	Line histoLine_;
-
 	GlobGenerator globGenerator;
-
-	Pixelz pix;
 
 	std::unique_ptr<DrawHelper> draw = make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
 
