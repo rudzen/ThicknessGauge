@@ -1,15 +1,8 @@
 #pragma once
 
-#include <array>
-
-
 class ThicknessGaugeData {
 	
 protected:
-
-	cv::Mat planarImage_;
-
-	const int arrayLimit = 512; // shit c++11 ->
 
 	vector<cv::Mat> frames;
 
@@ -38,9 +31,6 @@ protected:
 	cv::Size imageSize_;
 	int imageType_;
 
-	double rightMean_;
-	double leftMean_;
-
 public:
 
 	void setImageType(int imageType);
@@ -51,25 +41,14 @@ public:
 
 	void setImageSize(const int width, const int height);
 
-protected:
-	const int pixelChunkCount_ = 16;
-	const int pixelChunkSize_ = 153; // lowest whole number from 2448 as (2448 >> 4 = 153)
-
-	const std::string windowMainTitle = "Input";
-	const std::string windowOutputTitle = "Output";
-
 public:
 
-	ThicknessGaugeData(): avgGaugeHeight_(0), gaugeLineSet_(false), imageType_(0), rightMean_(0), leftMean_(0) {
+	ThicknessGaugeData(): avgGaugeHeight_(0), gaugeLineSet_(false), imageType_(0) {
 	}
 
 	cv::Mat& GetPlanarImage();
 
 	void setPlanarImage(const cv::Mat& mat);
-	void setRightMean(double mean);
-	double getRightMean() const;
-	void setLeftMean(double mean);
-	double getLeftMean() const;
 
 	const vi& getPixels() const;
 	const vi& getAllPixels() const;
@@ -81,22 +60,6 @@ public:
 	double getIntensity(int x) const;
 
 };
-
-inline void ThicknessGaugeData::setRightMean(double mean) {
-	rightMean_ = mean;
-}
-
-inline double ThicknessGaugeData::getRightMean() const {
-	return rightMean_;
-}
-
-inline void ThicknessGaugeData::setLeftMean(double mean) {
-	leftMean_ = mean;
-}
-
-inline double ThicknessGaugeData::getLeftMean() const {
-	return leftMean_;
-}
 
 inline void ThicknessGaugeData::setImageType(int imageType) {
 	imageType_ = imageType;
@@ -141,12 +104,4 @@ inline const vi& ThicknessGaugeData::getIntensity() const {
 
 inline double ThicknessGaugeData::getIntensity(int x) const {
 	return intensity_.at(x).y;
-}
-
-inline cv::Mat& ThicknessGaugeData::GetPlanarImage() {
-	return planarImage_;
-}
-
-inline void ThicknessGaugeData::setPlanarImage(const cv::Mat& mat) {
-	planarImage_ = mat;
 }
