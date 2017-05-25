@@ -15,8 +15,6 @@
 #include "LineSparse.h"
 #include "IO/GlobGenerator.h"
 #include "CV/Pixel.h"
-#include "CV/LineData/LineBaseData.h"
-#include "CV/LineData/LineLaserData.h"
 #include "CV/CannyR.h"
 #include "CV/FilterR.h"
 #include "CV/HoughLinesR.h"

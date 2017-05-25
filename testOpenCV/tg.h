@@ -9,9 +9,9 @@ namespace tg {
 
 	typedef std::pair<cv::Point2f, cv::Point2f> linePair;
 
-	enum Side { Left = 0, Right = 1 };
+	enum Side { Left = 0, Right = 1, Center = 2 };
 
-	enum class Quantile { Q0, Q25, Q50, Q75, Q100 };
+	enum XY { X = 0, Y = 1 };
 
 	enum class SortBy { X, Y };
 

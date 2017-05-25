@@ -17,8 +17,6 @@ private:
 	cv::Point2i lowestPixel_;
 	cv::Point2i highestPixel_;
 
-	map<Quantile, double> quantileMap_ = {{Quantile::Q25 , 0.25},{Quantile::Q50, 0.5},{Quantile::Q75, 0.75}};
-
 	cv::Point2d mean_;
 
 	cv::Point2d variance_;
@@ -68,10 +66,6 @@ public:
 	static double meanX(vector<cv::Point2i>& pixels);
 
 	static double meanY(vector<cv::Point2i>& pixels);
-
-	cv::Point2i quantileX(Quantile quant, vector<cv::Point2i>& pixels);
-
-	cv::Point2i quantileY(Quantile quant, vector<cv::Point2i>& pixels);
 
 	cv::Point2i percentileX(double percentage, vector<cv::Point2i>& pixels) const;
 

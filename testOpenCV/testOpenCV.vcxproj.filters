@@ -123,6 +123,9 @@
     <ClCompile Include="Calc\GaugeMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CV\LineData\Data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -239,12 +242,6 @@
     <ClInclude Include="CV\HoughLinesPR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="CV\LineData\LineBaseData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CV\LineData\LineLaserData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CV\LineData\LineData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -285,6 +282,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Calc\GaugeMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\LineData\Data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

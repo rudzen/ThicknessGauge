@@ -1,152 +1,85 @@
 #pragma once
-#include <vector>
 #include <opencv2/opencv.hpp>
+#include <vector>
+#ifndef CV_VERSION
+#include <array>
+#endif
 #include "../../tg.h"
-#include <ostream>
 #include "LineData.h"
 
 using namespace tg;
 
-// super class for both line classes..
 class LineData {
-	
-protected:
-	~LineData() = default;
-
-	enum class Side {
-		Left,
-		Right,
-		Center // only used for laser line data, base lines dont have a center
-	};
-
-	/**
-	* \brief Convert both left and right vector points to vectors of regular x/y points
-	* \param originalImage PH image, not used for anything
-	* \param side The side to compute for
-	*/
-	virtual void pointsToLine(cv::Mat& originalImage, Side side) = 0;
-
-	void calcYAvg();
-
-	template <Side side>
-	void appendPoint(cv::Point2f& point);
-
-	template <Side side>
-	void appendPoints(std::vector<cv::Point2f>& points);
-
-	// The left side points which makes up the left base line
-	std::vector<cv::Point2f> leftPoints_;
-
-	// The right side points which makes up the right base line
-	std::vector<cv::Point2f> rightPoints_;
-
-	// The left side Y avg value
-	float leftAvgY_;
-
-	// The right side Y avg value
-	float rightAvgY_;
-
-	LineData() {
-		leftAvgY_ = 0.0f;
-		rightAvgY_ = 0.0f;
-	}
-
-	LineData(const LineData& other)
-		: leftPoints_(other.leftPoints_),
-		  rightPoints_(other.rightPoints_),
-		  leftAvgY_(other.leftAvgY_),
-		  rightAvgY_(other.rightAvgY_) {
-	}
-
-	LineData& operator=(const LineData& other) {
-		if (this == &other)
-			return *this;
-		leftPoints_ = other.leftPoints_;
-		rightPoints_ = other.rightPoints_;
-		leftAvgY_ = other.leftAvgY_;
-		rightAvgY_ = other.rightAvgY_;
-		return *this;
-	}
 
 public:
-	const std::vector<cv::Point2f>& leftPoints() const {
-		return leftPoints_;
+	explicit LineData(Side side) : avg_(0.0)
+	                            , side_(side) {}
+
+	void computeAvg();
+
+	void setOffset(XY xy, double offset);
+
+	double getOffset(XY xy);
+
+	const std::vector<cv::Point2d>& points() const {
+		return points_;
 	}
 
-	void leftPoints(const std::vector<cv::Point2f>& leftPoints) {
-		leftPoints_ = leftPoints;
+	void set_points(const std::vector<cv::Point2d>& points) {
+		points_ = points;
 	}
 
-	const std::vector<cv::Point2f>& rightPoints() const {
-		return rightPoints_;
+	double getAvg() const {
+		return avg_;
 	}
 
-	void rightPoints(const std::vector<cv::Point2f>& rightPoints) {
-		rightPoints_ = rightPoints;
+	void setAvg(double avg) {
+		avg_ = avg;
 	}
 
-	const float& leftAvgY() const {
-		return leftAvgY_;
+	Side getSide() const {
+		return side_;
 	}
 
-	void leftAvgY(float leftAvgY) {
-		leftAvgY_ = leftAvgY;
+	void setSide(Side side) {
+		side_ = side;
 	}
 
-	const float& rightAvgY() const {
-		return rightAvgY_;
-	}
+protected:
 
-	void rightAvgY(float rightAvgY) {
-		rightAvgY_ = rightAvgY;
-	}
+	std::vector<cv::Point2d> points_;
+
+	// offset in x and y, where 0 = X and 1 = Y
+#ifdef CV_VERSION
+	cv::Vec2d offset_;
+#else
+	std::array<double, 2> offset_;
+#endif
+
+	double avg_;
+
+	Side side_;
+
 };
 
-template <LineData::Side side>
-void LineData::appendPoint(cv::Point2f& point) {
-	switch (side) {
-	case Side::Left:
-		leftPoints_.push_back(point);
-		break;
-	case Side::Right:
-		rightPoints_.push_back(point);
-		break;
-	case Side::Center:
-	default:
-		std::cerr << "Error while adding point, center is not a valid side.";
-	}
+inline void LineData::setOffset(XY xy, double offset) {
+	offset_[xy] = offset;
 }
 
-template <LineData::Side side>
-void LineData::appendPoints(std::vector<cv::Point2f>& points) {
-	if (side == Side::Center) {
-		std::cerr << "Error while adding points, center is not a valid side.";
-		return;
-	}
-
-	std::vector<cv::Point2f>& target = side == Side::Left ? leftPoints_ : rightPoints_;
-
-	target.reserve(target.size() + points.size());
-	target.insert(target.begin(), points.begin(), points.end());
+inline double LineData::getOffset(XY xy) {
+	return offset_[xy];
 }
 
 /**
 * \brief Computes the average Y values of both lines
 */
-inline void LineData::calcYAvg() {
+inline void LineData::computeAvg() {
 
-	auto sum = 0.0f;
+	auto sum = 0.0;
 
-	for (auto& p : leftPoints_)
+	for (auto& p : points_)
 		sum += p.y;
 
-	leftAvgY_ = sum / static_cast<float>(leftPoints_.size());
-
-	sum = 0.0f;
-
-	for (auto& p : rightPoints_)
-		sum += p.y;
-
-	rightAvgY_ = sum / static_cast<float>(rightPoints_.size());
+	avg_ = sum / static_cast<float>(points_.size());
 
 }

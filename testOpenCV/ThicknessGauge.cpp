@@ -16,8 +16,6 @@
 #include "CV/Pixel.h"
 #include "CV/FilterR.h"
 #include "CV/HoughLinesPR.h"
-#include "CV/LineData/LineBaseData.h"
-#include "CV/LineData/LineLaserData.h"
 #include "CV/SparseR.h"
 #include "Calc/LineCalc.h"
 #include <opencv2/core/base.hpp>
@@ -187,8 +185,6 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
  * \param output 4-sized float vector descriping the base line locations in x/y with index 0 + 1 = left side and 2 + 3 = right side
  */
 void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph, cv::Vec4f& output) {
-
-	LineLaserData results;
 
 	cv::Mat lineHKernel = (cv::Mat_<char>(4, 1) <<
 		0 ,

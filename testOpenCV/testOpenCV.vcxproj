@@ -168,6 +168,7 @@
     <ClCompile Include="CV\GenericCV.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
+    <ClCompile Include="CV\LineData\Data.cpp" />
     <ClCompile Include="UI\DrawHelper.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
@@ -188,9 +189,8 @@
     <ClInclude Include="CV\HoughLinesR.h" />
     <ClInclude Include="CV\Kernels.h" />
     <ClInclude Include="CV\LaserR.h" />
-    <ClInclude Include="CV\LineData\LineBaseData.h" />
+    <ClInclude Include="CV\LineData\Data.h" />
     <ClInclude Include="CV\LineData\LineData.h" />
-    <ClInclude Include="CV\LineData\LineLaserData.h" />
     <ClInclude Include="CV\MorphR.h" />
     <ClInclude Include="CV\SparseR.h" />
     <ClInclude Include="Exceptions\CalibrationException.h" />

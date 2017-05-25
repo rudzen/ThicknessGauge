@@ -81,27 +81,6 @@ double MiniCalc::meanY(vector<cv::Point>& pixels) {
 	return resY / pixels.size();
 }
 
-cv::Point MiniCalc::quantileX(Quantile quant, vector<cv::Point>& pixels) {
-	if (pixels.empty())
-		return cv::Point(0, 0);
-
-	if (quant == Quantile::Q0) return pixels.front();
-	if (quant == Quantile::Q100) return pixels.back();
-	auto index = quantileMap_[quant] * pixels.size();
-	auto pixSorted(pixels);
-	sort(pixSorted.begin(), pixSorted.end(), sortX);
-	return pixSorted.at(static_cast<int>(index));
-}
-
-cv::Point MiniCalc::quantileY(Quantile quant, vector<cv::Point>& pixels) {
-	if (quant == Quantile::Q0) return pixels.front();
-	if (quant == Quantile::Q100) return pixels.back();
-	auto index = quantileMap_[quant] * pixels.size();
-	auto pixSorted(pixels);
-	sort(pixSorted.begin(), pixSorted.end(), sortY);
-	return pixSorted.at(static_cast<int>(index));
-}
-
 cv::Point MiniCalc::percentileX(double percentage, vector<cv::Point>& pixels) const {
 	if (percentage == 0.0) return pixels.front();
 	if (percentage == 1.0) return pixels.back();
