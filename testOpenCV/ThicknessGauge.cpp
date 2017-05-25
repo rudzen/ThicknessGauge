@@ -77,7 +77,6 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	try {
 
-
 		// determin where to get the frames from.
 		if (globName == "camera")
 			captureFrames();
@@ -211,8 +210,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	int bias = Left;
 
-	auto running = true;
-
 	auto quarter = static_cast<float>(frames[0].rows / 4);
 	auto baseLineY = frames[0].rows - quarter;
 
@@ -249,7 +246,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	allElements.reserve(imSize.width * imSize.height);
 
-#define _sparse_mode
+	auto running = true;
 
 	while (running) {
 
@@ -281,6 +278,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 				running = false;
 				break;
 			}
+
 		}
 
 		// generate real boundry
@@ -305,6 +303,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		auto t = org(boundryRect);
 		lineY = frames.front().rows - quarter + boundryRect.y + LineCalc::computeRealIntensityLine(t, tmp, static_cast<float>(t.rows), 0.0f, "_left_baseline", static_cast<float>(frames.front().rows) - quarter + boundryRect.y);
+
+		if (!showWindows_)
+			running = false;
 
 		if (running)
 			lineY = 0.0f;
@@ -381,7 +382,6 @@ void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 
 		}
 
-
 		// calculate the avg rect
 		output.x = 0.0f;
 		output.y = 0.0f;
@@ -396,6 +396,9 @@ void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 		output.y /= markingRects.size();
 		output.width /= markingRects.size();
 		std::cout << "Final marking rect : " << output << endl;
+
+		if (!showWindows_)
+			running = false;
 
 		if (!running)
 			break;
@@ -492,11 +495,14 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		auto time = (end - start) / cv::getTickFrequency();
 		std::cout << cv::format("time for laser detection (s) : %f\n", time);
 
+		if (!showWindows_)
+			running = false;
+
 		if (running && showWindows_) {
 			draw->drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
 			draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
 			draw->drawText(&tmpOut, cv::format("%f pixels", diff), TextDrawPosition::UpperLeft);
-			draw->drawText(&tmpOut, cv::format("%f s",time), TextDrawPosition::UpperRight);
+			draw->drawText(&tmpOut, cv::format("%f s", time), TextDrawPosition::UpperRight);
 			draw->showImage(windowName, tmpOut);
 			if (draw->isEscapePressed(30))
 				running = false;
@@ -604,7 +610,7 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 void ThicknessGauge::captureFrames() {
 	// check if we succeeded
 	if (!cap.isOpened())
-		CV_Error(cv::Error::StsError, "Error while attempting to open capture device.");
+	CV_Error(cv::Error::StsError, "Error while attempting to open capture device.");
 
 	cv::Mat t;
 	for (auto i = 0; i++ < frameCount_;) {
@@ -619,7 +625,6 @@ void ThicknessGauge::captureFrames() {
 bool ThicknessGauge::saveData(string filename, std::vector<cv::Point2f>& baseLineLeft, std::vector<cv::Point2f>& baseLineRight, std::vector<cv::Point2f>& mainLine) {
 	return true;
 }
-
 
 bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, string timeString, string extraInfo) const {
 	// TODO : needs to be updated + documented
@@ -654,7 +659,6 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pix
 	return true;
 }
 
-
 void ThicknessGauge::laplace(cv::Mat& image) const {
 	cv::Mat tmp;
 	Laplacian(image, tmp, settings.ddepth, settings.kernelSize); // , scale, delta, BORDER_DEFAULT);
@@ -664,7 +668,6 @@ void ThicknessGauge::laplace(cv::Mat& image) const {
 void ThicknessGauge::sobel(cv::Mat& image) const {
 	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, cv::BORDER_DEFAULT);
 }
-
 
 /**
  * \brief Sums the intensity for a specific coloumn in a matrix
