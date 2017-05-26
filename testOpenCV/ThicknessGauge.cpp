@@ -5,9 +5,7 @@
 #include "Util/Util.h"
 #include "IO/ImageSave.h"
 #include "Exceptions/CaptureFailException.h"
-#include "Testing/TestConfig.h"
 #include "UI/ProgressBar.h"
-#include "LineSparse.h"
 #include "Histogram/Histogram.h"
 #include "IO/GlobGenerator.h"
 #include "Histogram/HistoPeak.h"
@@ -19,9 +17,7 @@
 #include "CV/SparseR.h"
 #include "Calc/LineCalc.h"
 #include <opencv2/core/base.hpp>
-#include <opencv2/core/base.hpp>
 #include "UI/DrawHelper.h"
-#include "CV/GenericCV.h"
 
 /**
  * \brief Initializes the capture device using PV_API constant
