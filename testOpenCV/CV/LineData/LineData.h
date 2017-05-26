@@ -11,7 +11,27 @@ using namespace tg;
 
 class LineData {
 
+	protected:
+
+	std::vector<cv::Point2d> points_;
+
+	// offset in x and y, where 0 = X and 1 = Y
+#ifdef CV_VERSION
+	cv::Vec2d offset_;
+
+	cv::Rect2d rectangle_;
+#else
+	std::array<double, 2> offset_;
+#endif
+
+	double avg_;
+
+	Side side_;
+
 public:
+
+	LineData() { }
+
 	explicit LineData(Side side) : avg_(0.0)
 	                            , side_(side) {}
 
@@ -21,11 +41,15 @@ public:
 
 	double getOffset(XY xy);
 
-	const std::vector<cv::Point2d>& points() const {
+	void setRect(cv::Rect2d rect) {
+		rectangle_ = rect;
+	}
+
+	const std::vector<cv::Point2d>& getPoints() const {
 		return points_;
 	}
 
-	void set_points(const std::vector<cv::Point2d>& points) {
+	void setPoints(const std::vector<cv::Point2d>& points) {
 		points_ = points;
 	}
 
@@ -44,21 +68,6 @@ public:
 	void setSide(Side side) {
 		side_ = side;
 	}
-
-protected:
-
-	std::vector<cv::Point2d> points_;
-
-	// offset in x and y, where 0 = X and 1 = Y
-#ifdef CV_VERSION
-	cv::Vec2d offset_;
-#else
-	std::array<double, 2> offset_;
-#endif
-
-	double avg_;
-
-	Side side_;
 
 };
 

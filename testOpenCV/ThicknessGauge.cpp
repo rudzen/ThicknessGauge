@@ -204,8 +204,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	draw->makeWindow(leftWindow);
 	draw->makeWindow(rightWindow);
 
-	int bias = Left;
-
 	auto quarter = static_cast<float>(frames[0].rows / 4);
 	auto baseLineY = frames[0].rows - quarter;
 
