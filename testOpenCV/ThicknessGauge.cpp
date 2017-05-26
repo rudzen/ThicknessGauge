@@ -324,13 +324,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
  */
 cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough) {
 
-
 	const std::string windowName = "test marking out";
 	draw->makeWindow(windowName);
-
-	// build cannyfied images
-	vector<cv::Mat> candis;
-	candis.reserve(frameCount_);
 
 	cv::Mat lineVKernel = (cv::Mat_<char>(4, 4) <<
 		0 , 0 , 1 , 1 ,
@@ -412,6 +407,8 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		return cv::Rect2d(output);
 
 	CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", output.x, output.y, output.width, output.height));
+
+	return cv::Rect2d(0.0, 0.0, 0.0, 0.0);
 }
 
 /**
