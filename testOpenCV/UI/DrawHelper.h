@@ -88,6 +88,10 @@ public:
 		cv::rectangle(image, rectangle, colour, 1, CV_AA);
 	}
 
+	void drawRectangle(cv::Mat& image, cv::Rect2d& rectangle, cv::Scalar colour) const {
+		cv::rectangle(image, rectangle, colour, 1, CV_AA);
+	}
+
 	const cv::Scalar& colour() const {
 		return colour_;
 	}

@@ -19,7 +19,6 @@ class LineData {
 #ifdef CV_VERSION
 	cv::Vec2d offset_;
 
-	cv::Rect2d rectangle_;
 #else
 	std::array<double, 2> offset_;
 #endif
@@ -40,10 +39,6 @@ public:
 	void setOffset(XY xy, double offset);
 
 	double getOffset(XY xy);
-
-	void setRect(cv::Rect2d rect) {
-		rectangle_ = rect;
-	}
 
 	const std::vector<cv::Point2d>& getPoints() const {
 		return points_;
@@ -86,8 +81,13 @@ inline void LineData::computeAvg() {
 
 	auto sum = 0.0;
 
-	for (auto& p : points_)
-		sum += p.y;
+	#pragma omp parallel for
+	for (auto i = 0; i < points_.size(); i++) {
+		sum += points_[i].y;
+	}
+
+	//for (auto& p : points_)
+	//	sum += p.y;
 
 	avg_ = sum / static_cast<float>(points_.size());
 

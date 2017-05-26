@@ -105,9 +105,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		baselineFilter->setShowWindow(showWindows_);
 
 		// the marking rect determins where in the frame the marking is located.
-		cv::Rect2f markingRect;
-
-		computerMarkingRectangle(canny, markingFilter, houghV, markingRect);
+		cv::Rect2d markingRect = computerMarkingRectangle(canny, markingFilter, houghV);
 
 		// make sure the minimum is at least 10 pixels.
 		auto minLineLen = computeHoughPMinLine<10>(markingRect);
@@ -322,10 +320,13 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
  * \param canny The canny filter class
  * \param filter The custom filter class
  * \param hough The houghline class
- * \param output The rectangle vector
- * \return true if ok, otherwise false
+ * \return The rectangle which was computed
  */
-void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output) {
+cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough) {
+
+
+	const std::string windowName = "test marking out";
+	draw->makeWindow(windowName);
 
 	// build cannyfied images
 	vector<cv::Mat> candis;
@@ -342,14 +343,13 @@ void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 
 	vector<cv::Mat> cannyImages;
 
-	const std::string windowName = "test marking out";
-	draw->makeWindow(windowName);
+	cv::Mat markingTest;
 
 	vector<cv::Rect2f> markingRects;
 
-	auto running = true;
+	cv::Rect2d output(0.0, 0.0, 0.0, 0.0);
 
-	cv::Mat markingTest;
+	auto running = true;
 
 	while (running) {
 
@@ -409,7 +409,7 @@ void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
 		draw->removeWindow(windowName);
 
 	if (output.width > 0.0f && output.height > 0.0f)
-		return;
+		return cv::Rect2d(output);
 
 	CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", output.x, output.y, output.width, output.height));
 }
@@ -422,7 +422,7 @@ void ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_p
  * \param markingLocation The marking location rectangle
  * \param result The resulting laser line centroid points, with one for each x based on the weigth of their intensity for each X
  */
-void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result) {
+void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2d& markingLocation, std::vector<cv::Point2f>& result) {
 
 	// generate frames with marking
 	std::vector<cv::Mat> markingFrames;
@@ -519,7 +519,7 @@ cv::Vec2f ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR> hough) 
  * \return the computed value, but not less than minLen
  */
 template <int minLen>
-int ThicknessGauge::computeHoughPMinLine(cv::Rect2f& rect) const {
+int ThicknessGauge::computeHoughPMinLine(cv::Rect2d& rect) const {
 	auto minLineLen = cvRound(rect.width / 32);
 
 	if (minLineLen < minLen)

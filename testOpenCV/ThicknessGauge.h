@@ -116,16 +116,16 @@ private:
 
 	void computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph, cv::Vec4f& output);
 
-	void computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough, cv::Rect2f& output);
+	cv::Rect2d computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough);
 
-	void computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2f& markingLocation, std::vector<cv::Point2f>& result);
+	void computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2d& markingLocation, std::vector<cv::Point2f>& result);
 
 private: /* helper functions */
 
 	cv::Vec2f computeIntersectionCut(shared_ptr<HoughLinesR> hough);
 
 	template <int minLen>
-	int computeHoughPMinLine(cv::Rect2f& rect) const;
+	int computeHoughPMinLine(cv::Rect2d& rect) const;
 
 	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right);
 

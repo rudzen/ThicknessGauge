@@ -50,7 +50,7 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec
 
 #endif
 
-void LineCalc::adjustMarkingRect(cv::Rect2f& markingRect, cv::Vec4f& intersectionPoints, double buffer) {
+void LineCalc::adjustMarkingRect(cv::Rect2d& markingRect, cv::Vec4f& intersectionPoints, double buffer) {
 
 	if (markingRect.x == 0)
 		CV_Error(cv::Error::BadROISize, "Marketing rectangle start position is zero.");		

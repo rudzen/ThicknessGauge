@@ -6,40 +6,6 @@ class ThicknessGaugeData {
 	
 protected:
 
-	using Data = struct Data {
-
-		Data(const cv::Size size, std::vector<cv::Point2f>& leftPoints, std::vector<cv::Point2f>& rightPoints, std::vector<cv::Point2f>& centerPoints) : left(leftPoints)
-		                                                                                                                                               , right(rightPoints)
-		                                                                                                                                               , center(centerPoints)
-		                                                                                                                                               , size(size)
-		                                                                                                                                               , exposure(0) {
-			auto half = size.width * (1.0 / 2.0);
-			size_t lim = cvRound(ceil(half));
-			auto limHalf = lim >> 1;
-			auto limQuarter = limHalf >> 1;
-			left.reserve(limQuarter);
-			right.reserve(limQuarter);
-			center.reserve(limHalf);
-		}
-
-		// the left side points for the line
-		std::vector<cv::Point2f>& left;
-
-		// the right side points for the line
-		std::vector<cv::Point2f>& right;
-
-		// the center points
-		std::vector<cv::Point2f>& center;
-
-		// offsets, which is exactly the pieces missing between left/center and center/right
-		std::array<float, 2> offsets;
-
-		// the total size of the representataion, includes full height and both offsets
-		cv::Size size;
-
-		unsigned int exposure;
-	};
-
 	vector<cv::Mat> frames;
 
 	LineConfig lineConfig_;
