@@ -403,12 +403,22 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 	if (showWindows_)
 		draw->removeWindow(windowName);
 
-	if (output.width > 0.0f && output.height > 0.0f)
+	auto validRectangle = [output]()->bool {
+		return output.width + output.height > 0.0;
+	};
+	
+	bool outputOk = validRectangle();
+
+	if (outputOk)
 		return cv::Rect2d(output);
 
-	CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", output.x, output.y, output.width, output.height));
-
 	return cv::Rect2d(0.0, 0.0, 0.0, 0.0);
+
+	//if (output.width > 0.0f && output.height > 0.0f)
+
+	//CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", output.x, output.y, output.width, output.height));
+
+	//return cv::Rect2d(0.0, 0.0, 0.0, 0.0);
 }
 
 /**
