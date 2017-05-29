@@ -55,7 +55,7 @@ public:
 		return markingRect;
 	}
 
-	void setMarkingRect(const cv::Rect2f& markingRect) {
+	void setMarkingRect(const cv::Rect_<T>& markingRect) {
 		this->markingRect = markingRect;
 	}
 };

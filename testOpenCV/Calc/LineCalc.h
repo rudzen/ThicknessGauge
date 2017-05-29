@@ -26,7 +26,7 @@ public:
 
 	static void adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoints, double buffer);
 
-	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, float upperLimit, float lowerLimit, std::string filename, float fileOffsetY) {
+	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, double upperLimit, double lowerLimit, std::string filename, double fileOffsetY) {
 
 		// generate vector with all X
 		if (!output.empty())
@@ -42,23 +42,16 @@ public:
 		cv::Mat C;
 
 		for (auto i = 0; i < image.cols; i++) {
-			output.push_back(cv::Point2f(static_cast<float>(i), 0.0f));
-			auto B = cv::Mat(image, cv::Rect2f(static_cast<float>(i), lowerLimit, 1.0f, upperLimit));
+			output.push_back(cv::Point2d(static_cast<double>(i), 0.0));
+			auto B = cv::Mat(image, cv::Rect2f(static_cast<double>(i), lowerLimit, 1.0, upperLimit));
 			B.copyTo(C);
 			auto m = cv::moments(C, false);
 			//int x = m.m10 / m.m00;
 			auto y = m.m01 / m.m00;
 			//cout << "intensity at x [x-pos / centroid]: [" << i << " / " << y << ']' << endl;
-			if (y > 0) {
+			if (y > 0)
 				output.back().y = y;
-			}
 		}
-
-		//std::cout << "intensity lines: " << output << std::endl;
-
-		//auto m = cv::moments(image, false);
-		//int x = m.m10 / m.m00;
-		//int y = m.m01 / m.m00;
 
 		std::ofstream file(filename + ".intensitet.txt");
 		std::ofstream fileY(filename + ".intensitet_y.txt");
