@@ -675,9 +675,33 @@ void ThicknessGauge::captureFrames() {
 
 }
 
-bool ThicknessGauge::saveData(string filename, std::vector<cv::Point2f>& baseLineLeft, std::vector<cv::Point2f>& baseLineRight, std::vector<cv::Point2f>& mainLine) {
+bool ThicknessGauge::saveData(string filename) {
+	cv::FileStorage fs(filename + ".json", cv::FileStorage::WRITE);
+	if (!fs.isOpened()) {
+		cerr << "Error while opening " << filename << " for output." << endl;
+		return false;
+	}
+
+	std::cout << cv::format("Saving data..\n");
+
+	fs << "Filename" << filename;
+	fs << "Time" << Util::getTime();
+	fs << "ComputeTime" << " ";
+	fs << "Difference" << data->difference;
+	fs << "MarkingRectangle" << data->markingRect;
+	fs << "Intersections" << data->intersections;
+	fs << "IntersectionCuts" << data->intersectionCuts;
+	fs << "Baselines" << data->baseLines;
+	fs << "CenterLine" << data->centerLine;
+	fs << "LeftBasePoints" << data->leftPoints;
+	fs << "RightBasePoints" << data->rightPoints;
+	fs << "CenterPoints" << data->centerPoints;
+	fs << "FirstFrame" << frames.front();
+	fs.release();
+
 	return true;
 }
+
 
 bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, string timeString, string extraInfo) const {
 	// TODO : needs to be updated + documented

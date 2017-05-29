@@ -94,9 +94,9 @@ int main(int argc, char** argv) {
 
 			c.computeMarkingHeight(globName);
 
-			auto data = c.getData();
+			auto data = c.getData(); // virker :-)
 
-			cout << data->centerPoints << endl;
+			c.saveData("output_mufmuf");
 
 
 
