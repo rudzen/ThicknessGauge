@@ -36,7 +36,7 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec
 	auto intersectsRight = intersection(rightBorder, horizontalLine, rightIntersection);
 
 	// check if there are two intersections
-	if (!intersectsLeft & intersectsRight) {
+	if (!(intersectsLeft & intersectsRight)) {
 		Util::loge("Error in intersection detection.");
 		CV_Error(cv::Error::StsAssert, "Intersection points are invalid.");
 		return false;
