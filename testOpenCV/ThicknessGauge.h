@@ -11,8 +11,6 @@
 #include "Calibrate/CalibrationSettings.h"
 #include "Util/Util.h"
 
-#include "Testing/TestConfig.h"
-#include "LineSparse.h"
 #include "IO/GlobGenerator.h"
 #include "CV/Pixel.h"
 #include "CV/CannyR.h"
@@ -79,7 +77,9 @@ private:
 
 	const double PIangle = CV_PI / 180;
 
-	uint64 frameTime_;
+	std::unique_ptr<DrawHelper> draw = make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
+
+	double frameTime_;
 
 	int frameCount_;
 
@@ -96,7 +96,6 @@ private:
 
 	GlobGenerator globGenerator;
 
-	std::unique_ptr<DrawHelper> draw = make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
 
 public:
 
@@ -132,7 +131,7 @@ private:
 
 	cv::Rect2d computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough);
 
-	void computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter, cv::Rect2d& markingLocation, std::vector<cv::Point2f>& result);
+	void computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter);
 
 private: /* helper functions */
 
@@ -165,9 +164,9 @@ public: // getters and setters
 
 	void setFrameCount(int frameCount);
 
-	uint64 getFrameTime() const;
+	double getFrameTime() const;
 
-	void setFrameTime(uint64 uint64);
+	void setFrameTime(double uint64);
 
 	double getTickFrequency() const;
 

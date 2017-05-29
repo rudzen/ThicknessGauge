@@ -71,6 +71,8 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	try {
 
+		uint64 startTime = cv::getTickCount();
+
 		// determin where to get the frames from.
 		if (globName == "camera")
 			captureFrames();
@@ -102,17 +104,27 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 		// the marking rect determins where in the frame the marking is located.
 
+		uint64 endTime = cv::getTickCount();
+
+		frameTime_ += endTime - startTime;
+
 		data->markingRect = computerMarkingRectangle(canny, markingFilter, houghV);
 
-		cv::Rect2d markingRect = data->markingRect;
+		startTime = cv::getTickCount();
 
 		// check the resulting rectangle for weirdness
-		if (markingRect.x < 0.0 || markingRect.y < 0.0 || markingRect.width > imageSize_.width || markingRect.height > imageSize_.height || markingRect.area() >= imageSize_.area()) {
-			CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", markingRect.x, markingRect.y, markingRect.width, markingRect.height));
+		if (data->markingRect.x < 0.0 || data->markingRect.y < 0.0 || data->markingRect.width > imageSize_.width || data->markingRect.height > imageSize_.height || data->markingRect.area() >= imageSize_.area()) {
+			CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height));
 		}
 
+		endTime = cv::getTickCount();
+
+		frameTime_ += endTime - startTime;
+
 		// make sure the minimum is at least 10 pixels.
-		auto minLineLen = computeHoughPMinLine<10>(markingRect);
+		auto minLineLen = computeHoughPMinLine<10>(data->markingRect);
+
+		startTime = cv::getTickCount();
 
 		// horizontal houghline extension class
 		auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, showWindows_);
@@ -121,12 +133,18 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
 
 		houghH->setMaxLineGab(12);
-		houghH->setMarkingRect(markingRect);
+		houghH->setMarkingRect(data->markingRect);
+
+		endTime = cv::getTickCount();
+
+		frameTime_ += endTime - startTime;
 
 		computeBaseLineAreas(canny, baselineFilter, houghH, morph);
 
-		std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
-		std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
+		//std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
+		//std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
+
+		startTime = cv::getTickCount();
 
 		LineCalc lineCalc;
 
@@ -138,17 +156,14 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		// pixel cut off is based on the border of the marking..
 		cv::Vec2f intersectionCutoff = computeIntersectionCut(houghV);
 
-		lineCalc.adjustMarkingRect(markingRect, data->intersections, intersectionCutoff[0]);
+		lineCalc.adjustMarkingRect(data->markingRect, data->intersections, intersectionCutoff[0]);
 
 		// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
 		lineCalc.adjustBaseLines(data->baseLines, data->intersections, intersectionCutoff[0]);
 
-		std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", markingRect.x, markingRect.y, markingRect.width, markingRect.height);
-		std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
-		std::cout << cv::format("Adjusted base line Y [right]: %f\n", data->baseLines[3]);
-
-		// work on laser location on marking..
-		std::vector<cv::Point2f> laserLine;
+		//std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
+		//std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
+		//std::cout << cv::format("Adjusted base line Y [right]: %f\n", data->baseLines[3]);
 
 		// filter for laser detection
 		auto laserFilter = make_shared<FilterR>("Laser Filter");
@@ -157,8 +172,14 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		// main laser class
 		auto laser = make_shared<LaserR>();
 
+		endTime = cv::getTickCount();
+
+		frameTime_ += endTime - startTime;
+
 		// computes the Y locations of the laserline inside the marking rect
-		computeLaserLocations(laser, laserFilter, markingRect, laserLine);
+		computeLaserLocations(laser, laserFilter);
+
+		frameTime_ /= cv::getTickFrequency();
 
 		draw->removeAllWindows();
 
@@ -180,6 +201,8 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
  * \param morph The morphology class
  */
 void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
+
+	auto startTime = cv::getTickCount();
 
 	cv::Mat lineHKernel = (cv::Mat_<char>(4, 1) <<
 		0 ,
@@ -235,12 +258,18 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	std::vector<cv::Point2f> leftElements(leftSize.width * leftSize.height);
 	std::vector<cv::Point2f> rightElements(rightSize.width * rightSize.width);
 
+	auto endTime = cv::getTickCount();
+
+	frameTime_ += endTime - startTime;
+
 	auto running = true;
 
 	while (running) {
 
 		leftElements.clear();
 		rightElements.clear();
+
+		startTime = cv::getTickCount();
 
 		cv::Mat org;
 
@@ -309,6 +338,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		t = org(rightBoundryRect);
 		rightY = frames.front().rows - quarter + rightBoundryRect.y + LineCalc::computeRealIntensityLine(t, data->rightPoints, static_cast<double>(t.rows), 0.0, "_right_baseline", static_cast<double>(frames.front().rows - quarter + rightBoundryRect.y));
 
+		endTime = cv::getTickCount();
 
 		if (!showWindows_)
 			running = false;
@@ -319,6 +349,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		}
 
 	}
+
+	frameTime_ += endTime - startTime;
 
 	data->baseLines[0] = 0.0;
 	data->baseLines[1] = leftY;
@@ -363,6 +395,8 @@ void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<CannyR> canny, s
  */
 cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough) {
 
+	auto startTime = cv::getTickCount();
+
 	const std::string windowName = "test marking out";
 	draw->makeWindow(windowName);
 
@@ -383,9 +417,15 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 
 	cv::Rect2d output(0.0, 0.0, 0.0, 0.0);
 
+	uint64 endTime = cv::getTickCount();
+
 	auto running = true;
 
+	frameTime_ += endTime - startTime;
+
 	while (running) {
+
+		startTime = cv::getTickCount();
 
 		markingRects.reserve(frameCount_);
 		cv::Mat sparse;
@@ -423,7 +463,10 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		output.x /= markingRects.size();
 		output.y /= markingRects.size();
 		output.width /= markingRects.size();
-		std::cout << "Final marking rect : " << output << endl;
+
+		endTime = cv::getTickCount();
+
+		//std::cout << "Final marking rect : " << output << endl;
 
 		if (!showWindows_)
 			running = false;
@@ -439,14 +482,23 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		}
 	}
 
+	frameTime_ += endTime - startTime;
+
 	if (showWindows_)
 		draw->removeWindow(windowName);
+
+
+	startTime = cv::getTickCount();
 
 	auto validRectangle = [output]()-> bool {
 		return output.width > 0.0 && output.height > 0.0;
 	};
 
 	bool outputOk = validRectangle();
+
+	endTime = cv::getTickCount();
+
+	frameTime_ += endTime - startTime;
 
 	if (outputOk)
 		return cv::Rect2d(output);
@@ -459,16 +511,16 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
  * \brief Computes the laser line location on the marking in Y
  * \param laser The laser class
  * \param filter The custom filter class
- * \param markingLocation The marking location rectangle
- * \param result The resulting laser line centroid points, with one for each x based on the weigth of their intensity for each X
  */
-void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter, cv::Rect2d& markingLocation, std::vector<cv::Point2f>& result) {
+void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter) {
+
+	uint64 startTime = cv::getTickCount();
 
 	// generate frames with marking
 	std::vector<cv::Mat> markingFrames;
 
 	for (auto& frame : frames)
-		markingFrames.push_back(frame(markingLocation));
+		markingFrames.push_back(frame(data->markingRect));
 
 	const std::string windowName = "test height";
 	draw->makeWindow(windowName);
@@ -488,11 +540,15 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 	for (auto i = 0; i < imSize.width; i++)
 		results.at(i).x = i;
 
+	uint64 endTime = cv::getTickCount();
+
+	frameTime_ += endTime - startTime;
+
 	while (running) {
 
-		auto start = cv::getTickCount();
-
 		auto highestPixel = 0.0;
+
+		startTime = cv::getTickCount();
 
 		for (auto i = 0; i < imSize.width; i++)
 			results.at(i).y = 0.0;
@@ -536,13 +592,14 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 		Util::copyVector(results, data->centerPoints);
 
 		auto highestPixelTotal = frames.front().rows - (highestPixel / static_cast<unsigned int>(frameCount_));
-		auto end = cv::getTickCount();
+		endTime = cv::getTickCount();
+
 		std::cout << cv::format("highestPixelTotal: %f\n", highestPixelTotal);
 
 		data->difference = abs(base - highestPixelTotal);
 		std::cout << cv::format("diff from baseline: %f\n", data->difference);
 
-		auto time = (end - start) / cv::getTickFrequency();
+		auto time = (endTime - startTime) / cv::getTickFrequency();
 		std::cout << cv::format("time for laser detection (s) : %f\n", time);
 
 		if (!showWindows_)
@@ -562,6 +619,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 	// align the results!!! :-)
 	for (auto& p : data->centerPoints)
 		p.y = imageSize_.height - p.y;
+
+	frameTime_ += endTime - startTime;
 
 	draw->removeWindow(windowName);
 
@@ -676,17 +735,18 @@ void ThicknessGauge::captureFrames() {
 }
 
 bool ThicknessGauge::saveData(string filename) {
-	cv::FileStorage fs(filename + ".json", cv::FileStorage::WRITE);
+	auto f(filename + ".json");
+	cv::FileStorage fs(f, cv::FileStorage::WRITE);
 	if (!fs.isOpened()) {
-		cerr << "Error while opening " << filename << " for output." << endl;
+		cerr << "Error while opening " << f << " for output." << endl;
 		return false;
 	}
 
 	std::cout << cv::format("Saving data..\n");
 
 	fs << "Filename" << filename;
-	fs << "Time" << Util::getTime();
-	fs << "ComputeTime" << " ";
+	fs << "TimeSaved" << Util::getTime();
+	fs << "ComputeTime" << frameTime_;
 	fs << "Difference" << data->difference;
 	fs << "MarkingRectangle" << data->markingRect;
 	fs << "Intersections" << data->intersections;
@@ -869,11 +929,11 @@ void ThicknessGauge::setFrameCount(int frameCount) {
 	frameCount_ = frameCount;
 }
 
-uint64 ThicknessGauge::getFrameTime() const {
+double ThicknessGauge::getFrameTime() const {
 	return frameTime_;
 }
 
-void ThicknessGauge::setFrameTime(uint64 frameTime) {
+void ThicknessGauge::setFrameTime(double frameTime) {
 	frameTime_ = frameTime;
 }
 

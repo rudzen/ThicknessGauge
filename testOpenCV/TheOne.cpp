@@ -98,6 +98,8 @@ int main(int argc, char** argv) {
 
 			c.saveData("output_mufmuf");
 
+			cout << "difference: " << data->difference << endl;
+
 
 
 			//auto result = c.findMarkingLinePairs_(globName);
