@@ -107,8 +107,9 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		cv::Rect2d markingRect = data->markingRect;
 
 		// check the resulting rectangle for weirdness
-		if (markingRect.x < 0.0 || markingRect.y < 0.0 || markingRect.width > imageSize_.width || markingRect.height > imageSize_.height || markingRect.area() >= imageSize_.area())
-		CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", markingRect.x, markingRect.y, markingRect.width, markingRect.height));
+		if (markingRect.x < 0.0 || markingRect.y < 0.0 || markingRect.width > imageSize_.width || markingRect.height > imageSize_.height || markingRect.area() >= imageSize_.area()) {
+			CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", markingRect.x, markingRect.y, markingRect.width, markingRect.height));
+		}
 
 		// make sure the minimum is at least 10 pixels.
 		auto minLineLen = computeHoughPMinLine<10>(markingRect);
@@ -124,33 +125,27 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 		computeBaseLineAreas(canny, baselineFilter, houghH, morph);
 
-		// the baselines, which are located outside the marking
-		cv::Vec4f baseLines = data->baseLines;
-
-		std::cout << cv::format("Base line Y [left] : %f\n", baseLines[1]);
-		std::cout << cv::format("Base line Y [right]: %f\n", baseLines[3]);
-
-		// the locations for where the base lines intersect with the marking border
-		cv::Vec4f intersections;
+		std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
+		std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
 
 		LineCalc lineCalc;
 
 		// compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
-		lineCalc.computeIntersectionPoints(baseLines, houghV->getLeftBorder(), houghV->getRightBorder(), intersections);
+		lineCalc.computeIntersectionPoints(data->baseLines, houghV->getLeftBorder(), houghV->getRightBorder(), data->intersections);
 
-		std::cout << "intersection points: " << intersections << std::endl;
+		std::cout << "intersection points: " << data->intersections << std::endl;
 
 		// pixel cut off is based on the border of the marking..
 		cv::Vec2f intersectionCutoff = computeIntersectionCut(houghV);
 
-		lineCalc.adjustMarkingRect(markingRect, intersections, intersectionCutoff[0]);
+		lineCalc.adjustMarkingRect(markingRect, data->intersections, intersectionCutoff[0]);
 
 		// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
-		lineCalc.adjustBaseLines(baseLines, intersections, intersectionCutoff[0]);
+		lineCalc.adjustBaseLines(data->baseLines, data->intersections, intersectionCutoff[0]);
 
 		std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", markingRect.x, markingRect.y, markingRect.width, markingRect.height);
-		std::cout << cv::format("Adjusted base line Y [left] : %f\n", baseLines[1]);
-		std::cout << cv::format("Adjusted base line Y [right]: %f\n", baseLines[3]);
+		std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
+		std::cout << cv::format("Adjusted base line Y [right]: %f\n", data->baseLines[3]);
 
 		// work on laser location on marking..
 		std::vector<cv::Point2f> laserLine;
@@ -163,7 +158,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		auto laser = make_shared<LaserR>();
 
 		// computes the Y locations of the laserline inside the marking rect
-		computeLaserLocations(laser, baseLines, laserFilter, markingRect, laserLine);
+		computeLaserLocations(laser, laserFilter, markingRect, laserLine);
 
 		draw->removeAllWindows();
 
@@ -221,11 +216,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	rightBaseLine.width = frames.front().cols - rightBaseLine.x;
 	rightBaseLine.height = leftBaseLine.height;
 
-
-	cout << "left  baseline roi : " << leftBaseLine << endl;
-	cout << "right baseline roi : " << rightBaseLine << endl;
-	cout << "right baseline info: " << rightBaseLine << endl;
-
+	// cannot be resized
 	vector<cv::Mat> left;
 	vector<cv::Mat> right;
 
@@ -237,10 +228,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	auto leftSize = left.front().size();
 	auto rightSize = right.front().size();
-
-	cout << "leftSize: " << leftSize << endl;
-	cout << "rightSize: " << rightSize << endl;
-
 
 	auto leftY = 0.0;
 	auto rightY = 0.0;
@@ -262,7 +249,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		for (auto& l : left) {
 			org = l.clone();
 
-			computeBaseLine(org, canny, filter, hough, morph);
+			processMatForLine(org, canny, filter, hough, morph);
 
 			const auto& lines = hough->getRightLines();
 			for (auto& h : lines)
@@ -295,7 +282,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		for (auto& r : right) {
 			org = r.clone();
 
-			computeBaseLine(org, canny, filter, hough, morph);
+			processMatForLine(org, canny, filter, hough, morph);
 
 			const auto& lines = hough->getLeftLines();
 			for (auto& h : lines)
@@ -323,8 +310,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		rightY = frames.front().rows - quarter + rightBoundryRect.y + LineCalc::computeRealIntensityLine(t, data->rightPoints, static_cast<double>(t.rows), 0.0, "_right_baseline", static_cast<double>(frames.front().rows - quarter + rightBoundryRect.y));
 
 
-
-
 		if (!showWindows_)
 			running = false;
 
@@ -346,8 +331,15 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	draw->removeWindow(rightWindow);
 }
 
-
-void ThicknessGauge::computeBaseLine(cv::Mat& org, shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
+/**
+ * \brief Processes the matrix for optimal output and computes the line information based on the results
+ * \param org The matrix to perform the process on
+ * \param canny The canny extension class used
+ * \param filter The filter extension class used
+ * \param hough The hough extension class used
+ * \param morph The morphology extenstion class used
+ */
+void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
 	filter->setImage(org);
 	filter->doFilter();
 
@@ -466,12 +458,11 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 /**
  * \brief Computes the laser line location on the marking in Y
  * \param laser The laser class
- * \param baseLine The baseline vector
  * \param filter The custom filter class
  * \param markingLocation The marking location rectangle
  * \param result The resulting laser line centroid points, with one for each x based on the weigth of their intensity for each X
  */
-void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2d& markingLocation, std::vector<cv::Point2f>& result) {
+void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter, cv::Rect2d& markingLocation, std::vector<cv::Point2f>& result) {
 
 	// generate frames with marking
 	std::vector<cv::Mat> markingFrames;
@@ -483,11 +474,9 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 	draw->makeWindow(windowName);
 
 	// local copy of real baseline
-	auto base = frames.front().rows - baseLine[1];
+	auto base = frames.front().rows - data->baseLines[1];
 
 	cv::Mat tmpOut;
-
-	std::vector<cv::Point2d> pixelsOutput;
 
 	auto thresholdLevel = 100.0;
 
@@ -518,13 +507,12 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 			findNonZero(baseFrame, nonZero);
 			auto laserArea = cv::boundingRect(nonZero);
 			auto t = baseFrame(laserArea);
-			highestPixel += LineCalc::computeRealIntensityLine(t, pixelsOutput, static_cast<float>(t.rows), 0.0f, "_marking", static_cast<float>(laserArea.y));
-			highestPixel += (laserArea.y);
+			highestPixel += laserArea.y + LineCalc::computeRealIntensityLine(t, data->centerPoints, static_cast<double>(t.rows), 0.0, "_marking", static_cast<double>(laserArea.y));
 
 			if (draw->isEscapePressed(30))
 				running = false;
 
-			if (!i && running)
+			if (!i && running && showWindows_)
 				cv::cvtColor(markingFrames.at(i), tmpOut, CV_GRAY2BGR);
 		}
 
@@ -532,8 +520,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		auto end = cv::getTickCount();
 		std::cout << cv::format("highestPixelTotal: %f\n", highestPixelTotal);
 
-		auto diff = abs(base - highestPixelTotal);
-		std::cout << cv::format("diff from baseline: %f\n", diff);
+		data->difference = abs(base - highestPixelTotal);
+		std::cout << cv::format("diff from baseline: %f\n", data->difference);
 
 		auto time = (end - start) / cv::getTickFrequency();
 		std::cout << cv::format("time for laser detection (s) : %f\n", time);
@@ -544,7 +532,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 		if (running && showWindows_) {
 			draw->drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
 			draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
-			draw->drawText(&tmpOut, cv::format("%f pixels", diff), TextDrawPosition::UpperLeft);
+			draw->drawText(&tmpOut, cv::format("%f pixels", data->difference), TextDrawPosition::UpperLeft);
 			draw->drawText(&tmpOut, cv::format("%f s", time), TextDrawPosition::UpperRight);
 			draw->showImage(windowName, tmpOut);
 			if (draw->isEscapePressed(30))
@@ -557,8 +545,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& 
 
 }
 
-cv::Vec2f ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR> hough) {
-	return cv::Vec2f(40.0f, 40.0f);
+cv::Vec2d ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR> hough) {
+	return cv::Vec2d(40.0f, 40.0f);
 }
 
 /**

@@ -37,18 +37,32 @@ public:
 
 	typedef struct Data {
 
+		// the points of the laser on the marking
 		std::vector<cv::Point2d> centerPoints;
+
+		// the points thwere the laser hits ground zero on the LEFT side of the marking
 		std::vector<cv::Point2d> leftPoints;
+
+		// the points thwere the laser hits ground zero on the RIGHT side of the marking
 		std::vector<cv::Point2d> rightPoints;
 
+		// the rectangle which includes the entire marking
 		cv::Rect2d markingRect;
 
-		cv::Vec4d intersections;
+		// the base lines where the laser hits the actual ground-zero
 		cv::Vec4d baseLines;
+
+		// the locations for where the base lines intersect with the marking border
+		cv::Vec4d intersections;
+
+		// enclusure of the laser line
 		cv::Vec4d centerLine;
 
+		// the points where the intersections are cut.
+		// adjusted so potential unwanted information is not included in further calculations
 		cv::Vec2d intersectionCuts;
 
+		// the difference between the baseline(s) and the laser line on the marking in sub-pixels
 		double difference;
 
 	} Data;
@@ -105,15 +119,15 @@ public: // basic stuff to extract information
 private:
 
 	void computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
-	static void computeBaseLine(cv::Mat& org, shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
+	static void processMatForLine(cv::Mat& org, shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
 
 	cv::Rect2d computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough);
 
-	void computeLaserLocations(shared_ptr<LaserR> laser, cv::Vec4f& baseLine, shared_ptr<FilterR> filter, cv::Rect2d& markingLocation, std::vector<cv::Point2f>& result);
+	void computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter, cv::Rect2d& markingLocation, std::vector<cv::Point2f>& result);
 
 private: /* helper functions */
 
-	cv::Vec2f computeIntersectionCut(shared_ptr<HoughLinesR> hough);
+	cv::Vec2d computeIntersectionCut(shared_ptr<HoughLinesR> hough);
 
 	template <int minLen>
 	int computeHoughPMinLine(cv::Rect2d& rect) const;

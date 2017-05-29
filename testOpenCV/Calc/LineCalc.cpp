@@ -3,6 +3,15 @@
 
 #ifdef CV_VERSION
 
+/**
+ * \brief Computes intersection points based on 4 points (2 x 2)
+ * \param o1 Point one of pair one
+ * \param p1 Point one of pair two
+ * \param o2 Point two of pair one
+ * \param p2 Point two of pair two
+ * \param r The resulting point of intersection
+ * \return true if intersection was found, otherwise false
+ */
 bool LineCalc::intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f& r) const {
 
 	auto d1 = p1 - o1;
@@ -18,11 +27,25 @@ bool LineCalc::intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::
 	return true;
 }
 
+/** @overload
+ * \param border The border vector containing x/y coordinates for both borders
+ * \param line The line vector The line for which to check intersections with borders
+ * \param result The resulting point coordinates if they intersect
+ * \return true if intersection was found, otherwise false
+ */
 bool LineCalc::intersection(const cv::Vec4f& border, cv::Vec4f& line, cv::Point2f& result) const {
 	return intersection(cv::Point2f(border[0], border[1]), cv::Point2f(line[0], line[1]), cv::Point2f(border[2], border[3]), cv::Point2f(line[2], line[3]), result);
 }
 
-bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec4f& leftBorder, const cv::Vec4f& rightBorder, cv::Vec4f& output) const {
+/**
+ * \brief Computes the intersection points based on horizontal line and two borders
+ * \param horizontalLine The horizontal line
+ * \param leftBorder The left border
+ * \param rightBorder The right border
+ * \param output The resulting intersection points (if any)
+ * \return true if intersection points where computed, otherwise false
+ */
+bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec4f& leftBorder, const cv::Vec4f& rightBorder, cv::Vec4d& output) const {
 
 	cv::Point2f leftIntersection;
 	cv::Point2f rightIntersection;
@@ -52,7 +75,13 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec
 
 }
 
-void LineCalc::adjustMarkingRect(cv::Rect2d& markingRect, cv::Vec4f& intersectionPoints, double buffer) {
+/**
+ * \brief Adjust the marking rectangle based on the intersection points and specified buffer
+ * \param markingRect The rectangle to adjust
+ * \param intersectionPoints The intersection points
+ * \param buffer The buffer to apply
+ */
+void LineCalc::adjustMarkingRect(cv::Rect2d& markingRect, cv::Vec4d& intersectionPoints, double buffer) {
 
 	if (markingRect.x == 0)
 		CV_Error(cv::Error::BadROISize, "Marketing rectangle start position is zero.");		
@@ -64,10 +93,102 @@ void LineCalc::adjustMarkingRect(cv::Rect2d& markingRect, cv::Vec4f& intersectio
 
 }
 
-void LineCalc::adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoints, double buffer) {
+/**
+ * \brief Adjusts the baselines according to intersection points and specified buffer
+ * \param baseLines The baseline
+ * \param intersectionPoints The intersection points
+ * \param buffer The buffer
+ */
+void LineCalc::adjustBaseLines(cv::Vec4d& baseLines, cv::Vec4d& intersectionPoints, double buffer) {
 	
 	baseLines[0] = intersectionPoints[0] - buffer;
 	baseLines[2] = intersectionPoints[2] + buffer;
+
+}
+
+/**
+ * \brief Computes the intensity centroid for each X in the Y direction.
+ * This gives the weighted Y position based off the intensity levels across that single X column
+ * \param image The image to perform the computation on
+ * \param output The output vector of points
+ * \param upperLimit The upper limit of the rectangular cut out
+ * \param lowerLimit The lower limit of the rectangular cut out
+ * \param filename Filename for saving to text
+ * \param fileOffsetY The offset for the values in the textfile
+ * \return The avg of the computed Y value across the entirety of the image matrix with regards to cut offs
+ */
+double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, double upperLimit, double lowerLimit, std::string filename, double fileOffsetY) {
+
+	// generate vector with all X
+	if (!output.empty())
+		output.clear();
+
+	// grab sizes
+	auto cols = image.cols;
+	auto rows = image.rows;
+
+	// reserve enough space for the output point vector
+	output.reserve(cols * rows);
+
+	// temporary matrix
+	cv::Mat C;
+
+	// cut out rectangle without any X value set
+	cv::Rect2d cutOut(0.0, lowerLimit, 1.0, upperLimit);
+
+	for (auto i = 0; i < cols; i++) {
+
+		// create a new point in the list with only X value set
+		output.push_back(cv::Point2d(static_cast<double>(i), 0.0));
+
+		// adjust cutOut rectangle for current position
+		cutOut.x = static_cast<double>(i);
+
+		// create a new matrix based of the settings 
+		auto B = cv::Mat(image, cutOut);
+
+		// copy the rectanglular matrix to avoid cascade reference
+		B.copyTo(C);
+
+		// perform moments on the matrix without treating it as a binary image (which it is NOT)
+		auto m = cv::moments(C, false);
+
+		// compute x & y
+		//auto x = m.m10 / m.m00; // x is not used, so no need to calculate it
+		auto y = m.m01 / m.m00;
+
+		// only include values above 0.0 in y-pos
+		if (y > 0.0)
+			output.back().y = y;
+	}
+
+	// following is ONLY for text file output.
+
+	std::ofstream file(filename + ".intensitet.txt");
+	std::ofstream fileY(filename + ".intensitet_y.txt");
+	std::ofstream fileButt(filename + ".intensitet_y_korigeret.txt");
+
+	cv::Vec2d avg(0.0, 0.0);
+	for (auto& h : output) {
+		//out = to_string(h.y);
+		avg[0] += h.y;
+		avg[1] += rows - h.y;
+		file << h.x << ' ' << (h.y + fileOffsetY) << '\n';
+		fileY << h.y + fileOffsetY << '\n';
+		fileButt << rows - (h.y + fileOffsetY) << '\n';
+	}
+
+	avg[0] /= output.size();
+	avg[1] /= output.size();
+
+	fileY << "avg:" << avg[0] << '\n';
+	fileButt << "avg:" << avg[1] << '\n';
+
+	file.close();
+	fileY.close();
+	fileButt.close();
+
+	return avg[1];
 
 }
 
