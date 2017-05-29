@@ -443,7 +443,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		draw->removeWindow(windowName);
 
 	auto validRectangle = [output]()-> bool {
-		return output.width + output.height > 0.0;
+		return output.width > 0.0 && output.height > 0.0;
 	};
 
 	bool outputOk = validRectangle();
@@ -473,6 +473,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 	const std::string windowName = "test height";
 	draw->makeWindow(windowName);
 
+	auto imSize = markingFrames.front().size();
+
 	// local copy of real baseline
 	auto base = frames.front().rows - data->baseLines[1];
 
@@ -482,11 +484,18 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	auto running = true;
 
+	std::vector<cv::Point2d> results(imSize.width);
+	for (auto i = 0; i < imSize.width; i++)
+		results.at(i).x = i;
+
 	while (running) {
 
 		auto start = cv::getTickCount();
 
 		auto highestPixel = 0.0;
+
+		for (auto i = 0; i < imSize.width; i++)
+			results.at(i).y = 0.0;
 
 		for (auto i = frameCount_; i--;) {
 
@@ -509,12 +518,22 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			auto t = baseFrame(laserArea);
 			highestPixel += laserArea.y + LineCalc::computeRealIntensityLine(t, data->centerPoints, static_cast<double>(t.rows), 0.0, "_marking", static_cast<double>(laserArea.y));
 
+			for (auto& muffe : data->centerPoints)
+				results.at(muffe.x).y += muffe.y;
+
 			if (draw->isEscapePressed(30))
 				running = false;
 
 			if (!i && running && showWindows_)
 				cv::cvtColor(markingFrames.at(i), tmpOut, CV_GRAY2BGR);
 		}
+
+		for (auto& muffe : data->centerPoints)
+			results.at(muffe.x).y /= frameCount_;
+
+		// since theres some issues with using results vector, this works just as fine.
+		data->centerPoints.clear();
+		Util::copyVector(results, data->centerPoints);
 
 		auto highestPixelTotal = frames.front().rows - (highestPixel / static_cast<unsigned int>(frameCount_));
 		auto end = cv::getTickCount();
@@ -538,8 +557,11 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
-
 	}
+
+	// align the results!!! :-)
+	for (auto& p : data->centerPoints)
+		p.y = imageSize_.height - p.y;
 
 	draw->removeWindow(windowName);
 

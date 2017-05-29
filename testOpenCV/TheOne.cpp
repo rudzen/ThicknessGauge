@@ -94,6 +94,12 @@ int main(int argc, char** argv) {
 
 			c.computeMarkingHeight(globName);
 
+			auto data = c.getData();
+
+			cout << data->centerPoints << endl;
+
+
+
 			//auto result = c.findMarkingLinePairs_(globName);
 			//cout << result << endl;
 			//returnValue = result.first.x != 0;

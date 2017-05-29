@@ -68,6 +68,12 @@ public:
 	} Data;
 
 	std::unique_ptr<Data> data; // there can be only one!
+
+public: // data return point
+
+	Data* getData() const {
+		return data.get();
+	}
 	
 private:
 

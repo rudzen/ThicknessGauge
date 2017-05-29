@@ -216,13 +216,6 @@ public:
 
 	void show() const;
 
-	void alignLeftY(int frameCount) {
-		leftY_ /= frameCount;
-		cout << cv::format("Horizontal baseline Y aligned to : %i\n", leftY_);
-		line(output, cv::Point(0, cvRound(leftY_)), cv::Point(output.cols / 2, cvRound(leftY_)), cv::Scalar(0, 255, 0), 1, cv::LINE_AA);
-		imshow(windowName, output);
-	}
-
 	void setAngleLimit(double angleLimit) {
 		this->angleLimit_ = angleLimit;
 	}
@@ -321,6 +314,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 	show();
 
 	return;
+
 	// TODO : Re-make splitX to be "recursive" with splitting depth.
 
 	double centerRight[3] = { 0.0, 0.0, 0.0 };
