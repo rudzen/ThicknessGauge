@@ -101,24 +101,31 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		baselineFilter->setShowWindow(showWindows_);
 
 		// the marking rect determins where in the frame the marking is located.
-		cv::Rect2d markingRect = computerMarkingRectangle(canny, markingFilter, houghV);
+
+		data->markingRect = computerMarkingRectangle(canny, markingFilter, houghV);
+
+		cv::Rect2d markingRect = data->markingRect;
+
+		// check the resulting rectangle for weirdness
+		if (markingRect.x < 0.0 || markingRect.y < 0.0 || markingRect.width > imageSize_.width || markingRect.height > imageSize_.height || markingRect.area() >= imageSize_.area())
+			CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", markingRect.x, markingRect.y, markingRect.width, markingRect.height));
 
 		// make sure the minimum is at least 10 pixels.
 		auto minLineLen = computeHoughPMinLine<10>(markingRect);
 
-		// horizontal houghline class
+		// horizontal houghline extension class
 		auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, minLineLen, showWindows_);
 
-		// morph extension class for easy use
+		// morph extension class
 		auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
 
 		houghH->setMaxLineGab(12);
 		houghH->setMarkingRect(markingRect);
 
-		// the baselines, which are located outside the marking
-		cv::Vec4f baseLines;
+		computeBaseLineAreas(canny, baselineFilter, houghH, morph, data->baseLines);
 
-		computeBaseLineAreas(canny, baselineFilter, houghH, morph, baseLines);
+		// the baselines, which are located outside the marking
+		cv::Vec4f baseLines = data->baseLines;
 
 		std::cout << cv::format("Base line Y [left] : %f\n", baseLines[1]);
 		std::cout << cv::format("Base line Y [right]: %f\n", baseLines[2]);
@@ -165,7 +172,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 	}
 	catch (cv::Exception& e) {
-		cerr << cv::format("Exception caught in computeMarkingHeight().\n%s\n", e.msg);
+		cerr << cv::format("Exception caught in computeMarkingHeight().\n%s\n", e.msg.c_str());
 	}
 
 }
@@ -178,7 +185,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
  * \param morph The morphology class
  * \param output 4-sized float vector descriping the base line locations in x/y with index 0 + 1 = left side and 2 + 3 = right side
  */
-void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph, cv::Vec4f& output) {
+void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph, cv::Vec4d& output) {
 
 	cv::Mat lineHKernel = (cv::Mat_<char>(4, 1) <<
 		0 ,
@@ -290,7 +297,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		boundryRect.width -= 40;
 
 		auto t = org(boundryRect);
-		lineY = frames.front().rows - quarter + boundryRect.y + LineCalc::computeRealIntensityLine(t, tmp, static_cast<float>(t.rows), 0.0f, "_left_baseline", static_cast<float>(frames.front().rows) - quarter + boundryRect.y);
+		lineY = frames.front().rows - quarter + boundryRect.y + LineCalc::computeRealIntensityLine(t, tmp, static_cast<float>(t.rows), 0.0f, "_left_baseline", static_cast<float>(frames.front().rows - quarter + boundryRect.y));
 
 		if (!showWindows_)
 			running = false;
@@ -410,11 +417,6 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 
 	return cv::Rect2d(0.0, 0.0, 0.0, 0.0);
 
-	//if (output.width > 0.0f && output.height > 0.0f)
-
-	//CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", output.x, output.y, output.width, output.height));
-
-	//return cv::Rect2d(0.0, 0.0, 0.0, 0.0);
 }
 
 /**
@@ -654,16 +656,6 @@ bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pix
 	//is.SaveImage(image);
 
 	return true;
-}
-
-void ThicknessGauge::laplace(cv::Mat& image) const {
-	cv::Mat tmp;
-	Laplacian(image, tmp, settings.ddepth, settings.kernelSize); // , scale, delta, BORDER_DEFAULT);
-	convertScaleAbs(tmp, image);
-}
-
-void ThicknessGauge::sobel(cv::Mat& image) const {
-	Sobel(image, image, -1, 1, 1, settings.kernelSize, settings.scale, settings.delta, cv::BORDER_DEFAULT);
 }
 
 /**
