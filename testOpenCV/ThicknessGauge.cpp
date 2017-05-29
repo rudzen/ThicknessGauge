@@ -135,18 +135,21 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		houghH->setMaxLineGab(12);
 		houghH->setMarkingRect(data->markingRect);
 
+
 		endTime = cv::getTickCount();
 
 		frameTime_ += endTime - startTime;
 
 		computeBaseLineAreas(canny, baselineFilter, houghH, morph);
+		
+		// testing angles
+		LineCalc lineCalc;
 
 		//std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
 		//std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
 
 		startTime = cv::getTickCount();
 
-		LineCalc lineCalc;
 
 		// compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
 		lineCalc.computeIntersectionPoints(data->baseLines, houghV->getLeftBorder(), houghV->getRightBorder(), data->intersections);
@@ -160,6 +163,13 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 		// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
 		lineCalc.adjustBaseLines(data->baseLines, data->intersections, intersectionCutoff[0]);
+
+
+		cv::Point2d leftLine(data->markingRect.x, data->baseLines[1]);
+		cv::Point2d rightLine(leftLine.x + data->markingRect.width, data->baseLines[3]);
+
+		cout << "angle between baselines: " << lineCalc.angleBetweenLines(leftLine, rightLine) << endl;
+
 
 		//std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
 		//std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
@@ -882,7 +892,7 @@ bool ThicknessGauge::getSparseY(cv::Mat& image, vi& output) const {
 	findNonZero(image, pix);
 
 	// sort the list in X
-	sort(pix.begin(), pix.end(), miniCalc.sortX);
+	sort(pix.begin(), pix.end(), miniCalc->sortX);
 
 	auto x = pix.front().x;
 	auto y = 0;

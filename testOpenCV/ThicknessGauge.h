@@ -104,7 +104,7 @@ public:
 	cv::VideoCapture cap;
 	CalibrationSettings cs;
 
-	MiniCalc miniCalc;
+	std::unique_ptr<MiniCalc> miniCalc = std::make_unique<MiniCalc>();
 
 	void initVideoCapture();
 
