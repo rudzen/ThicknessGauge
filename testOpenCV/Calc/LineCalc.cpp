@@ -27,18 +27,22 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec
 	cv::Point2f leftIntersection;
 	cv::Point2f rightIntersection;
 
+	// align horizontal line
 	horizontalLine[0] = leftBorder[0];
 	horizontalLine[2] = rightBorder[2];
 
+	// check intersection for both sides
 	auto intersectsLeft = intersection(leftBorder, horizontalLine, leftIntersection);
 	auto intersectsRight = intersection(rightBorder, horizontalLine, rightIntersection);
 
+	// check if there are two intersections
 	if (!intersectsLeft & intersectsRight) {
 		Util::loge("Error in intersection detection.");
 		CV_Error(cv::Error::StsAssert, "Intersection points are invalid.");
 		return false;
 	}
 
+	// assign result to output vector
 	output[0] = leftIntersection.x;
 	output[1] = leftIntersection.y;
 	output[2] = rightIntersection.x;
@@ -47,8 +51,6 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec
 	return true;
 
 }
-
-#endif
 
 void LineCalc::adjustMarkingRect(cv::Rect2d& markingRect, cv::Vec4f& intersectionPoints, double buffer) {
 
@@ -68,3 +70,5 @@ void LineCalc::adjustBaseLines(cv::Vec4f& baseLines, cv::Vec4f& intersectionPoin
 	baseLines[2] = intersectionPoints[2] + buffer;
 
 }
+
+#endif
