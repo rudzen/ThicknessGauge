@@ -264,14 +264,14 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		auto leftBoundry = cv::minAreaRect(leftElements);
 		auto leftBoundryRect = leftBoundry.boundingRect2f();
 
+		leftBoundryRect.width -= 40.0f;
+
 		if (showWindows_) {
 			draw->drawRectangle(org, leftBoundryRect, cv::Scalar(255, 255, 255));
 			draw->showImage(leftWindow, org);
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
-
-		leftBoundryRect.width -= 40.0f;
 
 		auto t = org(leftBoundryRect);
 		leftY = frames.front().rows - quarter + leftBoundryRect.y + LineCalc::computeRealIntensityLine(t, data->leftPoints, static_cast<double>(t.rows), 0.0, "_left_baseline", static_cast<double>(frames.front().rows - quarter + leftBoundryRect.y));
@@ -297,14 +297,14 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		auto rightBoundry = cv::minAreaRect(rightElements);
 		auto rightBoundryRect = rightBoundry.boundingRect2f();
 
+		rightBoundryRect.width += 40.0f;
+
 		if (showWindows_) {
 			draw->drawRectangle(org, rightBoundryRect, cv::Scalar(255, 255, 255));
 			draw->showImage(rightWindow, org);
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
-
-		rightBoundryRect.width += 40.0f;
 
 		t = org(rightBoundryRect);
 		rightY = frames.front().rows - quarter + rightBoundryRect.y + LineCalc::computeRealIntensityLine(t, data->rightPoints, static_cast<double>(t.rows), 0.0, "_right_baseline", static_cast<double>(frames.front().rows - quarter + rightBoundryRect.y));
@@ -379,7 +379,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 
 	cv::Mat markingTest;
 
-	vector<cv::Rect2f> markingRects;
+	vector<cv::Rect2d> markingRects;
 
 	cv::Rect2d output(0.0, 0.0, 0.0, 0.0);
 
@@ -411,10 +411,10 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		}
 
 		// calculate the avg rect
-		output.x = 0.0f;
-		output.y = 0.0f;
-		output.width = 0.0f;
-		output.height = static_cast<float>(frames.front().rows);
+		output.x = 0.0;
+		output.y = 0.0;
+		output.width = 0.0;
+		output.height = static_cast<double>(frames.front().rows);
 		for (auto& r : markingRects) {
 			output.x += r.x;
 			output.y += r.y;
