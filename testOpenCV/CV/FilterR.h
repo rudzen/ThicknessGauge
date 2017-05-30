@@ -59,11 +59,6 @@ class FilterR : public BaseR<float> {
 	 */
 	int border_;
 
-	/**
-	 * \brief Show the result window
-	 */
-	bool showWindow_;
-
 	// only for UI
 
 	int deltaI_ = 0;
@@ -82,23 +77,24 @@ class FilterR : public BaseR<float> {
 
 public: // constructors
 
-	explicit FilterR(std::string windowName): delta_(0.0)
+	explicit FilterR(std::string windowName, bool showWindows): delta_(0.0)
 	         , ddepth_(-1)
-	         , border_(cv::BORDER_DEFAULT)
-	         , showWindow_(true) {
+	         , border_(cv::BORDER_DEFAULT) {
 		generateKernel(3, 3, 1.0f);
 		anchor_ = cv::Point(-1, -1);
-		this->windowName = windowName;
-		createWindow();
+		showWindows_ = showWindows;
+		if (showWindows) {
+			this->windowName = windowName;
+			createWindow();
+		}
 	}
 
 	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows, std::string windowName) : kernel_(kernel)
 	                                                                                                                                                        , anchor_(anchor)
 	                                                                                                                                                        , delta_(delta)
 	                                                                                                                                                        , ddepth_(ddepth)
-	                                                                                                                                                        , border_(border)
-	                                                                                                                                                        , showWindow_(showWindows)
-	{
+	                                                                                                                                                        , border_(border) {
+		showWindows_ = showWindows;
 		this->windowName = windowName;
 		if (showWindows) createWindow();
 	}
@@ -137,10 +133,6 @@ public: // getters & setters
 
 	void setBorder(int border) { border_ = border; }
 
-	bool getShowWindow() const { return showWindow_; }
-
-	void setShowWindow(bool showWindow) { showWindow_ = showWindow; }
-
 	// functions
 
 	void generateKernel(int width, int height, float modifier);
@@ -173,6 +165,6 @@ inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, dou
 
 inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border) {
 	filter2D(image_, result_, depth, kernel, anchor, delta, border);
-	if (getShowWindow())
+	if (showWindows_)
 		imshow(windowName, result_);
 }

@@ -43,6 +43,8 @@ protected:
 
 	std::string windowName;
 
+	bool showWindows_ = false;
+
 public:
 
 	void setOriginal(const cv::Mat& original) { original_ = original; }
@@ -57,5 +59,13 @@ public:
 
 	void setMarkingRect(const cv::Rect_<T>& markingRect) {
 		this->markingRect = markingRect;
+	}
+
+	bool isShowWindows() const {
+		return showWindows_;
+	}
+
+	void setShowWindows(bool showWindows) {
+		showWindows_ = showWindows;
 	}
 };

@@ -36,11 +36,12 @@ public:
 		linePair points;
 		std::vector<cv::Point2f> elements;
 
-		LineH() { }
+		LineH() {
+		}
 
 		LineH(cv::Vec4f entry, linePair points)
 			: entry(entry),
-			points(points) {
+			  points(points) {
 			elements.reserve(cvRound(Util::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
 		}
 
@@ -129,10 +130,10 @@ public:
 
 	HoughLinesPR(const int rho, const int theta, const int threshold, const int minLineLen, const bool showWindow)
 		: rho_(rho),
-		theta_(theta),
-		threshold_(threshold),
-		minLineLen_(minLineLen),
-		showWindow_(showWindow) {
+		  theta_(theta),
+		  threshold_(threshold),
+		  minLineLen_(minLineLen),
+		  showWindow_(showWindow) {
 		angle_ = degree * theta;
 		minTheta_ = 0.0;
 		maxTheta_ = CV_PI;
@@ -165,7 +166,7 @@ private:
 
 	double getAngle(int x1, int x2, int y1, int y2) const;
 
-	static bool splitLinesInX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double *leftCenter, double *rightCenter);
+	static bool splitLinesInX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double* leftCenter, double* rightCenter);
 
 	// callbacks
 
@@ -212,7 +213,7 @@ public:
 
 	void drawLine(float x1, float y1, float x2, float y2, cv::Scalar colour);
 
-	void drawLine(cv::Vec4f & line, cv::Scalar colour);
+	void drawLine(cv::Vec4f& line, cv::Scalar colour);
 
 	void show() const;
 
@@ -222,7 +223,8 @@ public:
 
 	void setOriginal(cv::Mat& newImage) {
 		original_ = newImage;
-		cvtColor(original_, output, CV_GRAY2BGR);
+		if (showWindows_)
+			cvtColor(original_, output, CV_GRAY2BGR);
 		lines.reserve(image_.cols * image_.rows);
 	}
 
@@ -244,7 +246,6 @@ public:
 };
 
 inline void HoughLinesPR::computeBorders() {
-
 
 
 }
@@ -308,17 +309,19 @@ inline void HoughLinesPR::doHorizontalHough() {
 
 	//drawLines(allLines, cv::Scalar(0, 0, 255));
 
-	drawLines(leftLines, cv::Scalar(255, 0, 255));
-	drawLines(rightLines, cv::Scalar(0, 255, 0));
+	if (showWindows_) {
+		drawLines(leftLines, cv::Scalar(255, 0, 255));
+		drawLines(rightLines, cv::Scalar(0, 255, 0));
+		show();
+	}
 
-	show();
 
 	return;
 
 	// TODO : Re-make splitX to be "recursive" with splitting depth.
 
-	double centerRight[3] = { 0.0, 0.0, 0.0 };
-	double centerLeft[3] = { 0.0, 0.0, 0.0 };
+	double centerRight[3] = {0.0, 0.0, 0.0};
+	double centerLeft[3] = {0.0, 0.0, 0.0};
 
 	std::vector<LineH> left[3];
 	std::vector<LineH> right[3];
@@ -411,7 +414,7 @@ inline void HoughLinesPR::doHorizontalHough() {
  * \brief Populates the lines information for main vector and populates left and right sides
  */
 inline void HoughLinesPR::bresenham() {
-	
+
 	if (allLines.empty())
 		return;
 
@@ -444,7 +447,8 @@ inline void HoughLinesPR::bresenham() {
 		leftLines.clear();
 		Util::loge("Warning, no right side lines were detected, left lines treated as right lines.");
 		onlyRight ^= true;
-	} else
+	}
+	else
 		onlyRight = lSize == 0;
 
 
@@ -452,7 +456,7 @@ inline void HoughLinesPR::bresenham() {
 	for (auto& rightLine : rightLines) {
 		cv::LineIterator it(image_, rightLine.points.first, rightLine.points.second, 8);
 		rightLine.elements.reserve(it.count);
-		for (auto i = 0; i < it.count; i++, ++it)
+		for (auto i = 0; i < it.count; i++ , ++it)
 			rightLine.elements.emplace_back(it.pos());
 	}
 
@@ -468,7 +472,7 @@ inline void HoughLinesPR::bresenham() {
 	for (auto& leftLine : leftLines) {
 		cv::LineIterator it(image_, leftLine.points.first, leftLine.points.second, 8);
 		leftLine.elements.reserve(it.count);
-		for (auto i = 0; i < it.count; i++, ++it)
+		for (auto i = 0; i < it.count; i++ , ++it)
 			leftLine.elements.emplace_back(it.pos());
 	}
 
@@ -494,21 +498,22 @@ inline double HoughLinesPR::getAngle(int x1, int x2, int y1, int y2) const {
 	return atan2(y1 - y2, x1 - x2);
 }
 
-inline bool HoughLinesPR::splitLinesInX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double *leftCenter, double *rightCenter) {
+inline bool HoughLinesPR::splitLinesInX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double* leftCenter, double* rightCenter) {
 
 	*leftCenter = 0.0;
 	*rightCenter = 0.0;
 
 	for (auto& line : source) {
 		//if (s[1] >= yMin && s[3] >= yMin) { // desværre, ellers bliver størrelserne og dermed pointers fucked up.
-			auto centerX = (line.entry[2] + line.entry[0]) * 0.5f;
-			if (centerX <= x) {
-				left.emplace_back(line);
-				*leftCenter += centerX;
-			} else {
-				right.emplace_back(line);
-				*rightCenter += centerX;
-			}
+		auto centerX = (line.entry[2] + line.entry[0]) * 0.5f;
+		if (centerX <= x) {
+			left.emplace_back(line);
+			*leftCenter += centerX;
+		}
+		else {
+			right.emplace_back(line);
+			*rightCenter += centerX;
+		}
 		//}
 	}
 

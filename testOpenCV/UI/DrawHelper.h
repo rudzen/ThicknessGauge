@@ -23,12 +23,12 @@ public:
 		cv::startWindowThread();
 	}
 
-	static void makeWindow(std::string name);
+	void makeWindow(std::string name);
 
-	static void removeWindow(std::string& name);
-	static void removeWindow(const std::string& name);
+	void removeWindow(std::string& name) const;
+	void removeWindow(const std::string& name) const;
 
-	static void removeAllWindows();
+	void removeAllWindows() const;
 
 	void showImage(std::string& windowName, cv::Mat& image) const;
 	void showImage(const std::string& name, cv::Mat& image) const;
@@ -82,7 +82,7 @@ public:
 		drawText(image, text, position, colour_);
 	}
 
-	static void drawText(cv::Mat* image, const std::string text, tg::TextDrawPosition position, cv::Scalar colour);
+	void drawText(cv::Mat* image, const std::string text, tg::TextDrawPosition position, cv::Scalar colour) const;
 
 	void drawRectangle(cv::Mat& image, cv::Rect2f& rectangle, cv::Scalar colour) const {
 		cv::rectangle(image, rectangle, colour, 1, CV_AA);

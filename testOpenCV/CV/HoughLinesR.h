@@ -129,15 +129,12 @@ private:
 
 	double angleLimit_;
 
-	bool showWindow_;
-
 public:
 
 	HoughLinesR(const int rho, const int theta, const int threshold, const bool showWindow)
 		: rho_(rho),
 		  theta_(theta),
-		  threshold(threshold),
-		  showWindow_(showWindow) {
+		  threshold(threshold) {
 		angle_ = CV_PI / 180 * theta;
 		srn_ = 0;
 		stn_ = 0;
@@ -145,6 +142,7 @@ public:
 		maxTheta_ = CV_PI;
 		angleLimit_ = 0;
 		windowName = "HoughLines";
+		showWindows_ = showWindow;
 		if (showWindow)
 			createWindow();
 	}
@@ -202,20 +200,14 @@ public:
 
 	void doVerticalHough();
 
-	void alignLeftY(int frameCount) {
-		leftY_ /= frameCount;
-		cout << cv::format("Horizontal baseline Y aligned to : %i\n", leftY_);
-		line(output_, cv::Point(0, cvRound(leftY_)), cv::Point(output_.cols / 2, cvRound(leftY_)), cv::Scalar(0, 255, 0), 1, cv::LINE_AA);
-		imshow(windowName, output_);
-	}
-
 	void setAngleLimit(double angleLimit) {
 		this->angleLimit_ = angleLimit;
 	}
 
 	void setOriginal(cv::Mat& original) {
 		original_ = original;
-		cvtColor(original_, output_, CV_GRAY2BGR);
+		if (showWindows_)
+			cvtColor(original_, output_, CV_GRAY2BGR);
 	}
 
 	const vector<cv::Vec2f>& getLines() const {
@@ -298,7 +290,7 @@ inline void HoughLinesR::computeBorders() {
 	rightBorder_[2] = rightRoi.x + rightRoi.width;
 	rightBorder_[3] = imgHeight;
 
-	if (showWindow_) {
+	if (showWindows_) {
 		drawLine(leftBorder_);
 		drawLine(rightBorder_);
 		//drawLines(leftLines_, cv::Scalar(0, 255, 0));
@@ -428,7 +420,7 @@ inline linePair HoughLinesR::computePointPair2(cv::Vec2f& line) const {
 }
 
 inline void HoughLinesR::drawLines(vector<LineV>& linePairs, cv::Scalar colour) {
-	if (!showWindow_)
+	if (!showWindows_)
 		return;
 
 	if (linePairs.empty())
@@ -447,7 +439,7 @@ inline void HoughLinesR::drawLine(cv::Vec4f& line) {
 }
 
 inline void HoughLinesR::showOutput() const {
-	if (!showWindow_)
+	if (!showWindows_)
 		return;
 
 	imshow(windowName, output_);

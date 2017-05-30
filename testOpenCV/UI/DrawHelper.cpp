@@ -2,20 +2,28 @@
 #include <opencv2/highgui/highgui.hpp>
 
 void DrawHelper::makeWindow(std::string name) {
+	if (!showWindows_)
+		return;
 	cv::namedWindow(name, cv::WINDOW_FREERATIO | cv::WINDOW_GUI_EXPANDED);
 }
 
-void DrawHelper::removeWindow(std::string& name) {
+void DrawHelper::removeWindow(std::string& name) const {
+	if (!showWindows_)
+		return;
 	cv::destroyWindow(name);
 	cv::waitKey(1);
 }
 
-void DrawHelper::removeWindow(const std::string& name) {
+void DrawHelper::removeWindow(const std::string& name) const {
+	if (!showWindows_)
+		return;
 	cv::destroyWindow(name);
 	cv::waitKey(1);
 }
 
-void DrawHelper::removeAllWindows() {
+void DrawHelper::removeAllWindows() const {
+	if (!showWindows_)
+		return;
 	cv::destroyAllWindows();
 }
 
@@ -31,7 +39,9 @@ void DrawHelper::showImage(const std::string& name, cv::Mat& image) const {
 	cv::imshow(name, image);
 }
 
-void DrawHelper::drawText(cv::Mat* image, const std::string text, tg::TextDrawPosition position, cv::Scalar colour) {
+void DrawHelper::drawText(cv::Mat* image, const std::string text, tg::TextDrawPosition position, cv::Scalar colour) const {
+	if (!showWindows_)
+		return;
 	cv::Point pos;
 	switch (position) {
 	case tg::TextDrawPosition::UpperLeft:
