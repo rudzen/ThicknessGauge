@@ -19,9 +19,9 @@ void HoughLinesR::computeMeta() {
 	for (auto& a : allLines_) {
 		a.slobe = (a.entry[3] - a.entry[1]) / (a.entry[2] - a.entry[0]);
 		if (a.points.first.x < center)
-			leftLines_.push_back(a);
+			leftLines_.emplace_back(a);
 		else
-			rightLines_.push_back(a);
+			rightLines_.emplace_back(a);
 	}
 
 	auto lSize = leftLines_.size();
@@ -40,7 +40,7 @@ void HoughLinesR::computeMeta() {
 		cv::LineIterator it(image_, left.points.first, left.points.second, 8);
 		left.elements.reserve(it.count);
 		for (auto i = 0; i < it.count; i++ , ++it)
-			left.elements.push_back(it.pos());
+			left.elements.emplace_back(it.pos());
 	}
 
 	if (lSize > 1)
@@ -50,7 +50,7 @@ void HoughLinesR::computeMeta() {
 		cv::LineIterator it(image_, right.points.first, right.points.second, 8);
 		right.elements.reserve(it.count);
 		for (auto i = 0; i < it.count; i++ , ++it)
-			right.elements.push_back(it.pos());
+			right.elements.emplace_back(it.pos());
 	}
 
 	if (rSize > 1)

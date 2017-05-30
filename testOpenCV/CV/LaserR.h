@@ -55,7 +55,7 @@ class LaserR : public BaseR<float> {
 			os << " y: " << obj.y;
 			os << " cut:" << obj.cut;
 			os << "\nv: (" << obj.i.size() << ") {\n";
-			for (auto i = 0; i < obj.i.size(); i++) os << i << ' ' << obj.i.at(i) << '\n';
+			for (auto i = 0; i < obj.i.size(); i++) os << i << ' ' << obj.i[i] << '\n';
 			os << '}';
 			return os;
 		}
@@ -109,10 +109,10 @@ inline void LaserR::configureXLine(vector<cv::Point2i>& nonZeroes, vector<v3<flo
 	lines_.reserve(image_.cols);
 
 	// populate xLine vector
-	for (auto i = 0; i < image_.cols; i++) lines_.push_back(xLine(i));
+	for (auto i = 0; i < image_.cols; i++) lines_.emplace_back(xLine(i));
 
 	// copy the values from nonZero vector
-	for (auto& nz : nonZeroes) lines_[nz.x].i.push_back(image_.at<unsigned char>(nz));
+	for (auto& nz : nonZeroes) lines_[nz.x].i.emplace_back(image_.at<unsigned char>(nz));
 
 	auto ok = computeXLine();
 
@@ -121,7 +121,7 @@ inline void LaserR::configureXLine(vector<cv::Point2i>& nonZeroes, vector<v3<flo
 		return;
 	}
 
-	for (auto& line : lines_) output.push_back(v3<float>(static_cast<float>(line.x), line.y, static_cast<float>(line.i.size())));
+	for (auto& line : lines_) output.emplace_back(v3<float>(static_cast<float>(line.x), line.y, static_cast<float>(line.i.size())));
 
 }
 

@@ -331,7 +331,7 @@ inline std::vector<HistoPeak::PeakInfo> HistoPeak::findPeaks(cv::InputArray _src
 
 			auto peak_info = peakInfo(max_pos, up_hill.size(), down_hill.size(), src2.at<float>(max_pos));
 
-			output.push_back(peak_info);
+			output.emplace_back(peak_info);
 		}
 		i++;
 		pre_state = static_cast<int>(cur_state);
@@ -384,7 +384,7 @@ inline std::vector<HistoPeak::PeakInfo> HistoPeak::findDales(cv::InputArray _src
 
 			auto peak_info = peakInfo(max_pos, up_hill.size(), down_hill.size(), src2.at<float>(max_pos));
 
-			output.push_back(peak_info);
+			output.emplace_back(peak_info);
 		}
 		i++;
 		pre_state = static_cast<int>(cur_state);
@@ -406,7 +406,7 @@ inline std::vector<int> HistoPeak::getLocalMaximum(cv::InputArray _src, int smoo
 
 	for (auto& p : peaks) {
 		if (p.value > max_val * peak_per && p.leftSize >= 2 && p.rightSize >= 2)
-			output.push_back(p.pos); // could be pos
+			output.emplace_back(p.pos); // could be pos
 	}
 
 	auto histImg = drawHistogram(src);
@@ -428,7 +428,7 @@ inline std::vector<int> HistoPeak::getLocalMinimum(cv::InputArray _src, int smoo
 
 	for (auto& d : dales) {
 		if (d.value > max_val * dalePer && d.leftSize >= 2 && d.rightSize >= 2)
-			output.push_back(d.pos);
+			output.emplace_back(d.pos);
 	}
 
 	auto histImg = drawHistogram(src);

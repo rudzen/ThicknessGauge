@@ -75,7 +75,7 @@ bool SparseR<T>::generateSparse() {
 	for (auto& p : allTotal_) {
 		if (p.x != x) {
 			if (count > 0) {
-				allSparse_.push_back(cv::Point(x, image_.rows - y));
+				allSparse_.emplace_back(cv::Point(x, image_.rows - y));
 				count = 0;
 			}
 			highest = 0;

@@ -31,11 +31,11 @@ public:
 	}
 
 	const cv::Rect2d& getRectangle(Side side) const {
-		return rectangles_.at(side);
+		return rectangles_[side];
 	}
 
 	void setRectangle(Side side, cv::Rect2d rectangle) {
-		rectangles_.at(side) = rectangle;
+		rectangles_[side] = rectangle;
 	}
 
 	cv::Size getTotalSize() const {

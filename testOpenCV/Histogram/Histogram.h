@@ -122,7 +122,7 @@ inline void Histogram::populateHistogram(cv::Mat& image) {
 	for (auto i = 0; i < count; ++i) {
 		auto val = cvRound(hist_.at<float>(1, i));
 		//if (val > 0)
-			dale_.push_back(v2<int>(i, val));
+			dale_.emplace_back(v2<int>(i, val));
 	}
 
 	// attempt to seperate highest peak with line

@@ -350,7 +350,7 @@ inline void HoughLinesR::doVerticalHough() {
 		if (theta <= degree * (180 - angleLimit_) && theta >= degree * angleLimit_)
 			continue;
 		auto p = computePointPair(line);
-		allLines_.push_back(LineV(line, p));
+		allLines_.emplace_back(LineV(line, p));
 		//std::cout << "vert : " << p.first << " " << p.second << endl;
 	}
 

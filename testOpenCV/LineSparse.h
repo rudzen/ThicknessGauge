@@ -34,18 +34,18 @@ private:
 		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
 	} searchX;
 
-	const map<Location, int> locationBaseMap = { { Location::baseOne , 0 }, { Location::baseTwo, 1 } };
-	const map<Location, int> locationHeigthMap = { { Location::heigthOne , 0 }, { Location::heigthTwo, 1 } };
+	const std::map<Location, int> locationBaseMap = { { Location::baseOne , 0 }, { Location::baseTwo, 1 } };
+	const std::map<Location, int> locationHeigthMap = { { Location::heigthOne , 0 }, { Location::heigthTwo, 1 } };
 
-	map<int, int> intensity_;
+	std::map<int, int> intensity_;
 
 
 public:
-	const map<int, int>& intensity() const {
+	const std::map<int, int>& intensity() const {
 		return intensity_;
 	}
 
-	void intensity(const map<int, int>& intensity) {
+	void intensity(const std::map<int, int>& intensity) {
 		intensity_ = intensity;
 	}
 
@@ -68,45 +68,45 @@ private:
 	/**
 	 * \brief All the complete work from the class. Diffirentiated Y values + differentiated intensity values.
 	 */
-	vector<cv::Point2i> allComplete_;
+	std::vector<cv::Point2i> allComplete_;
 
 	/**
 	* \brief All the sparse elements
 	*/
-	vector<cv::Point2i> allSparse_;
+	std::vector<cv::Point2i> allSparse_;
 
 	/**
 	* \brief All the raw pixel locations from frame
 	*/
-	vector<cv::Point2i> allTotal_;
+	std::vector<cv::Point2i> allTotal_;
 
 	/**
 	 * \brief All the sparse elements differentiated
 	 */
-	vector<cv::Point2i> allDifferentiated_;
+	std::vector<cv::Point2i> allDifferentiated_;
 
 	// temporary bastard
-	vector<cv::Point2i> tmp;
+	std::vector<cv::Point2i> tmp;
 
 	/**
 	* \brief Left side of the elements
 	*/
-	vector<cv::Point2i> leftOne_;
+	std::vector<cv::Point2i> leftOne_;
 
 	/**
 	* \brief Left side #2 of the elements
 	*/
-	vector<cv::Point2i> leftTwo_;
+	std::vector<cv::Point2i> leftTwo_;
 
 	/**
 	* \brief Right side #1 of the elements
 	*/
-	vector<cv::Point2i> rightOne_;
+	std::vector<cv::Point2i> rightOne_;
 
 	/**
 	* \brief Right side #2 of the elements
 	*/
-	vector<cv::Point2i> rightTwo_;
+	std::vector<cv::Point2i> rightTwo_;
 
 	/**
 	* \brief The calculated baseline for all 3 sides
@@ -122,7 +122,7 @@ public:
 	 * \param input The vector to be differentiated
 	 * \param output The results
 	 */
-	static void differentiateY(vector<cv::Point2i>& input, vector<cv::Point2i>& output);
+	static void differentiateY(std::vector<cv::Point2i>& input, std::vector<cv::Point2i>& output);
 
 
 	/**
@@ -131,7 +131,7 @@ public:
 	void differentiateY();
 
 
-	void saveAllData(string& filePrefix);
+	void saveAllData(std::string& filePrefix);
 
 	/**
 	 * \brief Differentiates the intensity levels in X direction
@@ -152,7 +152,7 @@ public:
 	 * \param target The target vector with sourceOne and sourceTwo data
 	 * \param sortX Sorting method to be used when combining is done
 	 */
-	void combine(vector<cv::Point2d>& sourceOne, vector<cv::Point2d>& sourceTwo, vector<cv::Point2d> target, SortMethod sortX) const;
+	void combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sortX) const;
 
 	/**
 	 * \brief Get the pixel intensity of a location from the current frame
@@ -232,7 +232,7 @@ public: // getters and setter + minor functions
 
 };
 
-inline void Line::differentiateY(vector<cv::Point2i>& input, vector<cv::Point2i>& output) {
+inline void Line::differentiateY(std::vector<cv::Point2i>& input, std::vector<cv::Point2i>& output) {
 
 	output.clear();
 
@@ -242,14 +242,14 @@ inline void Line::differentiateY(vector<cv::Point2i>& input, vector<cv::Point2i>
 	auto size = input.size();
 
 	if (size == 1) {
-		output.push_back(cv::Point(input.front().x, -input.front().y));
+		output.emplace_back(cv::Point(input.front().x, -input.front().y));
 		return;
 	}
 
 	output.reserve(input.size() - 1);
 
 	for (auto i = 1; i < size; ++i)
-		output.push_back(cv::Point(input[i].x, input[i].y - input[i - 1].y));
+		output.emplace_back(cv::Point(input[i].x, input[i].y - input[i - 1].y));
 }
 
 inline void Line::differentiateY() {
@@ -257,25 +257,25 @@ inline void Line::differentiateY() {
 	auto size = allSparse_.size();
 
 	if (size == 1) {
-		allDifferentiated_.push_back(cv::Point(allSparse_.front().x, -allSparse_.front().y));
+		allDifferentiated_.emplace_back(cv::Point(allSparse_.front().x, -allSparse_.front().y));
 		return;
 	}
 
 	tmp.reserve(allSparse_.size() - 1);
 
 	for (auto i = 1; i < size; ++i)
-		tmp.push_back(cv::Point(allSparse_[i].x, allSparse_[i].y - allSparse_[i - 1].y));
+		tmp.emplace_back(cv::Point(allSparse_[i].x, allSparse_[i].y - allSparse_[i - 1].y));
 
 	differentiateY(tmp, allDifferentiated_);
 }
 
-inline void Line::saveAllData(string& filePrefix) {
-	ofstream all(filePrefix + "_d_0_all.txt");
-	ofstream sparse(filePrefix + "_d_1_sparse.txt");
-	ofstream inten(filePrefix + "_d_2_intensity.txt");
-	ofstream diff1(filePrefix + "_d_3_diff1.txt");
-	ofstream diff2(filePrefix + "_d_4_diff2.txt");
-	ofstream full(filePrefix + "_d_5_full.txt");
+inline void Line::saveAllData(std::string& filePrefix) {
+	std::ofstream all(filePrefix + "_d_0_all.txt");
+	std::ofstream sparse(filePrefix + "_d_1_sparse.txt");
+	std::ofstream inten(filePrefix + "_d_2_intensity.txt");
+	std::ofstream diff1(filePrefix + "_d_3_diff1.txt");
+	std::ofstream diff2(filePrefix + "_d_4_diff2.txt");
+	std::ofstream full(filePrefix + "_d_5_full.txt");
 
 	for (auto& p : allTotal_)
 		all << p << '\n';
@@ -339,15 +339,15 @@ inline void Line::mergeIntensity() {
 
 	for (auto& incent : allDifferentiated_) {
 		if (intensity_.count(incent.x))
-			allComplete_.push_back(cv::Point(incent.x, intensity_[incent.x] + incent.y));
+			allComplete_.emplace_back(cv::Point(incent.x, intensity_[incent.x] + incent.y));
 		else
-			allComplete_.push_back(incent);
+			allComplete_.emplace_back(incent);
 	}
 
 	std::sort(allComplete_.begin(), allComplete_.end(), sortX);
 }
 
-inline void Line::combine(vector<cv::Point2d>& sourceOne, vector<cv::Point2d>& sourceTwo, vector<cv::Point2d> target, SortMethod sort) const {
+inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sort) const {
 	target.reserve(sourceOne.size() + sourceTwo.size());
 	target.insert(target.begin(), sourceOne.begin(), sourceOne.end());
 	target.insert(target.end(), sourceTwo.begin(), sourceTwo.end());
@@ -403,7 +403,7 @@ inline bool Line::generateSparse() {
 	for (auto& p : allTotal_) {
 		if (p.x != x) {
 			if (count > 0) {
-				allSparse_.push_back(cv::Point(x, frame_.rows - y));
+				allSparse_.emplace_back(cv::Point(x, frame_.rows - y));
 				count = 0;
 			}
 			highest = 0;
@@ -437,13 +437,13 @@ inline void Line::split(double leftOne, double leftTwo, double rightOne, double 
 
 	for (auto& p : allSparse_) {
 		if (p.x < leftOne)
-			leftOne_.push_back(p);
+			leftOne_.emplace_back(p);
 		else if (p.x < leftTwo)
-			leftTwo_.push_back(p);
+			leftTwo_.emplace_back(p);
 		else if (p.x < rightOne)
-			rightOne_.push_back(p);
+			rightOne_.emplace_back(p);
 		else
-			rightTwo_.push_back(p);
+			rightTwo_.emplace_back(p);
 	}
 }
 

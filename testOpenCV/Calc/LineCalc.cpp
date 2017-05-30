@@ -138,11 +138,13 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 
 	for (auto i = 0; i < cols; i++) {
 
+		auto x = static_cast<double>(static_cast<signed int>(i));
+
 		// create a new point in the list with only X value set
-		output.push_back(cv::Point2d(static_cast<double>(i), 0.0));
+		output.emplace_back(cv::Point2d(x, 0.0));
 
 		// adjust cutOut rectangle for current position
-		cutOut.x = static_cast<double>(i);
+		cutOut.x = x;
 
 		// create a new matrix based of the settings 
 		auto B = cv::Mat(image, cutOut);
@@ -162,31 +164,25 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 			output.back().y = y;
 	}
 
-	// following is ONLY for text file output.
-
-	std::ofstream file(filename + ".intensitet.txt");
-	std::ofstream fileY(filename + ".intensitet_y.txt");
-	std::ofstream fileButt(filename + ".intensitet_y_korigeret.txt");
-
 	cv::Vec2d avg(0.0, 0.0);
 	for (auto& h : output) {
-		//out = to_string(h.y);
+	//	//out = to_string(h.y);
 		avg[0] += h.y;
 		avg[1] += rows - h.y;
-		file << h.x << ' ' << (h.y + fileOffsetY) << '\n';
-		fileY << h.y + fileOffsetY << '\n';
-		fileButt << rows - (h.y + fileOffsetY) << '\n';
+	//	file << h.x << ' ' << (h.y + fileOffsetY) << '\n';
+	//	fileY << h.y + fileOffsetY << '\n';
+	//	fileButt << rows - (h.y + fileOffsetY) << '\n';
 	}
 
 	avg[0] /= output.size();
 	avg[1] /= output.size();
 
-	fileY << "avg:" << avg[0] << '\n';
-	fileButt << "avg:" << avg[1] << '\n';
+	//fileY << "avg:" << avg[0] << '\n';
+	//fileButt << "avg:" << avg[1] << '\n';
 
-	file.close();
-	fileY.close();
-	fileButt.close();
+	//file.close();
+	//fileY.close();
+	//fileButt.close();
 
 	return avg[1];
 

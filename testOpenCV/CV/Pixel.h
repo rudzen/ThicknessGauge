@@ -161,7 +161,7 @@ public:
 				continue;
 			if (p.x > x)
 				break;
-			elements.push_back(p);
+			elements.emplace_back(p);
 		}
 
 		auto highestIntensity = 0;

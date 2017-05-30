@@ -160,7 +160,7 @@ public:
 			return false;
 		auto file_node_iterator = node.begin(), it_end = node.end();
 		for (; file_node_iterator != it_end; ++file_node_iterator)
-			l.push_back(static_cast<string>(*file_node_iterator));
+			l.emplace_back(static_cast<string>(*file_node_iterator));
 		return true;
 	}
 
@@ -358,13 +358,13 @@ public:
 		case Pattern::CIRCLES_GRID:
 			for (auto i = 0; i < boardSize.height; ++i)
 				for (auto j = 0; j < boardSize.width; ++j)
-					corners.push_back(cv::Point3f(float(j * squareSize), float(i * squareSize), 0));
+					corners.emplace_back(cv::Point3f(float(j * squareSize), float(i * squareSize), 0));
 			break;
 
 		case Pattern::ASYMMETRIC_CIRCLES_GRID:
 			for (auto i = 0; i < boardSize.height; i++)
 				for (auto j = 0; j < boardSize.width; j++)
-					corners.push_back(cv::Point3f(float((2 * j + i % 2) * squareSize), float(i * squareSize), 0));
+					corners.emplace_back(cv::Point3f(float((2 * j + i % 2) * squareSize), float(i * squareSize), 0));
 			break;
 		default:
 			break;
@@ -473,7 +473,7 @@ public:
 
 				// For camera only take new samples after delay time
 				if (mode == Mode::CAPTURING && (!s.inputCapture.isOpened() || clock() - prevTimestamp > s.delay * 1e-3 * CLOCKS_PER_SEC)) {
-					imagePoints.push_back(pointBuf);
+					imagePoints.emplace_back(pointBuf);
 					prevTimestamp = clock();
 					blinkOutput = s.inputCapture.isOpened();
 				}

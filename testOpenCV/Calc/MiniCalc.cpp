@@ -87,7 +87,7 @@ cv::Point MiniCalc::percentileX(double percentage, vector<cv::Point>& pixels) co
 	auto index = percentage * pixels.size();
 	auto pixSorted(pixels);
 	sort(pixSorted.begin(), pixSorted.end(), sortX);
-	return pixSorted.at(static_cast<int>(index));
+	return pixSorted[static_cast<int>(index)];
 }
 
 cv::Point MiniCalc::percentileY(double percentage, vector<cv::Point>& pixels) const {
@@ -96,7 +96,7 @@ cv::Point MiniCalc::percentileY(double percentage, vector<cv::Point>& pixels) co
 	auto index = percentage * pixels.size();
 	auto pixSorted(pixels);
 	sort(pixSorted.begin(), pixSorted.end(), sortY);
-	return pixSorted.at(static_cast<int>(index));
+	return pixSorted[static_cast<int>(index)];
 }
 
 cv::Point2d MiniCalc::variance(vector<cv::Point>& pixels) const {
@@ -184,7 +184,7 @@ int MiniCalc::highestPixelInLine(cv::Mat& image) const {
 	cv::Rect highestRect(0, 0, 0, 0);
 
 	for (auto i = 0; i < contours.size(); ++i) {
-		auto r = boundingRect(contours.at(i));
+		auto r = boundingRect(contours[i]);
 		if (/* halfImageY < r.y && */ r.y > highestRect.y) {
 			highestRect = r;
 		}
@@ -224,7 +224,7 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 	gradientPixels.clear();
 	gradientPixels.reserve(input.cols);
 	for (auto x = input.cols; x--;)
-		gradientPixels.push_back(cv::Point2d(0.0, 0.0));
+		gradientPixels.emplace_back(cv::Point2d(0.0, 0.0));
 
 	pixels.clear();
 	pixels.reserve(input.cols);
@@ -244,10 +244,10 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 	for (auto& p : pix) {
 		if (p.x != x) {
 			if (count > 0) {
-				pixels.push_back(cv::Point(x, static_cast<int>(cvRound(ySum / static_cast<double>(count)))));
+				pixels.emplace_back(cv::Point(x, static_cast<int>(cvRound(ySum / static_cast<double>(count)))));
 				auto gradient = static_cast<unsigned char>(cvRound(gradientSum / count));
 				output.at<unsigned char>(pixels.back()) = gradient;
-				gradientPixels.at(x).y = gradient;
+				gradientPixels[x].y = gradient;
 				count = 0;
 			}
 			ySum = 0;
@@ -286,10 +286,10 @@ bool MiniCalc::computeDiags(cv::Mat& image, vector<cv::Mat>& diags) {
 
 	// grab the positive diags
 	for (auto i = 1; i < image.rows; ++i)
-		diags.push_back(image.diag(i));
+		diags.emplace_back(image.diag(i));
 
 	for (auto i = image.rows; i >= 0; --i)
-		diags.push_back(image.diag(i));
+		diags.emplace_back(image.diag(i));
 
 	return diags.empty() ^ true;
 }
@@ -307,7 +307,7 @@ bool MiniCalc::computeDiagAvg(vector<cv::Mat>& diagonals, vd& output) {
 			for (auto i = 0; i < d.cols; i++)
 				sum += input[d.step * j + i];
 			if (sum > 0.0) {
-				output.push_back(cv::Point2d(j, sum / d.cols));
+				output.emplace_back(cv::Point2d(j, sum / d.cols));
 				//cout << "sum : " << sum << endl;
 			}
 		}

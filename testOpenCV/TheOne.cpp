@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include "ThicknessGauge.h"
@@ -29,7 +30,7 @@ using namespace TCLAP;
  */
 
 #define _USE_MATH_DEFINES
-#define _CRT_SECURE_NO_WARNINGS
+
 
 #define RUDZ_DEBUG
 
@@ -169,22 +170,22 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
 		// add basic switches
 		SwitchArg demoSwitch("d", "demo", "runs regular demo", true, new DemoModeVisitor());
-		xors.push_back(&demoSwitch);
+		xors.emplace_back(&demoSwitch);
 		//cmd.add(demoSwitch);
 
 		SwitchArg calibrationSwitch("c", "calibrate", "perform camera calibration", false, new CalibrationModeVisitor());
-		xors.push_back(&calibrationSwitch);
+		xors.emplace_back(&calibrationSwitch);
 		//cmd.add(calibrationSwitch);
 
 		SwitchArg buildInfoSwitch("i", "info", "show software information", false, new BuildInfoVisitor());
-		xors.push_back(&buildInfoSwitch);
+		xors.emplace_back(&buildInfoSwitch);
 		//cmd.add(buildInfoSwitch);
 
 		SwitchArg testSwitch("t", "test", "Perform test", false, new TestModeVisitor());
-		xors.push_back(&testSwitch);
+		xors.emplace_back(&testSwitch);
 
 		SwitchArg globSwitch("g", "save_glob", "Save -f frames as glob", false, new GlobModeVisitor());
-		xors.push_back(&globSwitch);
+		xors.emplace_back(&globSwitch);
 
 		cmd.xorAdd(xors);
 

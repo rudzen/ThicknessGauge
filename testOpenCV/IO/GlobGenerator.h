@@ -42,7 +42,7 @@ public:
 	void generateGlob() {
 		cv::glob(pattern_, files_, recursive_);
 		for (auto& f : files_)
-			images_.push_back(cv::imread(f, type_));
+			images_.emplace_back(cv::imread(f, type_));
 	}
 
 	void clear() {

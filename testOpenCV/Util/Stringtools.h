@@ -153,7 +153,7 @@ namespace utils {
 			istringstream f(str);
 			string s;
 			while (getline(f, s, ':'))
-				elems.push_back(parse<T>(s));
+				elems.emplace_back(parse<T>(s));
 
 			return elems;
 		}
@@ -247,7 +247,7 @@ namespace utils {
 
 			string item;
 			while (getline(ss, item, delim))
-				elems.push_back(item);
+				elems.emplace_back(item);
 
 			return elems;
 		}

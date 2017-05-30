@@ -302,7 +302,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 
 	// insert lines into data structure.
 	for (auto& line : lines)
-		allLines.push_back(LineH(line, computePointPair(line)));
+		allLines.emplace_back(LineH(line, computePointPair(line)));
 
 	bresenham();
 
@@ -425,9 +425,9 @@ inline void HoughLinesPR::bresenham() {
 
 	for (auto& line : allLines) {
 		if (line.entry[0] + ((line.entry[2] - line.entry[0]) / 2) < center_)
-			leftLines.push_back(line);
+			leftLines.emplace_back(line);
 		else
-			rightLines.push_back(line);
+			rightLines.emplace_back(line);
 	}
 
 	auto lSize = leftLines.size();
@@ -453,7 +453,7 @@ inline void HoughLinesPR::bresenham() {
 		cv::LineIterator it(image_, rightLine.points.first, rightLine.points.second, 8);
 		rightLine.elements.reserve(it.count);
 		for (auto i = 0; i < it.count; i++, ++it)
-			rightLine.elements.push_back(it.pos());
+			rightLine.elements.emplace_back(it.pos());
 	}
 
 	// sort if needed
@@ -469,7 +469,7 @@ inline void HoughLinesPR::bresenham() {
 		cv::LineIterator it(image_, leftLine.points.first, leftLine.points.second, 8);
 		leftLine.elements.reserve(it.count);
 		for (auto i = 0; i < it.count; i++, ++it)
-			leftLine.elements.push_back(it.pos());
+			leftLine.elements.emplace_back(it.pos());
 	}
 
 	// sort if needed
@@ -503,10 +503,10 @@ inline bool HoughLinesPR::splitLinesInX(vector<LineH>& source, vector<LineH>& ri
 		//if (s[1] >= yMin && s[3] >= yMin) { // desværre, ellers bliver størrelserne og dermed pointers fucked up.
 			auto centerX = (line.entry[2] + line.entry[0]) * 0.5f;
 			if (centerX <= x) {
-				left.push_back(line);
+				left.emplace_back(line);
 				*leftCenter += centerX;
 			} else {
-				right.push_back(line);
+				right.emplace_back(line);
 				*rightCenter += centerX;
 			}
 		//}

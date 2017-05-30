@@ -233,7 +233,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	draw->makeWindow(rightWindow);
 
 	auto quarter = static_cast<double>(frames.front().rows) / 4;
-	auto baseLineY = frames[0].rows - quarter;
+	auto baseLineY = imageSize_.height - quarter;
 
 	auto markingRect = hough->getMarkingRect();
 
@@ -246,7 +246,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	cv::Rect2d rightBaseLine;
 	rightBaseLine.x = leftBaseLine.width + markingRect.width;
 	rightBaseLine.y = leftBaseLine.y;
-	rightBaseLine.width = frames.front().cols - rightBaseLine.x;
+	rightBaseLine.width = imageSize_.width - rightBaseLine.x;
 	rightBaseLine.height = leftBaseLine.height;
 
 	// cannot be resized
@@ -255,8 +255,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	// generate baseline images..
 	for (auto i = frameCount_; i--;) {
-		left.push_back(frames[i](leftBaseLine));
-		right.push_back(frames[i](rightBaseLine));
+		left.emplace_back(frames[i](leftBaseLine));
+		right.emplace_back(frames[i](rightBaseLine));
 	}
 
 	auto leftSize = left.front().size();
@@ -265,8 +265,10 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	auto leftY = 0.0;
 	auto rightY = 0.0;
 
-	std::vector<cv::Point2f> leftElements(leftSize.width * leftSize.height);
-	std::vector<cv::Point2f> rightElements(rightSize.width * rightSize.width);
+	std::vector<cv::Point2f> leftElements(leftSize.area());
+	std::vector<cv::Point2f> rightElements(rightSize.area());
+
+	auto offset = imageSize_.height - quarter;
 
 	auto endTime = cv::getTickCount();
 
@@ -313,8 +315,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		}
 
 		auto t = org(leftBoundryRect);
-		leftY = frames.front().rows - quarter + leftBoundryRect.y + LineCalc::computeRealIntensityLine(t, data->leftPoints, static_cast<double>(t.rows), 0.0, "_left_baseline", static_cast<double>(frames.front().rows - quarter + leftBoundryRect.y));
-
+		leftY = LineCalc::computeRealIntensityLine(t, data->leftPoints, static_cast<double>(t.rows), 0.0, "_left_baseline", offset + leftBoundryRect.y);
+		leftY += offset + leftBoundryRect.y;
 
 		// right
 
@@ -346,7 +348,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		}
 
 		t = org(rightBoundryRect);
-		rightY = frames.front().rows - quarter + rightBoundryRect.y + LineCalc::computeRealIntensityLine(t, data->rightPoints, static_cast<double>(t.rows), 0.0, "_right_baseline", static_cast<double>(frames.front().rows - quarter + rightBoundryRect.y));
+		rightY = LineCalc::computeRealIntensityLine(t, data->rightPoints, static_cast<double>(t.rows), 0.0, "_right_baseline", offset + rightBoundryRect.y);
+		rightY += offset + rightBoundryRect.y;
 
 		endTime = cv::getTickCount();
 
@@ -364,8 +367,6 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	data->baseLines[0] = 0.0;
 	data->baseLines[1] = leftY;
-	// TODO : Add right side line computation
-	// just clone left to right for now
 	data->baseLines[2] = 0.0;
 	data->baseLines[3] = rightY;
 
@@ -440,9 +441,9 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		markingRects.reserve(frameCount_);
 		cv::Mat sparse;
 		for (auto i = frames.size(); i--;) {
-			markingTest = frames.at(i).clone();
-			auto org = frames.at(i).clone();
-			filter->setImage(frames.at(i).clone());
+			markingTest = frames[i].clone();
+			auto org = frames[i].clone();
+			filter->setImage(frames[i].clone());
 			filter->doFilter();
 			canny->setImage(filter->getResult());
 			canny->doCanny();
@@ -454,7 +455,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 
 			hough->doVerticalHough();
 			hough->computeBorders();
-			markingRects.push_back(hough->getMarkingRect());
+			markingRects.emplace_back(hough->getMarkingRect());
 			if (draw->isEscapePressed(30))
 				running = false;
 
@@ -530,7 +531,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 	std::vector<cv::Mat> markingFrames;
 
 	for (auto& frame : frames)
-		markingFrames.push_back(frame(data->markingRect));
+		markingFrames.emplace_back(frame(data->markingRect));
 
 	const std::string windowName = "test height";
 	draw->makeWindow(windowName);
@@ -548,7 +549,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	std::vector<cv::Point2d> results(imSize.width);
 	for (auto i = 0; i < imSize.width; i++)
-		results.at(i).x = i;
+		results[i].x = i;
 
 	uint64 endTime = cv::getTickCount();
 
@@ -561,14 +562,14 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 		startTime = cv::getTickCount();
 
 		for (auto i = 0; i < imSize.width; i++)
-			results.at(i).y = 0.0;
+			results[i].y = 0.0;
 
 		for (auto i = frameCount_; i--;) {
 
 			cv::Mat baseFrame;
 
 			// TODO : replace with custom filter if needed
-			cv::bilateralFilter(markingFrames.at(i), baseFrame, 3, 20, 10);
+			cv::bilateralFilter(markingFrames[i], baseFrame, 3, 20, 10);
 
 			//cv::Mat t;
 			//GenericCV::adaptiveThreshold(baseFrame, t, &thresholdLevel);
@@ -585,17 +586,17 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			highestPixel += laserArea.y + LineCalc::computeRealIntensityLine(t, data->centerPoints, static_cast<double>(t.rows), 0.0, "_marking", static_cast<double>(laserArea.y));
 
 			for (auto& muffe : data->centerPoints)
-				results.at(muffe.x).y += muffe.y;
+				results[static_cast<int>(muffe.x)].y += muffe.y;
 
 			if (draw->isEscapePressed(30))
 				running = false;
 
 			if (!i && running && showWindows_)
-				cv::cvtColor(markingFrames.at(i), tmpOut, CV_GRAY2BGR);
+				cv::cvtColor(markingFrames[i], tmpOut, CV_GRAY2BGR);
 		}
 
 		for (auto& muffe : data->centerPoints)
-			results.at(muffe.x).y /= frameCount_;
+			results.at(static_cast<int>(muffe.x)).y /= frameCount_;
 
 		// since theres some issues with using results vector, this works just as fine.
 		data->centerPoints.clear();
@@ -674,8 +675,8 @@ void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) 
 	cv::Rect rightRect2I(topRight, buttomRight);
 
 	for (auto& f : frames) {
-		left.push_back(f(leftRect2I));
-		right.push_back(f(rightRect2I));
+		left.emplace_back(f(leftRect2I));
+		right.emplace_back(f(rightRect2I));
 	}
 
 }
@@ -694,7 +695,7 @@ void ThicknessGauge::addNulls() {
 
 	for (auto& file : files) {
 		std::cout << cv::format("loading null file : %s\n", file.c_str());
-		nulls_.push_back(cv::imread(file, CV_8UC1));
+		nulls_.emplace_back(cv::imread(file, CV_8UC1));
 	}
 
 	for (auto& n : nulls_)
@@ -720,9 +721,9 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 	frames.reserve(size);
 
 	for (auto i = 0; i < size; ++i)
-		frames.push_back(cv::imread(files.at(i), CV_8UC1));
+		frames.emplace_back(cv::imread(files[i], CV_8UC1));
 
-	setImageSize(frames.at(0).size());
+	setImageSize(frames.front().size());
 
 }
 
@@ -737,7 +738,7 @@ void ThicknessGauge::captureFrames() {
 	cv::Mat t;
 	for (auto i = 0; i++ < frameCount_;) {
 		cap >> t;
-		frames.push_back(t);
+		frames.emplace_back(t);
 	}
 
 	setImageSize(t.size());
@@ -753,6 +754,7 @@ bool ThicknessGauge::saveData(string filename) {
 	}
 
 	std::cout << cv::format("Saving data..\n");
+	cv::Vec3i sizes(static_cast<int>(data->leftPoints.size()), static_cast<int>(data->centerPoints.size()), static_cast<int>(data->rightPoints.size()));
 
 	fs << "Filename" << filename;
 	fs << "TimeSaved" << Util::getTime();
@@ -763,11 +765,35 @@ bool ThicknessGauge::saveData(string filename) {
 	fs << "IntersectionCuts" << data->intersectionCuts;
 	fs << "Baselines" << data->baseLines;
 	fs << "CenterLine" << data->centerLine;
+	fs << "PointSizes" << sizes;
+	fs << "ImageSize" << imageSize_;
 	fs << "LeftBasePoints" << data->leftPoints;
-	fs << "RightBasePoints" << data->rightPoints;
 	fs << "CenterPoints" << data->centerPoints;
+	fs << "RightBasePoints" << data->rightPoints;
 	fs << "FirstFrame" << frames.front();
 	fs.release();
+
+	// save to regular txt files for easy plotting in fx. excel
+	// left side
+	std::ofstream file(filename + ".1.left.intensitet.txt");
+	file << "s: " << sizes[0] << '\n';
+	for (auto& h : data->leftPoints)
+		file << h.y << '\n';
+	file.close();
+
+	// center
+	file.open(filename + ".2.center.intensitet.txt");
+	file << "s: " << sizes[1] << '\n';
+	for (auto& h : data->centerPoints)
+		file << h.y << '\n';
+	file.close();
+
+	// right
+	file.open(filename + ".2.right.intensitet.txt");
+	file << "s: " << sizes[2] << '\n';
+	for (auto& h : data->rightPoints)
+		file << h.y << '\n';
+	file.close();
 
 	return true;
 }
@@ -902,7 +928,7 @@ bool ThicknessGauge::getSparseY(cv::Mat& image, vi& output) const {
 	for (auto& p : pix) {
 		if (p.x != x) {
 			if (count > 0) {
-				output.push_back(cv::Point(x, y));
+				output.emplace_back(cv::Point(x, y));
 				count = 0;
 			}
 			highest = 0;

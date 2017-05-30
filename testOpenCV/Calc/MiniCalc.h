@@ -205,7 +205,7 @@ public:
 
 		for (auto& e : elements) {
 			if (e.x >= leftEdge)
-				targetElements.push_back(e);
+				targetElements.emplace_back(e);
 		}
 
 		// just fill out the rest towards the left of the border
@@ -213,7 +213,7 @@ public:
 			const auto targetLastX = targetElements.back().x;
 			const auto targetLastY = targetElements.back().y;
 			for (auto i = targetLastX; i < imageWidth; ++i)
-				targetElements.push_back(cv::Point(i, targetLastY));
+				targetElements.emplace_back(cv::Point(i, targetLastY));
 		}
 	}
 
@@ -234,7 +234,7 @@ public:
 		for (auto& e : elements) {
 			if (e.x > rightEdge)
 				break;
-			targetElements.push_back(e);
+			targetElements.emplace_back(e);
 		}
 
 		// just fill out the rest towards the left of the border
@@ -242,7 +242,7 @@ public:
 			const auto targetLastX = targetElements.back().x;
 			const auto targetLastY = targetElements.back().y;
 			for (auto i = targetLastX; i >= 0; --i)
-				targetElements.push_back(cv::Point(i, targetLastY));
+				targetElements.emplace_back(cv::Point(i, targetLastY));
 		}
 
 	}
@@ -256,14 +256,14 @@ public:
 	 */
 	v2<double> fillElementGabs(vi& elements, cv::Mat& target, int barrier = 0) const {
 
-		elements.push_back(cv::Point(0, target.rows));
-		elements.push_back(cv::Point(target.cols, target.rows));
+		elements.emplace_back(cv::Point(0, target.rows));
+		elements.emplace_back(cv::Point(target.cols, target.rows));
 
 		sort(elements.begin(), elements.end(), sortX);
 
 		auto size = elements.size();
 
-		elements.push_back(elements.front());
+		elements.emplace_back(elements.front());
 
 		auto first = elements.front().x;
 
@@ -331,14 +331,14 @@ public:
 	static void getElementsX(vi& input, vi& output, int x) {
 		for (auto& e : input) {
 			if (e.x == x)
-				output.push_back(e);
+				output.emplace_back(e);
 		}
 	}
 
 	static void getElementsY(vi& input, vi& output, int y) {
 		for (auto& e : input) {
 			if (e.y == y)
-				output.push_back(e);
+				output.emplace_back(e);
 		}
 	}
 
@@ -367,7 +367,7 @@ public:
 		yLimit = abs(image.rows - yLimit);
 		for (auto& p : result) {
 			if (p.y <= yLimit)
-				output.push_back(p);
+				output.emplace_back(p);
 		}
 		return !output.empty();
 	}
@@ -380,7 +380,7 @@ public:
 
 		for (auto& p : pixels) {
 			if (p.y <= yLimit)
-				target.push_back(p);
+				target.emplace_back(p);
 		}
 
 		return !target.empty();
