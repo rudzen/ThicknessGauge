@@ -16,11 +16,6 @@ public:
 	}
 
 private:
-	// pre-calculated map of pixels and their distance in mm from base
-	cv::Mat pixelMap;
-
-	// the points of interest (location)
-	v2<double> point_;
 
 	// angle of camera
 	double angle_;
@@ -46,5 +41,13 @@ private:
 
 public:
 
-	
+	double calcMean(cv::Mat& image) {
+		
+	}
+
+	cv::Vec2d calcMeanStdDev(cv::Mat& image) {
+		
+	}
+
+
 };

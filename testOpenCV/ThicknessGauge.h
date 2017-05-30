@@ -83,9 +83,8 @@ private:
 
 	int frameCount_;
 
-	double const tickFrequency_ = cv::getTickFrequency();
-
 	bool showWindows_;
+
 	bool saveVideo_;
 
 	int binaryThreshold_;
@@ -95,7 +94,6 @@ private:
 	cv::Scalar baseColour_;
 
 	GlobGenerator globGenerator;
-
 
 public:
 
@@ -146,13 +144,13 @@ private: /* helper functions */
 
 	void captureFrames();
 
-	bool savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, std::string timeString, std::string extraInfo) const;
-
-private: /* old functions, might be deleted */
+private:
 
 	double sumColumn(cv::Mat& image, int x);
 
-	void sumColumns(cv::Mat& image, cv::Mat& target);
+	double intensityMean(cv::Mat& image) const;
+
+	static cv::Vec2d intensityStdDev(cv::Mat& image);
 
 	void computerGaugeLine(cv::Mat& output);
 
@@ -165,10 +163,6 @@ public: // getters and setters
 	void setFrameCount(int frameCount);
 
 	double getFrameTime() const;
-
-	void setFrameTime(double uint64);
-
-	double getTickFrequency() const;
 
 	bool isSaveVideo() const;
 

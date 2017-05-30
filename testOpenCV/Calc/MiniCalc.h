@@ -43,59 +43,7 @@ public:
 public:
 	MiniCalc();
 	~MiniCalc();
-
-	// means of all Y values for each X
-	vector<cv::Point> m_PlanarPixels;
-
-	void setMean(cv::Point2d newMean);
-
-	cv::Point2d getMean() const;
-
-	void addMean(cv::Point2d meanToAdd);
-
-	void setVariance(cv::Point2d newVariance);
-
-	cv::Point2d getVariance() const;
-
-	void addVariance(cv::Point2d varianceToAdd);
-
-	static cv::Point2d mean(vector<cv::Point2i>& pixels);
-
-	static double mean(vector<double>& vec);
-
-	static double meanX(vector<cv::Point2i>& pixels);
-
-	static double meanY(vector<cv::Point2i>& pixels);
-
-	cv::Point2i percentileX(double percentage, vector<cv::Point2i>& pixels) const;
-
-	cv::Point2i percentileY(double percentage, vector<cv::Point2i>& pixels) const;
-
-	cv::Point2d variance(vector<cv::Point2i>& pixels) const;
-
-	cv::Point2d variance(cv::Point2d& mean, vector<cv::Point2i>& pixels) const;
-
-	static void varianceAdd(vector<cv::Point2i>& pixels);
-
-	double varianceX(vector<cv::Point2i>& pixels) const;
-
-	double varianceX(double mean, vector<cv::Point2i>& pixels) const;
-
-	double varianceY(vector<cv::Point2i>& pixels) const;
-
-	double varianceY(double mean, vector<cv::Point2i>& pixels) const;
-
-	cv::Point2d sd(vector<cv::Point2i>& pixels) const {
-		return cv::Point2d(sqrt(varianceX(pixels)), sqrt(varianceY(pixels)));
-	}
-
-	double sdX(vector<cv::Point2i>& pixels) const {
-		return sqrt(varianceX(pixels));
-	}
-
-	double sdY(vector<cv::Point2i>& pixels) const {
-		return sqrt(varianceY(pixels));
-	}
+	cv::Point2d variance(cv::Point2d& mean, vector<cv::Point>& pixels) const;
 
 	static double varianceCoefficient(double*__restrict s, int mean) {
 		return *s / mean * 100;
@@ -105,14 +53,8 @@ public:
 
 	int highestPixelInLine(cv::Mat& image) const;
 
-	bool saveData(string filename) const;
-
 	/* Converts pixels from an image to a singular line vector in X, where Y is the mean of all pixels located at that given X in the image */
 	bool generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point2f>& pixels, vector<cv::Point2f>& gradientPixels) const;
-
-	bool generateGradientPlanarMap(cv::Mat& image, vector<cv::Point2d> planarPixels, vector<cv::Vec3b>& gradientPixels);
-
-	uchar getGradientYValues(cv::Mat& image, int x, int y, int maxY, int minY);
 
 	/**
 	 * \brief Computes mu
@@ -123,17 +65,6 @@ public:
 	 */
 	static double computeMu(double currentPosition, double inBetweenCount) {
 		return currentPosition / inBetweenCount;
-	}
-
-	/**
-	 * \brief Computes lines between two points
-	 * \param currentPoint The source point
-	 * \param targetPoint The destination point
-	 * \param result The resulting vector of points which makes up the line
-	 * \return true if the result is not empty, otherwise false
-	 */
-	static bool computeSimpleLine(cv::Point& currentPoint, cv::Point& targetPoint, vi& result) {
-
 	}
 
 	/**
@@ -186,65 +117,6 @@ public:
 		}
 
 		return cv::Point(0, imageHeight);
-	}
-
-	/**
-	 * \brief Compute the location of the elements on the left side of measuring target
-	 * \param elements All current elements
-	 * \param targetElements The resulting elements will be stored here
-	 * \param leftEdge The left edge
-	 * \param imageWidth The width of the image
-	 * \param sortElements if true, the source elements will be sorted, otherwise they wont
-	 */
-	void computeLeftElements(vi& elements, vi& targetElements, int leftEdge, int imageWidth, bool sortElements) const {
-
-		if (sortElements)
-			sort(elements.begin(), elements.end(), sortX);
-
-		targetElements.clear();
-
-		for (auto& e : elements) {
-			if (e.x >= leftEdge)
-				targetElements.emplace_back(e);
-		}
-
-		// just fill out the rest towards the left of the border
-		if (targetElements.back().x < imageWidth) {
-			const auto targetLastX = targetElements.back().x;
-			const auto targetLastY = targetElements.back().y;
-			for (auto i = targetLastX; i < imageWidth; ++i)
-				targetElements.emplace_back(cv::Point(i, targetLastY));
-		}
-	}
-
-	/**
-	* \brief Compute the location of the elements on the right side of measuring target
-	* \param elements All current elements
-	* \param targetElements The resulting elements will be stored here
-	* \param rightEdge The right edge
-	* \param sortElements if true, the source elements will be sorted, otherwise they wont
-	*/
-	void computeRightElements(vi& elements, vi& targetElements, int rightEdge, bool sortElements) const {
-		
-		if (sortElements)
-			sort(elements.begin(), elements.end(), sortX);
-
-		targetElements.clear();
-
-		for (auto& e : elements) {
-			if (e.x > rightEdge)
-				break;
-			targetElements.emplace_back(e);
-		}
-
-		// just fill out the rest towards the left of the border
-		if (targetElements.back().x > 0) {
-			const auto targetLastX = targetElements.back().x;
-			const auto targetLastY = targetElements.back().y;
-			for (auto i = targetLastX; i >= 0; --i)
-				targetElements.emplace_back(cv::Point(i, targetLastY));
-		}
-
 	}
 
 	/**
@@ -361,33 +233,8 @@ public:
 	 * \param yLimit The limit in height
 	 * \return true if something was found, otherwise false
 	 */
-	static bool getActualPixels(cv::Mat& image, vi& output, int yLimit) {
-		vi result;
-		cv::findNonZero(image, result);
-		yLimit = abs(image.rows - yLimit);
-		for (auto& p : result) {
-			if (p.y <= yLimit)
-				output.emplace_back(p);
-		}
-		return !output.empty();
-	}
+	static bool getActualPixels(cv::Mat& image, vi& output, int yLimit);
 
-	static bool getActualPixels(vi& pixels, vi&target, double yLimit, int imageHeight) {
-		if (!target.empty())
-			target.clear();
-
-		yLimit = abs(imageHeight - yLimit);
-
-		for (auto& p : pixels) {
-			if (p.y <= yLimit)
-				target.emplace_back(p);
-		}
-
-		return !target.empty();
-	}
-
-	bool computeDiags(cv::Mat& image, vector<cv::Mat>& diags);
-
-	bool computeDiagAvg(vector<cv::Mat>& diagonals, vd& output);
+	static bool getActualPixels(vi& pixels, vi& target, double yLimit, int imageHeight);
 
 };

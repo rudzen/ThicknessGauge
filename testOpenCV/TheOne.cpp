@@ -102,17 +102,12 @@ int main(int argc, char** argv) {
 			cout << "difference: " << data->difference << endl;
 
 
-
 			//auto result = c.findMarkingLinePairs_(globName);
 			//cout << result << endl;
 			//returnValue = result.first.x != 0;
 			//returnValue = c.generatePlanarImage(globName);
 			//if (returnValue) {
-#ifdef RUDZ_DEBUG
-			cout << cv::format("Planar image generated in %l seconds, processing..\n", c.getFrameTime() / c.getTickFrequency());
-#else
-				cout << "done..\n";
-#endif
+			cout << "done..\n";
 			//}
 		}
 		else if (options.isCalibrationMode()) {

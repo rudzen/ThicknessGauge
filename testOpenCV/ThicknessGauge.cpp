@@ -178,8 +178,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 
 		uint64 endTime = cv::getTickCount();
 
-		frameTime_ = endTime - startTime;
-		frameTime_ /= cv::getTickFrequency();
+		frameTime_ = static_cast<double>((endTime - startTime) / cv::getTickFrequency());
 
 		cout << "Total compute time (seconds) : " << frameTime_ << endl;
 
@@ -744,39 +743,21 @@ bool ThicknessGauge::saveData(string filename) {
 		file << h.y << '\n';
 	file.close();
 
-	return true;
-}
+	vector<double> means(frameCount_);
 
-
-bool ThicknessGauge::savePlanarImageData(string filename, vector<cv::Point>& pixels, cv::Mat& image, double highestY, string timeString, string extraInfo) const {
-	// TODO : needs to be updated + documented
-
-	cv::FileStorage fs(filename + ".json", cv::FileStorage::WRITE);
-
-	if (!fs.isOpened()) {
-		cerr << "Error while opening " << filename << " for output." << endl;
-		return false;
+	cout << "intensity means for all frames : \n";
+	for (auto& frame : frames) {
+		double m = intensityMean(frame);
+		means.emplace_back(m);
+		cout << m << '\n';
 	}
 
-	ostringstream oss;
-	oss << Util::getTime();
-	std::cout << cv::format("Saving data [frames: %i] [time: %s] [pixels: %i]\n", frameCount_, oss.str(), pixels.size());
+	cout << "mean/stddev for all frames : \n";
+	for (auto& frame : frames) {
+		cv::Vec2d m = intensityStdDev(frame);
+		cout << m << '\n';
+	}
 
-	fs << "Original filename" << filename;
-	fs << "Saved time" << Util::getTime();
-	fs << "Time to compute" << timeString;
-	//fs << "Seconds for computation" << static_cast<long>(frameTime_ / tickFrequency_);
-	fs << "Highest Y" << highestY;
-	fs << "Extra info" << extraInfo;
-
-	fs << "Eroded element count" << static_cast<int>(pixels.size());
-	fs << "Eroded elements" << pixels;
-	fs << "Eroded image" << image;
-
-	fs.release();
-
-	//ImageSave is(filename, SaveType::Image_Png);
-	//is.SaveImage(image);
 
 	return true;
 }
@@ -805,22 +786,30 @@ double ThicknessGauge::sumColumn(cv::Mat& image, int x) {
 
 }
 
-void ThicknessGauge::sumColumns(cv::Mat& image, cv::Mat& target) {
+/**
+ * \brief Computes the average (mean) intensity of the entire image
+ * \param image The image to calculate meaned intensity of
+ * \return the avg
+ */
+double ThicknessGauge::intensityMean(cv::Mat& image) const {
 
-	// note: this function is not the fastest possible,
-	// but has security for non-continious image data in matrix
+	vector<cv::Mat> channels;
+	cv::split(image, channels);
+	auto m = cv::mean(channels[0]);
+	return m[0];
 
-	auto sum = 0;
-	for (auto row = 0; row < image.rows; ++row) {
-		auto uc_pixel = image.data + row * image.step;
-		for (auto col = 0; col < image.cols; ++col) {
-			int pixelIntensity = uc_pixel[0];
-			sum += pixelIntensity;
-			uc_pixel++;
-		}
-		cout << cv::format("row -> sum: %i -> %i\n", row, sum);
-	}
 }
+
+cv::Vec2d ThicknessGauge::intensityStdDev(cv::Mat& image) {
+
+	cv::Scalar mean;
+	cv::Scalar stdDev;
+	cv::meanStdDev(image, mean, stdDev);
+
+	return cv::Vec2d(mean[0], stdDev[0]);
+
+}
+
 
 void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
 	//vi aboveLine;
@@ -916,14 +905,6 @@ void ThicknessGauge::setFrameCount(int frameCount) {
 
 double ThicknessGauge::getFrameTime() const {
 	return frameTime_;
-}
-
-void ThicknessGauge::setFrameTime(double frameTime) {
-	frameTime_ = frameTime;
-}
-
-double ThicknessGauge::getTickFrequency() const {
-	return tickFrequency_;
 }
 
 bool ThicknessGauge::isSaveVideo() const {

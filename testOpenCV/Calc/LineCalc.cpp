@@ -128,10 +128,7 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 	auto rows = image.rows;
 
 	// reserve enough space for the output point vector
-	output.reserve(cols * rows);
-
-	// temporary matrix
-	cv::Mat C;
+	output.reserve(cols);
 
 	// cut out rectangle without any X value set
 	cv::Rect2d cutOut(0.0, lowerLimit, 1.0, upperLimit);
@@ -149,11 +146,8 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 		// create a new matrix based of the settings 
 		auto B = cv::Mat(image, cutOut);
 
-		// copy the rectanglular matrix to avoid cascade reference
-		B.copyTo(C);
-
 		// perform moments on the matrix without treating it as a binary image (which it is NOT)
-		auto m = cv::moments(C, false);
+		auto m = cv::moments(B, false);
 
 		// compute x & y
 		//auto x = m.m10 / m.m00; // x is not used, so no need to calculate it
@@ -166,26 +160,59 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 
 	cv::Vec2d avg(0.0, 0.0);
 	for (auto& h : output) {
-	//	//out = to_string(h.y);
 		avg[0] += h.y;
 		avg[1] += rows - h.y;
-	//	file << h.x << ' ' << (h.y + fileOffsetY) << '\n';
-	//	fileY << h.y + fileOffsetY << '\n';
-	//	fileButt << rows - (h.y + fileOffsetY) << '\n';
 	}
 
 	avg[0] /= output.size();
 	avg[1] /= output.size();
 
-	//fileY << "avg:" << avg[0] << '\n';
-	//fileButt << "avg:" << avg[1] << '\n';
-
-	//file.close();
-	//fileY.close();
-	//fileButt.close();
-
 	return avg[1];
 
+}
+
+/**
+ * \brief Computes the inner angle between two points both intersection with a center point
+ * \param p1 The first point
+ * \param p2 The second point
+ * \param c The center point
+ * \return The angle in degrees
+ */
+double LineCalc::innerAngle(cv::Point2d& p1, cv::Point2d& p2, cv::Point2d& c) const {
+
+	auto dist1 = cv::sqrt((p1.x - c.x) * (p1.x - c.x) + (p1.y - c.y) * (p1.y - c.y));
+	auto dist2 = cv::sqrt((p2.x - c.x) * (p2.x - c.x) + (p2.y - c.y) * (p2.y - c.y));
+
+	double Ax, Ay;
+	double Bx, By;
+
+	auto Cx = c.x;
+	auto Cy = c.y;
+
+	// checking for closest point to c
+	if (dist1 < dist2) {
+		Bx = p1.x;
+		By = p1.y;
+		Ax = p2.x;
+		Ay = p2.y;
+	}
+	else {
+		Bx = p2.x;
+		By = p2.y;
+		Ax = p1.x;
+		Ay = p1.y;
+	}
+
+	auto Q1 = Cx - Ax;
+	auto Q2 = Cy - Ay;
+	auto P1 = Bx - Ax;
+	auto P2 = By - Ay;
+
+	auto A = acos((P1 * Q1 + P2 * Q2) / (cv::sqrt(P1 * P1 + P2 * P2) * cv::sqrt(Q1 * Q1 + Q2 * Q2)));
+
+	A *= 180 / CV_PI;
+
+	return A;
 }
 
 #endif
