@@ -148,10 +148,6 @@ private:
 
 	double sumColumn(cv::Mat& image, int x);
 
-	double intensityMean(cv::Mat& image) const;
-
-	static cv::Vec2d intensityStdDev(cv::Mat& image);
-
 	void computerGaugeLine(cv::Mat& output);
 
 	bool getSparseY(cv::Mat& image, vi& output) const;

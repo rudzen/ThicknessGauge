@@ -89,7 +89,7 @@ public:
 			if (elements[i].y < barrier)
 				return elements[i];
 		}
-		
+
 		return cv::Point(0, imageHeight);
 	}
 
@@ -236,5 +236,54 @@ public:
 	static bool getActualPixels(cv::Mat& image, vi& output, int yLimit);
 
 	static bool getActualPixels(vi& pixels, vi& target, double yLimit, int imageHeight);
+
+	/**
+	 * \brief Computes the average (mean) intensity of the entire image
+	 * \param image The image to calculate meaned intensity of
+	 * \return the avg
+	 */
+	double computeIntensityMean(cv::Mat& image) const {
+		
+		vector<cv::Mat> channels;
+		cv::split(image, channels);
+		auto m = cv::mean(channels[0]);
+
+		return m[0];
+
+	}
+
+	/**
+	 * \brief Computes the average (mean) intensity and the standard deviation of the same of the entire image
+	 * \param image The image to calculate meaned intensity and standard deviation of the mean on
+	 * \return the avg as a 2d double precision float vector
+	 */
+	static cv::Vec2d intensityStdDev(cv::Mat& image) {
+
+		cv::Scalar mean;
+		cv::Scalar stdDev;
+		cv::meanStdDev(image, mean, stdDev);
+
+		return cv::Vec2d(mean[0], stdDev[0]);
+
+	}
+
+	/**
+	 * \brief Retrieve the location of both the minimum and the maximum point in an image
+	 * \param image The image to perform the operation on
+	 * \param minVal The minimum value acceptable
+	 * \param maxVal The maximum value acceptable
+	 * \return 2d vector where x = minimum location and y = maximum location
+	 */
+	static v2<cv::Point> getMinMaxLoc(cv::Mat& image, double minVal, double maxVal) {
+		
+		cv::Point minLoc;
+		cv::Point maxLoc;
+
+		cv::minMaxLoc(image, &minVal, &maxVal, &minLoc, &maxLoc);
+
+		return v2<cv::Point>(cv::Point(minLoc), cv::Point(maxLoc));
+
+	}
+
 
 };

@@ -786,31 +786,6 @@ double ThicknessGauge::sumColumn(cv::Mat& image, int x) {
 
 }
 
-/**
- * \brief Computes the average (mean) intensity of the entire image
- * \param image The image to calculate meaned intensity of
- * \return the avg
- */
-double ThicknessGauge::intensityMean(cv::Mat& image) const {
-
-	vector<cv::Mat> channels;
-	cv::split(image, channels);
-	auto m = cv::mean(channels[0]);
-	return m[0];
-
-}
-
-cv::Vec2d ThicknessGauge::intensityStdDev(cv::Mat& image) {
-
-	cv::Scalar mean;
-	cv::Scalar stdDev;
-	cv::meanStdDev(image, mean, stdDev);
-
-	return cv::Vec2d(mean[0], stdDev[0]);
-
-}
-
-
 void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
 	//vi aboveLine;
 
