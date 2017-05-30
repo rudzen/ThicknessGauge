@@ -272,16 +272,16 @@ public:
 	 * \param image The image to perform the operation on
 	 * \param minVal The minimum value acceptable
 	 * \param maxVal The maximum value acceptable
-	 * \return 2d vector where x = minimum location and y = maximum location
+	 * \return 4d vector with both points
 	 */
-	static v2<cv::Point> getMinMaxLoc(cv::Mat& image, double minVal, double maxVal) {
+	static cv::Vec4i getMinMaxLoc(cv::Mat& image, double minVal, double maxVal) {
 		
 		cv::Point minLoc;
 		cv::Point maxLoc;
 
 		cv::minMaxLoc(image, &minVal, &maxVal, &minLoc, &maxLoc);
 
-		return v2<cv::Point>(cv::Point(minLoc), cv::Point(maxLoc));
+		return cv::Vec4i(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
 
 	}
 

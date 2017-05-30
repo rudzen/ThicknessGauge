@@ -12,8 +12,6 @@ public:
 	                                                                                                  , distLaserToGround_(laserDist)
 	                                                                                                  , focal_(focal)
 	                                                                                                  , ccd_(ccd) {
-		// TODO : Perform the basic distance calculations here.
-
 	}
 
 private:
