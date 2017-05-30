@@ -29,7 +29,7 @@ The main controller class
 class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
-	ThicknessGauge(): data(new Data()), frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(20), lineThreshold_(100) {
+	ThicknessGauge(): data(new Data()), frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(100), lineThreshold_(100) {
 		baseColour_ = cv::Scalar(255, 255, 255);
 	}
 

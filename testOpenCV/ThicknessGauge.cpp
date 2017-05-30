@@ -423,7 +423,6 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		cv::Mat sparse;
 		for (auto i = frames.size(); i--;) {
 			markingTest = frames[i].clone();
-			auto org = frames[i].clone();
 			filter->setImage(frames[i].clone());
 			filter->doFilter();
 			canny->setImage(filter->getResult());
@@ -439,7 +438,6 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 			markingRects.emplace_back(hough->getMarkingRect());
 			if (draw->isEscapePressed(30))
 				running = false;
-
 		}
 
 		// calculate the avg rect
@@ -510,8 +508,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	cv::Mat tmpOut;
 
-	auto thresholdLevel = 100.0;
-
 	auto running = true;
 
 	std::vector<cv::Point2d> results(imSize.width);
@@ -535,7 +531,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			//cv::Mat t;
 			//GenericCV::adaptiveThreshold(baseFrame, t, &thresholdLevel);
 
-			threshold(baseFrame, baseFrame, thresholdLevel, 255, CV_THRESH_BINARY);
+			threshold(baseFrame, baseFrame, binaryThreshold_, 255, CV_THRESH_BINARY);
 
 			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
@@ -544,7 +540,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			findNonZero(baseFrame, nonZero);
 			auto laserArea = cv::boundingRect(nonZero);
 			auto t = baseFrame(laserArea);
-			highestPixel += laserArea.y + LineCalc::computeRealIntensityLine(t, data->centerPoints, static_cast<double>(t.rows), 0.0, "_marking", static_cast<double>(laserArea.y));
+			highestPixel += laserArea.y;
+			highestPixel += LineCalc::computeRealIntensityLine(t, data->centerPoints, static_cast<double>(t.rows), 0.0, "_marking", static_cast<double>(laserArea.y));
 
 			for (auto& muffe : data->centerPoints)
 				results[static_cast<int>(muffe.x)].y += muffe.y;
@@ -563,7 +560,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 		data->centerPoints.clear();
 		Util::copyVector(results, data->centerPoints);
 
-		auto highestPixelTotal = frames.front().rows - (highestPixel / static_cast<unsigned int>(frameCount_));
+		auto highestPixelTotal = frames.front().rows - highestPixel / static_cast<unsigned int>(frameCount_);
 
 		std::cout << cv::format("highestPixelTotal: %f\n", highestPixelTotal);
 
@@ -742,22 +739,6 @@ bool ThicknessGauge::saveData(string filename) {
 	for (auto& h : data->rightPoints)
 		file << h.y << '\n';
 	file.close();
-
-	vector<double> means(frameCount_);
-
-	cout << "intensity means for all frames : \n";
-	for (auto& frame : frames) {
-		double m = intensityMean(frame);
-		means.emplace_back(m);
-		cout << m << '\n';
-	}
-
-	cout << "mean/stddev for all frames : \n";
-	for (auto& frame : frames) {
-		cv::Vec2d m = intensityStdDev(frame);
-		cout << m << '\n';
-	}
-
 
 	return true;
 }
