@@ -33,7 +33,7 @@ public:
 		baseColour_ = cv::Scalar(255, 255, 255);
 	}
 
-	typedef struct Data {
+	using Data = struct Data {
 
 		// the points of the laser on the marking
 		std::vector<cv::Point2d> centerPoints;
@@ -63,7 +63,7 @@ public:
 		// the difference between the baseline(s) and the laser line on the marking in sub-pixels
 		double difference;
 
-	} Data;
+	};
 
 	std::unique_ptr<Data> data; // there can be only one!
 
