@@ -289,4 +289,7 @@
     </None>
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Intersection bug.txt" />
+  </ItemGroup>
 </Project>

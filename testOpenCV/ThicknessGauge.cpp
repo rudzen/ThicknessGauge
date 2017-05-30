@@ -44,7 +44,7 @@ void ThicknessGauge::generateGlob(std::string& name) {
 		throw CaptureFailException("Error while attempting to open capture device.");
 
 	Util::createDirectory(name);
-	auto pbTitle = "Captuing glob " + name;
+	auto pbTitle = "Capturing glob " + name;
 
 	ProgressBar pb(frameCount_ * 2, pbTitle.c_str());
 	pb.SetFrequencyUpdate(10);
@@ -302,8 +302,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		}
 
 		auto t = org(leftBoundryRect);
-		leftY = LineCalc::computeRealIntensityLine(t, data->leftPoints, static_cast<double>(t.rows), 0.0, "_left_baseline", offset + leftBoundryRect.y);
-		leftY += offset + leftBoundryRect.y;
+		leftY = leftBoundryRect.y;
+		leftY += offset;
+		leftY += LineCalc::computeRealIntensityLine(t, data->leftPoints, static_cast<double>(t.rows), 0.0, "_left_baseline", offset + leftBoundryRect.y);
 
 		// right
 
@@ -337,16 +338,16 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		}
 
 		t = org(rightBoundryRect);
-		rightY = LineCalc::computeRealIntensityLine(t, data->rightPoints, static_cast<double>(t.rows), 0.0, "_right_baseline", offset + rightBoundryRect.y);
-		rightY += offset + rightBoundryRect.y;
+		rightY = rightBoundryRect.y;
+		rightY += offset;
+		rightY += LineCalc::computeRealIntensityLine(t, data->rightPoints, static_cast<double>(t.rows), 0.0, "_right_baseline", offset + rightBoundryRect.y);
 
-		if (!showWindows_)
-			running = false;
+		// forcefully break out of the loop
+		if (!showWindows_ || !running)
+			break;
 
-		if (running) {
-			leftY = 0.0;
-			rightY = 0.0;
-		}
+		leftY = 0.0;
+		rightY = 0.0;
 
 	}
 
@@ -355,8 +356,10 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	data->baseLines[2] = 0.0;
 	data->baseLines[3] = rightY;
 
-	draw->removeWindow(leftWindow);
-	draw->removeWindow(rightWindow);
+	if (showWindows_) {
+		draw->removeWindow(leftWindow);
+		draw->removeWindow(rightWindow);
+	}
 }
 
 /**
@@ -405,8 +408,6 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 	);
 
 	filter->setKernel(lineVKernel);
-
-	vector<cv::Mat> cannyImages;
 
 	cv::Mat markingTest;
 
@@ -511,12 +512,15 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 	auto running = true;
 
 	std::vector<cv::Point2d> results(imSize.width);
+
 	for (auto i = 0; i < imSize.width; i++)
 		results[i].x = i;
 
+	double highestPixel;
+
 	while (running) {
 
-		auto highestPixel = 0.0;
+		highestPixel = 0.0;
 
 		for (auto i = 0; i < imSize.width; i++)
 			results[i].y = 0.0;
@@ -549,7 +553,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			if (draw->isEscapePressed(30))
 				running = false;
 
-			if (!i && running && showWindows_)
+			if (showWindows_ && !i && running)
 				cv::cvtColor(markingFrames[i], tmpOut, CV_GRAY2BGR);
 		}
 
@@ -560,23 +564,28 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 		data->centerPoints.clear();
 		Util::copyVector(results, data->centerPoints);
 
-		auto highestPixelTotal = frames.front().rows - highestPixel / static_cast<unsigned int>(frameCount_);
+		auto highestPixelTotal = imageSize_.height - highestPixel / static_cast<unsigned int>(frameCount_);
+
+		highestPixel = 0.0;
 
 		std::cout << cv::format("highestPixelTotal: %f\n", highestPixelTotal);
 
 		data->difference = abs(base - highestPixelTotal);
 		std::cout << cv::format("diff from baseline: %f\n", data->difference);
 
-		if (!showWindows_)
-			running = false;
-		else {
+		if (!running || !showWindows_)
+			break;
+
+		if (showWindows_) {
 			draw->drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
 			draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
 			draw->drawText(&tmpOut, cv::format("%f pixels", data->difference), TextDrawPosition::UpperLeft);
-			draw->drawText(&tmpOut, cv::format("%f s", time), TextDrawPosition::UpperRight);
+			//draw->drawText(&tmpOut, cv::format("%f s", time), TextDrawPosition::UpperRight);
 			draw->showImage(windowName, tmpOut);
 			if (draw->isEscapePressed(30))
 				running = false;
+		} else {
+			break;
 		}
 	}
 

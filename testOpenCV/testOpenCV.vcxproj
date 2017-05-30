@@ -238,6 +238,9 @@
     <None Include="ClassDiagram.cd" />
     <None Include="_run_test.bat" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Intersection bug.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

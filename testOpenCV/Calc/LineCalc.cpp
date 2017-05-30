@@ -158,16 +158,13 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 			output.back().y = y;
 	}
 
-	cv::Vec2d avg(0.0, 0.0);
-	for (auto& h : output) {
-		avg[0] += h.y;
-		avg[1] += rows - h.y;
-	}
+	double avg = 0.0;
+	for (auto& h : output)
+		avg += h.y;
 
-	avg[0] /= output.size();
-	avg[1] /= output.size();
+	avg /= output.size();
 
-	return avg[1];
+	return avg;
 
 }
 
