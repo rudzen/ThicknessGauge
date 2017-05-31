@@ -96,7 +96,7 @@ public:
 	}
 
 private:
-	float center_;
+	double center_;
 
 	double leftY_ = 0.0;
 
@@ -225,7 +225,6 @@ public:
 		original_ = newImage;
 		if (showWindows_)
 			cvtColor(original_, output, CV_GRAY2BGR);
-		lines.reserve(image_.cols * image_.rows);
 	}
 
 	const int& getMinLineLen() const {
@@ -283,6 +282,7 @@ inline void HoughLinesPR::minLineLencb(int value, void* userData) {
 inline void HoughLinesPR::doHorizontalHough() {
 	// not optimized what so ever..
 	// splitting things up in smaller function would help!
+	lines.reserve(image_.cols * image_.rows);
 
 	HoughLinesP(image_, lines, rho_, CV_PI / 4.0, threshold_, static_cast<double>(minLineLen_), static_cast<double>(maxLineGab_));
 
@@ -299,7 +299,7 @@ inline void HoughLinesPR::doHorizontalHough() {
 	rightLines.clear();
 	rightLines.reserve(count);
 
-	center_ = static_cast<float>(image_.cols) * 0.5f;
+	center_ = static_cast<double>(image_.cols) * 0.5f;
 
 	// insert lines into data structure.
 	for (auto& line : lines)
@@ -427,10 +427,15 @@ inline void HoughLinesPR::bresenham() {
 	leftLines.reserve(size);
 
 	for (auto& line : allLines) {
-		if (line.entry[0] + ((line.entry[2] - line.entry[0]) / 2) < center_)
+		if (line.entry[0] < center_)
 			leftLines.emplace_back(line);
 		else
 			rightLines.emplace_back(line);
+
+		//if (line.entry[0] + ((line.entry[2] - line.entry[0]) / 2) < center_)
+		//	leftLines.emplace_back(line);
+		//else
+		//	rightLines.emplace_back(line);
 	}
 
 	auto lSize = leftLines.size();
@@ -438,18 +443,18 @@ inline void HoughLinesPR::bresenham() {
 
 	auto onlyRight = false;
 
-	if (rSize == 0) {
-		if (lSize == 0)
-			throw NoLineDetectedException("No horizontal lines detected.");
+	//if (rSize == 0) {
+	//	if (lSize == 0)
+	//		throw NoLineDetectedException("No horizontal lines detected.");
 
-		// emergency case if the only located lines are on the left side.
-		Util::copyVector(leftLines, rightLines);
-		leftLines.clear();
-		Util::loge("Warning, no right side lines were detected, left lines treated as right lines.");
-		onlyRight ^= true;
-	}
-	else
-		onlyRight = lSize == 0;
+	//	// emergency case if the only located lines are on the left side.
+	//	Util::copyVector(leftLines, rightLines);
+	//	leftLines.clear();
+	//	Util::loge("Warning, no right side lines were detected, left lines treated as right lines.");
+	//	onlyRight ^= true;
+	//}
+	//else
+	//	onlyRight = lSize == 0;
 
 
 	// build right side line points
@@ -460,13 +465,13 @@ inline void HoughLinesPR::bresenham() {
 			rightLine.elements.emplace_back(it.pos());
 	}
 
-	// sort if needed
-	if (rSize > 1)
-		sort(rightLines.begin(), rightLines.end(), lineHsizeSort);
+	//// sort if needed
+	//if (rSize > 1)
+	//	sort(rightLines.begin(), rightLines.end(), lineHsizeSort);
 
-	// null left side lines guard
-	if (onlyRight)
-		return;
+	//// null left side lines guard
+	//if (onlyRight)
+	//	return;
 
 	// build left side line points
 	for (auto& leftLine : leftLines) {
@@ -476,9 +481,9 @@ inline void HoughLinesPR::bresenham() {
 			leftLine.elements.emplace_back(it.pos());
 	}
 
-	// sort if needed
-	if (lSize > 1)
-		sort(leftLines.begin(), leftLines.end(), lineHsizeSort);
+	//// sort if needed
+	//if (lSize > 1)
+	//	sort(leftLines.begin(), leftLines.end(), lineHsizeSort);
 
 }
 

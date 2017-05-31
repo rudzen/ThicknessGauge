@@ -15,11 +15,11 @@ public:
 	LineCalc() {
 	}
 
-	bool intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f& r) const;
+	bool intersection(cv::Point2d o1, cv::Point2d p1, cv::Point2d o2, cv::Point2d p2, cv::Point2d& r) const;
 
-	bool intersection(const cv::Vec4f& border, cv::Vec4f& line, cv::Point2f& result) const;
+	bool intersection(const cv::Vec4d& border, cv::Vec4d& line, cv::Point2d& result) const;
 
-	bool computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec4f& leftBorder, const cv::Vec4f& rightBorder, cv::Vec4d& output) const;
+	bool computeIntersectionPoints(cv::Vec4d horizontalLine, const cv::Vec4d& leftBorder, const cv::Vec4d& rightBorder, cv::Vec4d& output) const;
 
 	static void adjustMarkingRect(cv::Rect2d& markingRect, cv::Vec4d& intersectionPoints, double buffer);
 

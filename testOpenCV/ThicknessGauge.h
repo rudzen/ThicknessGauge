@@ -135,8 +135,7 @@ private: /* helper functions */
 
 	cv::Vec2d computeIntersectionCut(shared_ptr<HoughLinesR> hough);
 
-	template <int minLen>
-	int computeHoughPMinLine(cv::Rect2d& rect) const;
+	static double computeHoughPMinLine(double minLen, cv::Rect2d& rect);
 
 	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right);
 

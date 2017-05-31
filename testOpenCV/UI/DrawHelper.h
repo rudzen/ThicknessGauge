@@ -84,6 +84,10 @@ public:
 
 	void drawText(cv::Mat* image, const std::string text, tg::TextDrawPosition position, cv::Scalar colour) const;
 
+	void drawRectangle(cv::Mat& image, cv::Rect& rectangle, cv::Scalar colour) const {
+		cv::rectangle(image, rectangle, colour, 1, CV_AA);
+	}
+
 	void drawRectangle(cv::Mat& image, cv::Rect2f& rectangle, cv::Scalar colour) const {
 		cv::rectangle(image, rectangle, colour, 1, CV_AA);
 	}

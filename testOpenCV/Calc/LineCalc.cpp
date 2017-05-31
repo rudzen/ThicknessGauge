@@ -12,12 +12,12 @@
  * \param r The resulting point of intersection
  * \return true if intersection was found, otherwise false
  */
-bool LineCalc::intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f& r) const {
+bool LineCalc::intersection(cv::Point2d o1, cv::Point2d p1, cv::Point2d o2, cv::Point2d p2, cv::Point2d& r) const {
 
 	auto d1 = p1 - o1;
 	auto d2 = p2 - o2;
 
-	auto cross = d1.x * d2.y - d1.y * d2.x;
+	double cross = d1.x * d2.y - d1.y * d2.x;
 	if (abs(cross) < /*EPS*/1e-8) return false;
 
 	auto x = o2 - o1;
@@ -33,8 +33,8 @@ bool LineCalc::intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::
  * \param result The resulting point coordinates if they intersect
  * \return true if intersection was found, otherwise false
  */
-bool LineCalc::intersection(const cv::Vec4f& border, cv::Vec4f& line, cv::Point2f& result) const {
-	return intersection(cv::Point2f(border[0], border[1]), cv::Point2f(line[0], line[1]), cv::Point2f(border[2], border[3]), cv::Point2f(line[2], line[3]), result);
+bool LineCalc::intersection(const cv::Vec4d& border, cv::Vec4d& line, cv::Point2d& result) const {
+	return intersection(cv::Point2d(border[0], border[1]), cv::Point2d(line[0], line[1]), cv::Point2d(border[2], border[3]), cv::Point2d(line[2], line[3]), result);
 }
 
 /**
@@ -45,10 +45,10 @@ bool LineCalc::intersection(const cv::Vec4f& border, cv::Vec4f& line, cv::Point2
  * \param output The resulting intersection points (if any)
  * \return true if intersection points where computed, otherwise false
  */
-bool LineCalc::computeIntersectionPoints(cv::Vec4f horizontalLine, const cv::Vec4f& leftBorder, const cv::Vec4f& rightBorder, cv::Vec4d& output) const {
+bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontalLine, const cv::Vec4d& leftBorder, const cv::Vec4d& rightBorder, cv::Vec4d& output) const {
 
-	cv::Point2f leftIntersection;
-	cv::Point2f rightIntersection;
+	cv::Point2d leftIntersection;
+	cv::Point2d rightIntersection;
 
 	// align horizontal line
 	horizontalLine[0] = leftBorder[0];

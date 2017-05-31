@@ -45,31 +45,6 @@ public:
 
 
 	/**
-	 * \brief Get the pixel intensity sum of a 3 channel image
-	 * \param image The image to get the sum from
-	 * \return The total sum of pixel intensity for the whole image
-	 */
-	static unsigned int Pixelz::getAllPixelSum(cv::Mat& image) {
-
-		if (image.channels() != 3)
-			return -1;
-
-		unsigned int sum = 0;
-		auto uc_pixel = image.data;
-		for (auto row = 0; row < image.rows; ++row) {
-			uc_pixel = image.data + row * image.step;
-			for (auto col = 0; col < image.cols; ++col) {
-				int a = uc_pixel[0];
-				int b = uc_pixel[1];
-				int c = uc_pixel[2];
-				sum += (a + b) + c;
-				uc_pixel += 3;
-			}
-		}
-		return sum;
-	}
-
-	/**
 	 * \brief Get avg intensity for parsed line (0-255)
 	 * \param image The image to use as base for intensity computation
 	 * \param vector The vector to check for

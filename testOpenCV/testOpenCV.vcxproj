@@ -189,7 +189,6 @@
     <ClInclude Include="CV\Kernels.h" />
     <ClInclude Include="CV\LaserR.h" />
     <ClInclude Include="CV\MorphR.h" />
-    <ClInclude Include="CV\SparseR.h" />
     <ClInclude Include="Exceptions\CalibrationException.h" />
     <ClInclude Include="ArgClasses\CalibrationModeVisitor.h" />
     <ClInclude Include="Calibrate\CalibrationSettings.h" />

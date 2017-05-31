@@ -246,6 +246,13 @@ public:
 		return rightBorder_;
 	}
 
+	void leftBorder(cv::Vec4d leftBorder) {
+		leftBorder_ = leftBorder;
+	}
+
+	void rightBorder(cv::Vec4d rightBorder) {
+		rightBorder_ = rightBorder;
+	}
 };
 
 inline void HoughLinesR::computeRectFromLines(vector<LineV>& input, cv::Rect2d& output) {
