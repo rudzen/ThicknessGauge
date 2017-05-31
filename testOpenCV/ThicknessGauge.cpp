@@ -787,7 +787,7 @@ bool ThicknessGauge::saveData(string filename) {
 	std::ofstream file(filename + ".1.left.intensitet.txt");
 
 	auto writeY = [&](auto p) { file << p.y << '\n'; };
-
+	
 	// left
 	std::for_each(data->leftPoints.begin(), data->leftPoints.end(), writeY);
 	file.close();

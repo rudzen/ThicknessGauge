@@ -23,22 +23,51 @@ private:
 
 public:
 
-	struct pixelYsort {
-		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
-		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
-		bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.y < pt2.y; }
-	} sortY;
+	template <typename T1, typename T2, class Pred = std::less<T2>>
+	struct sortXless {
+		bool operator()(const std::pair<T1, T2>& left, const std::pair<T1, T2>& right) {
+			Pred p;
+			return p(left.second, right.second);
+		}
+	};
 
+	template <typename T1, class T2, class Pred = std::less<T2>>
+	struct sortYless {
+		bool operator()(const std::pair<T1, T2>& left, const std::pair<T1, T2>& right) {
+			Pred p;
+			return p(left.second, right.second);
+		}
+	};
+
+	template <class T1, class T2 = cv::Point_<T1>, class Pred = std::less<T2>>
+	struct pointSortX {
+		bool operator()(const T2& left, const T2& right) {
+			Pred p;
+			return p(left.y, right.y);
+		}
+	};
+
+	//struct pixelYsort {
+	//	bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
+	//	bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
+	//	bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.y < pt2.y; }
+	//} sortY;
+
+	template <typename T, class Pred = std::less<T>>
 	struct pixelXsort {
-		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
-		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
-		bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.x < pt2.x; }
-	} sortX;
+		bool operator()(cv::Point_<T> pt1, cv::Point_<T> pt2) const {
+			Pred p;
+			return p(pt1.x, pt2.x);
+		}
+		//bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
+		//bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.x < pt2.x; }
+	};
 
 	void sortContours(vector<vector<cv::Point>>& contours) {
 		auto contourComparator = [](vector<cv::Point> a, vector<cv::Point> b) { return contourArea(a) > contourArea(b); };
 		sort(contours.begin(), contours.end(), contourComparator);
 	}
+
 
 public:
 	MiniCalc();
@@ -68,58 +97,6 @@ public:
 	}
 
 	/**
-	 * \brief Right edge detection\n
-	 * Retrieve the right edge of the part to be measured
-	 * by looking at the center of the elements and tracking them towards the right edge until
-	 * the baseLevel is hit.
-	 * \param elements The current data elements
-	 * \param imageHeight The image height
-	 * \param baseLevel The base level of the entirety of the data
-	 * \return The point where the elements to be measured are below baseline
-	 */
-	cv::Point getRightEdge(vi& elements, int imageHeight, int baseLevel) const {
-
-		sort(elements.begin(), elements.end(), sortX);
-
-		const auto barrier = imageHeight - baseLevel;
-
-		const auto size = elements.size() / 2;
-
-		for (auto i = size; i > 0; --i) {
-			if (elements[i].y < barrier)
-				return elements[i];
-		}
-
-		return cv::Point(0, imageHeight);
-	}
-
-	/**
-	* \brief Left edge detection\n
-	* Retrieve the left edge of the part to be measured
-	* by looking at the center of the elements and tracking them backwards to the left edge until
-	* the baseLevel is hit.
-	* \param elements The current data elements
-	* \param imageHeight The image height
-	* \param baseLevel The base level of the entirety of the data
-	* \return The point where the elements to be measured are below baseline
-	*/
-	cv::Point getLeftEdge(vi& elements, int imageHeight, int baseLevel) const {
-
-		sort(elements.begin(), elements.end(), sortX);
-
-		const auto barrier = imageHeight - baseLevel;
-
-		const auto size = elements.size() / 2;
-
-		for (auto i = size; i > 0; ++i) {
-			if (elements[i].y < barrier)
-				return elements[i];
-		}
-
-		return cv::Point(0, imageHeight);
-	}
-
-	/**
 	 * \brief Fills the gabs in the elements with simple linear lines
 	 * \param elements The elements to fill gabs in
 	 * \param target The target matrix
@@ -131,7 +108,7 @@ public:
 		elements.emplace_back(cv::Point(0, target.rows));
 		elements.emplace_back(cv::Point(target.cols, target.rows));
 
-		sort(elements.begin(), elements.end(), sortX);
+		sort(elements.begin(), elements.end(), sortXless<vi, vi>());
 
 		auto size = elements.size();
 
@@ -243,7 +220,7 @@ public:
 	 * \return the avg
 	 */
 	double computeIntensityMean(cv::Mat& image) const {
-		
+
 		vector<cv::Mat> channels;
 		cv::split(image, channels);
 		auto m = cv::mean(channels[0]);
@@ -275,7 +252,7 @@ public:
 	 * \return 4d vector with both points
 	 */
 	static cv::Vec4i getMinMaxLoc(cv::Mat& image, double minVal, double maxVal) {
-		
+
 		cv::Point minLoc;
 		cv::Point maxLoc;
 
