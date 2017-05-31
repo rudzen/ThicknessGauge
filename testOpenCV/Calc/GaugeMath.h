@@ -12,6 +12,11 @@ public:
 	                                                                                                  , distLaserToGround_(laserDist)
 	                                                                                                  , focal_(focal)
 	                                                                                                  , ccd_(ccd) {
+		distCamToCenter_ = 0.0;
+	}
+
+	double computeRange(cv::Point2d& p1, cv::Point2d& p2) {
+		return (height_ * focal_) / (abs(p2.y - p1.y) * ccd_);
 	}
 
 private:
