@@ -113,11 +113,9 @@ void LineCalc::adjustBaseLines(cv::Vec4d& baseLines, cv::Vec4d& intersectionPoin
  * \param output The output vector of points
  * \param upperLimit The upper limit of the rectangular cut out
  * \param lowerLimit The lower limit of the rectangular cut out
- * \param filename Filename for saving to text
- * \param fileOffsetY The offset for the values in the textfile
  * \return The avg of the computed Y value across the entirety of the image matrix with regards to cut offs
  */
-double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, double upperLimit, double lowerLimit, std::string filename, double fileOffsetY) {
+double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, int upperLimit, int lowerLimit) {
 
 	// generate vector with all X
 	if (!output.empty())

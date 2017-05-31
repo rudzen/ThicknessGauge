@@ -267,6 +267,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		leftElements.clear();
 		rightElements.clear();
 
+		leftY = 0.0;
+		rightY = 0.0;
+
 		cv::Mat org;
 
 		// left
@@ -278,7 +281,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 			processMatForLine(org, canny, filter, hough, morph);
 
-			const auto& lines = hough->getRightLines();
+			const auto& lines = hough->getRightLines(); // inner most side
 			for (auto& h : lines) {
 				if (h.entry[0] > leftCutoff)
 					Util::copyVector(h.elements, leftElements);
@@ -307,18 +310,20 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		auto t = org(leftBoundryRect);
 		leftY = static_cast<double>(leftBoundryRect.y);
 		leftY += offset;
-		leftY += LineCalc::computeRealIntensityLine(t, data->leftPoints, static_cast<double>(t.rows), 0.0, "_left_baseline", leftY);
+		leftY += LineCalc::computeRealIntensityLine(t, data->leftPoints, static_cast<double>(t.rows), 0.0);
+
+		cout << "left baseline: " << leftY << endl;
 
 		// right
 
 		for (auto& r : right) {
 			org = r.clone();
-			auto h = r.clone();
-			hough->setOriginal(h);
+			auto h1 = r.clone();
+			hough->setOriginal(h1);
 
 			processMatForLine(org, canny, filter, hough, morph);
 
-			const auto& lines = hough->getLeftLines();
+			const auto& lines = hough->getLeftLines(); // inner most side
 			for (auto& h : lines) {
 				if (h.entry[2] < rightCutoff)
 					Util::copyVector(h.elements, rightElements);
@@ -346,16 +351,16 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		t = org(rightBoundryRect);
 		rightY = static_cast<double>(rightBoundryRect.y);
+		rightY += LineCalc::computeRealIntensityLine(t, data->rightPoints, t.rows, 0);
 		rightY += offset;
-		rightY += LineCalc::computeRealIntensityLine(t, data->rightPoints, static_cast<double>(t.rows), 0.0, "_right_baseline", offset + rightBoundryRect.y);
+
+		cout << "right baseline: " << rightY << endl;
 
 		// forcefully break out of the loop
-		if (!showWindows_ || !running)
+		if (!showWindows_)
 			break;
 
-		leftY = 0.0;
-		rightY = 0.0;
-
+		running = false;
 	}
 
 	data->baseLines[0] = 0.0;
@@ -455,10 +460,6 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		out[2] /= vecs.size();
 	};
 
-	auto vecToString = [](std::string name, cv::Vec4d& vec)	{
-		return cv::format("%s vector: [%f,%f,%f,%f]\n", name, vec[0], vec[1], vec[2], vec[3]);
-	};
-
 	while (running) {
 
 		markingRects.clear();
@@ -500,6 +501,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
+
 	}
 
 	if (showWindows_)
@@ -554,11 +556,9 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 	for (auto i = 0; i < imSize.width; i++)
 		results[i].x = i;
 
-	double highestPixel;
-
 	while (running) {
 
-		highestPixel = 0.0;
+		auto highestPixel = 0.0;
 
 		for (auto i = 0; i < imSize.width; i++)
 			results[i].y = 0.0;
@@ -583,7 +583,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			auto laserArea = cv::boundingRect(nonZero);
 			auto t = baseFrame(laserArea);
 			highestPixel += laserArea.y;
-			highestPixel += LineCalc::computeRealIntensityLine(t, data->centerPoints, static_cast<double>(t.rows), 0.0, "_marking", static_cast<double>(laserArea.y));
+			highestPixel += LineCalc::computeRealIntensityLine(t, data->centerPoints, t.rows, 0);
 
 			for (auto& muffe : data->centerPoints)
 				results[static_cast<int>(muffe.x)].y += muffe.y;
@@ -626,6 +626,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 		else {
 			break;
 		}
+
 	}
 
 	if (showWindows_)
@@ -712,11 +713,17 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 	globGenerator.generateGlob();
 
 	auto files = globGenerator.getFiles();
+	
+	if (files.empty()) {
+		CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", globName));
+	}
+
 	auto size = static_cast<int>(files.size());
 
 	if (size != frameCount_)
 		setFrameCount(size);
 
+	frames.clear();
 	frames.reserve(size);
 
 	for (auto& f : files)
@@ -724,6 +731,7 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 
 	setImageSize(frames.front().size());
 
+	frames.shrink_to_fit();
 }
 
 /**

@@ -25,7 +25,7 @@ public:
 
 	static void adjustBaseLines(cv::Vec4d& baseLines, cv::Vec4d& intersectionPoints, double buffer);
 
-	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, double upperLimit, double lowerLimit, std::string filename, double fileOffsetY);
+	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, int upperLimit, int lowerLimit);
 
 	double angleBetweenLines(cv::Point2d& p1, cv::Point2d& p2) const {
 		return atan((p1.y - p2.y) / (p2.x - p1.x) * 180 / CV_PI);
