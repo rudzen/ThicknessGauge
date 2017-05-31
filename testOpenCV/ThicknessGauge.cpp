@@ -310,7 +310,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		auto t = org(leftBoundryRect);
 		leftY = static_cast<double>(leftBoundryRect.y);
 		leftY += offset;
-		leftY += LineCalc::computeRealIntensityLine(t, data->leftPoints, static_cast<double>(t.rows), 0.0);
+		leftY += LineCalc::computeRealIntensityLine(t, data->leftPoints, t.rows, 0.0);
 
 		cout << "left baseline: " << leftY << endl;
 
@@ -713,7 +713,7 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 	globGenerator.generateGlob();
 
 	auto files = globGenerator.getFiles();
-	
+
 	if (files.empty()) {
 		CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", globName));
 	}
@@ -780,24 +780,52 @@ bool ThicknessGauge::saveData(string filename) {
 	fs << "FirstFrame" << frames.front();
 	fs.release();
 
-	// save to regular txt files for easy plotting in fx. excel
-	// left side
+	std::sort(data->leftPoints.begin(), data->leftPoints.end(), miniCalc->sortX);
+	std::sort(data->centerPoints.begin(), data->centerPoints.end(), miniCalc->sortX);
+	std::sort(data->rightPoints.begin(), data->rightPoints.end(), miniCalc->sortX);
+
 	std::ofstream file(filename + ".1.left.intensitet.txt");
-	for (auto& h : data->leftPoints)
-		file << h.y << '\n';
+
+	auto writeY = [&](auto p) { file << p.y << '\n'; };
+
+	// left
+	std::for_each(data->leftPoints.begin(), data->leftPoints.end(), writeY);
 	file.close();
 
 	// center
 	file.open(filename + ".2.center.intensitet.txt");
-	for (auto& h : data->centerPoints)
-		file << h.y << '\n';
+	std::for_each(data->centerPoints.begin(), data->centerPoints.end(), writeY);
 	file.close();
 
 	// right
 	file.open(filename + ".2.right.intensitet.txt");
-	for (auto& h : data->rightPoints)
-		file << h.y << '\n';
+	std::for_each(data->rightPoints.begin(), data->rightPoints.end(), writeY);
 	file.close();
+
+	// generate image for output overview and save it.
+	cv::Mat overview = cv::Mat::zeros(frames.front().rows, data->leftPoints.size() + data->centerPoints.size() + data->rightPoints.size(), frames.front().type());
+
+	cv::Scalar col(210.0, 210.0, 210.0);
+
+	auto paintY = [](cv::Mat& image, std::vector<cv::Point2d>& points, int offset, cv::Scalar col) {
+		for (auto& p : points) {
+			image.at<char>(p.y, p.x + offset) = col[0];
+		}
+	};
+
+	auto offset = 0;
+	paintY(overview, data->leftPoints, offset, col);
+	offset += static_cast<int>(data->leftPoints.size());
+	cv::line(overview, data->leftPoints.back(), cv::Point(data->centerPoints.front().x + offset, data->centerPoints.front().y), col);
+	paintY(overview, data->centerPoints, offset, col);
+	offset += static_cast<int>(data->centerPoints.size());
+	cv::line(overview, cv::Point(data->centerPoints.back().x + data->leftPoints.size(), data->centerPoints.back().y), cv::Point(data->rightPoints.front().x + offset, data->rightPoints.front().y), col);
+	paintY(overview, data->rightPoints, offset, col);
+
+	cv::imshow("overview", overview);
+	cv::waitKey(0);
+
+	cv::imwrite("_overview.png", overview);
 
 	return true;
 }
