@@ -27,7 +27,7 @@
 
 using namespace tg;
 
-class HoughLinesPR : public BaseR<float> {
+class HoughLinesPR : public BaseR {
 
 public:
 

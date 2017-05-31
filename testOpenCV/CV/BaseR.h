@@ -20,7 +20,6 @@
   ||||  |   ||
   `+.__._._+*/
 
-template <class T>
 class BaseR {
 
 protected:
@@ -35,7 +34,7 @@ protected:
 	*/
 	cv::Mat image_;
 
-	cv::Rect_<T> markingRect;
+	cv::Rect2d markingRect;
 
 	int imageOffset = 0;
 
@@ -53,11 +52,11 @@ public:
 
 	void setImage(const cv::Mat& image) { image_ = image; }
 
-	const cv::Rect_<T>& getMarkingRect() const {
+	const cv::Rect2d& getMarkingRect() const {
 		return markingRect;
 	}
 
-	void setMarkingRect(const cv::Rect_<T>& markingRect) {
+	void setMarkingRect(const cv::Rect2d& markingRect) {
 		this->markingRect = markingRect;
 	}
 

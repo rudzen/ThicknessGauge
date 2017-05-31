@@ -24,7 +24,7 @@
   ||||  |   ||
   `+.__._._+*/
 
-class CannyR : public BaseR<float> {
+class CannyR : public BaseR {
 	
 	cv::Mat edges_;
 

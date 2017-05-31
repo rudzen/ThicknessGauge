@@ -10,7 +10,7 @@
 #include <ostream>
 #include "HoughLinesR.h"
 
-class LaserR : public BaseR<float> {
+class LaserR : public BaseR {
 
 	typedef struct xLine {
 

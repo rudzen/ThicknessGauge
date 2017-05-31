@@ -29,7 +29,7 @@
 using namespace tg;
 using namespace std;
 
-class HoughLinesR : public BaseR<float> {
+class HoughLinesR : public BaseR {
 
 public:
 
@@ -97,10 +97,10 @@ private:
 	vector<LineV> leftLines_;
 
 	// the x coordinates of the left "border" of the marking
-	cv::Vec4f leftBorder_;
+	cv::Vec4d leftBorder_;
 
 	// the x coordinates of the right "border" of the marking
-	cv::Vec4f rightBorder_;
+	cv::Vec4d rightBorder_;
 
 	double leftY_ = 0.0;
 
@@ -163,13 +163,13 @@ private:
 
 	void drawLines(vector<LineV>& linePairs, cv::Scalar colour);
 
-	void drawLine(cv::Vec4f & line);
+	void drawLine(cv::Vec4d& line);
 
 	void showOutput() const;
 
 	void computeMeta();
 
-	static void computeRectFromLines(vector<LineV>& input, cv::Rect2f& output);
+	static void computeRectFromLines(vector<LineV>& input, cv::Rect2d& output);
 
 	// callbacks
 
@@ -238,17 +238,17 @@ public:
 		this->leftLines_ = leftLines;
 	}
 
-	const cv::Vec4f& getLeftBorder() const {
+	const cv::Vec4d& getLeftBorder() const {
 		return leftBorder_;
 	}
 
-	const cv::Vec4f& getRightBorder() const {
+	const cv::Vec4d& getRightBorder() const {
 		return rightBorder_;
 	}
 
 };
 
-inline void HoughLinesR::computeRectFromLines(vector<LineV>& input, cv::Rect2f& output) {
+inline void HoughLinesR::computeRectFromLines(vector<LineV>& input, cv::Rect2d& output) {
 
 	for (auto& line : input) {
 		cv::Rect2f t = cv::boundingRect(line.elements);
@@ -267,13 +267,13 @@ inline void HoughLinesR::computeRectFromLines(vector<LineV>& input, cv::Rect2f& 
 
 inline void HoughLinesR::computeBorders() {
 
-	cv::Rect2f leftRoi(0.0f, 0.0f, 0.0f, static_cast<float>(image_.rows));
-	cv::Rect2f rightRoi(0.0f, 0.0f, 0.0f, static_cast<float>(image_.rows));
+	cv::Rect2d leftRoi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
+	cv::Rect2d rightRoi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
 
 	computeRectFromLines(leftLines_, leftRoi);
 	computeRectFromLines(rightLines_, rightRoi);
 
-	auto imgHeight = static_cast<float>(image_.rows);
+	auto imgHeight = static_cast<double>(image_.rows);
 
 	markingRect.x = leftRoi.x;
 	markingRect.y = leftRoi.y;
@@ -432,9 +432,9 @@ inline void HoughLinesR::drawLines(vector<LineV>& linePairs, cv::Scalar colour) 
 	}
 }
 
-inline void HoughLinesR::drawLine(cv::Vec4f& line) {
-	cv::Point2f p1(line[0], line[1]);
-	cv::Point2f p2(line[2], line[3]);
+inline void HoughLinesR::drawLine(cv::Vec4d& line) {
+	cv::Point2d p1(line[0], line[1]);
+	cv::Point2d p2(line[2], line[3]);
 	cv::line(output_, p1, p2, cv::Scalar(120, 120, 255), 2);
 }
 

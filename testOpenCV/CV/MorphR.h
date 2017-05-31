@@ -4,7 +4,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-class MorphR : public BaseR<float> {
+class MorphR : public BaseR {
 
 	cv::Mat output_;
 

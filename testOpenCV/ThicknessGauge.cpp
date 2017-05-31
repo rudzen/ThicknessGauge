@@ -595,6 +595,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 }
 
 cv::Vec2d ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR> hough) {
+	cv::Vec4d leftBorder = hough->getLeftBorder();
+
 	return cv::Vec2d(40.0f, 40.0f);
 }
 
