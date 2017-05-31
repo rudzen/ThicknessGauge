@@ -23,7 +23,7 @@
     <ProjectGuid>{1463A1B1-1383-4142-8001-FF934EDD3AD6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>testOpenCV</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
     <ProjectName>ThicknessGauge</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
