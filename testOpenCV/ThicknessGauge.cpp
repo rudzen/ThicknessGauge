@@ -239,21 +239,21 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	auto marking = hough->getMarkingRect();
 
-	cv::Rect2d leftBaseLine;
-	leftBaseLine.x = 0.0;
-	leftBaseLine.y = base_line_y;
-	leftBaseLine.width = marking.x;
-	leftBaseLine.height = quarter;
+	cv::Rect2d left_baseline;
+	left_baseline.x = 0.0;
+	left_baseline.y = base_line_y;
+	left_baseline.width = marking.x;
+	left_baseline.height = quarter;
 
-	cv::Rect2d rightBaseLine;
-	rightBaseLine.x = marking.x + marking.width;
-	rightBaseLine.y = base_line_y;
-	rightBaseLine.width = imageSize_.width - rightBaseLine.x;
-	rightBaseLine.height = quarter;
+	cv::Rect2d right_baseline;
+	right_baseline.x = marking.x + marking.width;
+	right_baseline.y = base_line_y;
+	right_baseline.width = imageSize_.width - right_baseline.x;
+	right_baseline.height = quarter;
 
 	// cannot be resized
-	vector<cv::Mat> left;
-	vector<cv::Mat> right;
+	vector<cv::Mat> left_frames;
+	vector<cv::Mat> right_frames;
 
 	//frame pointer for the desired frame set
 	unsigned int frame_index = 2;
@@ -261,13 +261,13 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	// generate baseline images..
 	for (auto i = frameCount_; i--;) {
-		left.emplace_back(frames->frames[i](leftBaseLine));
-		right.emplace_back(frames->frames[i](rightBaseLine));
+		left_frames.emplace_back(frames->frames[i](left_baseline));
+		right_frames.emplace_back(frames->frames[i](right_baseline));
 	}
 
-	auto left_size = left.front().size();
+	auto left_size = left_frames.front().size();
 	auto left_cutoff = left_size.width / 2.0;
-	auto right_size = right.front().size();
+	auto right_size = right_frames.front().size();
 	auto right_cutoff = right_size.width / 2.0;
 
 	auto left_y = 0.0;
@@ -292,17 +292,17 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		// left
 
-		for (auto& l : left) {
-			org = l.clone();
-			auto h = l.clone();
+		for (auto& left : left_frames) {
+			org = left.clone();
+			auto h = left.clone();
 			hough->setOriginal(h);
 
 			processMatForLine(org, canny, filter, hough, morph);
 
 			const auto& lines = hough->getRightLines(); // inner most side
-			for (auto& h : lines) {
-				if (h.entry[0] > left_cutoff)
-					Util::copyVector(h.elements, left_elements);
+			for (auto& line : lines) {
+				if (line.entry[0] > left_cutoff)
+					Util::copyVector(line.elements, left_elements);
 			}
 
 			if (draw->isEscapePressed(30))
@@ -314,7 +314,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		auto left_boundry = cv::minAreaRect(left_elements);
 		auto left_boundry_rect = left_boundry.boundingRect();
 
-		cout << "rightBoundryRect: " << left_boundry_rect.y << endl;
+		cout << "left_boundry_rect: " << left_boundry_rect.y << endl;
 
 		left_boundry_rect.width -= 40;
 
@@ -334,9 +334,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 		// right
 
-		for (auto& r : right) {
-			org = r.clone();
-			auto h1 = r.clone();
+		for (auto& right : right_frames) {
+			org = right.clone();
+			auto h1 = right.clone();
 			hough->setOriginal(h1);
 
 			processMatForLine(org, canny, filter, hough, morph);
@@ -365,7 +365,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 				running = false;
 		}
 
-		cout << "rightBoundryRect: " << right_boundry_rect.y << endl;
+		cout << "right_boundry_rect: " << right_boundry_rect.y << endl;
 
 		t = org(right_boundry_rect);
 		right_y = static_cast<double>(right_boundry_rect.y);
@@ -450,7 +450,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 
 	auto image_height = static_cast<double>(imageSize_.height);
 
-	unsigned int frame_index = 0;
+	unsigned int frame_index = 1;
 
 	auto frames = frameset[frame_index].get();
 
@@ -521,7 +521,6 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
-
 	}
 
 	if (showWindows_)
@@ -600,15 +599,15 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
 			/* RECT CUT METHOD */
-			std::vector<cv::Point> nonZero(base_frame.rows * base_frame.cols);
-			findNonZero(base_frame, nonZero);
-			auto laser_area = cv::boundingRect(nonZero);
+			std::vector<cv::Point> non_zero_elements(base_frame.rows * base_frame.cols);
+			findNonZero(base_frame, non_zero_elements);
+			auto laser_area = cv::boundingRect(non_zero_elements);
 			auto t = base_frame(laser_area);
 			highest_pixel += laser_area.y;
 			highest_pixel += LineCalc::computeRealIntensityLine(t, data->centerPoints, t.rows, 0);
 
-			for (auto& muffe : data->centerPoints)
-				results[static_cast<int>(muffe.x)].y += muffe.y;
+			for (auto& centerpoint : data->centerPoints)
+				results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
 
 			if (draw->isEscapePressed(30))
 				running = false;
@@ -617,8 +616,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 				cv::cvtColor(marking_frames[i], tmpOut, CV_GRAY2BGR);
 		}
 
-		for (auto& muffe : data->centerPoints)
-			results[static_cast<int>(muffe.x)].y /= frameCount_;
+		for (auto& centerpoint : data->centerPoints)
+			results[static_cast<int>(centerpoint.x)].y /= frameCount_;
 
 		// since theres some issues with using results vector, this works just as fine.
 		data->centerPoints.clear();
@@ -640,7 +639,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			draw->drawHorizontalLine(&tmpOut, cvRound(highest_total), cv::Scalar(0, 255, 0));
 			draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
 			draw->drawText(&tmpOut, cv::format("%f pixels", data->difference), TextDrawPosition::UpperLeft);
-			//draw->drawText(&tmpOut, cv::format("%f s", time), TextDrawPosition::UpperRight);
 			draw->showImage(window_name, tmpOut);
 			if (draw->isEscapePressed(30))
 				running = false;
@@ -657,9 +655,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 }
 
 cv::Vec2d ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR> hough) {
-	auto leftBorder = hough->getLeftBorder();
-	auto rightBorder = hough->getRightBorder();
-
+	auto left_border = hough->getLeftBorder();
+	auto right_border = hough->getRightBorder();
 
 	return cv::Vec2d(40.0, 40.0);
 }
@@ -698,9 +695,9 @@ void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right, 
 	cv::Rect left_rect(top_left, buttom_left);
 	cv::Rect right_rect(top_right, buttom_right);
 
-	for (auto& f : frames->frames) {
-		left.emplace_back(f(left_rect));
-		right.emplace_back(f(right_rect));
+	for (auto& frame : frames->frames) {
+		left.emplace_back(frame(left_rect));
+		right.emplace_back(frame(right_rect));
 	}
 
 }
@@ -733,9 +730,7 @@ void ThicknessGauge::addNulls() {
  */
 void ThicknessGauge::loadGlob(std::string& globName) {
 
-	cout << globName << endl;
-
-	for (int i = 0; i < frameset.size(); i++) {
+	for (auto i = 0; i < frameset.size(); i++) {
 
 		auto frames = frameset[i].get();
 
@@ -755,7 +750,6 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 
 		if (size != frameCount_)
 			setFrameCount(size);
-
 
 		frames->frames.clear();
 		frames->frames.reserve(size);
