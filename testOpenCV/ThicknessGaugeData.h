@@ -2,17 +2,24 @@
 
 #include <array>
 
+//class Frames {
+//public:
+//	std::vector<cv::Mat> frames;
+//	std::string exp_ext;
+//	int exp_ms;
+//};
+
 class ThicknessGaugeData {
-	
+
 protected:
 
-	vector<cv::Mat> frames;
+	std::array<int, 3> exposures = {5000, 20000, 40000};
+	std::array<std::string, 3> expusures_short = {"_5k", "_20k", "_40k"};
+	std::array<vector<cv::Mat>, 3> frames;
 
-	LineConfig lineConfig_;
+	//std::vector<Frames> frames;
 
 	cv::Vec4f gaugeLine_;
-
-	double avgGaugeHeight_;
 
 	bool gaugeLineSet_;
 
@@ -20,32 +27,26 @@ protected:
 
 	cv::Size imageSize_;
 
-	int imageType_;
+	void initFrames() {
+		for (auto i = 0; i < exposures.size(); i++) {
+			//frames[i].exp_ext = expusures_short[i];
+			//frames[i].exp_ms = exposures[i];
+			//frames.emplace_back(expusures_short[i], exposures[i]);
+		}
+
+	}
 
 public:
 
-	void setImageType(int imageType);
-
-	int getImageType() const;
+	ThicknessGaugeData() {
+		initFrames();
+	}
 
 	void setImageSize(cv::Size size);
 
 	void setImageSize(const int width, const int height);
 
-public:
-
-	ThicknessGaugeData(): avgGaugeHeight_(0), gaugeLineSet_(false), imageType_(0) {
-	}
-
 };
-
-inline void ThicknessGaugeData::setImageType(int imageType) {
-	imageType_ = imageType;
-}
-
-inline int ThicknessGaugeData::getImageType() const {
-	return imageType_;
-}
 
 inline void ThicknessGaugeData::setImageSize(cv::Size size) {
 	imageSize_ = size;

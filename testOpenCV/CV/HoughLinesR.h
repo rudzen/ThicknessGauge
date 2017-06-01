@@ -198,7 +198,7 @@ private:
 
 public:
 
-	void doVerticalHough();
+	int doVerticalHough();
 
 	void setAngleLimit(double angleLimit) {
 		this->angleLimit_ = angleLimit;
@@ -328,7 +328,8 @@ inline void HoughLinesR::thresholdcb(int value, void* userData) {
 	cout << cv::format("%s threshold : %i\n", that->windowName, value);
 }
 
-inline void HoughLinesR::doVerticalHough() {
+
+inline int HoughLinesR::doVerticalHough() {
 
 	if (!lines_.empty())
 		lines_.clear();
@@ -339,7 +340,7 @@ inline void HoughLinesR::doVerticalHough() {
 	//std::cout << "doVerticalHough # lines : " << lines.size();
 
 	if (lines_.empty())
-		return;
+		return -1;
 
 	allLines_.clear();
 	allLines_.reserve(lines_.size());
@@ -354,7 +355,8 @@ inline void HoughLinesR::doVerticalHough() {
 	}
 
 	if (allLines_.empty())
-		cerr << "FATAL ERROR, NO VERTICAL LINES DETECTED!";
+		return -2;
+	//cerr << "FATAL ERROR, NO VERTICAL LINES DETECTED!";
 
 	//drawLines(allLines, cv::Scalar(255, 0, 255));
 	computeMeta();

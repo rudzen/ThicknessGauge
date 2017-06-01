@@ -126,7 +126,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
 		computeBaseLineAreas(canny, filter_baseline, hough_horizontal, morph);
 		//std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
 		//std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
-		
+
 		// testing angles
 		LineCalc line_calc;
 
@@ -136,7 +136,14 @@ void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
 		std::cout << "intersection points: " << data->intersections << std::endl;
 
 		// pixel cut off is based on the border of the marking..
-		cv::Vec2f intersect_cutoff = computeIntersectionCut(hough_vertical);
+		cv::Vec2d intersect_cutoff = computeIntersectionCut(hough_vertical);
+
+		data->intersectionCuts[0] = data->intersections[0] - intersect_cutoff[0];
+		data->intersectionCuts[3] = data->intersections[3] + intersect_cutoff[1];
+
+		// set data for in-between areas
+		data->middlePieces[0] = data->intersectionCuts[0];
+		data->middlePieces[1] = data->intersectionCuts[3] - data->intersectionCuts[0];
 
 		line_calc.adjustMarkingRect(data->markingRect, data->intersections, intersect_cutoff[0]);
 
@@ -198,6 +205,13 @@ void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
  */
 void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
 
+	cv::Mat kernel_line_vertikal = (cv::Mat_<char>(4, 4) <<
+		0 , 0 , 1 , 1 ,
+		0 , 1 , 1 , 1 ,
+		1 , 1 , 1 , 0 ,
+		1 , 1 , 0 , 0
+	);
+
 	cv::Mat kernel_horizontal_line = (cv::Mat_<char>(4, 1) <<
 		0 ,
 		1 ,
@@ -205,7 +219,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		0
 	);
 
-	filter->setKernel(kernel_horizontal_line);
+	filter->setKernel(kernel_line_vertikal);
 
 	morph->setMethod(cv::MORPH_GRADIENT);
 	morph->setIterations(1);
@@ -217,6 +231,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		draw->makeWindow(window_left);
 		draw->makeWindow(window_right);
 	}
+
+	unsigned int frame_index = 2;
 
 	auto quarter = static_cast<double>(imageSize_.height) / 4.0;
 	auto base_line_y = imageSize_.height - quarter;
@@ -241,8 +257,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	// generate baseline images..
 	for (auto i = frameCount_; i--;) {
-		left.emplace_back(frames[i](leftBaseLine));
-		right.emplace_back(frames[i](rightBaseLine));
+		left.emplace_back(frames[frame_index][i](leftBaseLine));
+		right.emplace_back(frames[frame_index][i](rightBaseLine));
 	}
 
 	auto left_size = left.front().size();
@@ -430,6 +446,8 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 
 	auto image_height = static_cast<double>(imageSize_.height);
 
+	auto frame_index = 0;
+
 	auto accuRects = [image_height](vector<cv::Rect2d>& rects, cv::Rect2d& out) {
 		out.x = 0.0;
 		out.y = 0.0;
@@ -463,8 +481,8 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		right_borders.clear();
 
 		cv::Mat sparse;
-		for (auto i = frames.size(); i--;) {
-			filter->setImage(frames[i].clone());
+		for (auto i = 0; i < frames[frame_index].size(); i++) {
+			filter->setImage(frames[frame_index][i].clone());
 			filter->doFilter();
 			canny->setImage(filter->getResult());
 			canny->doCanny();
@@ -491,7 +509,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		if (!showWindows_)
 			running = false;
 		else {
-			auto marking_test = frames.front().clone();
+			auto marking_test = frames[frame_index].front().clone();
 			draw->drawRectangle(marking_test, output, cv::Scalar(128, 128, 128));
 			draw->showImage(window_name, marking_test);
 			if (draw->isEscapePressed(30))
@@ -528,8 +546,10 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	// generate frames with marking
 	std::vector<cv::Mat> marking_frames;
-	
-	for (auto& frame : frames)
+
+	auto frame_index = 0;
+
+	for (auto& frame : frames[frame_index])
 		marking_frames.emplace_back(frame(data->markingRect));
 
 	const std::string window_name = "test height";
@@ -657,18 +677,18 @@ double ThicknessGauge::computeHoughPMinLine(double min_len, cv::Rect2d& rect) {
  * \param left The output left side of the frames
  * \param right The output right side of the frames
  */
-void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) {
+void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right, unsigned int frame_index) {
 
 	cv::Point top_left(0, 0);
-	cv::Point buttom_left(frames.front().cols / 2, frames.front().rows);
+	cv::Point buttom_left(frames[frame_index].front().cols / 2, frames[frame_index].front().rows);
 
-	cv::Point top_right(frames.front().cols / 2, 0);
-	cv::Point buttom_right(frames.front().cols, frames.front().rows);
+	cv::Point top_right(frames[frame_index].front().cols / 2, 0);
+	cv::Point buttom_right(frames[frame_index].front().cols, frames[frame_index].front().rows);
 
 	cv::Rect left_rect(top_left, buttom_left);
 	cv::Rect right_rect(top_right, buttom_right);
 
-	for (auto& f : frames) {
+	for (auto& f : frames[frame_index]) {
 		left.emplace_back(f(left_rect));
 		right.emplace_back(f(right_rect));
 	}
@@ -702,30 +722,61 @@ void ThicknessGauge::addNulls() {
  * \param globName The name of the glob to load (foldername)
  */
 void ThicknessGauge::loadGlob(std::string& globName) {
-	globGenerator.setPattern(globName);
-	globGenerator.setRecursive(false);
-	globGenerator.generateGlob();
 
-	auto files = globGenerator.getFiles();
 
-	if (files.empty()) {
-		CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", globName));
+	for (int i = 0; i < frames.size(); i++) {
+	
+		globGenerator.setPattern(globName + expusures_short[i]);
+		globGenerator.setRecursive(false);
+		globGenerator.generateGlob();
+
+		auto files = globGenerator.getFiles();
+
+		if (files.empty()) {
+			CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", globName + expusures_short[i]));
+		}
+
+		auto size = static_cast<int>(files.size());
+
+		if (size != frameCount_)
+			setFrameCount(size);
+
+		frames[i].clear();
+		frames[i].reserve(size);
+
+		for (auto& file : files)
+			frames[i].emplace_back(cv::imread(file, CV_8UC1));
+
+		frames[i].shrink_to_fit();
+
 	}
 
-	auto size = static_cast<int>(files.size());
+	setImageSize(frames.front().front().size());
 
-	if (size != frameCount_)
-		setFrameCount(size);
+	//globGenerator.setPattern(globName);
+	//globGenerator.setRecursive(false);
+	//globGenerator.generateGlob();
 
-	frames.clear();
-	frames.reserve(size);
+	//auto files = globGenerator.getFiles();
 
-	for (auto& f : files)
-		frames.emplace_back(cv::imread(f, CV_8UC1));
+	//if (files.empty()) {
+	//	CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", globName));
+	//}
 
-	setImageSize(frames.front().size());
+	//auto size = static_cast<int>(files.size());
 
-	frames.shrink_to_fit();
+	//if (size != frameCount_)
+	//	setFrameCount(size);
+
+	//frames.clear();
+	//frames.reserve(size);
+
+	//for (auto& f : files)
+	//	frames.emplace_back(cv::imread(f, CV_8UC1));
+
+	//setImageSize(frames.front().size());
+
+	//frames.shrink_to_fit();
 }
 
 /**
@@ -739,7 +790,7 @@ void ThicknessGauge::captureFrames() {
 	cv::Mat t;
 	for (auto i = 0; i++ < frameCount_;) {
 		cap >> t;
-		frames.emplace_back(t);
+		frames[0].emplace_back(t);
 	}
 
 	setImageSize(t.size());
@@ -771,7 +822,7 @@ bool ThicknessGauge::saveData(string filename) {
 	fs << "LeftBasePoints" << data->leftPoints;
 	fs << "CenterPoints" << data->centerPoints;
 	fs << "RightBasePoints" << data->rightPoints;
-	fs << "FirstFrame" << frames.front();
+	fs << "FirstFrame" << frames[1].front();
 	fs.release();
 
 	std::sort(data->leftPoints.begin(), data->leftPoints.end(), miniCalc->sortX);
@@ -781,7 +832,7 @@ bool ThicknessGauge::saveData(string filename) {
 	std::ofstream file_output(filename + ".1.left.intensitet.txt");
 
 	auto writeY = [&](auto p) { file_output << p.y << '\n'; };
-	
+
 	// left
 	std::for_each(data->leftPoints.begin(), data->leftPoints.end(), writeY);
 	file_output.close();
@@ -799,7 +850,7 @@ bool ThicknessGauge::saveData(string filename) {
 	auto total_width = static_cast<int>(data->leftPoints.size() + data->centerPoints.size() + data->rightPoints.size());
 
 	// generate image for output overview and save it.
-	cv::Mat overview = cv::Mat::zeros(frames.front().rows, total_width, frames.front().type());
+	cv::Mat overview = cv::Mat::zeros(frames.front().front().rows, total_width, frames.front().front().type());
 
 	const char default_intensity = 210;
 	cv::Scalar default_col(210.0, 210.0, 210.0);
@@ -818,6 +869,8 @@ bool ThicknessGauge::saveData(string filename) {
 	offset += static_cast<unsigned int>(data->centerPoints.size());
 	cv::line(overview, cv::Point2d(data->centerPoints.back().x + data->leftPoints.size(), data->centerPoints.back().y), cv::Point2d(data->rightPoints.front().x + offset, data->rightPoints.front().y), default_col);
 	paintY(overview, data->rightPoints, offset);
+
+	draw->drawText(&overview, cv::format("diff (px): %f", data->difference), tg::TextDrawPosition::UpperRight, default_col);
 
 	cv::imshow("overview", overview);
 	cv::waitKey(0);

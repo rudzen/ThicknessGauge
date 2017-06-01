@@ -44,6 +44,12 @@ public:
 		// the points thwere the laser hits ground zero on the RIGHT side of the marking
 		std::vector<cv::Point2d> rightPoints;
 
+		// the missing link to the left
+		std::vector<cv::Point2d> middleLeft;
+
+		// the missing link to the right
+		std::vector<cv::Point2d> middleRight;
+
 		// the rectangle which includes the entire marking
 		cv::Rect2d markingRect;
 
@@ -59,6 +65,9 @@ public:
 		// the points where the intersections are cut.
 		// adjusted so potential unwanted information is not included in further calculations
 		cv::Vec2d intersectionCuts;
+
+		// the x coordinates for the pieces that are cut out.
+		cv::Vec4d middlePieces;
 
 		// the difference between the baseline(s) and the laser line on the marking in sub-pixels
 		double difference;
@@ -137,7 +146,7 @@ private: /* helper functions */
 
 	static double computeHoughPMinLine(double minLen, cv::Rect2d& rect);
 
-	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right);
+	void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right, unsigned int frame_index);
 
 	void loadGlob(std::string& globName);
 
