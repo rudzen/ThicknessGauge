@@ -13,7 +13,7 @@ cv::Point2d MiniCalc::variance(cv::Point2d& mean, vector<cv::Point>& pixels) con
 
 	cv::Point2d variance;
 	auto size = pixels.size();
-	for (auto& pixel_point : pixels) {
+	for (const auto& pixel_point : pixels) {
 		variance.x += (1.0 / (size - 1)) * pow(pixel_point.x - mean.x, 2.0);
 		variance.y += (1.0 / (size - 1)) * pow(pixel_point.y - mean.y, 2.0);
 	}
@@ -48,6 +48,7 @@ int MiniCalc::highestPixelInLine(cv::Mat& image) const {
 	return highestRect.y;
 }
 
+[[deprecated("not really used anymore, but could still prove useful in the future")]]
 bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point2f>& pixels, vector<cv::Point2f>& gradientPixels) const {
 
 	vector<cv::Point> pix;
@@ -69,32 +70,32 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 
 	auto x = pix.front().x;
 	auto count = 0;
-	auto ySum = 0;
-	auto totalYMean = 0.0;
-	auto gradientSum = 0.0;
+	auto y_sum = 0;
+	auto y_mean = 0.0;
+	auto gradient_sum = 0.0;
 
-	for (auto& p : pix) {
+	for (const auto& p : pix) {
 		if (p.x != x) {
 			if (count > 0) {
-				pixels.emplace_back(cv::Point(x, static_cast<int>(cvRound(ySum / static_cast<double>(count)))));
-				auto gradient = static_cast<unsigned char>(cvRound(gradientSum / count));
+				pixels.emplace_back(cv::Point(x, static_cast<int>(cvRound(y_sum / static_cast<double>(count)))));
+				auto gradient = static_cast<unsigned char>(cvRound(gradient_sum / count));
 				output.at<unsigned char>(pixels.back()) = gradient;
 				gradientPixels[x].y = gradient;
 				count = 0;
 			}
-			ySum = 0;
+			y_sum = 0;
 		}
 		x = p.x;
-		ySum += p.y;
-		totalYMean += p.y;
-		gradientSum += input.at<unsigned char>(p);
+		y_sum += p.y;
+		y_mean += p.y;
+		gradient_sum += input.at<unsigned char>(p);
 		count++;
 	}
 
 	if (pixels.empty())
 		return false;
 
-	totalYMean /= pixels.size();
+	y_mean /= pixels.size();
 
 	return true;
 }

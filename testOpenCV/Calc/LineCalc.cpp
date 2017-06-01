@@ -17,12 +17,12 @@ bool LineCalc::intersection(cv::Point2d o1, cv::Point2d p1, cv::Point2d o2, cv::
 	auto d1 = p1 - o1;
 	auto d2 = p2 - o2;
 
-	double cross = d1.x * d2.y - d1.y * d2.x;
+	auto cross = d1.x * d2.y - d1.y * d2.x;
 	if (abs(cross) < /*EPS*/1e-8) return false;
 
 	auto x = o2 - o1;
 
-	double t1 = (x.x * d2.y - x.y * d2.x) / cross;
+	auto t1 = (x.x * d2.y - x.y * d2.x) / cross;
 	r = o1 + d1 * t1;
 	return true;
 }
@@ -47,29 +47,29 @@ bool LineCalc::intersection(const cv::Vec4d& border, cv::Vec4d& line, cv::Point2
  */
 bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontalLine, const cv::Vec4d& leftBorder, const cv::Vec4d& rightBorder, cv::Vec4d& output) const {
 
-	cv::Point2d leftIntersection;
-	cv::Point2d rightIntersection;
-
 	// align horizontal line
 	horizontalLine[0] = leftBorder[0];
 	horizontalLine[2] = rightBorder[2];
 
+	cv::Point2d left_intersection;
+	cv::Point2d right_intersection;
+
 	// check intersection for both sides
-	auto intersectsLeft = intersection(leftBorder, horizontalLine, leftIntersection);
-	auto intersectsRight = intersection(rightBorder, horizontalLine, rightIntersection);
+	auto intersects_left = intersection(leftBorder, horizontalLine, left_intersection);
+	auto intersects_right = intersection(rightBorder, horizontalLine, right_intersection);
 
 	// check if there are two intersections
-	if (!(intersectsLeft & intersectsRight)) {
+	if (!(intersects_left & intersects_right)) {
 		Util::loge("Error in intersection detection.");
 		CV_Error(cv::Error::StsAssert, "Intersection points are invalid.");
 		return false;
 	}
 
 	// assign result to output vector
-	output[0] = leftIntersection.x;
-	output[1] = leftIntersection.y;
-	output[2] = rightIntersection.x;
-	output[3] = rightIntersection.y;
+	output[0] = left_intersection.x;
+	output[1] = left_intersection.y;
+	output[2] = right_intersection.x;
+	output[3] = right_intersection.y;
 
 	return true;
 
@@ -156,8 +156,9 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 			output.back().y = y;
 	}
 
-	double avg = 0.0;
-	for (auto& h : output)
+	auto avg = 0.0;
+
+	for (const auto& h : output)
 		avg += rows - h.y;
 
 	avg /= output.size();
@@ -168,46 +169,46 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 
 /**
  * \brief Computes the inner angle between two points both intersection with a center point
- * \param p1 The first point
- * \param p2 The second point
- * \param c The center point
+ * \param point1 The first point
+ * \param point2 The second point
+ * \param center The center point
  * \return The angle in degrees
  */
-double LineCalc::innerAngle(cv::Point2d& p1, cv::Point2d& p2, cv::Point2d& c) const {
+double LineCalc::innerAngle(cv::Point2d& point1, cv::Point2d& point2, cv::Point2d& center) const {
 
-	auto dist1 = cv::sqrt((p1.x - c.x) * (p1.x - c.x) + (p1.y - c.y) * (p1.y - c.y));
-	auto dist2 = cv::sqrt((p2.x - c.x) * (p2.x - c.x) + (p2.y - c.y) * (p2.y - c.y));
+	auto dist1 = cv::sqrt((point1.x - center.x) * (point1.x - center.x) + (point1.y - center.y) * (point1.y - center.y));
+	auto dist2 = cv::sqrt((point2.x - center.x) * (point2.x - center.x) + (point2.y - center.y) * (point2.y - center.y));
 
-	double Ax, Ay;
-	double Bx, By;
+	double ax, ay;
+	double bx, by;
 
-	auto Cx = c.x;
-	auto Cy = c.y;
+	auto cx = center.x;
+	auto cy = center.y;
 
 	// checking for closest point to c
 	if (dist1 < dist2) {
-		Bx = p1.x;
-		By = p1.y;
-		Ax = p2.x;
-		Ay = p2.y;
+		bx = point1.x;
+		by = point1.y;
+		ax = point2.x;
+		ay = point2.y;
 	}
 	else {
-		Bx = p2.x;
-		By = p2.y;
-		Ax = p1.x;
-		Ay = p1.y;
+		bx = point2.x;
+		by = point2.y;
+		ax = point1.x;
+		ay = point1.y;
 	}
 
-	auto Q1 = Cx - Ax;
-	auto Q2 = Cy - Ay;
-	auto P1 = Bx - Ax;
-	auto P2 = By - Ay;
+	auto q1 = cx - ax;
+	auto q2 = cy - ay;
+	auto p1 = bx - ax;
+	auto p2 = by - ay;
 
-	auto A = acos((P1 * Q1 + P2 * Q2) / (cv::sqrt(P1 * P1 + P2 * P2) * cv::sqrt(Q1 * Q1 + Q2 * Q2)));
+	auto a = acos((p1 * q1 + p2 * q2) / (cv::sqrt(p1 * p1 + p2 * p2) * cv::sqrt(q1 * q1 + q2 * q2)));
 
-	A *= 180 / CV_PI;
+	a *= 180 / CV_PI;
 
-	return A;
+	return a;
 }
 
 #endif
