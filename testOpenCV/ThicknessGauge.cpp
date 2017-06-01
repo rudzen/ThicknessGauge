@@ -75,7 +75,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
 
 		// determin where to get the frames from.
 		if (glob_name == "camera")
-			captureFrames(0);
+			captureFrames(0, frameCount_, 5000);
 		else
 			loadGlob(glob_name);
 
@@ -736,7 +736,7 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 	cout << globName << endl;
 
 	for (int i = 0; i < frameset.size(); i++) {
-	
+
 		auto frames = frameset[i].get();
 
 		cout << frames->exp_ext << endl;
@@ -769,44 +769,30 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 
 	setImageSize(frameset.front()->frames.front().size());
 
-	//globGenerator.setPattern(globName);
-	//globGenerator.setRecursive(false);
-	//globGenerator.generateGlob();
-
-	//auto files = globGenerator.getFiles();
-
-	//if (files.empty()) {
-	//	CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", globName));
-	//}
-
-	//auto size = static_cast<int>(files.size());
-
-	//if (size != frameCount_)
-	//	setFrameCount(size);
-
-	//frames.clear();
-	//frames.reserve(size);
-
-	//for (auto& f : files)
-	//	frames.emplace_back(cv::imread(f, CV_8UC1));
-
-	//setImageSize(frames.front().size());
-
-	//frames.shrink_to_fit();
 }
 
+
+
+
+
 /**
- * \brief Capture frameCount_ amount of frames from the capture device and stores them in a vector
+ * \brief Capture set amount of frames from the capture device with given exposure and stores them in a given vector
+ * \param frame_index The frameset index where to store the captured frame
+ * \param capture_count The amount of images to be captured
+ * \param exposure The exposure for the captured image (not implemented yet!)
  */
-void ThicknessGauge::captureFrames(unsigned int frame_index) {
+void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int capture_count, unsigned long long int exposure) {
 	// check if we succeeded
-	if (!cap.isOpened())
-	CV_Error(cv::Error::StsError, "Error while attempting to open capture device.");
+	if (!cap.isOpened()) {
+		CV_Error(cv::Error::StsError, "Error while attempting to open capture device.");
+	}
+
+	// TODO : add exposure adjustment for camera before capture!!!!
 
 	auto frames = frameset[frame_index].get();
 
 	cv::Mat t;
-	for (auto i = 0; i++ < frameCount_;) {
+	for (auto i = 0; i++ < capture_count;) {
 		cap >> t;
 		frames->frames.emplace_back(t);
 	}

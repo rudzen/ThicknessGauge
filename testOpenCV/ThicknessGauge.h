@@ -150,7 +150,7 @@ private: /* helper functions */
 
 	void loadGlob(std::string& globName);
 
-	void captureFrames(unsigned int frame_index);
+	void captureFrames(unsigned int frame_index, unsigned int capture_count, unsigned long long int exposure);
 
 private:
 
