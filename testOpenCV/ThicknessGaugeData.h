@@ -2,22 +2,24 @@
 
 #include <array>
 
-//class Frames {
-//public:
-//	std::vector<cv::Mat> frames;
-//	std::string exp_ext;
-//	int exp_ms;
-//};
-
 class ThicknessGaugeData {
 
 protected:
 
+	using Frames = struct Frames {
+		std::vector<cv::Mat> frames;
+		std::string exp_ext;
+		int exp_ms;
+
+		Frames(const std::string& expExt, int expMs)
+			: exp_ext(expExt),
+			  exp_ms(expMs) {
+		}
+	};
+
 	std::array<int, 3> exposures = {5000, 20000, 40000};
 	std::array<std::string, 3> expusures_short = {"_5k", "_20k", "_40k"};
-	std::array<vector<cv::Mat>, 3> frames;
-
-	//std::vector<Frames> frames;
+	std::vector<std::unique_ptr<Frames>> frameset;
 
 	cv::Vec4f gaugeLine_;
 
@@ -28,12 +30,16 @@ protected:
 	cv::Size imageSize_;
 
 	void initFrames() {
+		frameset.clear();
+		frameset.reserve(3);
 		for (auto i = 0; i < exposures.size(); i++) {
-			//frames[i].exp_ext = expusures_short[i];
-			//frames[i].exp_ms = exposures[i];
-			//frames.emplace_back(expusures_short[i], exposures[i]);
+			auto fra = std::make_unique<Frames>(expusures_short[i], exposures[i]);
+			frameset.emplace_back(std::move(fra));
+			//frameset[i]->exp_ext = expusures_short[i];
+			//frameset[i]->exp_ms = exposures[i];
+			//frameset.emplace_back(expusures_short[i], exposures[i]);
 		}
-
+		frameset.shrink_to_fit();
 	}
 
 public:

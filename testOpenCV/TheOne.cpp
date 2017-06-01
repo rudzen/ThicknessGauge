@@ -71,33 +71,33 @@ int main(int argc, char** argv) {
 			return 0;
 		}
 
-		ThicknessGauge c;
+		auto thicknessGauge = std::make_unique<ThicknessGauge>();
 
-		c.setFrameCount(options.getFrames());
-		c.setShowWindows(options.isShowWindows());
-		c.setSaveVideo(options.isRecordVideo());
-		c.initCalibrationSettings(options.getCameraFile());
+		thicknessGauge->setFrameCount(options.getFrames());
+		thicknessGauge->setShowWindows(options.isShowWindows());
+		thicknessGauge->setSaveVideo(options.isRecordVideo());
+		thicknessGauge->initCalibrationSettings(options.getCameraFile());
 		cv::setNumThreads(options.getNumOpenCvThreads());
 
-		//cout << options << endl;
+		cout << options << endl;
 
 		if (options.isGlobMode()) {
 			// TODO : use capture for file reading?!
-			c.initVideoCapture();
+			thicknessGauge->initVideoCapture();
 			auto globName = options.getGlobFolder();
-			c.generateGlob(globName);
+			thicknessGauge->generateGlob(globName);
 		}
 		else if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
 			auto glob_name = options.getGlobFolder();
-			c.initVideoCapture();
-			c.addNulls();
+			thicknessGauge->initVideoCapture();
+			thicknessGauge->addNulls();
 
-			c.computeMarkingHeight(glob_name);
+			thicknessGauge->computeMarkingHeight(glob_name);
 
-			auto data = c.getData(); // virker :-)
+			auto data = thicknessGauge->getData(); // virker :-)
 
-			c.saveData("output_mufmuf");
+			thicknessGauge->saveData("output_mufmuf");
 
 			cout << "difference: " << data->difference << endl;
 
