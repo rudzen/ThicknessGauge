@@ -55,7 +55,7 @@ void saveNull(std::string filename) {
 
 int main(int argc, char** argv) {
 
-	auto returnValue = false;
+	auto return_value = false;
 	CommandLineOptions options;
 
 	try {
@@ -89,11 +89,11 @@ int main(int argc, char** argv) {
 		}
 		else if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
-			auto globName = options.getGlobFolder();
+			auto glob_name = options.getGlobFolder();
 			c.initVideoCapture();
 			c.addNulls();
 
-			c.computeMarkingHeight(globName);
+			c.computeMarkingHeight(glob_name);
 
 			auto data = c.getData(); // virker :-)
 
@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
 	}
 	Util::log("\nSmooth operator...");
 
-	cout << returnValue << endl;
+	cout << return_value << endl;
 
 	return 0;
 	//return returnValue ^ true;
@@ -164,100 +164,100 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 		vector<Arg*> xors;
 
 		// add basic switches
-		SwitchArg demoSwitch("d", "demo", "runs regular demo", true, new DemoModeVisitor());
-		xors.emplace_back(&demoSwitch);
+		SwitchArg switch_demo("d", "demo", "runs regular demo", true, new DemoModeVisitor());
+		xors.emplace_back(&switch_demo);
 		//cmd.add(demoSwitch);
 
-		SwitchArg calibrationSwitch("c", "calibrate", "perform camera calibration", false, new CalibrationModeVisitor());
-		xors.emplace_back(&calibrationSwitch);
+		SwitchArg switch_calibration("c", "calibrate", "perform camera calibration", false, new CalibrationModeVisitor());
+		xors.emplace_back(&switch_calibration);
 		//cmd.add(calibrationSwitch);
 
-		SwitchArg buildInfoSwitch("i", "info", "show software information", false, new BuildInfoVisitor());
-		xors.emplace_back(&buildInfoSwitch);
+		SwitchArg switch_buildinfo("i", "info", "show software information", false, new BuildInfoVisitor());
+		xors.emplace_back(&switch_buildinfo);
 		//cmd.add(buildInfoSwitch);
 
-		SwitchArg testSwitch("t", "test", "Perform test", false, new TestModeVisitor());
-		xors.emplace_back(&testSwitch);
+		SwitchArg switch_test("t", "test", "Perform test", false, new TestModeVisitor());
+		xors.emplace_back(&switch_test);
 
-		SwitchArg globSwitch("g", "save_glob", "Save -f frames as glob", false, new GlobModeVisitor());
-		xors.emplace_back(&globSwitch);
+		SwitchArg switch_glob("g", "save_glob", "Save -f frames as glob", false, new GlobModeVisitor());
+		xors.emplace_back(&switch_glob);
 
 		cmd.xorAdd(xors);
 
-		ValueArg<string> nullSaveArg("", "null_save", "Save a singular image and exit", false, "null.png", new TestSuitConstraint());
-		cmd.add(nullSaveArg);
+		ValueArg<string> arg_nullsave("", "null_save", "Save a singular image and exit", false, "null.png", new TestSuitConstraint());
+		cmd.add(arg_nullsave);
 
 		/* end switches */
 
 		/* begin value base argument*/
-		ValueArg<string> testSuiteArg("", "test_suite", "Test name for saving the test under.", false, "default", new TestSuitConstraint());
-		cmd.add(testSuiteArg);
+		ValueArg<string> arg_testsuite("", "test_suite", "Test name for saving the test under.", false, "default", new TestSuitConstraint());
+		cmd.add(arg_testsuite);
 
-		ValueArg<int> frameArg("", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint("Frames", 5, 200));
-		cmd.add(frameArg);
+		ValueArg<int> arg_frame("", "frames", "amount of frames each calculation", false, 25, new IntegerConstraint("Frames", 5, 200));
+		cmd.add(arg_frame);
 
-		ValueArg<bool> showArg("", "show_windows", "displays windows in demo mode", false, true, "0/1");
-		cmd.add(showArg);
+		ValueArg<bool> arg_show_windows("", "show_windows", "displays windows in demo mode", false, true, "0/1");
+		cmd.add(arg_show_windows);
 
-		ValueArg<bool> videoArg("", "record_video", "Records demo mode to video", false, false, "0/1");
-		cmd.add(videoArg);
+		ValueArg<bool> arg_record_video("", "record_video", "Records demo mode to video", false, false, "0/1");
+		cmd.add(arg_record_video);
 
-		ValueArg<string> cameraFileArg("", "camera_settings", "OpenCV camera calibration file", false, default_camera_calibration_file, new FileConstraint());
-		cmd.add(cameraFileArg);
+		ValueArg<string> arg_camera_calibration_file("", "camera_settings", "OpenCV camera calibration file", false, default_camera_calibration_file, new FileConstraint());
+		cmd.add(arg_camera_calibration_file);
 
-		ValueArg<string> calibrationOutput("", "calibrate_output", "output file for camera matricies", false, "output.json", "filename");
-		cmd.add(calibrationOutput);
+		ValueArg<string> arg_calibration_output("", "calibrate_output", "output file for camera matricies", false, "output.json", "filename");
+		cmd.add(arg_calibration_output);
 
-		ValueArg<int> threadArg("", "opencv_threads", "OpenCV thread limit", false, 4, new IntegerConstraint("OpenCV Threads", 1, 40));
-		cmd.add(threadArg);
+		ValueArg<int> arg_max_opencv_threads("", "opencv_threads", "OpenCV thread limit", false, 4, new IntegerConstraint("OpenCV Threads", 1, 40));
+		cmd.add(arg_max_opencv_threads);
 
-		ValueArg<string> globNameArg("", "glob_name", "Name to save glob as", false, "camera", "Valid folder name.");
-		cmd.add(globNameArg);
+		ValueArg<string> arg_glob_name("", "glob_name", "Name to save glob as", false, "camera", "Valid folder name.");
+		cmd.add(arg_glob_name);
 
 		cmd.parse(argc, argv);
 
 		// check for null save.. this is an important thing! :-)
-		if (nullSaveArg.isSet()) {
-			options.setCameraFile(nullSaveArg.getValue());
+		if (arg_nullsave.isSet()) {
+			options.setCameraFile(arg_nullsave.getValue());
 			return true;
 		}
 
 		// read all parsed command line arguments
-		if (demoSwitch.isSet())
+		if (switch_demo.isSet())
 			options.setDemoMode(true);
-		else if (calibrationSwitch.isSet())
+		else if (switch_calibration.isSet())
 			options.setCalibrationMode(true);
-		else if (testSwitch.isSet())
+		else if (switch_test.isSet())
 			options.setTestMode(true);
-		else if (buildInfoSwitch.isSet()) { // check, its a instant abort if build info is found
+		else if (switch_buildinfo.isSet()) { // check, its a instant abort if build info is found
 			options.setBuildInfoMode(true);
 			return true;
 		}
-		else if (globSwitch.isSet())
+		else if (switch_glob.isSet())
 			options.setGlobMode(true); // glob mode
 
-		auto sval = cameraFileArg.getValue();
+		auto sval = arg_camera_calibration_file.getValue();
 		options.setCameraFile(sval);
 
-		sval = calibrationOutput.getValue();
+		sval = arg_calibration_output.getValue();
 		options.setCalibrationOutput(sval);
 
-		sval = testSuiteArg.getValue();
+		sval = arg_testsuite.getValue();
 		options.setTestSuite(sval);
 
-		sval = globNameArg.getValue();
+		sval = arg_glob_name.getValue();
 		options.setGlobFolder(sval);
 
-		auto ival = frameArg.getValue();
+		auto ival = arg_frame.getValue();
 		options.setFrames(ival);
 
-		ival = threadArg.getValue();
+		ival = arg_max_opencv_threads.getValue();
 		options.setNumOpenCvThreads(ival);
 
-		auto bval = showArg.getValue();
+		auto bval = arg_show_windows.getValue();
 		options.setShowWindows(bval);
 
-		bval = videoArg.getValue();
+		bval = arg_record_video.getValue();
 		options.setRecordVideo(bval);
 
 		return false;
