@@ -44,9 +44,9 @@ void ThicknessGauge::generateGlob(std::string& name) {
 		throw CaptureFailException("Error while attempting to open capture device.");
 
 	Util::createDirectory(name);
-	auto pbTitle = "Capturing glob " + name;
+	auto pb_title = "Capturing glob " + name;
 
-	ProgressBar pb(frameCount_ * 2, pbTitle.c_str());
+	ProgressBar pb(frameCount_ * 2, pb_title.c_str());
 	pb.SetFrequencyUpdate(10);
 	pb.SetStyle("-", " ");
 
@@ -64,20 +64,20 @@ void ThicknessGauge::generateGlob(std::string& name) {
 
 /**
  * \brief Determins the marking boundries
- * \param globName if "camera", use camera, otherwise load from glob folder
+ * \param glob_name if "camera", use camera, otherwise load from glob folder
  * \return 2 Float vector with the points marking the boundries as pair, where first = left, second = right
  */
-void ThicknessGauge::computeMarkingHeight(std::string& globName) {
+void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
 
 	try {
 
 		// determin where to get the frames from.
-		if (globName == "camera")
+		if (glob_name == "camera")
 			captureFrames();
 		else
-			loadGlob(globName);
+			loadGlob(glob_name);
 
-		uint64 startTime = cv::getTickCount();
+		uint64 time_start = cv::getTickCount();
 
 		// configure frames based on center vertical splitting of the original frames
 		//vector<cv::Mat> leftFrames(frameCount_);
@@ -88,24 +88,22 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, false);
 
 		// the filter used to determin the marking location in the frame
-		auto markingFilter = make_shared<FilterR>("Marking Filter", showWindows_);
-		markingFilter->setShowWindows(showWindows_);
+		auto filter_marking = make_shared<FilterR>("Marking Filter", showWindows_);
+		filter_marking->setShowWindows(showWindows_);
 
 		// filter to enhance the base line
-		auto baselineFilter = make_shared<FilterR>("Baseline Filter", showWindows_);
-		baselineFilter->setShowWindows(showWindows_);
+		auto filter_baseline = make_shared<FilterR>("Baseline Filter", showWindows_);
+		filter_baseline->setShowWindows(showWindows_);
 
 		// houghlines to determin where the actual marking is in the frame
-		auto houghV = make_shared<HoughLinesR>(1, static_cast<const int>(CV_PI / 180), 40, showWindows_);
+		auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(CV_PI / 180), 40, showWindows_);
 
 		// configure the diffrent functionalities
-		houghV->setAngleLimit(30);
-		houghV->setShowWindows(showWindows_);
+		hough_vertical->setAngleLimit(30);
+		hough_vertical->setShowWindows(showWindows_);
 
-		data->markingRect = computerMarkingRectangle(canny, markingFilter, houghV);
-		houghV->setMarkingRect(data->markingRect);
-
-		startTime = cv::getTickCount();
+		data->markingRect = computerMarkingRectangle(canny, filter_marking, hough_vertical);
+		hough_vertical->setMarkingRect(data->markingRect);
 
 		// check the resulting rectangle for weirdness
 		if (data->markingRect.x < 0.0 || data->markingRect.y < 0.0 || data->markingRect.width > imageSize_.width || data->markingRect.height > imageSize_.height || data->markingRect.area() >= imageSize_.area()) {
@@ -113,56 +111,56 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		}
 
 		// make sure the minimum is at least 10 pixels.
-		auto minLineLen = computeHoughPMinLine(10.0, data->markingRect);
+		auto min_line_len = computeHoughPMinLine(10.0, data->markingRect);
 
 		// horizontal houghline extension class
-		auto houghH = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, cvRound(minLineLen), showWindows_);
+		auto hough_horizontal = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, cvRound(min_line_len), showWindows_);
 
-		houghH->setMaxLineGab(12);
-		houghH->setMarkingRect(data->markingRect);
-		houghH->setShowWindows(showWindows_);
+		hough_horizontal->setMaxLineGab(12);
+		hough_horizontal->setMarkingRect(data->markingRect);
+		hough_horizontal->setShowWindows(showWindows_);
 
 		// morph extension class
 		auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
 
-		computeBaseLineAreas(canny, baselineFilter, houghH, morph);
+		computeBaseLineAreas(canny, filter_baseline, hough_horizontal, morph);
 		//std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
 		//std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
-
+		
 		// testing angles
-		LineCalc lineCalc;
+		LineCalc line_calc;
 
 		// compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
-		lineCalc.computeIntersectionPoints(data->baseLines, houghV->getLeftBorder(), houghV->getRightBorder(), data->intersections);
+		line_calc.computeIntersectionPoints(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
 
 		std::cout << "intersection points: " << data->intersections << std::endl;
 
 		// pixel cut off is based on the border of the marking..
-		cv::Vec2f intersectionCutoff = computeIntersectionCut(houghV);
+		cv::Vec2f intersect_cutoff = computeIntersectionCut(hough_vertical);
 
-		lineCalc.adjustMarkingRect(data->markingRect, data->intersections, intersectionCutoff[0]);
+		line_calc.adjustMarkingRect(data->markingRect, data->intersections, intersect_cutoff[0]);
 
 		// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
-		lineCalc.adjustBaseLines(data->baseLines, data->intersections, intersectionCutoff[0]);
+		line_calc.adjustBaseLines(data->baseLines, data->intersections, intersect_cutoff[0]);
 
-		cv::Point2d leftLine(data->markingRect.x, data->baseLines[1]);
-		cv::Point2d rightLine(leftLine.x + data->markingRect.width, data->baseLines[3]);
+		cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);
+		cv::Point2d line_right(line_left.x + data->markingRect.width, data->baseLines[3]);
 
-		cout << "angle between baselines: " << lineCalc.angleBetweenLines(leftLine, rightLine) << endl;
+		cout << "angle between baselines: " << line_calc.angleBetweenLines(line_left, line_right) << endl;
 
 		//std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
 		//std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
 		//std::cout << cv::format("Adjusted base line Y [right]: %f\n", data->baseLines[3]);
 
 		// filter for laser detection
-		auto laserFilter = make_shared<FilterR>("Laser Filter", showWindows_);
-		laserFilter->setShowWindows(showWindows_);
+		auto filter_laser = make_shared<FilterR>("Laser Filter", showWindows_);
+		filter_laser->setShowWindows(showWindows_);
 
 		// main laser class
 		auto laser = make_shared<LaserR>();
 
 		// computes the Y locations of the laserline inside the marking rect
-		computeLaserLocations(laser, laserFilter);
+		computeLaserLocations(laser, filter_laser);
 
 		if (showWindows_)
 			draw->removeAllWindows();
@@ -175,9 +173,9 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
 		for (auto& p : data->centerPoints)
 			p.y = imageSize_.height - p.y;
 
-		uint64 endTime = cv::getTickCount();
+		uint64 time_end = cv::getTickCount();
 
-		frameTime_ = static_cast<double>((endTime - startTime) / cv::getTickFrequency());
+		frameTime_ = static_cast<double>((time_end - time_start) / cv::getTickFrequency());
 
 		cout << "Total compute time (seconds) : " << frameTime_ << endl;
 
@@ -200,40 +198,40 @@ void ThicknessGauge::computeMarkingHeight(std::string& globName) {
  */
 void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
 
-	cv::Mat lineHKernel = (cv::Mat_<char>(4, 1) <<
+	cv::Mat kernel_horizontal_line = (cv::Mat_<char>(4, 1) <<
 		0 ,
 		1 ,
 		1 ,
 		0
 	);
 
-	filter->setKernel(lineHKernel);
+	filter->setKernel(kernel_horizontal_line);
 
 	morph->setMethod(cv::MORPH_GRADIENT);
 	morph->setIterations(1);
 
-	const std::string leftWindow = "test baseline left";
-	const std::string rightWindow = "test baseline right";
+	const std::string window_left = "test baseline left";
+	const std::string window_right = "test baseline right";
 
 	if (showWindows_) {
-		draw->makeWindow(leftWindow);
-		draw->makeWindow(rightWindow);
+		draw->makeWindow(window_left);
+		draw->makeWindow(window_right);
 	}
 
 	auto quarter = static_cast<double>(imageSize_.height) / 4.0;
-	auto baseLineY = imageSize_.height - quarter;
+	auto base_line_y = imageSize_.height - quarter;
 
-	auto markingRect = hough->getMarkingRect();
+	auto marking = hough->getMarkingRect();
 
 	cv::Rect2d leftBaseLine;
 	leftBaseLine.x = 0.0;
-	leftBaseLine.y = baseLineY;
-	leftBaseLine.width = markingRect.x;
+	leftBaseLine.y = base_line_y;
+	leftBaseLine.width = marking.x;
 	leftBaseLine.height = quarter;
 
 	cv::Rect2d rightBaseLine;
-	rightBaseLine.x = markingRect.x + markingRect.width;
-	rightBaseLine.y = baseLineY;
+	rightBaseLine.x = marking.x + marking.width;
+	rightBaseLine.y = base_line_y;
 	rightBaseLine.width = imageSize_.width - rightBaseLine.x;
 	rightBaseLine.height = quarter;
 
@@ -247,16 +245,16 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		right.emplace_back(frames[i](rightBaseLine));
 	}
 
-	auto leftSize = left.front().size();
-	auto leftCutoff = leftSize.width / 2.0;
-	auto rightSize = right.front().size();
-	auto rightCutoff = rightSize.width / 2.0;
+	auto left_size = left.front().size();
+	auto left_cutoff = left_size.width / 2.0;
+	auto right_size = right.front().size();
+	auto right_cutoff = right_size.width / 2.0;
 
-	auto leftY = 0.0;
-	auto rightY = 0.0;
+	auto left_y = 0.0;
+	auto right_y = 0.0;
 
-	std::vector<cv::Point2f> leftElements(leftSize.area());
-	std::vector<cv::Point2f> rightElements(rightSize.area());
+	std::vector<cv::Point2f> left_elements(left_size.area());
+	std::vector<cv::Point2f> right_elements(right_size.area());
 
 	auto offset = imageSize_.height - quarter;
 
@@ -264,11 +262,11 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 	while (running) {
 
-		leftElements.clear();
-		rightElements.clear();
+		left_elements.clear();
+		right_elements.clear();
 
-		leftY = 0.0;
-		rightY = 0.0;
+		left_y = 0.0;
+		right_y = 0.0;
 
 		cv::Mat org;
 
@@ -283,8 +281,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 			const auto& lines = hough->getRightLines(); // inner most side
 			for (auto& h : lines) {
-				if (h.entry[0] > leftCutoff)
-					Util::copyVector(h.elements, leftElements);
+				if (h.entry[0] > left_cutoff)
+					Util::copyVector(h.elements, left_elements);
 			}
 
 			if (draw->isEscapePressed(30))
@@ -293,26 +291,26 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		}
 
 		// generate real boundry
-		auto leftBoundry = cv::minAreaRect(leftElements);
-		auto leftBoundryRect = leftBoundry.boundingRect();
+		auto left_boundry = cv::minAreaRect(left_elements);
+		auto left_boundry_rect = left_boundry.boundingRect();
 
-		cout << "rightBoundryRect: " << leftBoundryRect.y << endl;
+		cout << "rightBoundryRect: " << left_boundry_rect.y << endl;
 
-		leftBoundryRect.width -= 40;
+		left_boundry_rect.width -= 40;
 
 		if (showWindows_) {
-			draw->drawRectangle(org, leftBoundryRect, cv::Scalar(255, 255, 255));
-			draw->showImage(leftWindow, org);
+			draw->drawRectangle(org, left_boundry_rect, cv::Scalar(255, 255, 255));
+			draw->showImage(window_left, org);
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
 
-		auto t = org(leftBoundryRect);
-		leftY = static_cast<double>(leftBoundryRect.y);
-		leftY += offset;
-		leftY += LineCalc::computeRealIntensityLine(t, data->leftPoints, t.rows, 0);
+		auto t = org(left_boundry_rect);
+		left_y = static_cast<double>(left_boundry_rect.y);
+		left_y += offset;
+		left_y += LineCalc::computeRealIntensityLine(t, data->leftPoints, t.rows, 0);
 
-		cout << "left baseline: " << leftY << endl;
+		cout << "left baseline: " << left_y << endl;
 
 		// right
 
@@ -325,8 +323,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 
 			const auto& lines = hough->getLeftLines(); // inner most side
 			for (auto& h : lines) {
-				if (h.entry[2] < rightCutoff)
-					Util::copyVector(h.elements, rightElements);
+				if (h.entry[2] < right_cutoff)
+					Util::copyVector(h.elements, right_elements);
 			}
 
 			if (draw->isEscapePressed(30))
@@ -335,26 +333,26 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 		}
 
 		// generate real boundry
-		auto rightBoundry = cv::minAreaRect(rightElements);
-		auto rightBoundryRect = rightBoundry.boundingRect();
+		auto right_boundry = cv::minAreaRect(right_elements);
+		auto right_boundry_rect = right_boundry.boundingRect();
 
-		rightBoundryRect.x += 40;
+		right_boundry_rect.x += 40;
 
 		if (showWindows_) {
-			draw->drawRectangle(org, rightBoundryRect, cv::Scalar(255, 255, 255));
-			draw->showImage(rightWindow, org);
+			draw->drawRectangle(org, right_boundry_rect, cv::Scalar(255, 255, 255));
+			draw->showImage(window_right, org);
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
 
-		cout << "rightBoundryRect: " << rightBoundryRect.y << endl;
+		cout << "rightBoundryRect: " << right_boundry_rect.y << endl;
 
-		t = org(rightBoundryRect);
-		rightY = static_cast<double>(rightBoundryRect.y);
-		rightY += LineCalc::computeRealIntensityLine(t, data->rightPoints, t.rows, 0);
-		rightY += offset;
+		t = org(right_boundry_rect);
+		right_y = static_cast<double>(right_boundry_rect.y);
+		right_y += LineCalc::computeRealIntensityLine(t, data->rightPoints, t.rows, 0);
+		right_y += offset;
 
-		cout << "right baseline: " << rightY << endl;
+		cout << "right baseline: " << right_y << endl;
 
 		// forcefully break out of the loop
 		if (!showWindows_)
@@ -364,13 +362,13 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 	}
 
 	data->baseLines[0] = 0.0;
-	data->baseLines[1] = leftY;
+	data->baseLines[1] = left_y;
 	data->baseLines[2] = 0.0;
-	data->baseLines[3] = rightY;
+	data->baseLines[3] = right_y;
 
 	if (showWindows_) {
-		draw->removeWindow(leftWindow);
-		draw->removeWindow(rightWindow);
+		draw->removeWindow(window_left);
+		draw->removeWindow(window_right);
 	}
 }
 
@@ -405,40 +403,38 @@ void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<CannyR> canny, s
  */
 cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough) {
 
-	const std::string windowName = "test marking out";
+	const std::string window_name = "test marking out";
 
 	if (showWindows_) {
-		draw->makeWindow(windowName);
+		draw->makeWindow(window_name);
 	}
 
-	cv::Mat lineVKernel = (cv::Mat_<char>(4, 4) <<
+	cv::Mat kernel_line_vertikal = (cv::Mat_<char>(4, 4) <<
 		0 , 0 , 1 , 1 ,
 		0 , 1 , 1 , 1 ,
 		1 , 1 , 1 , 0 ,
 		1 , 1 , 0 , 0
 	);
 
-	filter->setKernel(lineVKernel);
+	filter->setKernel(kernel_line_vertikal);
 
-	cv::Mat markingTest;
-
-	vector<cv::Rect2d> markingRects(frameCount_);
-	vector<cv::Vec4d> leftBorders(frameCount_);
-	vector<cv::Vec4d> rightBorders(frameCount_);
+	vector<cv::Rect2d> markings(frameCount_);
+	vector<cv::Vec4d> left_borders(frameCount_);
+	vector<cv::Vec4d> right_borders(frameCount_);
 
 	cv::Rect2d output(0.0, 0.0, 0.0, 0.0);
-	cv::Vec4d leftBorderOut(0.0, 0.0, 0.0, 0.0);
-	cv::Vec4d rightBorderOut(0.0, 0.0, 0.0, 0.0);
+	cv::Vec4d left_border_result(0.0, 0.0, 0.0, 0.0);
+	cv::Vec4d right_border_result(0.0, 0.0, 0.0, 0.0);
 
 	auto running = true;
 
-	auto imgHeight = static_cast<double>(imageSize_.height);
+	auto image_height = static_cast<double>(imageSize_.height);
 
-	auto accuRects = [imgHeight](vector<cv::Rect2d>& rects, cv::Rect2d& out) {
+	auto accuRects = [image_height](vector<cv::Rect2d>& rects, cv::Rect2d& out) {
 		out.x = 0.0;
 		out.y = 0.0;
 		out.width = 0.0;
-		out.height = imgHeight;
+		out.height = image_height;
 		for (auto& r : rects) {
 			out.x += r.x;
 			out.width += r.width;
@@ -447,9 +443,9 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 		out.width /= rects.size();
 	};
 
-	auto accuVecs = [imgHeight](vector<cv::Vec4d>& vecs, cv::Vec4d& out) {
+	auto accuVecs = [image_height](vector<cv::Vec4d>& vecs, cv::Vec4d& out) {
 		out[0] = 0.0;
-		out[1] = imgHeight;
+		out[1] = image_height;
 		out[2] = 0.0;
 		out[3] = 0.0;
 		for (auto& v : vecs) {
@@ -462,13 +458,12 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 
 	while (running) {
 
-		markingRects.clear();
-		leftBorders.clear();
-		rightBorders.clear();
+		markings.clear();
+		left_borders.clear();
+		right_borders.clear();
 
 		cv::Mat sparse;
 		for (auto i = frames.size(); i--;) {
-			markingTest = frames[i].clone();
 			filter->setImage(frames[i].clone());
 			filter->doFilter();
 			canny->setImage(filter->getResult());
@@ -482,22 +477,23 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 
 			hough->doVerticalHough();
 			hough->computeBorders();
-			markingRects.emplace_back(hough->getMarkingRect());
-			leftBorders.emplace_back(hough->getLeftBorder());
-			rightBorders.emplace_back(hough->getRightBorder());
+			markings.emplace_back(hough->getMarkingRect());
+			left_borders.emplace_back(hough->getLeftBorder());
+			right_borders.emplace_back(hough->getRightBorder());
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
 
-		accuRects(markingRects, output);
-		accuVecs(leftBorders, leftBorderOut);
-		accuVecs(rightBorders, rightBorderOut);
+		accuRects(markings, output);
+		accuVecs(left_borders, left_border_result);
+		accuVecs(right_borders, right_border_result);
 
 		if (!showWindows_)
 			running = false;
 		else {
-			draw->drawRectangle(markingTest, output, cv::Scalar(128, 128, 128));
-			draw->showImage(windowName, markingTest);
+			auto marking_test = frames.front().clone();
+			draw->drawRectangle(marking_test, output, cv::Scalar(128, 128, 128));
+			draw->showImage(window_name, marking_test);
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
@@ -505,17 +501,17 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
 	}
 
 	if (showWindows_)
-		draw->removeWindow(windowName);
+		draw->removeWindow(window_name);
 
 	auto validRectangle = [output]()-> bool {
 		return output.width > 0.0 && output.height > 0.0;
 	};
 
-	bool outputOk = validRectangle();
+	bool valid_rect = validRectangle();
 
-	if (outputOk) {
-		hough->leftBorder(leftBorderOut);
-		hough->rightBorder(rightBorderOut);
+	if (valid_rect) {
+		hough->leftBorder(left_border_result);
+		hough->rightBorder(right_border_result);
 		return cv::Rect2d(output);
 	}
 
@@ -530,19 +526,17 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, sh
  */
 void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter) {
 
-	uint64 startTime = cv::getTickCount();
-
 	// generate frames with marking
-	std::vector<cv::Mat> markingFrames;
-
+	std::vector<cv::Mat> marking_frames;
+	
 	for (auto& frame : frames)
-		markingFrames.emplace_back(frame(data->markingRect));
+		marking_frames.emplace_back(frame(data->markingRect));
 
-	const std::string windowName = "test height";
+	const std::string window_name = "test height";
 	if (showWindows_)
-		draw->makeWindow(windowName);
+		draw->makeWindow(window_name);
 
-	auto imSize = markingFrames.front().size();
+	auto image_size = marking_frames.front().size();
 
 	// local copy of real baseline
 	auto base = imageSize_.height - data->baseLines[1];
@@ -551,39 +545,39 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	auto running = true;
 
-	std::vector<cv::Point2d> results(imSize.width);
+	std::vector<cv::Point2d> results(image_size.width);
 
-	for (auto i = 0; i < imSize.width; i++)
+	for (auto i = 0; i < image_size.width; i++)
 		results[i].x = i;
 
 	while (running) {
 
-		auto highestPixel = 0.0;
+		auto highest_pixel = 0.0;
 
-		for (auto i = 0; i < imSize.width; i++)
+		for (auto i = 0; i < image_size.width; i++)
 			results[i].y = 0.0;
 
 		for (auto i = frameCount_; i--;) {
 
-			cv::Mat baseFrame;
+			cv::Mat base_frame;
 
 			// TODO : replace with custom filter if needed
-			cv::bilateralFilter(markingFrames[i], baseFrame, 3, 20, 10);
+			cv::bilateralFilter(marking_frames[i], base_frame, 3, 20, 10);
 
 			//cv::Mat t;
 			//GenericCV::adaptiveThreshold(baseFrame, t, &thresholdLevel);
 
-			threshold(baseFrame, baseFrame, binaryThreshold_, 255, CV_THRESH_BINARY);
+			threshold(base_frame, base_frame, binaryThreshold_, 255, CV_THRESH_BINARY);
 
-			GaussianBlur(baseFrame, baseFrame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
+			GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
 			/* RECT CUT METHOD */
-			std::vector<cv::Point> nonZero(baseFrame.rows * baseFrame.cols);
-			findNonZero(baseFrame, nonZero);
-			auto laserArea = cv::boundingRect(nonZero);
-			auto t = baseFrame(laserArea);
-			highestPixel += laserArea.y;
-			highestPixel += LineCalc::computeRealIntensityLine(t, data->centerPoints, t.rows, 0);
+			std::vector<cv::Point> nonZero(base_frame.rows * base_frame.cols);
+			findNonZero(base_frame, nonZero);
+			auto laser_area = cv::boundingRect(nonZero);
+			auto t = base_frame(laser_area);
+			highest_pixel += laser_area.y;
+			highest_pixel += LineCalc::computeRealIntensityLine(t, data->centerPoints, t.rows, 0);
 
 			for (auto& muffe : data->centerPoints)
 				results[static_cast<int>(muffe.x)].y += muffe.y;
@@ -592,7 +586,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 				running = false;
 
 			if (showWindows_ && !i && running)
-				cv::cvtColor(markingFrames[i], tmpOut, CV_GRAY2BGR);
+				cv::cvtColor(marking_frames[i], tmpOut, CV_GRAY2BGR);
 		}
 
 		for (auto& muffe : data->centerPoints)
@@ -602,24 +596,24 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 		data->centerPoints.clear();
 		Util::copyVector(results, data->centerPoints);
 
-		auto highestPixelTotal = imageSize_.height - highestPixel / static_cast<unsigned int>(frameCount_);
+		auto highest_total = imageSize_.height - highest_pixel / static_cast<unsigned int>(frameCount_);
 
-		highestPixel = 0.0;
+		highest_pixel = 0.0;
 
-		std::cout << cv::format("highestPixelTotal: %f\n", highestPixelTotal);
+		std::cout << cv::format("highestPixelTotal: %f\n", highest_total);
 
-		data->difference = abs(base - highestPixelTotal);
+		data->difference = abs(base - highest_total);
 		std::cout << cv::format("diff from baseline: %f\n", data->difference);
 
 		if (!running || !showWindows_)
 			break;
 
 		if (showWindows_) {
-			draw->drawHorizontalLine(&tmpOut, cvRound(highestPixelTotal), cv::Scalar(0, 255, 0));
+			draw->drawHorizontalLine(&tmpOut, cvRound(highest_total), cv::Scalar(0, 255, 0));
 			draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
 			draw->drawText(&tmpOut, cv::format("%f pixels", data->difference), TextDrawPosition::UpperLeft);
 			//draw->drawText(&tmpOut, cv::format("%f s", time), TextDrawPosition::UpperRight);
-			draw->showImage(windowName, tmpOut);
+			draw->showImage(window_name, tmpOut);
 			if (draw->isEscapePressed(30))
 				running = false;
 		}
@@ -630,7 +624,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 	}
 
 	if (showWindows_)
-		draw->removeWindow(windowName);
+		draw->removeWindow(window_name);
 
 }
 
@@ -648,13 +642,13 @@ cv::Vec2d ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR> hough) 
  * \param rect The rectangle of the marking location
  * \return the computed value, but not less than minLen
  */
-double ThicknessGauge::computeHoughPMinLine(double minLen, cv::Rect2d& rect) {
-	auto minLineLen = rect.width / 32.0;
+double ThicknessGauge::computeHoughPMinLine(double min_len, cv::Rect2d& rect) {
+	auto min_line_len = rect.width / 32.0;
 
-	if (minLineLen < minLen)
-		minLineLen = minLen;
+	if (min_line_len < min_len)
+		min_line_len = min_len;
 
-	return minLineLen;
+	return min_line_len;
 }
 
 /**
@@ -665,18 +659,18 @@ double ThicknessGauge::computeHoughPMinLine(double minLen, cv::Rect2d& rect) {
  */
 void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right) {
 
-	cv::Point topLeft(0, 0);
-	cv::Point buttomLeft(frames.front().cols / 2, frames.front().rows);
+	cv::Point top_left(0, 0);
+	cv::Point buttom_left(frames.front().cols / 2, frames.front().rows);
 
-	cv::Point topRight(frames.front().cols / 2, 0);
-	cv::Point buttomRight(frames.front().cols, frames.front().rows);
+	cv::Point top_right(frames.front().cols / 2, 0);
+	cv::Point buttom_right(frames.front().cols, frames.front().rows);
 
-	cv::Rect leftRect2I(topLeft, buttomLeft);
-	cv::Rect rightRect2I(topRight, buttomRight);
+	cv::Rect left_rect(top_left, buttom_left);
+	cv::Rect right_rect(top_right, buttom_right);
 
 	for (auto& f : frames) {
-		left.emplace_back(f(leftRect2I));
-		right.emplace_back(f(rightRect2I));
+		left.emplace_back(f(left_rect));
+		right.emplace_back(f(right_rect));
 	}
 
 }
