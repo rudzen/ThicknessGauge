@@ -23,45 +23,17 @@ private:
 
 public:
 
-	template <typename T1, typename T2, class Pred = std::less<T2>>
-	struct sortXless {
-		bool operator()(const std::pair<T1, T2>& left, const std::pair<T1, T2>& right) {
-			Pred p;
-			return p(left.second, right.second);
-		}
-	};
+	struct pixelYsort {
+		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
+		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
+		bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.y < pt2.y; }
+	} sortY;
 
-	template <typename T1, class T2, class Pred = std::less<T2>>
-	struct sortYless {
-		bool operator()(const std::pair<T1, T2>& left, const std::pair<T1, T2>& right) {
-			Pred p;
-			return p(left.second, right.second);
-		}
-	};
-
-	template <class T1, class T2 = cv::Point_<T1>, class Pred = std::less<T2>>
-	struct pointSortX {
-		bool operator()(const T2& left, const T2& right) {
-			Pred p;
-			return p(left.y, right.y);
-		}
-	};
-
-	//struct pixelYsort {
-	//	bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
-	//	bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
-	//	bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.y < pt2.y; }
-	//} sortY;
-
-	template <typename T, class Pred = std::less<T>>
 	struct pixelXsort {
-		bool operator()(cv::Point_<T> pt1, cv::Point_<T> pt2) const {
-			Pred p;
-			return p(pt1.x, pt2.x);
-		}
-		//bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
-		//bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.x < pt2.x; }
-	};
+		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
+		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
+		bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.x < pt2.x; }
+	} sortX;
 
 	void sortContours(vector<vector<cv::Point>>& contours) {
 		auto contourComparator = [](vector<cv::Point> a, vector<cv::Point> b) { return contourArea(a) > contourArea(b); };
@@ -108,7 +80,7 @@ public:
 		elements.emplace_back(cv::Point(0, target.rows));
 		elements.emplace_back(cv::Point(target.cols, target.rows));
 
-		sort(elements.begin(), elements.end(), sortXless<vi, vi>());
+		sort(elements.begin(), elements.end(), sortX);
 
 		auto size = elements.size();
 
