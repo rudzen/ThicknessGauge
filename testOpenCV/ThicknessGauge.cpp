@@ -19,8 +19,6 @@
 #include <opencv2/core/base.hpp>
 #include "UI/DrawHelper.h"
 
-
-
 /**
  * \brief Initializes the class and loads any aditional information
  * \param glob_name if "camera", use camera, otherwise load from glob folder
@@ -58,6 +56,7 @@ void ThicknessGauge::initCalibrationSettings(string fileName) const {
  * \param name The name of the glob, let it be a valid foldername!!!
  */
 void ThicknessGauge::generateGlob(std::string& name) {
+	initVideoCapture();
 	if (!cap.isOpened()) // check if we succeeded
 		throw CaptureFailException("Error while attempting to open capture device.");
 
