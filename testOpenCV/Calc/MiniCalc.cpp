@@ -49,7 +49,7 @@ int MiniCalc::highestPixelInLine(cv::Mat& image) const {
 }
 
 [[deprecated("not really used anymore, but could still prove useful in the future")]]
-bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point2f>& pixels, vector<cv::Point2f>& gradientPixels) const {
+bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point2f>& pixels, vector<cv::Point2f>& gradient_pixels) const {
 
 	vector<cv::Point> pix;
 
@@ -57,10 +57,10 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 
 	findNonZero(input, pix);
 
-	gradientPixels.clear();
-	gradientPixels.reserve(input.cols);
+	gradient_pixels.clear();
+	gradient_pixels.reserve(input.cols);
 	for (auto x = input.cols; x--;)
-		gradientPixels.emplace_back(cv::Point2d(0.0, 0.0));
+		gradient_pixels.emplace_back(cv::Point2d(0.0, 0.0));
 
 	pixels.clear();
 	pixels.reserve(input.cols);
@@ -80,7 +80,7 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 				pixels.emplace_back(cv::Point(x, static_cast<int>(cvRound(y_sum / static_cast<double>(count)))));
 				auto gradient = static_cast<unsigned char>(cvRound(gradient_sum / count));
 				output.at<unsigned char>(pixels.back()) = gradient;
-				gradientPixels[x].y = gradient;
+				gradient_pixels[x].y = gradient;
 				count = 0;
 			}
 			y_sum = 0;
@@ -100,25 +100,27 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 	return true;
 }
 
-bool MiniCalc::getActualPixels(cv::Mat& image, vi& output, int yLimit) {
+bool MiniCalc::getActualPixels(cv::Mat& image, vi& output, int y_limit) {
 	vi result;
 	cv::findNonZero(image, result);
-	yLimit = abs(image.rows - yLimit);
+	y_limit = abs(image.rows - y_limit);
 	for (auto& p : result) {
-		if (p.y <= yLimit)
+		if (p.y <= y_limit)
 			output.emplace_back(p);
 	}
 	return !output.empty();
 }
 
-bool MiniCalc::getActualPixels(vi& pixels, vi& target, double yLimit, int imageHeight) {
+bool MiniCalc::getActualPixels(vi& pixels, vi& target, double y_limit, double image_height) {
 	if (!target.empty())
 		target.clear();
 
-	yLimit = abs(imageHeight - yLimit);
+	y_limit = abs(image_height - y_limit);
+
+	target.reserve(cvRound(y_limit));
 
 	for (auto& p : pixels) {
-		if (p.y <= yLimit)
+		if (p.y <= y_limit)
 			target.emplace_back(p);
 	}
 

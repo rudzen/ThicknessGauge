@@ -114,8 +114,8 @@ private:
 
 	int threshold;
 
-	const int aperMin = 3;
-	const int aperMax = 7;
+	const int APERTURE_MIN = 3;
+	const int APERTURE_MAX = 7;
 
 	double srn_;
 
@@ -310,20 +310,20 @@ inline void HoughLinesR::computeBorders() {
 
 }
 
-inline void HoughLinesR::rhocb(int value, void* userData) {
-	auto that = static_cast<HoughLinesR*>(userData);
+inline void HoughLinesR::rhocb(int value, void* user_data) {
+	auto that = static_cast<HoughLinesR*>(user_data);
 	that->setTheta(value);
 	cout << cv::format("%s rho : %i\n", that->windowName, value);
 }
 
-inline void HoughLinesR::thetacb(int value, void* userData) {
-	auto that = static_cast<HoughLinesR*>(userData);
+inline void HoughLinesR::thetacb(int value, void* user_data) {
+	auto that = static_cast<HoughLinesR*>(user_data);
 	that->setTheta(value);
 	cout << cv::format("%s theta : %i\n", that->windowName, value);
 }
 
-inline void HoughLinesR::thresholdcb(int value, void* userData) {
-	auto that = static_cast<HoughLinesR*>(userData);
+inline void HoughLinesR::thresholdcb(int value, void* user_data) {
+	auto that = static_cast<HoughLinesR*>(user_data);
 	that->setThreshold(value);
 	cout << cv::format("%s threshold : %i\n", that->windowName, value);
 }
@@ -428,14 +428,14 @@ inline linePair HoughLinesR::computePointPair2(cv::Vec2f& line) const {
 
 }
 
-inline void HoughLinesR::drawLines(vector<LineV>& linePairs, cv::Scalar colour) {
+inline void HoughLinesR::drawLines(vector<LineV>& line_pairs, cv::Scalar colour) {
 	if (!showWindows_)
 		return;
 
-	if (linePairs.empty())
+	if (line_pairs.empty())
 		return;
 
-	for (auto& lineV : linePairs) {
+	for (auto& lineV : line_pairs) {
 		line(output_, lineV.points.first, lineV.points.second, colour, 1, CV_AA);
 		//line(original, r.first, r.second, colour, 1, CV_AA);
 	}

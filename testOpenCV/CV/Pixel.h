@@ -49,12 +49,12 @@ public:
 	 * \param image The image to use as base for intensity computation
 	 * \param vector The vector to check for
 	 * \param connectivity Line connectivity, default = 8
-	 * \param leftToRight Reverse direction, default = false
+	 * \param left_to_right Reverse direction, default = false
 	 * \return The average intensity for the line, ranging 0-255 (uchar)
 	 */
-	static uchar Pixelz::getLineAvgIntensity(cv::Mat& image, cv::Vec4f& vector, int connectivity = 8, bool leftToRight = false) {
+	static uchar Pixelz::getLineAvgIntensity(cv::Mat& image, cv::Vec4f& vector, int connectivity = 8, bool left_to_right = false) {
 
-		cv::LineIterator it(image, cv::Point(cvRound(vector[0]), cvRound(vector[1])), cv::Point(cvRound(vector[2]), cvRound(vector[3])), connectivity, leftToRight);
+		cv::LineIterator it(image, cv::Point(cvRound(vector[0]), cvRound(vector[1])), cv::Point(cvRound(vector[2]), cvRound(vector[3])), connectivity, left_to_right);
 
 		if (it.count == 0)
 			return 0;
@@ -115,15 +115,15 @@ public:
 	 * \brief Retrieve the highest located pixel in a specific coloum
 	 * \param image The image to use
 	 * \param x The coloumn to get the highest pixel from
-	 * \param miniCalc For sorting struct only
+	 * \param mini_calc For sorting struct only
 	 * \return The location of the highest pixel location
 	 */
-	int Pixelz::getHighestYpixel(cv::Mat& image, int x, MiniCalc& miniCalc) const {
+	int Pixelz::getHighestYpixel(cv::Mat& image, int x, MiniCalc& mini_calc) const {
 		auto highest = image.rows;
 		vector<cv::Point> pix;
 		findNonZero(image, pix);
 
-		sort(pix.begin(), pix.end(), miniCalc.sortX);
+		sort(pix.begin(), pix.end(), mini_calc.sortX);
 
 		auto intensitySum = 0.0;
 		auto yAvg = 0.0;

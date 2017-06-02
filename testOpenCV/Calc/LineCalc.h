@@ -12,20 +12,17 @@ public:
 
 #ifdef CV_VERSION
 
-	LineCalc() {
-	}
-
 	bool intersection(cv::Point2d o1, cv::Point2d p1, cv::Point2d o2, cv::Point2d p2, cv::Point2d& r) const;
 
 	bool intersection(const cv::Vec4d& border, cv::Vec4d& line, cv::Point2d& result) const;
 
-	bool computeIntersectionPoints(cv::Vec4d horizontalLine, const cv::Vec4d& leftBorder, const cv::Vec4d& rightBorder, cv::Vec4d& output) const;
+	bool computeIntersectionPoints(cv::Vec4d horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output) const;
 
-	static void adjustMarkingRect(cv::Rect2d& markingRect, cv::Vec4d& intersectionPoints, double buffer);
+	static void adjustMarkingRect(cv::Rect2d& marking_rect, cv::Vec4d& intersection_points, double buffer);
 
-	static void adjustBaseLines(cv::Vec4d& baseLines, cv::Vec4d& intersectionPoints, double buffer);
+	static void adjustBaseLines(cv::Vec4d& base_lines, cv::Vec4d& intersection_points, double buffer);
 
-	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, int upperLimit, int lowerLimit);
+	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, int upper_limit, int lower_limit);
 
 	double angleBetweenLines(cv::Point2d& p1, cv::Point2d& p2) const {
 		return atan((p1.y - p2.y) / (p2.x - p1.x) * 180 / CV_PI);

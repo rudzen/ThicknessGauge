@@ -9,10 +9,10 @@
  * \param p1 Point one of pair two
  * \param o2 Point two of pair one
  * \param p2 Point two of pair two
- * \param r The resulting point of intersection
+ * \param result The resulting point of intersection
  * \return true if intersection was found, otherwise false
  */
-bool LineCalc::intersection(cv::Point2d o1, cv::Point2d p1, cv::Point2d o2, cv::Point2d p2, cv::Point2d& r) const {
+bool LineCalc::intersection(cv::Point2d o1, cv::Point2d p1, cv::Point2d o2, cv::Point2d p2, cv::Point2d& result) const {
 
 	auto d1 = p1 - o1;
 	auto d2 = p2 - o2;
@@ -23,7 +23,7 @@ bool LineCalc::intersection(cv::Point2d o1, cv::Point2d p1, cv::Point2d o2, cv::
 	auto x = o2 - o1;
 
 	auto t1 = (x.x * d2.y - x.y * d2.x) / cross;
-	r = o1 + d1 * t1;
+	result = o1 + d1 * t1;
 	return true;
 }
 
@@ -39,24 +39,24 @@ bool LineCalc::intersection(const cv::Vec4d& border, cv::Vec4d& line, cv::Point2
 
 /**
  * \brief Computes the intersection points based on horizontal line and two borders
- * \param horizontalLine The horizontal line
- * \param leftBorder The left border
- * \param rightBorder The right border
+ * \param horizontal_line The horizontal line
+ * \param left_border The left border
+ * \param right_border The right border
  * \param output The resulting intersection points (if any)
  * \return true if intersection points where computed, otherwise false
  */
-bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontalLine, const cv::Vec4d& leftBorder, const cv::Vec4d& rightBorder, cv::Vec4d& output) const {
+bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output) const {
 
 	// align horizontal line
-	horizontalLine[0] = leftBorder[0];
-	horizontalLine[2] = rightBorder[2];
+	horizontal_line[0] = left_border[0];
+	horizontal_line[2] = right_border[2];
 
 	cv::Point2d left_intersection;
 	cv::Point2d right_intersection;
 
 	// check intersection for both sides
-	auto intersects_left = intersection(leftBorder, horizontalLine, left_intersection);
-	auto intersects_right = intersection(rightBorder, horizontalLine, right_intersection);
+	auto intersects_left = intersection(left_border, horizontal_line, left_intersection);
+	auto intersects_right = intersection(right_border, horizontal_line, right_intersection);
 
 	// check if there are two intersections
 	if (!(intersects_left & intersects_right)) {
@@ -77,32 +77,32 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontalLine, const cv::Vec
 
 /**
  * \brief Adjust the marking rectangle based on the intersection points and specified buffer
- * \param markingRect The rectangle to adjust
- * \param intersectionPoints The intersection points
+ * \param marking_rect The rectangle to adjust
+ * \param intersection_points The intersection points
  * \param buffer The buffer to apply
  */
-void LineCalc::adjustMarkingRect(cv::Rect2d& markingRect, cv::Vec4d& intersectionPoints, double buffer) {
+void LineCalc::adjustMarkingRect(cv::Rect2d& marking_rect, cv::Vec4d& intersection_points, double buffer) {
 
-	if (markingRect.x == 0)
+	if (marking_rect.x == 0)
 		CV_Error(cv::Error::BadROISize, "Marketing rectangle start position is zero.");		
-	else if (markingRect.width == 0)
+	else if (marking_rect.width == 0)
 		CV_Error(cv::Error::BadROISize, "Marketing rectangle width is zero.");
 
-	markingRect.x = intersectionPoints[0] + buffer;
-	markingRect.width = intersectionPoints[2] - markingRect.x - buffer;
+	marking_rect.x = intersection_points[0] + buffer;
+	marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
 
 }
 
 /**
  * \brief Adjusts the baselines according to intersection points and specified buffer
- * \param baseLines The baseline
- * \param intersectionPoints The intersection points
+ * \param base_lines The baseline
+ * \param intersection_points The intersection points
  * \param buffer The buffer
  */
-void LineCalc::adjustBaseLines(cv::Vec4d& baseLines, cv::Vec4d& intersectionPoints, double buffer) {
+void LineCalc::adjustBaseLines(cv::Vec4d& base_lines, cv::Vec4d& intersection_points, double buffer) {
 	
-	baseLines[0] = intersectionPoints[0] - buffer;
-	baseLines[2] = intersectionPoints[2] + buffer;
+	base_lines[0] = intersection_points[0] - buffer;
+	base_lines[2] = intersection_points[2] + buffer;
 
 }
 
@@ -111,11 +111,11 @@ void LineCalc::adjustBaseLines(cv::Vec4d& baseLines, cv::Vec4d& intersectionPoin
  * This gives the weighted Y position based off the intensity levels across that single X column
  * \param image The image to perform the computation on
  * \param output The output vector of points
- * \param upperLimit The upper limit of the rectangular cut out
- * \param lowerLimit The lower limit of the rectangular cut out
+ * \param upper_limit The upper limit of the rectangular cut out
+ * \param lower_limit The lower limit of the rectangular cut out
  * \return The avg of the computed Y value across the entirety of the image matrix with regards to cut offs
  */
-double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, int upperLimit, int lowerLimit) {
+double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, int upper_limit, int lower_limit) {
 
 	// generate vector with all X
 	if (!output.empty())
@@ -129,7 +129,7 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 	output.reserve(cols);
 
 	// cut out rectangle without any X value set
-	cv::Rect2d cutOut(0.0, lowerLimit, 1.0, upperLimit);
+	cv::Rect2d cutOut(0.0, lower_limit, 1.0, upper_limit);
 
 	for (auto i = 0; i < cols; i++) {
 

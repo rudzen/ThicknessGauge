@@ -345,8 +345,8 @@ inline void HoughLinesPR::bresenham() {
 		//	rightLines.emplace_back(line);
 	}
 
-	auto lSize = leftLines.size();
-	auto rSize = rightLines.size();
+	auto left_size = leftLines.size();
+	auto right_size = rightLines.size(); // not wrong
 
 	auto onlyRight = false;
 
@@ -365,11 +365,11 @@ inline void HoughLinesPR::bresenham() {
 
 
 	// build right side line points
-	for (auto& rightLine : rightLines) {
-		cv::LineIterator it(image_, rightLine.points.first, rightLine.points.second, 8);
-		rightLine.elements.reserve(it.count);
+	for (auto& right_line : rightLines) {
+		cv::LineIterator it(image_, right_line.points.first, right_line.points.second, 8);
+		right_line.elements.reserve(it.count);
 		for (auto i = 0; i < it.count; i++ , ++it)
-			rightLine.elements.emplace_back(it.pos());
+			right_line.elements.emplace_back(it.pos());
 	}
 
 	//// sort if needed
@@ -381,11 +381,11 @@ inline void HoughLinesPR::bresenham() {
 	//	return;
 
 	// build left side line points
-	for (auto& leftLine : leftLines) {
-		cv::LineIterator it(image_, leftLine.points.first, leftLine.points.second, 8);
-		leftLine.elements.reserve(it.count);
+	for (auto& left_line : leftLines) {
+		cv::LineIterator it(image_, left_line.points.first, left_line.points.second, 8);
+		left_line.elements.reserve(it.count);
 		for (auto i = 0; i < it.count; i++ , ++it)
-			leftLine.elements.emplace_back(it.pos());
+			left_line.elements.emplace_back(it.pos());
 	}
 
 	//// sort if needed
@@ -410,40 +410,40 @@ inline double HoughLinesPR::getAngle(int x1, int x2, int y1, int y2) const {
 	return atan2(y1 - y2, x1 - x2);
 }
 
-inline bool HoughLinesPR::splitLinesInX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double* leftCenter, double* rightCenter) {
+inline bool HoughLinesPR::splitLinesInX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double* left_center, double* right_center) {
 
-	*leftCenter = 0.0;
-	*rightCenter = 0.0;
+	*left_center = 0.0;
+	*right_center = 0.0;
 
 	for (auto& line : source) {
 		//if (s[1] >= yMin && s[3] >= yMin) { // desværre, ellers bliver størrelserne og dermed pointers fucked up.
 		auto centerX = (line.entry[2] + line.entry[0]) * 0.5f;
 		if (centerX <= x) {
 			left.emplace_back(line);
-			*leftCenter += centerX;
+			*left_center += centerX;
 		}
 		else {
 			right.emplace_back(line);
-			*rightCenter += centerX;
+			*right_center += centerX;
 		}
 		//}
 	}
 
 	if (!left.empty())
-		*leftCenter /= left.size();
+		*left_center /= left.size();
 
 	if (!right.empty())
-		*rightCenter /= right.size();
+		*right_center /= right.size();
 
 	return !(right.empty() && left.empty());
 
 }
 
-inline void HoughLinesPR::drawLine(vector<linePair>& linePairs, cv::Scalar colour) {
+inline void HoughLinesPR::drawLine(vector<linePair>& line_pairs, cv::Scalar colour) {
 	if (!showWindow_)
 		return;
 
-	for (auto& r : linePairs) {
+	for (auto& r : line_pairs) {
 		drawLine(r.first, r.second, colour);
 		//line(original, r.first, r.second, colour, 1, CV_AA);
 	}

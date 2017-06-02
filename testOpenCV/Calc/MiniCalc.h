@@ -179,12 +179,12 @@ public:
 	 * \brief Crude cutoff of pixels from image based on Y
 	 * \param image The image data
 	 * \param output The output vector
-	 * \param yLimit The limit in height
+	 * \param y_limit The limit in height
 	 * \return true if something was found, otherwise false
 	 */
-	static bool getActualPixels(cv::Mat& image, vi& output, int yLimit);
+	static bool getActualPixels(cv::Mat& image, vi& output, int y_limit);
 
-	static bool getActualPixels(vi& pixels, vi& target, double yLimit, int imageHeight);
+	static bool getActualPixels(vi& pixels, vi& target, double y_limit, double image_height);
 
 	/**
 	 * \brief Computes the average (mean) intensity of the entire image
