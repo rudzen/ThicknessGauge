@@ -69,6 +69,12 @@ public:
 		// the rectangle which includes the entire marking
 		cv::Rect2d markingRect;
 
+		// left border vector
+		cv::Vec4d leftBorder;
+
+		// right border vector
+		cv::Vec4d rightBorder;
+
 		// the base lines where the laser hits the actual ground-zero
 		cv::Vec4d baseLines;
 
@@ -84,6 +90,13 @@ public:
 
 		// the x coordinates for the pieces that are cut out.
 		cv::Vec4d middlePieces;
+
+		// the avg
+		double leftAvg;
+		double leftMiddleAvg;
+		double centerAvg;
+		double rightMiddleAvg;
+		double rightAvg;
 
 		// the difference between the baseline(s) and the laser line on the marking in sub-pixels
 		double difference;
@@ -165,6 +178,8 @@ private:
 	cv::Rect2d computerMarkingRectangle(shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough);
 
 	void computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter);
+
+	void computerInBetween(shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
 
 private: /* helper functions */
 

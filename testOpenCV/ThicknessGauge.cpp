@@ -15,7 +15,6 @@
 #include "CV/FilterR.h"
 #include "CV/HoughLinesPR.h"
 #include "CV/SparseR.h"
-#include "Calc/LineCalc.h"
 #include <opencv2/core/base.hpp>
 #include "UI/DrawHelper.h"
 
@@ -31,7 +30,8 @@ void ThicknessGauge::initialize(std::string& glob_name) {
 	if (glob_name == "camera") {
 		initVideoCapture();
 		captureFrames(0, frameCount_, 5000);
-	} else
+	}
+	else
 		loadGlob(glob_name);
 }
 
@@ -69,11 +69,11 @@ void ThicknessGauge::generateGlob(std::string& name) {
 
 	cv::Mat t;
 
-	unsigned long progress = 1;
+	unsigned long progress = 0;
 	for (auto i = 0; i < frameCount_; ++i) {
-		pb.Progressed(progress++);
+		pb.Progressed(++progress);
 		cap >> t;
-		pb.Progressed(progress++);
+		pb.Progressed(++progress);
 		cv::imwrite(name + "/img" + to_string(i) + ".png", t);
 	}
 	pb.Progressed(frameCount_ * 2);
@@ -134,11 +134,11 @@ void ThicknessGauge::computeMarkingHeight() {
 		//std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
 		//std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
 
-		// testing angles
-		LineCalc line_calc;
-
 		// compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
-		line_calc.computeIntersectionPoints(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
+		lineCalc->computeIntersectionPoints(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
+
+		// grabs the in between parts and stores the data
+		computerInBetween(filter_baseline, hough_horizontal, morph);
 
 		std::cout << "intersection points: " << data->intersections << std::endl;
 
@@ -152,15 +152,16 @@ void ThicknessGauge::computeMarkingHeight() {
 		data->middlePieces[0] = data->intersectionCuts[0];
 		data->middlePieces[1] = data->intersectionCuts[3] - data->intersectionCuts[0];
 
-		line_calc.adjustMarkingRect(data->markingRect, data->intersections, intersect_cutoff[0]);
+		lineCalc->adjustMarkingRect(data->markingRect, data->intersections, intersect_cutoff[0]);
 
 		// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
-		line_calc.adjustBaseLines(data->baseLines, data->intersections, intersect_cutoff[0]);
+		lineCalc->adjustBaseLines(data->baseLines, data->intersections, intersect_cutoff[0]);
 
+		// testing angles between baseline.. should be max 5 degrees
 		cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);
 		cv::Point2d line_right(line_left.x + data->markingRect.width, data->baseLines[3]);
 
-		cout << "angle between baselines: " << line_calc.angleBetweenLines(line_left, line_right) << endl;
+		cout << "angle between baselines: " << lineCalc->angleBetweenLines(line_left, line_right) << endl;
 
 		//std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
 		//std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
@@ -332,7 +333,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 		auto t = org(left_boundry_rect);
 		left_y = static_cast<double>(left_boundry_rect.y);
 		left_y += offset;
-		left_y += LineCalc::computeRealIntensityLine(t, data->leftPoints, t.rows, 0);
+		left_y += lineCalc->computeRealIntensityLine(t, data->leftPoints, t.rows, 0);
 
 		cout << "left baseline: " << left_y << endl;
 
@@ -373,7 +374,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 
 		t = org(right_boundry_rect);
 		right_y = static_cast<double>(right_boundry_rect.y);
-		right_y += LineCalc::computeRealIntensityLine(t, data->rightPoints, t.rows, 0);
+		right_y += lineCalc->computeRealIntensityLine(t, data->rightPoints, t.rows, 0);
 		right_y += offset;
 
 		cout << "right baseline: " << right_y << endl;
@@ -535,6 +536,8 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<FilterR> filter, 
 	bool valid_rect = validRectangle();
 
 	if (valid_rect) {
+		data->leftBorder = left_border_result;
+		data->rightBorder = right_border_result;
 		hough->leftBorder(left_border_result);
 		hough->rightBorder(right_border_result);
 		return cv::Rect2d(output);
@@ -606,7 +609,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			auto laser_area = cv::boundingRect(non_zero_elements);
 			auto t = base_frame(laser_area);
 			highest_pixel += laser_area.y;
-			highest_pixel += LineCalc::computeRealIntensityLine(t, data->centerPoints, t.rows, 0);
+			highest_pixel += lineCalc->computeRealIntensityLine(t, data->centerPoints, t.rows, 0);
 
 			for (auto& centerpoint : data->centerPoints)
 				results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
@@ -655,6 +658,68 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 		draw->removeWindow(window_name);
 
 }
+
+void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
+
+	// temporary function to compute the middle pieces, just for the lulz, not going to be used in calculations (yet).
+
+	std::vector<cv::Mat> left_middle;
+	std::vector<cv::Mat> right_middle;
+
+	// reuseable vectors for all parts
+	std::vector<cv::Mat> left;
+	std::vector<cv::Mat> right;
+
+	cv::Rect2d left_base_roi;
+	cv::Rect2d right_base_roi;
+
+	cv::Rect2d left_laser_roi;
+	cv::Rect2d right_laser_roi;
+
+	// grab low exposure frames to get the baseline part of the image
+	auto frame_index = 2;
+
+	auto frame = frameset[frame_index].get();
+
+	auto image_size = frame->frames.front().size();
+
+	auto quarter = image_size.height >> 2;
+
+	left_base_roi.x = data->markingRect.x;
+	left_base_roi.y = image_size.height - quarter;
+
+	left_base_roi.width = data->leftBorder[2] - data->intersections[0];
+	left_base_roi.height = quarter;
+
+	cout << "in between: left_base_roi -> " << left_base_roi << endl;
+
+	// TODO : insert check for centerline boundries crossing over border
+	left_laser_roi.x = data->intersections[0];
+	left_laser_roi.y = 0;
+
+	left_laser_roi.width = data->leftBorder[2] - data->intersections[0];
+	left_laser_roi.height = image_size.height;
+
+	cout << "in between: left_laser_roi -> " << left_laser_roi << endl;
+
+	// grab the left left baseline
+	for (auto& f : frame->frames) {
+		left.emplace_back(f(left_base_roi));
+	}
+
+	// switch to lower exposure and grab left right side
+	frame_index = 0;
+	frame = frameset[frame_index].get();
+	for (auto& f : frame->frames) {
+		right.emplace_back(f(left_laser_roi));
+	}
+
+	cv::imwrite("__left_.png", left.front());
+	cv::imwrite("__right_.png", right.front());
+
+
+}
+
 
 cv::Vec2d ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR> hough) {
 	auto left_border = hough->getLeftBorder();
@@ -767,10 +832,6 @@ void ThicknessGauge::loadGlob(std::string& globName) {
 
 }
 
-
-
-
-
 /**
  * \brief Capture set amount of frames from the capture device with given exposure and stores them in a given vector
  * \param frame_index The frameset index where to store the captured frame
@@ -867,6 +928,8 @@ bool ThicknessGauge::saveData(string filename) {
 	unsigned int offset = 0;
 	paintY(overview, data->leftPoints, offset);
 	offset += static_cast<unsigned int>(data->leftPoints.size());
+
+
 	cv::line(overview, data->leftPoints.back(), cv::Point2d(data->centerPoints.front().x + offset, data->centerPoints.front().y), default_col);
 	paintY(overview, data->centerPoints, offset);
 	offset += static_cast<unsigned int>(data->centerPoints.size());
