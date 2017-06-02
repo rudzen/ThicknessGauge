@@ -35,12 +35,11 @@ protected:
 		for (auto i = 0; i < exposures.size(); i++) {
 			auto fra = std::make_unique<Frames>(expusures_short[i], exposures[i]);
 			frameset.emplace_back(std::move(fra));
-			//frameset[i]->exp_ext = expusures_short[i];
-			//frameset[i]->exp_ms = exposures[i];
-			//frameset.emplace_back(expusures_short[i], exposures[i]);
 		}
 		frameset.shrink_to_fit();
 	}
+
+
 
 public:
 

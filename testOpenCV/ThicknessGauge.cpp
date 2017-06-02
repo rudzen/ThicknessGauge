@@ -19,6 +19,24 @@
 #include <opencv2/core/base.hpp>
 #include "UI/DrawHelper.h"
 
+
+
+/**
+ * \brief Initializes the class and loads any aditional information
+ * \param glob_name if "camera", use camera, otherwise load from glob folder
+ */
+void ThicknessGauge::initialize(std::string& glob_name) {
+	data->globName = glob_name;
+	canny->setPixelz(pixels);
+	addNulls();
+	// determin where to get the frames from.
+	if (glob_name == "camera") {
+		initVideoCapture();
+		captureFrames(0, frameCount_, 5000);
+	} else
+		loadGlob(glob_name);
+}
+
 /**
  * \brief Initializes the capture device using PV_API constant
  * (requires that OpenCV is compiled with the location of the PvAPI, deprecated version)
@@ -31,8 +49,8 @@ void ThicknessGauge::initVideoCapture() {
  * \brief Initializes the calibration settings
  * \param fileName The filename for the calibration settings
  */
-void ThicknessGauge::initCalibrationSettings(string fileName) {
-	cs.readSettings(fileName);
+void ThicknessGauge::initCalibrationSettings(string fileName) const {
+	cs->readSettings(fileName);
 }
 
 /**
@@ -64,20 +82,11 @@ void ThicknessGauge::generateGlob(std::string& name) {
 
 /**
  * \brief Determins the marking boundries
- * \param glob_name if "camera", use camera, otherwise load from glob folder
  * \return 2 Float vector with the points marking the boundries as pair, where first = left, second = right
  */
-void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
+void ThicknessGauge::computeMarkingHeight() {
 
 	try {
-
-		cout << glob_name << endl;
-
-		// determin where to get the frames from.
-		if (glob_name == "camera")
-			captureFrames(0, frameCount_, 5000);
-		else
-			loadGlob(glob_name);
 
 		uint64 time_start = cv::getTickCount();
 
@@ -85,9 +94,6 @@ void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
 		//vector<cv::Mat> leftFrames(frameCount_);
 		//vector<cv::Mat> rightFrames(frameCount_);
 		//splitFrames(leftFrames, rightFrames);
-
-		// common canny with default settings for detecting marking borders
-		auto canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, false);
 
 		// the filter used to determin the marking location in the frame
 		auto filter_marking = make_shared<FilterR>("Marking Filter", showWindows_);
@@ -104,7 +110,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
 		hough_vertical->setAngleLimit(30);
 		hough_vertical->setShowWindows(showWindows_);
 
-		data->markingRect = computerMarkingRectangle(canny, filter_marking, hough_vertical);
+		data->markingRect = computerMarkingRectangle(filter_marking, hough_vertical);
 		hough_vertical->setMarkingRect(data->markingRect);
 
 		// check the resulting rectangle for weirdness
@@ -125,7 +131,7 @@ void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
 		// morph extension class
 		auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
 
-		computeBaseLineAreas(canny, filter_baseline, hough_horizontal, morph);
+		computeBaseLineAreas(filter_baseline, hough_horizontal, morph);
 		//std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
 		//std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
 
@@ -200,12 +206,11 @@ void ThicknessGauge::computeMarkingHeight(std::string& glob_name) {
 
 /**
  * \brief Computes the base line areas and determine the actual base line.
- * \param canny The canny filter class
  * \param filter The custom filter class
  * \param hough The houghlines class
  * \param morph The morphology class
  */
-void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
+void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
 
 	cv::Mat kernel_line_vertikal = (cv::Mat_<char>(4, 4) <<
 		0 , 0 , 1 , 1 ,
@@ -297,7 +302,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			auto h = left.clone();
 			hough->setOriginal(h);
 
-			processMatForLine(org, canny, filter, hough, morph);
+			processMatForLine(org, filter, hough, morph);
 
 			const auto& lines = hough->getRightLines(); // inner most side
 			for (auto& line : lines) {
@@ -339,7 +344,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 			auto h1 = right.clone();
 			hough->setOriginal(h1);
 
-			processMatForLine(org, canny, filter, hough, morph);
+			processMatForLine(org, filter, hough, morph);
 
 			const auto& lines = hough->getLeftLines(); // inner most side
 			for (auto& h : lines) {
@@ -395,12 +400,11 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<F
 /**
  * \brief Processes the matrix for optimal output and computes the line information based on the results
  * \param org The matrix to perform the process on
- * \param canny The canny extension class used
  * \param filter The filter extension class used
  * \param hough The hough extension class used
  * \param morph The morphology extenstion class used
  */
-void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
+void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
 	filter->setImage(org);
 	filter->doFilter();
 
@@ -416,12 +420,11 @@ void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<CannyR> canny, s
 
 /**
  * \brief Computes the location of the marking rectangle, this rectangle is used to determin the location where the laser is actually on the marking.
- * \param canny The canny filter class
  * \param filter The custom filter class
  * \param hough The houghline class
  * \return The rectangle which was computed
  */
-cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough) {
+cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough) {
 
 	const std::string window_name = "test marking out";
 
@@ -786,7 +789,7 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 	auto frames = frameset[frame_index].get();
 
 	cv::Mat t;
-	for (auto i = 0; i++ < capture_count;) {
+	for (unsigned int i = 0; i++ < capture_count;) {
 		cap >> t;
 		frames->frames.emplace_back(t);
 	}
@@ -853,7 +856,7 @@ bool ThicknessGauge::saveData(string filename) {
 	// generate image for output overview and save it.
 	cv::Mat overview = cv::Mat::zeros(tmp_mat.rows, total_width, tmp_mat.type());
 
-	const char default_intensity = 210;
+	const char default_intensity = static_cast<char>(210);
 	cv::Scalar default_col(210.0, 210.0, 210.0);
 
 	auto paintY = [=](cv::Mat& image, std::vector<cv::Point2d>& points, int offset) {

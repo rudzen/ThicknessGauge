@@ -3,6 +3,7 @@
 #include <opencv2/videostab/inpainting.hpp>
 #include <opencv2/highgui.hpp>
 #include <iostream>
+#include <memory>
 #include "BaseR.h"
 #include "Pixel.h"
 
@@ -28,7 +29,7 @@ class CannyR : public BaseR {
 	
 	cv::Mat edges_;
 
-	Pixelz pixelz_;
+	std::shared_ptr<Pixelz> pPixelz;
 
 	int threshold1_;
 
@@ -100,6 +101,9 @@ public:
 		return edges_;
 	}
 
+	void setPixelz(const std::shared_ptr<Pixelz>& pixelz) {
+		pPixelz = pixelz;
+	}
 };
 
 inline void CannyR::threshold1cb(int value, void* user_data) {
@@ -132,8 +136,8 @@ inline void CannyR::doCanny() {
 	Canny(image_, edges_, threshold1_, threshold2_, apertureSize_, gradient_ > 0);
 
 	if (removePepperNoise_)
-		pixelz_.removePepperNoise(image_);
-
+		pPixelz->removePepperNoise(image_);
+	
 	if (showWindow_)
 		imshow(windowName, edges_);
 }

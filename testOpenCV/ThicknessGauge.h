@@ -20,6 +20,7 @@
 #include "CV/LaserR.h"
 #include "UI/DrawHelper.h"
 #include "CV/MorphR.h"
+#include "Calc/LineCalc.h"
 
 using namespace tg;
 
@@ -29,9 +30,21 @@ The main controller class
 class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
-	ThicknessGauge(): data(new Data()), frameTime_(0), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(100), lineThreshold_(100) {
+
+	ThicknessGauge(int frameCount, bool showWindows, bool saveVideo, int binaryThreshold, int lineThreshold)
+		: data(new Data()), frameCount_(frameCount),
+		  showWindows_(showWindows),
+		  saveVideo_(saveVideo),
+		  binaryThreshold_(binaryThreshold),
+		  lineThreshold_(lineThreshold) {
 		baseColour_ = cv::Scalar(255, 255, 255);
+		canny = std::make_unique<CannyR>(200, 250, 3, true, showWindows, false);
 	}
+
+	//ThicknessGauge(): data(new Data()), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(100), lineThreshold_(100) {
+	//	baseColour_ = cv::Scalar(255, 255, 255);
+	//	canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, false);
+	//}
 
 	using Data = struct Data {
 
@@ -49,6 +62,9 @@ public:
 
 		// the missing link to the right
 		std::vector<cv::Point2d> middleRight;
+
+		// the name of the glob loaded (or "camera" for live feed)
+		std::string globName;
 
 		// the rectangle which includes the entire marking
 		cv::Rect2d markingRect;
@@ -84,11 +100,18 @@ public: // data return point
 	
 private:
 
-	const double PIangle = CV_PI / 180;
+	std::unique_ptr<MiniCalc> miniCalc = std::make_unique<MiniCalc>();
+
+	std::unique_ptr<LineCalc> lineCalc = std::make_unique<LineCalc>();
 
 	std::unique_ptr<DrawHelper> draw = make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
 
-	double frameTime_;
+	// common canny with default settings for detecting marking borders
+	std::shared_ptr<CannyR> canny;
+
+	const double PIangle = CV_PI / 180;
+
+	double frameTime_ = 0.0;
 
 	int frameCount_;
 
@@ -109,19 +132,22 @@ public:
 	// opencv and misc settings objects
 
 	cv::VideoCapture cap;
-	CalibrationSettings cs;
 
-	std::unique_ptr<MiniCalc> miniCalc = std::make_unique<MiniCalc>();
+	// the following pointers are public on purpose!
+	std::unique_ptr<CalibrationSettings> cs = std::make_unique<CalibrationSettings>();
+	std::shared_ptr<Pixelz> pixels = std::make_shared<Pixelz>();
+
+	void initialize(std::string& glob_name);
 
 	void initVideoCapture();
 
-	void initCalibrationSettings(string fileName);
+	void initCalibrationSettings(string fileName) const;
 
 public: // basic stuff to extract information
 
 	void generateGlob(std::string& name);
 
-	void computeMarkingHeight(std::string& globName);
+	void computeMarkingHeight();
 
 	/**
 	* \brief Loads all null images from "./null/" folder.
@@ -132,11 +158,11 @@ public: // basic stuff to extract information
 
 private:
 
-	void computeBaseLineAreas(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
+	void computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
 
-	static void processMatForLine(cv::Mat& org, shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
+	void processMatForLine(cv::Mat& org, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
 
-	cv::Rect2d computerMarkingRectangle(shared_ptr<CannyR> canny, shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough);
+	cv::Rect2d computerMarkingRectangle(shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough);
 
 	void computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter);
 

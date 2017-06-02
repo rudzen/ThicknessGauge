@@ -71,11 +71,11 @@ int main(int argc, char** argv) {
 			return 0;
 		}
 
-		auto thicknessGauge = std::make_unique<ThicknessGauge>();
+		auto thicknessGauge = std::make_unique<ThicknessGauge>(options.getFrames(), options.isShowWindows(), options.isRecordVideo(), 100, 100);
 
-		thicknessGauge->setFrameCount(options.getFrames());
-		thicknessGauge->setShowWindows(options.isShowWindows());
-		thicknessGauge->setSaveVideo(options.isRecordVideo());
+		//thicknessGauge->setFrameCount(options.getFrames());
+		//thicknessGauge->setShowWindows(options.isShowWindows());
+		//thicknessGauge->setSaveVideo(options.isRecordVideo());
 		thicknessGauge->initCalibrationSettings(options.getCameraFile());
 		cv::setNumThreads(options.getNumOpenCvThreads());
 
@@ -90,10 +90,10 @@ int main(int argc, char** argv) {
 		else if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
 			auto glob_name = options.getGlobFolder();
-			thicknessGauge->initVideoCapture();
-			thicknessGauge->addNulls();
 
-			thicknessGauge->computeMarkingHeight(glob_name);
+			thicknessGauge->initialize(glob_name);
+
+			thicknessGauge->computeMarkingHeight();
 
 			auto data = thicknessGauge->getData(); // virker :-)
 
