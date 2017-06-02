@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 		thicknessGauge->initCalibrationSettings(options.getCameraFile());
 		cv::setNumThreads(options.getNumOpenCvThreads());
 
-		cout << options << endl;
+		//cout << options << endl;
 
 		if (options.isGlobMode()) {
 			// TODO : use capture for file reading?!

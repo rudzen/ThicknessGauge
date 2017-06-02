@@ -477,10 +477,14 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<FilterR> filter, 
 		out[3] = 0.0;
 		for (auto& v : vecs) {
 			out[0] += v[0];
+			out[1] += v[1];
 			out[2] += v[2];
+			out[3] += v[3];
 		}
 		out[0] /= vecs.size();
+		out[1] /= vecs.size();
 		out[2] /= vecs.size();
+		out[3] /= vecs.size();
 	};
 
 	while (running) {
@@ -667,8 +671,8 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<Ho
 	std::vector<cv::Mat> right_middle;
 
 	// reuseable vectors for all parts
-	std::vector<cv::Mat> left;
-	std::vector<cv::Mat> right;
+	std::vector<cv::Mat> base;
+	std::vector<cv::Mat> mark;
 
 	cv::Rect2d left_base_roi;
 	cv::Rect2d right_base_roi;
@@ -685,16 +689,20 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<Ho
 
 	auto quarter = image_size.height >> 2;
 
-	left_base_roi.x = data->markingRect.x;
+	cout << "data->markingRect: " << data->markingRect << endl;
+	cout << "data->leftBorder" << data->leftBorder << endl;
+	cout << "data->rightBorder" << data->rightBorder << endl;
+
+	left_base_roi.x = data->leftBorder[0] + (data->leftBorder[2] - data->leftBorder[0]) / 2;
 	left_base_roi.y = image_size.height - quarter;
 
-	left_base_roi.width = data->leftBorder[2] - data->intersections[0];
+	left_base_roi.width = data->intersections[0] - data->markingRect.x;
 	left_base_roi.height = quarter;
 
 	cout << "in between: left_base_roi -> " << left_base_roi << endl;
 
 	// TODO : insert check for centerline boundries crossing over border
-	left_laser_roi.x = data->intersections[0];
+	left_laser_roi.x = data->intersections[0] - data->intersections[1];
 	left_laser_roi.y = 0;
 
 	left_laser_roi.width = data->leftBorder[2] - data->intersections[0];
@@ -704,18 +712,18 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<Ho
 
 	// grab the left left baseline
 	for (auto& f : frame->frames) {
-		left.emplace_back(f(left_base_roi));
+		base.emplace_back(f(left_base_roi));
 	}
 
 	// switch to lower exposure and grab left right side
 	frame_index = 0;
 	frame = frameset[frame_index].get();
 	for (auto& f : frame->frames) {
-		right.emplace_back(f(left_laser_roi));
+		mark.emplace_back(f(left_laser_roi));
 	}
 
-	cv::imwrite("__left_.png", left.front());
-	cv::imwrite("__right_.png", right.front());
+	cv::imwrite("__left_.png", base.front());
+	cv::imwrite("__right_.png", mark.front());
 
 
 }
