@@ -15,11 +15,11 @@ class CameraData {
 
 public:
 
-	auto empty() {
+	bool empty() const {
 		return Id.empty();
 	}
 
-	size_t size() {
+	size_t size() const {
 		return Id.size();
 	}
 

@@ -58,29 +58,16 @@ void saveNull(std::string filename) {
 
 int main(int argc, char** argv) {
 
-	std::string name;
 	CameraData cameraData;
 	AVT::VmbAPI::CameraPtrVector cameras;
-	AVT::VmbAPI::VimbaSystem& system = AVT::VmbAPI::VimbaSystem::GetInstance();
+	auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
 	if (VmbErrorSuccess == system.Startup()) {
 		if (VmbErrorSuccess == system.GetCameras(cameras)) {
 			cameraData.parse(cameras);
-			//for (auto& c : cameras) {
-			//	c->GetName(name);
-			//	std::cout <<  name << std::endl;
-			//}
-			//for (AVT::VmbAPI::CameraPtrVector::iterator iter = cameras.begin();
-			//     cameras.end() != iter;
-			//     ++iter) {
-			//	if (VmbErrorSuccess == (*iter)->GetName(name)) {
-			//		std::cout << name << std::endl;
-			//	}
-			//}
 		}
 	}
 	system.Shutdown();
 	cout << cameraData << endl;
-	return 0;
 
 	auto return_value = false;
 	CommandLineOptions options;
