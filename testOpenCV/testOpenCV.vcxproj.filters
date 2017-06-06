@@ -76,6 +76,12 @@
     <Filter Include="Header Files\CV\Histogram">
       <UniqueIdentifier>{1b9254c4-7bb6-425b-9305-ee69155c6f8f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vimba">
+      <UniqueIdentifier>{b66d1ead-998a-4110-877b-8102672dfd4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vimba">
+      <UniqueIdentifier>{2ef3ffd4-2c0e-4338-8822-601751586905}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TheOne.cpp">
@@ -122,6 +128,9 @@
     </ClCompile>
     <ClCompile Include="Calc\GaugeMath.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Vimba\GC2450MCamera.cpp">
+      <Filter>Source Files\Vimba</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -274,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="Calc\GaugeMath.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vimba\GC2450MCamera.h">
+      <Filter>Header Files\Vimba</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

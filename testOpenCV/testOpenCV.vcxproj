@@ -84,8 +84,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\OpenCV\build\install\include;C:\Program Files\Allied Vision Technologies\GigESDK\inc-pc;C:\Program Files\Allied Vision\Vimba_2.0\VimbaCPP\Include;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\include;C:\Program Files\Allied Vision\Vimba_2.0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\OpenCV\build\install\x64\vc15\lib;C:\Program Files\Allied Vision Technologies\GigESDK\lib-pc\x64;C:\Program Files\Allied Vision\Vimba_2.0\VimbaCPP\Lib\Win64;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\OpenCV\build\install\include;C:\Program Files\Allied Vision Technologies\GigESDK\inc-pc;C:\Program Files\Allied Vision\Vimba_2.1\;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OpenCV\build\install\x64\vc15\lib;C:\Program Files\Allied Vision Technologies\GigESDK\lib-pc\x64;$(VIMBA_HOME)\VimbaCPP\Lib\Win64;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -141,7 +141,7 @@
       <LanguageStandard>stdcpp14</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OpenMPSupport>true</OpenMPSupport>
-      <AdditionalIncludeDirectories>$(Path);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Path);$(ProjectDir);$(VIMBA_HOME);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <OmitFramePointers>true</OmitFramePointers>
       <StringPooling>true</StringPooling>
@@ -176,6 +176,7 @@
     <ClCompile Include="TheOne.cpp" />
     <ClCompile Include="Util\Util.cpp" />
     <ClCompile Include="IO\VideoInfo.cpp" />
+    <ClCompile Include="Vimba\GC2450MCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
@@ -226,6 +227,7 @@
     <ClInclude Include="Util\Vec.h" />
     <ClInclude Include="IO\VideoInfo.h" />
     <ClInclude Include="tg.h" />
+    <ClInclude Include="Vimba\GC2450MCamera.h" />
     <ClInclude Include="_unused_crap\temp_mains.txt" />
     <ClInclude Include="_unused_crap\temp_unused.txt" />
   </ItemGroup>
