@@ -287,6 +287,9 @@
     <ClInclude Include="Vimba\GC2450MCamera.h">
       <Filter>Header Files\Vimba</Filter>
     </ClInclude>
+    <ClInclude Include="Vimba\CameraData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

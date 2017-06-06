@@ -5421,9 +5421,8 @@ VmbErrorType GC2450MCamera::GetStatLocalRateFeature(AVT::VmbAPI::FeaturePtr& fea
 }
 
 VmbErrorType GC2450MCamera::GetStatPacketErrors(VmbInt64_t& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetStatPacketErrorsFeature(pFeature);
+	VmbErrorType result = GetStatPacketErrorsFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -5432,8 +5431,7 @@ VmbErrorType GC2450MCamera::GetStatPacketErrors(VmbInt64_t& value) {
 
 VmbErrorType GC2450MCamera::GetStatPacketErrorsFeature(AVT::VmbAPI::FeaturePtr& feature) {
 	if (m_StatPacketErrorsFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("StatPacketErrors", m_StatPacketErrorsFeature);
+		VmbErrorType result = GetFeatureByName("StatPacketErrors", m_StatPacketErrorsFeature);
 		if (result != VmbErrorSuccess) {
 			m_StatPacketErrorsFeature.reset();
 			return result;
@@ -5455,8 +5453,7 @@ VmbErrorType GC2450MCamera::GetStatPacketMissed(VmbInt64_t& value) {
 
 VmbErrorType GC2450MCamera::GetStatPacketMissedFeature(AVT::VmbAPI::FeaturePtr& feature) {
 	if (m_StatPacketMissedFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("StatPacketMissed", m_StatPacketMissedFeature);
+		VmbErrorType result = GetFeatureByName("StatPacketMissed", m_StatPacketMissedFeature);
 		if (result != VmbErrorSuccess) {
 			m_StatPacketMissedFeature.reset();
 			return result;
@@ -5478,8 +5475,7 @@ VmbErrorType GC2450MCamera::GetStatPacketReceived(VmbInt64_t& value) {
 
 VmbErrorType GC2450MCamera::GetStatPacketReceivedFeature(AVT::VmbAPI::FeaturePtr& feature) {
 	if (m_StatPacketReceivedFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("StatPacketReceived", m_StatPacketReceivedFeature);
+		VmbErrorType result = GetFeatureByName("StatPacketReceived", m_StatPacketReceivedFeature);
 		if (result != VmbErrorSuccess) {
 			m_StatPacketReceivedFeature.reset();
 			return result;

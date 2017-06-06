@@ -227,6 +227,7 @@
     <ClInclude Include="Util\Vec.h" />
     <ClInclude Include="IO\VideoInfo.h" />
     <ClInclude Include="tg.h" />
+    <ClInclude Include="Vimba\CameraData.h" />
     <ClInclude Include="Vimba\GC2450MCamera.h" />
     <ClInclude Include="_unused_crap\temp_mains.txt" />
     <ClInclude Include="_unused_crap\temp_unused.txt" />
