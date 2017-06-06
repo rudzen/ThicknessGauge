@@ -132,6 +132,9 @@
     <ClCompile Include="Vimba\GC2450MCamera.cpp">
       <Filter>Source Files\Vimba</Filter>
     </ClCompile>
+    <ClCompile Include="Vimba\CaptureAVTCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -288,6 +291,12 @@
       <Filter>Header Files\Vimba</Filter>
     </ClInclude>
     <ClInclude Include="Vimba\CameraData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vimba\CaptureAVTCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vimba\CameraFrame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

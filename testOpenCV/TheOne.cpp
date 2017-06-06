@@ -19,6 +19,7 @@
 #include <VimbaCPP/Include/VimbaSystem.h>
 #include "Vimba/GC2450MCamera.h"
 #include "Vimba/CameraData.h"
+#include "Vimba/CameraFrame.h"
 
 using namespace std;
 using namespace TCLAP;
@@ -58,16 +59,9 @@ void saveNull(std::string filename) {
 
 int main(int argc, char** argv) {
 
-	CameraData cameraData;
-	AVT::VmbAPI::CameraPtrVector cameras;
-	auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
-	if (VmbErrorSuccess == system.Startup()) {
-		if (VmbErrorSuccess == system.GetCameras(cameras)) {
-			cameraData.parse(cameras);
-		}
-	}
-	system.Shutdown();
-	cout << cameraData << endl;
+	//CameraFrame cameraFrame;
+	//cameraFrame.captureFrames();
+	//return 0;
 
 	auto return_value = false;
 	CommandLineOptions options;

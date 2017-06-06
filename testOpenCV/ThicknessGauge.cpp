@@ -17,6 +17,9 @@
 #include "CV/SparseR.h"
 #include <opencv2/core/base.hpp>
 #include "UI/DrawHelper.h"
+#include <VimbaC/Include/VmbCommonTypes.h>
+#include <VimbaCPP/Include/Camera.h>
+#include <VimbaCPP/Include/VimbaSystem.h>
 
 /**
  * \brief Initializes the class and loads any aditional information
@@ -28,6 +31,79 @@ void ThicknessGauge::initialize(std::string& glob_name) {
 	addNulls();
 	// determin where to get the frames from.
 	if (glob_name == "camera") {
+		AVT::VmbAPI::CameraPtrVector cameras;
+		auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
+		if (VmbErrorSuccess == system.Startup()) {
+			if (VmbErrorSuccess == system.GetCameras(cameras)) {
+				data->cameraData->parse(cameras);
+			}
+			if (cameras.empty())
+				Util::loge("Error, no cameras currently available.");
+			data->cameraPtr = cameras.front();
+		}
+
+		//		const char* pCameraID,
+		//const char* pCameraName,
+		//const char* pCameraModel,
+		//const char* pCameraSerialNumber,
+		//const char* pInterfaceID,
+		//VmbInterfaceType interfaceType,
+		//const char* pInterfaceName,
+		//const char* pInterfaceSerialNumber,
+		//VmbAccessModeType interfacePermittedAccess
+
+		VmbInterfaceType cam_interface_type;
+		auto error = data->cameraPtr->GetInterfaceType(cam_interface_type);
+		if (error == VmbErrorSuccess) {
+			cout << "cam_interface_type ok.\n";
+		}
+
+		VmbAccessModeType cam_interface_permissions;
+		error = data->cameraPtr->GetPermittedAccess(cam_interface_permissions);
+		if (error == VmbErrorSuccess) {
+			cout << "cam_interface_permissions ok.\n";
+		}
+
+		error = data->cameraPtr->Open(VmbAccessModeFull);
+		if (error == VmbErrorSuccess) {
+			cout << "Open ok.\n";
+		}
+
+		AVT::VmbAPI::FeaturePtr featPtr;
+		error = data->cameraPtr->GetFeatureByName("ExposureTimeAbs", featPtr);
+		if (error == VmbErrorSuccess) {
+			cout << "ExposureTimeAbs ok.\n";
+		}
+		else {
+			cout << "ExposureTimeAbs fail.\n";
+		}
+
+		std::string value;
+		error = featPtr->GetValue(value);
+		if (error == VmbErrorSuccess) {
+			cout << "GetValue ok. " << value << "\n";
+			error = featPtr->SetValue(1);
+			if (error == VmbErrorSuccess) {
+				cout << "SetValue ok.\n";
+			}
+		}
+
+		error = data->cameraPtr->Close();
+		if (error == VmbErrorSuccess) {
+			cout << "Close ok.\n";
+		}
+
+		//auto res = data->camera.GetExposureTimeAbsFeature(featPtr);
+		//if (VmbErrorSuccess == res) {
+		//	cout << "Camera feature retrieved.." << endl;
+		//	VmbInt32_t exposure_low = 40000;
+		//	featPtr->SetValue(exposure_low);
+		//} else {
+		//	cout << "Camera feature retrieval failed !.." << endl;
+		//}
+
+		//system.Shutdown();
+
 		initVideoCapture();
 		captureFrames(0, frameCount_, 5000);
 	}
@@ -860,6 +936,13 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 	for (unsigned int i = 0; i++ < capture_count;) {
 		cap >> t;
 		frames->frames.emplace_back(t);
+	}
+
+	while (true) {
+		for (auto& f : frames->frames) {
+			imshow("cap", t);
+			cvWaitKey(30);
+		}
 	}
 
 	setImageSize(t.size());

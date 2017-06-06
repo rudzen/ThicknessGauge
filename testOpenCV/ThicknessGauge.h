@@ -21,6 +21,8 @@
 #include "UI/DrawHelper.h"
 #include "CV/MorphR.h"
 #include "Calc/LineCalc.h"
+#include "Vimba/CameraData.h"
+#include "Vimba/GC2450MCamera.h"
 
 using namespace tg;
 
@@ -62,6 +64,12 @@ public:
 
 		// the missing link to the right
 		std::vector<cv::Point2d> middleRight;
+
+		// the camera meta data
+		std::unique_ptr<CameraData> cameraData = std::make_unique<CameraData>();
+
+		// the main camera
+		AVT::VmbAPI::CameraPtr cameraPtr;
 
 		// the name of the glob loaded (or "camera" for live feed)
 		std::string globName;
@@ -110,7 +118,11 @@ public: // data return point
 	Data* getData() const {
 		return data.get();
 	}
-	
+
+	//AVT::VmbAPI::CameraPtr* getCamera() const {
+	//	return data->cameraPtr.get();
+	//}
+
 private:
 
 	std::unique_ptr<MiniCalc> miniCalc = std::make_unique<MiniCalc>();

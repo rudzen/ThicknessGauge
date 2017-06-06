@@ -263,7 +263,6 @@ public:
 		UserSetSelector_UserSet5 = 5
 	} UserSetSelectorEnum;
 
-
 	GC2450MCamera(
 		const char* pCameraID,
 		const char* pCameraName,

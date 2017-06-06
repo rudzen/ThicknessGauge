@@ -812,9 +812,8 @@ VmbErrorType GC2450MCamera::GetExposureModeFeature(AVT::VmbAPI::FeaturePtr& feat
 }
 
 VmbErrorType GC2450MCamera::GetExposureTimeAbs(double& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureTimeAbsFeature(pFeature);
+	VmbErrorType result = GetExposureTimeAbsFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);

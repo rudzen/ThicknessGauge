@@ -176,6 +176,7 @@
     <ClCompile Include="TheOne.cpp" />
     <ClCompile Include="Util\Util.cpp" />
     <ClCompile Include="IO\VideoInfo.cpp" />
+    <ClCompile Include="Vimba\CaptureAVTCamera.cpp" />
     <ClCompile Include="Vimba\GC2450MCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -228,6 +229,8 @@
     <ClInclude Include="IO\VideoInfo.h" />
     <ClInclude Include="tg.h" />
     <ClInclude Include="Vimba\CameraData.h" />
+    <ClInclude Include="Vimba\CameraFrame.h" />
+    <ClInclude Include="Vimba\CaptureAVTCamera.h" />
     <ClInclude Include="Vimba\GC2450MCamera.h" />
     <ClInclude Include="_unused_crap\temp_mains.txt" />
     <ClInclude Include="_unused_crap\temp_unused.txt" />
