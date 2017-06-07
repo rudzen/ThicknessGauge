@@ -29,69 +29,70 @@ void ThicknessGauge::initialize(std::string& glob_name) {
 	data->globName = glob_name;
 	canny->setPixelz(pixels);
 	addNulls();
+
 	// determin where to get the frames from.
 	if (glob_name == "camera") {
-		AVT::VmbAPI::CameraPtrVector cameras;
-		auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
-		if (VmbErrorSuccess == system.Startup()) {
-			if (VmbErrorSuccess == system.GetCameras(cameras)) {
-				data->cameraData->parse(cameras);
-			}
-			if (cameras.empty())
-				Util::loge("Error, no cameras currently available.");
-			data->cameraPtr = cameras.front();
-		}
+		//AVT::VmbAPI::CameraPtrVector cameras;
+		//auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
+		//if (VmbErrorSuccess == system.Startup()) {
+		//	if (VmbErrorSuccess == system.GetCameras(cameras)) {
+		//		data->cameraData->parse(cameras);
+		//	}
+		//	if (cameras.empty())
+		//		Util::loge("Error, no cameras currently available.");
+		//	data->cameraPtr = cameras.front();
+		//}
 
-		//		const char* pCameraID,
-		//const char* pCameraName,
-		//const char* pCameraModel,
-		//const char* pCameraSerialNumber,
-		//const char* pInterfaceID,
-		//VmbInterfaceType interfaceType,
-		//const char* pInterfaceName,
-		//const char* pInterfaceSerialNumber,
-		//VmbAccessModeType interfacePermittedAccess
+		////		const char* pCameraID,
+		////const char* pCameraName,
+		////const char* pCameraModel,
+		////const char* pCameraSerialNumber,
+		////const char* pInterfaceID,
+		////VmbInterfaceType interfaceType,
+		////const char* pInterfaceName,
+		////const char* pInterfaceSerialNumber,
+		////VmbAccessModeType interfacePermittedAccess
 
-		VmbInterfaceType cam_interface_type;
-		auto error = data->cameraPtr->GetInterfaceType(cam_interface_type);
-		if (error == VmbErrorSuccess) {
-			cout << "cam_interface_type ok.\n";
-		}
+		//VmbInterfaceType cam_interface_type;
+		//auto error = data->cameraPtr->GetInterfaceType(cam_interface_type);
+		//if (error == VmbErrorSuccess) {
+		//	cout << "cam_interface_type ok.\n";
+		//}
 
-		VmbAccessModeType cam_interface_permissions;
-		error = data->cameraPtr->GetPermittedAccess(cam_interface_permissions);
-		if (error == VmbErrorSuccess) {
-			cout << "cam_interface_permissions ok.\n";
-		}
+		//VmbAccessModeType cam_interface_permissions;
+		//error = data->cameraPtr->GetPermittedAccess(cam_interface_permissions);
+		//if (error == VmbErrorSuccess) {
+		//	cout << "cam_interface_permissions ok.\n";
+		//}
 
-		error = data->cameraPtr->Open(VmbAccessModeFull);
-		if (error == VmbErrorSuccess) {
-			cout << "Open ok.\n";
-		}
+		////error = data->cameraPtr->Open(VmbAccessModeFull);
+		////if (error == VmbErrorSuccess) {
+		////	cout << "Open ok.\n";
+		////}
 
-		AVT::VmbAPI::FeaturePtr featPtr;
-		error = data->cameraPtr->GetFeatureByName("ExposureTimeAbs", featPtr);
-		if (error == VmbErrorSuccess) {
-			cout << "ExposureTimeAbs ok.\n";
-		}
-		else {
-			cout << "ExposureTimeAbs fail.\n";
-		}
+		//AVT::VmbAPI::FeaturePtr featPtr;
+		//error = data->cameraPtr->GetFeatureByName("ExposureTimeAbs", featPtr);
+		//if (error == VmbErrorSuccess) {
+		//	cout << "ExposureTimeAbs ok.\n";
+		//}
+		//else {
+		//	cout << "ExposureTimeAbs fail.\n";
+		//}
 
-		std::string value;
-		error = featPtr->GetValue(value);
-		if (error == VmbErrorSuccess) {
-			cout << "GetValue ok. " << value << "\n";
-			error = featPtr->SetValue(1);
-			if (error == VmbErrorSuccess) {
-				cout << "SetValue ok.\n";
-			}
-		}
+		//std::string value;
+		//error = featPtr->GetValue(value);
+		//if (error == VmbErrorSuccess) {
+		//	cout << "GetValue ok. " << value << "\n";
+		//	error = featPtr->SetValue(1);
+		//	if (error == VmbErrorSuccess) {
+		//		cout << "SetValue ok.\n";
+		//	}
+		//}
 
-		error = data->cameraPtr->Close();
-		if (error == VmbErrorSuccess) {
-			cout << "Close ok.\n";
-		}
+		//error = data->cameraPtr->Close();
+		//if (error == VmbErrorSuccess) {
+		//	cout << "Close ok.\n";
+		//}
 
 		//auto res = data->camera.GetExposureTimeAbsFeature(featPtr);
 		//if (VmbErrorSuccess == res) {
@@ -214,7 +215,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		lineCalc->computeIntersectionPoints(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
 
 		// grabs the in between parts and stores the data
-		computerInBetween(filter_baseline, hough_horizontal, morph);
+		//computerInBetween(filter_baseline, hough_horizontal, morph);
 
 		std::cout << "intersection points: " << data->intersections << std::endl;
 
@@ -930,22 +931,56 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 
 	// TODO : add exposure adjustment for camera before capture!!!!
 
-	auto frames = frameset[frame_index].get();
-
 	cv::Mat t;
-	for (unsigned int i = 0; i++ < capture_count;) {
-		cap >> t;
-		frames->frames.emplace_back(t);
+
+	const std::string window_name = "cap";
+	if (showWindows_) {
+		draw->showWindows(true);
+		draw->makeWindow(window_name);
 	}
 
-	while (true) {
-		for (auto& f : frames->frames) {
-			imshow("cap", t);
-			cvWaitKey(30);
+	Util::log("Starting capture..");
+
+	ProgressBar pb(capture_count * frameset.size() * 2, "Capturing..", std::cout);
+	pb.SetFrequencyUpdate(10);
+	pb.SetStyle("=", " ");
+	auto pb_pos = 1;
+
+	for (auto& f : frameset) {
+		f->frames.clear();
+		f->frames.reserve(capture_count);
+		cap.set(CV_CAP_PROP_EXPOSURE, static_cast<double>(f->exp_ms));
+		//cout << "capturing with exposure : " << cap.get(CV_CAP_PROP_EXPOSURE) << endl;
+		for (unsigned int i = 0; i++ < capture_count;) {
+			pb.Progressed(pb_pos++);
+			cap >> t;
+			f->frames.emplace_back(t);
+			pb.Progressed(pb_pos++);
 		}
 	}
 
 	setImageSize(t.size());
+
+	pb.Progressed(100);
+
+	cout << endl;
+
+	Util::log("Capture done.");
+
+	//	auto frames = frameset[frame_index].get();
+
+	//for (unsigned int i = 0; i++ < capture_count;) {
+	//	cap >> t;
+	//	frames->frames.emplace_back(t);
+	//}
+
+	//while (true) {
+	//	for (auto& f : frames->frames) {
+	//		imshow("cap", t);
+	//		cvWaitKey(30);
+	//	}
+	//}
+
 
 }
 

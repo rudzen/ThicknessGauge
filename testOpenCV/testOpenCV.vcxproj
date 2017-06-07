@@ -232,6 +232,7 @@
     <ClInclude Include="Vimba\CameraFrame.h" />
     <ClInclude Include="Vimba\CaptureAVTCamera.h" />
     <ClInclude Include="Vimba\GC2450MCamera.h" />
+    <ClInclude Include="Vimba\OpenCVVideoRecorder.h" />
     <ClInclude Include="_unused_crap\temp_mains.txt" />
     <ClInclude Include="_unused_crap\temp_unused.txt" />
   </ItemGroup>

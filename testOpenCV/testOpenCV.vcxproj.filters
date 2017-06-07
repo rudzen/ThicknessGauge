@@ -299,6 +299,9 @@
     <ClInclude Include="Vimba\CameraFrame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Vimba\OpenCVVideoRecorder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

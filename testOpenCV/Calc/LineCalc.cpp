@@ -84,9 +84,9 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontal_line, const cv::Ve
 void LineCalc::adjustMarkingRect(cv::Rect2d& marking_rect, cv::Vec4d& intersection_points, double buffer) {
 
 	if (marking_rect.x == 0)
-		CV_Error(cv::Error::BadROISize, "Marketing rectangle start position is zero.");		
+		CV_Error(cv::Error::BadROISize, "Marking rectangle start position is zero.");		
 	else if (marking_rect.width == 0)
-		CV_Error(cv::Error::BadROISize, "Marketing rectangle width is zero.");
+		CV_Error(cv::Error::BadROISize, "Marking rectangle width is zero.");
 
 	marking_rect.x = intersection_points[0] + buffer;
 	marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
