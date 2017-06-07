@@ -65,6 +65,9 @@ public:
 		// the missing link to the right
 		std::vector<cv::Point2d> middleRight;
 
+		// start location for the 3 point vectors
+		cv::Vec3d pointsStart;
+
 		// the camera meta data
 		std::unique_ptr<CameraData> cameraData = std::make_unique<CameraData>();
 

@@ -362,6 +362,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 
 	auto offset = imageSize_.height - quarter;
 
+	auto left_avg = 0.0;
+	auto right_avg = 0.0;
+	
 	auto running = true;
 
 	while (running) {
@@ -371,6 +374,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 
 		left_y = 0.0;
 		right_y = 0.0;
+
+		left_avg = 0.0;
+		right_avg = 0.0;
 
 		cv::Mat org;
 
@@ -385,9 +391,11 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 
 			const auto& lines = hough->getRightLines(); // inner most side
 			for (auto& line : lines) {
-				if (line.entry[0] > left_cutoff)
+				if (line.entry[0] > left_cutoff) {
 					Util::copyVector(line.elements, left_elements);
+				}
 			}
+
 
 			if (draw->isEscapePressed(30))
 				running = false;
@@ -672,7 +680,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	while (running) {
 
-		auto highest_pixel = 0.0;
+		auto avg_height = 0.0;
 
 		for (auto i = 0; i < image_size.width; i++)
 			results[i].y = 0.0;
@@ -697,8 +705,9 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			//cout << non_zero_elements << endl;
 			auto laser_area = cv::boundingRect(non_zero_elements);
 			auto t = base_frame(laser_area);
-			highest_pixel += laser_area.y;
-			highest_pixel += lineCalc->computeRealIntensityLine(t, data->centerPoints, t.rows, 0);
+			avg_height += laser_area.y;
+			avg_height += lineCalc->computeRealIntensityLine(t, data->centerPoints, t.rows, 0);
+			//highest_pixel -= laser_area.height;
 
 			for (auto& centerpoint : data->centerPoints)
 				results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
@@ -712,20 +721,26 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			}
 		}
 
-		for (auto& centerpoint : data->centerPoints)
+		data->pointsStart[1] = data->centerPoints.front().x + data->markingRect.x;
+
+		for (auto& centerpoint : data->centerPoints) {
 			results[static_cast<int>(centerpoint.x)].y /= frameCount_;
+			if (centerpoint.x + data->markingRect.x < data->pointsStart[1]) {
+				data->pointsStart[1] = centerpoint.x + data->markingRect.x;
+			}
+		}
 
 		// since theres some issues with using results vector, this works just as fine.
 		data->centerPoints.clear();
 		Util::copyVector(results, data->centerPoints);
 
-		auto highest_total =  image_size.height - highest_pixel / static_cast<unsigned int>(frameCount_);
+		auto highest_total =  image_size.height - avg_height / static_cast<unsigned int>(frameCount_);
 
-		highest_pixel = 0.0;
+		avg_height = 0.0;
 
 		std::cout << cv::format("highestPixelTotal: %f\n", highest_total);
 
-		data->difference = abs(highest_total - base);
+		data->difference = abs(avg_height - base);
 		std::cout << cv::format("diff from baseline: %f\n", data->difference);
 
 		if (!running || !showWindows_)
@@ -1040,25 +1055,36 @@ bool ThicknessGauge::saveData(string filename) {
 	auto total_width = static_cast<int>(data->leftPoints.size() + data->centerPoints.size() + data->rightPoints.size());
 
 	// generate image for output overview and save it.
-	cv::Mat overview = cv::Mat::zeros(tmp_mat.rows, total_width, tmp_mat.type());
+	cv::Mat overview;
+	cv::cvtColor(frameset[0]->frames.front(), overview, CV_GRAY2BGR);
+	//cv::Mat overview = cv::Mat::zeros(tmp_mat.rows, total_width, tmp_mat.type());
+	//cv::Mat overview = cv::Mat::zeros(tmp_mat.rows, total_width, tmp_mat.type());
 
 	const char default_intensity = static_cast<char>(210);
-	cv::Scalar default_col(210.0, 210.0, 210.0);
+	cv::Scalar default_col(0, 0, 250.0);
 
 	auto paintY = [=](cv::Mat& image, std::vector<cv::Point2d>& points, int offset) {
 		for (auto& p : points) {
-			image.at<char>(cvRound(p.y), cvRound(p.x + offset)) = default_intensity;
+			cv::Point p1(cvRound(p.x + offset), cvRound(p.y));
+			cv::line(image, p1, p1, default_col);
+			//image.at<char>(cvRound(p.y), cvRound(p.x + offset)) = default_intensity;
 		}
 	};
 
-	unsigned int offset = 0;
+	unsigned int offset = cvFloor(data->pointsStart[0]);
 	paintY(overview, data->leftPoints, offset);
-	offset += static_cast<unsigned int>(data->leftPoints.size());
+	offset = cvFloor(data->pointsStart[1]); // static_cast<unsigned int>(data->leftPoints.size());
 
-	cv::line(overview, data->leftPoints.back(), cv::Point2d(data->centerPoints.front().x + offset, data->centerPoints.front().y), default_col);
+	//cv::line(overview, data->leftPoints.back(), cv::Point2d(data->centerPoints.front().x + offset, data->centerPoints.front().y), default_col);
+
 	paintY(overview, data->centerPoints, offset);
-	offset += static_cast<unsigned int>(data->centerPoints.size());
-	cv::line(overview, cv::Point2d(data->centerPoints.back().x + data->leftPoints.size(), data->centerPoints.back().y), cv::Point2d(data->rightPoints.front().x + offset, data->rightPoints.front().y), default_col);
+
+	offset += cvFloor(data->pointsStart[2]); // cvRound(data->leftBorder[2] - data->leftBorder[0]);
+	//offset += static_cast<unsigned int>(data->centerPoints.size());
+	//cv::line(overview, cv::Point2d(data->centerPoints.back().x + data->leftPoints.size(), data->centerPoints.back().y), cv::Point2d(data->rightPoints.front().x + offset, data->rightPoints.front().y), default_col);
+
+	//offset += cvRound(data->rightBorder[2] - data->rightBorder[0]);
+
 	paintY(overview, data->rightPoints, offset);
 
 	draw->drawText(&overview, cv::format("diff (px): %f", data->difference), tg::TextDrawPosition::UpperRight, default_col);

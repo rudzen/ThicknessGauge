@@ -152,14 +152,15 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 		auto y = m.m01 / m.m00;
 
 		// only include values above 0.0 in y-pos
-		if (y > 0.0)
-			output.back().y = y;
+		if (y > 0.0) {
+			output.back().y = y;			
+		}
 	}
 
 	auto avg = 0.0;
 
 	for (const auto& h : output)
-		avg += rows - h.y;
+		avg += h.y;
 
 	avg /= output.size();
 
