@@ -232,7 +232,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		lineCalc->adjustMarkingRect(data->markingRect, data->intersections, intersect_cutoff[0]);
 
 		// adjust the baselines according to the intersection points. (could perhaps be useful in the future)
-		lineCalc->adjustBaseLines(data->baseLines, data->intersections, intersect_cutoff[0]);
+		//lineCalc->adjustBaseLines(data->baseLines, data->intersections, intersect_cutoff[0]);
 
 		// testing angles between baseline.. should be max 5 degrees
 		cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);
@@ -715,7 +715,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 		std::cout << cv::format("highestPixelTotal: %f\n", highest_total);
 
-		data->difference = abs(base - highest_total);
+		data->difference = abs(highest_total - base);
 		std::cout << cv::format("diff from baseline: %f\n", data->difference);
 
 		if (!running || !showWindows_)
@@ -956,6 +956,10 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 			cap >> t;
 			f->frames.emplace_back(t);
 			pb.Progressed(pb_pos++);
+			draw->showImage(window_name, t);
+			if (draw->isEscapePressed(30)) {
+				// nothing :P
+			}
 		}
 	}
 
@@ -966,21 +970,6 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 	cout << endl;
 
 	Util::log("Capture done.");
-
-	//	auto frames = frameset[frame_index].get();
-
-	//for (unsigned int i = 0; i++ < capture_count;) {
-	//	cap >> t;
-	//	frames->frames.emplace_back(t);
-	//}
-
-	//while (true) {
-	//	for (auto& f : frames->frames) {
-	//		imshow("cap", t);
-	//		cvWaitKey(30);
-	//	}
-	//}
-
 
 }
 
@@ -1054,7 +1043,6 @@ bool ThicknessGauge::saveData(string filename) {
 	unsigned int offset = 0;
 	paintY(overview, data->leftPoints, offset);
 	offset += static_cast<unsigned int>(data->leftPoints.size());
-
 
 	cv::line(overview, data->leftPoints.back(), cv::Point2d(data->centerPoints.front().x + offset, data->centerPoints.front().y), default_col);
 	paintY(overview, data->centerPoints, offset);
