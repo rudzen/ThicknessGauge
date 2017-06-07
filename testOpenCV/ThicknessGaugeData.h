@@ -17,7 +17,7 @@ protected:
 		}
 	};
 
-	std::array<int, 3> exposures = {5000, 10000, 40000};
+	std::array<int, 3> exposures = {5000, 20000, 40000};
 	std::array<std::string, 3> expusures_short = {"_5k", "_20k", "_40k"};
 	std::vector<std::unique_ptr<Frames>> frameset;
 

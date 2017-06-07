@@ -341,6 +341,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 	unsigned int frame_index = 2;
 	auto frames = frameset[frame_index].get();
 
+	Util::log(cv::format("computeBaseLineAreas using exposure set %i : %s (%i)", frame_index, frames->exp_ext, frames->exp_ms));
+
 	// generate baseline images..
 	for (auto i = frameCount_; i--;) {
 		left_frames.emplace_back(frames->frames[i](left_baseline));
@@ -530,9 +532,11 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<FilterR> filter, 
 
 	auto image_height = static_cast<double>(imageSize_.height);
 
-	unsigned int frame_index = 1;
+	unsigned int frame_index = 2;
 
 	auto frames = frameset[frame_index].get();
+
+	Util::log(cv::format("computerMarkingRectangle using exposure set %i : %s (%i)", frame_index, frames->exp_ext, frames->exp_ms));
 
 	auto accuRects = [image_height](vector<cv::Rect2d>& rects, cv::Rect2d& out) {
 		out.x = 0.0;
@@ -642,6 +646,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	auto frames = frameset[frame_index].get();
 
+	Util::log(cv::format("computeLaserLocations using exposure set %i : %s (%i)", frame_index, frames->exp_ext, frames->exp_ms));
+
 	for (auto& frame : frames->frames)
 		marking_frames.emplace_back(frame(data->markingRect));
 
@@ -652,9 +658,10 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 	auto image_size = marking_frames.front().size();
 
 	// local copy of real baseline
-	auto base = imageSize_.height - data->baseLines[1];
+	auto base = (data->baseLines[1] - data->baseLines[3]) / 2;
 
 	cv::Mat tmpOut;
+	cv::Rect rect_draw;
 
 	auto running = true;
 
@@ -687,6 +694,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			/* RECT CUT METHOD */
 			std::vector<cv::Point> non_zero_elements(base_frame.rows * base_frame.cols);
 			findNonZero(base_frame, non_zero_elements);
+			//cout << non_zero_elements << endl;
 			auto laser_area = cv::boundingRect(non_zero_elements);
 			auto t = base_frame(laser_area);
 			highest_pixel += laser_area.y;
@@ -698,8 +706,10 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			if (draw->isEscapePressed(30))
 				running = false;
 
-			if (showWindows_ && !i && running)
+			if (showWindows_ && !i && running) {
 				cv::cvtColor(marking_frames[i], tmpOut, CV_GRAY2BGR);
+				rect_draw = laser_area;
+			}
 		}
 
 		for (auto& centerpoint : data->centerPoints)
@@ -709,7 +719,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 		data->centerPoints.clear();
 		Util::copyVector(results, data->centerPoints);
 
-		auto highest_total = imageSize_.height - highest_pixel / static_cast<unsigned int>(frameCount_);
+		auto highest_total =  image_size.height - highest_pixel / static_cast<unsigned int>(frameCount_);
 
 		highest_pixel = 0.0;
 
@@ -722,6 +732,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			break;
 
 		if (showWindows_) {
+			draw->drawRectangle(tmpOut, rect_draw, cv::Scalar(255, 0, 0));
 			draw->drawHorizontalLine(&tmpOut, cvRound(highest_total), cv::Scalar(0, 255, 0));
 			draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
 			draw->drawText(&tmpOut, cv::format("%f pixels", data->difference), TextDrawPosition::UpperLeft);
