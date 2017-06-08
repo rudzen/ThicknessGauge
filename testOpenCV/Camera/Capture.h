@@ -129,13 +129,15 @@ public:
 
 		const cv::Vec2d target(targetStdDev_ - delta_, targetStdDev_ + delta_);
 
+		// TODO : Få lortet til at virke!
+
 		while (stddev[0] < target[0]) {
-			exposure += 50.0;
+			exposure += 100.0;
 			cap_.set(CV_CAP_PROP_EXPOSURE, exposure);
 			cap_ >> t;
 			cv::meanStdDev(t, mean, stddev);
 
-			std::cout << cv::format("trying [exposure:%f] [mean:%f] [stddev:%f]\n", exposure, mean[0], stddev[0]);
+			std::cout << cv::format("trying [exposure:%f] [mean:%f] [stddev:%f]\n", cap_.get(CV_CAP_PROP_EXPOSURE), mean[0], stddev[0]);
 
 			imwrite(cv::format("images/exposuretest_%f.png", exposure), t);
 
