@@ -346,7 +346,6 @@ inline int HoughLinesR::doVerticalHough() {
 			continue;
 		auto p = computePointPair(line);
 		allLines_.emplace_back(LineV(line, p));
-		//std::cout << "vert : " << p.first << " " << p.second << endl;
 	}
 
 	if (allLines_.empty())
@@ -369,8 +368,6 @@ inline linePair HoughLinesR::computePointPair(cv::Vec2f& line) const {
 	auto y0 = b * rho;
 	cv::Point2f pt1(static_cast<float>(x0 + 1000 * (-b)), static_cast<float>(y0 + 1000 * (a)));
 	cv::Point2f pt2(static_cast<float>(x0 - 1000 * (-b)), static_cast<float>(y0 - 1000 * (a)));
-	//cv::Point2f pt1(cvRound(x0 + 1000 * (-b)), cvRound(y0 + 1000 * (a)));
-	//cv::Point2f pt2(cvRound(x0 - 1000 * (-b)), cvRound(y0 - 1000 * (a)));
 	return linePair(pt1, pt2);
 }
 

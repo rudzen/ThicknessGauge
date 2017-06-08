@@ -18,12 +18,12 @@ public:
 
 	// In your contructor call the constructor of the base class
 	// and pass a camera object
-	FrameObserver(AVT::VmbAPI::CameraPtr pCamera) : IFrameObserver(pCamera) {
+	explicit FrameObserver(AVT::VmbAPI::CameraPtr pCamera) : IFrameObserver(pCamera) {
 		this->pCamera = pCamera;
-
+		res = VmbErrorType::VmbErrorOther;
 	}
 
-	void FrameReceived(const AVT::VmbAPI::FramePtr pFrame) {
+	void FrameReceived(const AVT::VmbAPI::FramePtr pFrame) override {
 		VmbFrameStatusType eReceiveStatus;
 		if (VmbErrorSuccess == pFrame->GetReceiveStatus(eReceiveStatus)) {
 			if (VmbFrameStatusComplete == eReceiveStatus) {
@@ -45,6 +45,11 @@ class CameraFrame {
 public:
 
 	//std::vector<cv::Mat> frames;
+
+	// TODO : Capture frame(s) into opencv image matrix,
+	// 1) Convert the captured frame into "old" style lplImage format
+	// 2) Based on the information, configure a matrix
+	// 3) Copy the data from the captured frame into the matrix
 
 	void captureFrames() {
 

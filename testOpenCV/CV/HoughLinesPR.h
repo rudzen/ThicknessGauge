@@ -307,8 +307,6 @@ inline void HoughLinesPR::doHorizontalHough() {
 
 	bresenham();
 
-	//drawLines(allLines, cv::Scalar(0, 0, 255));
-
 	if (showWindows_) {
 		drawLines(leftLines, cv::Scalar(255, 0, 255));
 		drawLines(rightLines, cv::Scalar(0, 255, 0));

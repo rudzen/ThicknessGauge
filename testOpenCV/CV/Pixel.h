@@ -162,7 +162,7 @@ public:
 	/**
 	 * \brief Removed problematic 2 pixel radius black island pixels by filling with white
 	 * The intent for this function is to be used after a binary threshold
-	 * and to make certain algorithms work more smoothly as the islands of pixels will be more "whole".
+	 * and to make certain algorithms work more smoothly as islands of pixels will be removed.
 	 * \param mask The image to use
 	 */
 	static void removePepperNoise(cv::Mat& mask) {

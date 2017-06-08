@@ -27,9 +27,8 @@ GC2450MCamera::GC2450MCamera(
 
 // Category /Acquisition
 VmbErrorType GC2450MCamera::AcquisitionAbort() {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionAbortFeature(pFeature);
+	auto result = GetAcquisitionAbortFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->RunCommand();
@@ -37,9 +36,8 @@ VmbErrorType GC2450MCamera::AcquisitionAbort() {
 }
 
 VmbErrorType GC2450MCamera::GetAcquisitionAbortFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_AcquisitionAbortFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("AcquisitionAbort", m_AcquisitionAbortFeature);
+	if (m_AcquisitionAbortFeature.get() == nullptr) {
+		auto result = GetFeatureByName("AcquisitionAbort", m_AcquisitionAbortFeature);
 		if (result != VmbErrorSuccess) {
 			m_AcquisitionAbortFeature.reset();
 			return result;
@@ -50,9 +48,8 @@ VmbErrorType GC2450MCamera::GetAcquisitionAbortFeature(AVT::VmbAPI::FeaturePtr& 
 }
 
 VmbErrorType GC2450MCamera::GetAcquisitionFrameCount(VmbInt64_t& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionFrameCountFeature(pFeature);
+	auto result = GetAcquisitionFrameCountFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -60,9 +57,8 @@ VmbErrorType GC2450MCamera::GetAcquisitionFrameCount(VmbInt64_t& value) {
 }
 
 VmbErrorType GC2450MCamera::SetAcquisitionFrameCount(VmbInt64_t value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionFrameCountFeature(pFeature);
+	auto result = GetAcquisitionFrameCountFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -70,9 +66,8 @@ VmbErrorType GC2450MCamera::SetAcquisitionFrameCount(VmbInt64_t value) {
 }
 
 VmbErrorType GC2450MCamera::GetAcquisitionFrameCountFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_AcquisitionFrameCountFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("AcquisitionFrameCount", m_AcquisitionFrameCountFeature);
+	if (m_AcquisitionFrameCountFeature.get() == nullptr) {
+		auto result = GetFeatureByName("AcquisitionFrameCount", m_AcquisitionFrameCountFeature);
 		if (result != VmbErrorSuccess) {
 			m_AcquisitionFrameCountFeature.reset();
 			return result;
@@ -139,14 +134,13 @@ VmbErrorType GC2450MCamera::GetAcquisitionFrameRateLimitFeature(AVT::VmbAPI::Fea
 }
 
 VmbErrorType GC2450MCamera::GetAcquisitionMode(AcquisitionModeEnum& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetAcquisitionModeFeature(pFeature);
+	VmbErrorType result = GetAcquisitionModeFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	VmbInt64_t nValue;
 	result = pFeature->GetValue(nValue);
-	value = (AcquisitionModeEnum)nValue;
+	value = static_cast<AcquisitionModeEnum>(nValue);
 	return result;
 }
 
@@ -728,8 +722,7 @@ VmbErrorType GC2450MCamera::SetDSPSubregionTop(VmbInt64_t value) {
 
 VmbErrorType GC2450MCamera::GetDSPSubregionTopFeature(AVT::VmbAPI::FeaturePtr& feature) {
 	if (m_DSPSubregionTopFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("DSPSubregionTop", m_DSPSubregionTopFeature);
+		VmbErrorType result = GetFeatureByName("DSPSubregionTop", m_DSPSubregionTopFeature);
 		if (result != VmbErrorSuccess) {
 			m_DSPSubregionTopFeature.reset();
 			return result;
@@ -742,21 +735,19 @@ VmbErrorType GC2450MCamera::GetDSPSubregionTopFeature(AVT::VmbAPI::FeaturePtr& f
 
 // Category /Controls/Exposure
 VmbErrorType GC2450MCamera::GetExposureAuto(ExposureAutoEnum& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoFeature(pFeature);
+	auto result = GetExposureAutoFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	VmbInt64_t nValue;
 	result = pFeature->GetValue(nValue);
-	value = (ExposureAutoEnum)nValue;
+	value = static_cast<ExposureAutoEnum>(nValue);
 	return result;
 }
 
 VmbErrorType GC2450MCamera::SetExposureAuto(ExposureAutoEnum value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoFeature(pFeature);
+	auto result = GetExposureAutoFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -764,9 +755,8 @@ VmbErrorType GC2450MCamera::SetExposureAuto(ExposureAutoEnum value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureAutoFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureAuto", m_ExposureAutoFeature);
+	if (m_ExposureAutoFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureAuto", m_ExposureAutoFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureAutoFeature.reset();
 			return result;
@@ -777,9 +767,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoFeature(AVT::VmbAPI::FeaturePtr& feat
 }
 
 VmbErrorType GC2450MCamera::GetExposureMode(ExposureModeEnum& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureModeFeature(pFeature);
+	auto result = GetExposureModeFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	VmbInt64_t nValue;
@@ -789,9 +778,8 @@ VmbErrorType GC2450MCamera::GetExposureMode(ExposureModeEnum& value) {
 }
 
 VmbErrorType GC2450MCamera::SetExposureMode(ExposureModeEnum value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureModeFeature(pFeature);
+	auto result = GetExposureModeFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -799,9 +787,8 @@ VmbErrorType GC2450MCamera::SetExposureMode(ExposureModeEnum value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureModeFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureModeFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureMode", m_ExposureModeFeature);
+	if (m_ExposureModeFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureMode", m_ExposureModeFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureModeFeature.reset();
 			return result;
@@ -813,7 +800,7 @@ VmbErrorType GC2450MCamera::GetExposureModeFeature(AVT::VmbAPI::FeaturePtr& feat
 
 VmbErrorType GC2450MCamera::GetExposureTimeAbs(double& value) {
 	AVT::VmbAPI::FeaturePtr pFeature;
-	VmbErrorType result = GetExposureTimeAbsFeature(pFeature);
+	auto result = GetExposureTimeAbsFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -821,9 +808,8 @@ VmbErrorType GC2450MCamera::GetExposureTimeAbs(double& value) {
 }
 
 VmbErrorType GC2450MCamera::SetExposureTimeAbs(double value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureTimeAbsFeature(pFeature);
+	VmbErrorType result = GetExposureTimeAbsFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -831,9 +817,8 @@ VmbErrorType GC2450MCamera::SetExposureTimeAbs(double value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureTimeAbsFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureTimeAbsFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureTimeAbs", m_ExposureTimeAbsFeature);
+	if (m_ExposureTimeAbsFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureTimeAbs", m_ExposureTimeAbsFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureTimeAbsFeature.reset();
 			return result;
@@ -846,9 +831,8 @@ VmbErrorType GC2450MCamera::GetExposureTimeAbsFeature(AVT::VmbAPI::FeaturePtr& f
 
 // Category /Controls/Exposure/ExposureAutoControl
 VmbErrorType GC2450MCamera::GetExposureAutoAdjustTol(VmbInt64_t& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoAdjustTolFeature(pFeature);
+	auto result = GetExposureAutoAdjustTolFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -856,9 +840,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoAdjustTol(VmbInt64_t& value) {
 }
 
 VmbErrorType GC2450MCamera::SetExposureAutoAdjustTol(VmbInt64_t value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoAdjustTolFeature(pFeature);
+	auto result = GetExposureAutoAdjustTolFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -866,9 +849,8 @@ VmbErrorType GC2450MCamera::SetExposureAutoAdjustTol(VmbInt64_t value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoAdjustTolFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureAutoAdjustTolFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureAutoAdjustTol", m_ExposureAutoAdjustTolFeature);
+	if (m_ExposureAutoAdjustTolFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureAutoAdjustTol", m_ExposureAutoAdjustTolFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureAutoAdjustTolFeature.reset();
 			return result;
@@ -879,21 +861,19 @@ VmbErrorType GC2450MCamera::GetExposureAutoAdjustTolFeature(AVT::VmbAPI::Feature
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoAlg(ExposureAutoAlgEnum& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoAlgFeature(pFeature);
+	auto result = GetExposureAutoAlgFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	VmbInt64_t nValue;
 	result = pFeature->GetValue(nValue);
-	value = (ExposureAutoAlgEnum)nValue;
+	value = static_cast<ExposureAutoAlgEnum>(nValue);
 	return result;
 }
 
 VmbErrorType GC2450MCamera::SetExposureAutoAlg(ExposureAutoAlgEnum value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoAlgFeature(pFeature);
+	auto result = GetExposureAutoAlgFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -901,9 +881,8 @@ VmbErrorType GC2450MCamera::SetExposureAutoAlg(ExposureAutoAlgEnum value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoAlgFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureAutoAlgFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureAutoAlg", m_ExposureAutoAlgFeature);
+	if (m_ExposureAutoAlgFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureAutoAlg", m_ExposureAutoAlgFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureAutoAlgFeature.reset();
 			return result;
@@ -914,9 +893,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoAlgFeature(AVT::VmbAPI::FeaturePtr& f
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoMax(VmbInt64_t& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoMaxFeature(pFeature);
+	auto result = GetExposureAutoMaxFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -924,9 +902,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoMax(VmbInt64_t& value) {
 }
 
 VmbErrorType GC2450MCamera::SetExposureAutoMax(VmbInt64_t value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoMaxFeature(pFeature);
+	auto result = GetExposureAutoMaxFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -934,9 +911,8 @@ VmbErrorType GC2450MCamera::SetExposureAutoMax(VmbInt64_t value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoMaxFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureAutoMaxFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureAutoMax", m_ExposureAutoMaxFeature);
+	if (m_ExposureAutoMaxFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureAutoMax", m_ExposureAutoMaxFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureAutoMaxFeature.reset();
 			return result;
@@ -947,9 +923,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoMaxFeature(AVT::VmbAPI::FeaturePtr& f
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoMin(VmbInt64_t& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoMinFeature(pFeature);
+	auto result = GetExposureAutoMinFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -957,9 +932,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoMin(VmbInt64_t& value) {
 }
 
 VmbErrorType GC2450MCamera::SetExposureAutoMin(VmbInt64_t value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoMinFeature(pFeature);
+	VmbErrorType result = GetExposureAutoMinFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -967,9 +941,8 @@ VmbErrorType GC2450MCamera::SetExposureAutoMin(VmbInt64_t value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoMinFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureAutoMinFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureAutoMin", m_ExposureAutoMinFeature);
+	if (m_ExposureAutoMinFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureAutoMin", m_ExposureAutoMinFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureAutoMinFeature.reset();
 			return result;
@@ -980,9 +953,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoMinFeature(AVT::VmbAPI::FeaturePtr& f
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoOutliers(VmbInt64_t& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoOutliersFeature(pFeature);
+	auto result = GetExposureAutoOutliersFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -990,9 +962,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoOutliers(VmbInt64_t& value) {
 }
 
 VmbErrorType GC2450MCamera::SetExposureAutoOutliers(VmbInt64_t value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoOutliersFeature(pFeature);
+	auto result = GetExposureAutoOutliersFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -1000,9 +971,8 @@ VmbErrorType GC2450MCamera::SetExposureAutoOutliers(VmbInt64_t value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoOutliersFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureAutoOutliersFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureAutoOutliers", m_ExposureAutoOutliersFeature);
+	if (m_ExposureAutoOutliersFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureAutoOutliers", m_ExposureAutoOutliersFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureAutoOutliersFeature.reset();
 			return result;
@@ -1013,9 +983,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoOutliersFeature(AVT::VmbAPI::FeatureP
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoRate(VmbInt64_t& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoRateFeature(pFeature);
+	VmbErrorType result = GetExposureAutoRateFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -1023,9 +992,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoRate(VmbInt64_t& value) {
 }
 
 VmbErrorType GC2450MCamera::SetExposureAutoRate(VmbInt64_t value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoRateFeature(pFeature);
+	auto result = GetExposureAutoRateFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -1033,9 +1001,8 @@ VmbErrorType GC2450MCamera::SetExposureAutoRate(VmbInt64_t value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoRateFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureAutoRateFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureAutoRate", m_ExposureAutoRateFeature);
+	if (m_ExposureAutoRateFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureAutoRate", m_ExposureAutoRateFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureAutoRateFeature.reset();
 			return result;
@@ -1046,9 +1013,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoRateFeature(AVT::VmbAPI::FeaturePtr& 
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoTarget(VmbInt64_t& value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoTargetFeature(pFeature);
+	auto result = GetExposureAutoTargetFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->GetValue(value);
@@ -1056,9 +1022,8 @@ VmbErrorType GC2450MCamera::GetExposureAutoTarget(VmbInt64_t& value) {
 }
 
 VmbErrorType GC2450MCamera::SetExposureAutoTarget(VmbInt64_t value) {
-	VmbErrorType result;
 	AVT::VmbAPI::FeaturePtr pFeature;
-	result = GetExposureAutoTargetFeature(pFeature);
+	auto result = GetExposureAutoTargetFeature(pFeature);
 	if (result != VmbErrorSuccess)
 		return result;
 	result = pFeature->SetValue(value);
@@ -1066,9 +1031,8 @@ VmbErrorType GC2450MCamera::SetExposureAutoTarget(VmbInt64_t value) {
 }
 
 VmbErrorType GC2450MCamera::GetExposureAutoTargetFeature(AVT::VmbAPI::FeaturePtr& feature) {
-	if (m_ExposureAutoTargetFeature.get() == NULL) {
-		VmbErrorType result;
-		result = GetFeatureByName("ExposureAutoTarget", m_ExposureAutoTargetFeature);
+	if (m_ExposureAutoTargetFeature.get() == nullptr) {
+		auto result = GetFeatureByName("ExposureAutoTarget", m_ExposureAutoTargetFeature);
 		if (result != VmbErrorSuccess) {
 			m_ExposureAutoTargetFeature.reset();
 			return result;
