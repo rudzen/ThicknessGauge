@@ -140,7 +140,7 @@ void ThicknessGauge::generateGlob(std::string& name) {
 	Util::createDirectory(name);
 	auto pb_title = "Capturing glob " + name;
 
-	ProgressBar pb(frameCount_ * 2, pb_title.c_str());
+	ProgressBar pb(frameCount_, pb_title.c_str());
 	pb.SetFrequencyUpdate(10);
 	pb.SetStyle("-", " ");
 
@@ -150,10 +150,9 @@ void ThicknessGauge::generateGlob(std::string& name) {
 	for (auto i = 0; i < frameCount_; ++i) {
 		pb.Progressed(++progress);
 		cap >> t;
-		pb.Progressed(++progress);
 		cv::imwrite(name + "/img" + to_string(i) + ".png", t);
 	}
-	pb.Progressed(frameCount_ * 2);
+	pb.Progressed(frameCount_);
 }
 
 /**
@@ -969,7 +968,7 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 
 	Util::log("Starting capture..");
 
-	ProgressBar pb(capture_count * frameset.size() * 2, "Capturing..", std::cout);
+	ProgressBar pb(static_cast<unsigned long>(capture_count * frameset.size() * 2), "Capturing..", std::cout);
 	pb.SetFrequencyUpdate(10);
 	pb.SetStyle("=", " ");
 	auto pb_pos = 1;
@@ -1061,6 +1060,10 @@ bool ThicknessGauge::saveData(string filename) {
 	cv::cvtColor(frameset.back()->frames.front(), overlay, CV_GRAY2BGR);
 	cv::Mat overview = cv::Mat::zeros(overlay.rows, overlay.cols, frameset[0]->frames.front().type());
 
+#ifdef _MSC_VER
+#pragma message("MSC compatible compiler detected -- turning off warning 4309")
+#pragma warning( disable : 4309)
+#endif
 	const char default_intensity = static_cast<char>(210);
 	cv::Scalar default_col(0, 0, 250.0);
 	cv::Scalar default_bw(200.0, 200.0, 200.0);

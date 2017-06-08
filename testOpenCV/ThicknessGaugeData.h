@@ -1,13 +1,23 @@
 #pragma once
 
 #include <array>
+#include <ostream>
 
 class ThicknessGaugeData {
 
 protected:
 
-	using Frames = struct Frames {
+	/**
+	 * \brief The "main" frame container.
+	 * Has all the information which is required for the entire process.
+	 * This structure is contained within the vector "frameset", and is accessed
+	 * easily by pointing.. like..
+	 * auto frames = frameset[frameset_index].get();
+	 */
+	typedef struct Frames {
 		std::vector<cv::Mat> frames;
+		std::vector<double> means;
+		std::vector<double> stddevs;
 		std::string exp_ext;
 		int exp_ms;
 
@@ -15,7 +25,83 @@ protected:
 			: exp_ext(expExt),
 			  exp_ms(expMs) {
 		}
-	};
+
+		/**
+		 * \brief Clear the entire structure
+		 */
+		void clear() {
+			frames.clear();
+			means.clear();
+			stddevs.clear();
+			exp_ext = "";
+			exp_ms = 0;
+		}
+
+		/**
+		 * \brief Computes mean and stddev based on the contained frames.
+		 */
+		void compute() {
+			cv::Scalar mean;
+			cv::Scalar stddev;
+			means.clear();
+			means.shrink_to_fit();
+			means.reserve(frames.size());
+			stddevs.clear();
+			stddevs.shrink_to_fit();
+			stddevs.reserve(frames.size());
+			for (auto& frame : frames) {
+				cv::meanStdDev(frame, mean, stddev);
+				means.emplace_back(mean[0]);
+				stddevs.emplace_back(stddev[0]);
+			}
+		}
+
+
+		friend std::ostream& operator<<(std::ostream& os, const Frames& obj) {
+			os << "[Frame Structure]\n{\n";
+			if (obj.frames.empty()) {
+				return os << "\t\"frameCount\": null,\n}";
+			}
+			os << cv::format("\t\"frameCount\": %l,\n", obj.frames.size());
+			os << cv::format("\t\"frameDimensions\": %ix%i,\n", obj.frames.front().cols, obj.frames.front().rows);
+			os << cv::format("\t\"frameExposureDefault\": %i,\n", obj.exp_ms);
+			os << cv::format("\t\"frameExposureExtension\": %s,\n", obj.exp_ext);
+
+			// means
+			os << "\t\"means\": [\n";
+			auto size = obj.means.size();
+			for (auto i = 0; i < size; i++) {
+				os << cv::format("\t\t\"value_%i\":%f", i, obj.means[i]);
+				if (i != size - 1)
+					os << ",\n";
+			}
+			os << "\t],\n";
+
+			os << "\t\"stddevs\": [\n";
+			size = obj.stddevs.size();
+			for (auto i = 0; i < size; i++) {
+				os << cv::format("\t\t\"value_%i\":%f", i, obj.stddevs[i]);
+				if (i != size - 1)
+					os << ",\n";
+			}
+			os << "]\n}";
+
+
+
+
+
+
+
+
+
+			return os
+				<< "frames: " << obj.frames
+				<< " means: " << obj.means
+				<< " stddevs: " << obj.stddevs
+				<< " exp_ext: " << obj.exp_ext
+				<< " exp_ms: " << obj.exp_ms;
+		}
+	} Frames;
 
 	std::array<int, 3> exposures = {5000, 20000, 40000};
 	std::array<std::string, 3> expusures_short = {"_5k", "_20k", "_40k"};
