@@ -1038,7 +1038,7 @@ bool ThicknessGauge::saveData(string filename) {
 
 	std::ofstream file_output(filename + ".1.left.intensitet.txt");
 
-	auto writeY = [&](auto p) { file_output << p.y << '\n'; };
+	auto writeY = [&](auto p) { file_output << p.y - data->difference << '\n'; };
 
 	// left
 	std::for_each(data->leftPoints.begin(), data->leftPoints.end(), writeY);
@@ -1057,51 +1057,64 @@ bool ThicknessGauge::saveData(string filename) {
 	auto total_width = static_cast<int>(data->leftPoints.size() + data->centerPoints.size() + data->rightPoints.size());
 
 	// generate image for output overview and save it.
-	cv::Mat overview;
-	cv::cvtColor(frameset[0]->frames.front(), overview, CV_GRAY2BGR);
-	//cv::Mat overview = cv::Mat::zeros(tmp_mat.rows, total_width, tmp_mat.type());
-	//cv::Mat overview = cv::Mat::zeros(tmp_mat.rows, total_width, tmp_mat.type());
+	cv::Mat overlay;
+	cv::cvtColor(frameset.back()->frames.front(), overlay, CV_GRAY2BGR);
+	cv::Mat overview = cv::Mat::zeros(overlay.rows, overlay.cols, frameset[0]->frames.front().type());
 
 	const char default_intensity = static_cast<char>(210);
 	cv::Scalar default_col(0, 0, 250.0);
+	cv::Scalar default_bw(200.0, 200.0, 200.0);
 
-	auto paintY = [=](cv::Mat& image, std::vector<cv::Point2d>& points, int offset_x, double offset_y = 0.0) {
+	auto paintY = [](cv::Mat& image, std::vector<cv::Point2d>& points, double offset_x, double offset_y = 0.0, cv::Scalar col = cv::Scalar(0.0, 0.0, 255.0)) {
 		for (auto& p : points) {
 			cv::Point p1(cvRound(p.x + offset_x), cvRound(p.y + offset_y));
-			cv::line(image, p1, p1, default_col);
+			cv::line(image, p1, p1, col);
 			//image.at<char>(cvRound(p.y), cvRound(p.x + offset)) = default_intensity;
 		}
 	};
 
-	unsigned int offset = cvFloor(data->pointsStart[0]);
-	paintY(overview, data->leftPoints, offset);
-	offset = cvFloor(data->pointsStart[1]); // static_cast<unsigned int>(data->leftPoints.size());
-
-	paintY(overview, data->centerPoints, offset, -data->difference);
-
-	offset += cvFloor(data->pointsStart[2]); // cvRound(data->leftBorder[2] - data->leftBorder[0]);
-
-	paintY(overview, data->rightPoints, offset);
-
-	draw->drawText(&overview, cv::format("diff (px): %f", data->difference), tg::TextDrawPosition::UpperRight, default_col);
-
 	// testing height stuff drawing HERE
 
-	cv::Point2f base_left_p1(data->pointsStart[0], data->baseLines[1]);
-	cv::Point2f base_left_p2(data->pointsStart[1], base_left_p1.y);
+	draw->showWindows(true);
+	const std::string diff_text = cv::format("diff (px): %f", data->difference);
+	draw->drawText(&overlay, diff_text, tg::TextDrawPosition::UpperRight, default_col);
+	draw->drawText(&overview, diff_text, tg::TextDrawPosition::UpperRight, default_bw);
+
+	// LEFT
+
+	const auto cut_buffer = 40;
+
+	cv::Point2f base_left_p1(data->pointsStart[1] - data->leftPoints.size() - cut_buffer, data->baseLines[1]);
+	cv::Point2f base_left_p2(data->pointsStart[1] - cut_buffer, base_left_p1.y);
+	draw->drawLine(overlay, base_left_p1, base_left_p2, cv::Scalar(255, 0.0, 0.0));
 	draw->drawLine(overview, base_left_p1, base_left_p2, cv::Scalar(255, 0.0, 0.0));
+	//paintY(overlay, data->leftPoints, data->pointsStart[1] - data->leftPoints.size(), 0.0, default_col);
+	//paintY(overview, data->leftPoints, data->pointsStart[1] - data->leftPoints.size(), 0.0, default_bw);
 
-	cv::Point2f marking_p1(base_left_p2.x, base_left_p1.y - data->difference);
-	cv::Point2f marking_p2(marking_p1.x + data->centerPoints.size(), marking_p1.y);
-	draw->drawLine(overview, marking_p1, marking_p2, cv::Scalar(0.0, 255, 0.0));
+	// CENTER
+
+	cv::Point2f marking_p1(base_left_p2.x + cut_buffer * 2, base_left_p1.y - data->difference);
+	cv::Point2f marking_p2(marking_p1.x + data->centerPoints.size() - cut_buffer * 2, marking_p1.y);
+	draw->drawLine(overlay, marking_p1, marking_p2, cv::Scalar(255.0, 0.0, 0.0));
+	//draw->drawLine(overview, marking_p1, marking_p2, cv::Scalar(255.0, 0.0, 0.0));
+	paintY(overlay, data->centerPoints, marking_p1.x - cut_buffer, -data->difference, default_col);
+	paintY(overview, data->centerPoints, marking_p1.x - cut_buffer, -data->difference, default_bw);
+
+	// RIGHT
 	
-	cv::Point2f base_right_p1(marking_p2.x, data->baseLines[3]);
+	cv::Point2f base_right_p1(marking_p2.x + cut_buffer * 2, data->baseLines[3]);
 	cv::Point2f base_right_p2(base_right_p1.x + data->rightPoints.size(), base_right_p1.y);
+	draw->drawLine(overlay, base_right_p1, base_right_p2, cv::Scalar(255.0, 0.0, 0.0));
 	draw->drawLine(overview, base_right_p1, base_right_p2, cv::Scalar(255.0, 0.0, 0.0));
+	//paintY(overlay, data->rightPoints, base_right_p1.x, -data->difference, default_col);
+	//paintY(overview, data->rightPoints, base_right_p1.x, -data->difference, default_bw);
 
+	cv::imshow("overlay", overlay);
 	cv::imshow("overview", overview);
+
 	cv::waitKey(0);
 
+	cv::imwrite("_overlay.png", overlay);
 	cv::imwrite("_overview.png", overview);
 
 	return true;

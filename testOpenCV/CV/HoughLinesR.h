@@ -300,11 +300,6 @@ inline void HoughLinesR::computeBorders() {
 	if (showWindows_) {
 		drawLine(leftBorder_);
 		drawLine(rightBorder_);
-		//drawLines(leftLines_, cv::Scalar(0, 255, 0));
-		//drawLines(rightLines_, cv::Scalar(0, 0, 255));
-		//cv::rectangle(output_, leftRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
-		//cv::rectangle(output_, rightRoi, cv::Scalar(255, 255, 0), 3, CV_AA);
-		//cv::rectangle(output_, markingRect, cv::Scalar(255, 0, 0), 3, CV_AA);
 		showOutput();
 	}
 
@@ -360,6 +355,8 @@ inline int HoughLinesR::doVerticalHough() {
 
 	//drawLines(allLines, cv::Scalar(255, 0, 255));
 	computeMeta();
+
+	return 0;
 
 }
 
