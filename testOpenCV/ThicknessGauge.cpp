@@ -20,6 +20,7 @@
 #include <VimbaC/Include/VmbCommonTypes.h>
 #include <VimbaCPP/Include/Camera.h>
 #include <VimbaCPP/Include/VimbaSystem.h>
+#include "Camera/Capture.h"
 
 /**
  * \brief Initializes the class and loads any aditional information
@@ -118,6 +119,11 @@ void ThicknessGauge::initialize(std::string& glob_name) {
  */
 void ThicknessGauge::initVideoCapture() {
 	cap.open(CV_CAP_PVAPI);
+	Capture capture(cap);
+	capture.targetStdDev(63.0);
+	capture.deltaValue(2.0);
+	cout << "whoop: " << capture.detectExposure() << endl;
+
 }
 
 /**

@@ -165,6 +165,7 @@
     <ClCompile Include="Calc\LineCalc.cpp" />
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
+    <ClCompile Include="Camera\Capture.cpp" />
     <ClCompile Include="CV\GenericCV.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
@@ -183,6 +184,8 @@
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
     <ClInclude Include="Calc\GaugeMath.h" />
     <ClInclude Include="Calc\LineCalc.h" />
+    <ClInclude Include="Camera\Capture.h" />
+    <ClInclude Include="Camera\CaptureInterface.h" />
     <ClInclude Include="CV\BaseR.h" />
     <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />
     <ClInclude Include="CV\CannyR.h" />
