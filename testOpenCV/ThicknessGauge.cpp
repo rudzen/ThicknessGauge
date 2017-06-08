@@ -163,6 +163,12 @@ void ThicknessGauge::computeMarkingHeight() {
 
 	try {
 
+		// test print for all framesets
+		for (auto& f:  frameset) {
+			f->compute();
+			cout << f << endl;
+		}
+
 		uint64 time_start = cv::getTickCount();
 
 		// configure frames based on center vertical splitting of the original frames

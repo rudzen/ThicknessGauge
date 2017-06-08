@@ -55,52 +55,6 @@ protected:
 				stddevs.emplace_back(stddev[0]);
 			}
 		}
-
-
-		friend std::ostream& operator<<(std::ostream& os, const Frames& obj) {
-			os << "[Frame Structure]\n{\n";
-			if (obj.frames.empty()) {
-				return os << "\t\"frameCount\": null,\n}";
-			}
-			os << cv::format("\t\"frameCount\": %l,\n", obj.frames.size());
-			os << cv::format("\t\"frameDimensions\": %ix%i,\n", obj.frames.front().cols, obj.frames.front().rows);
-			os << cv::format("\t\"frameExposureDefault\": %i,\n", obj.exp_ms);
-			os << cv::format("\t\"frameExposureExtension\": %s,\n", obj.exp_ext);
-
-			// means
-			os << "\t\"means\": [\n";
-			auto size = obj.means.size();
-			for (auto i = 0; i < size; i++) {
-				os << cv::format("\t\t\"value_%i\":%f", i, obj.means[i]);
-				if (i != size - 1)
-					os << ",\n";
-			}
-			os << "\t],\n";
-
-			os << "\t\"stddevs\": [\n";
-			size = obj.stddevs.size();
-			for (auto i = 0; i < size; i++) {
-				os << cv::format("\t\t\"value_%i\":%f", i, obj.stddevs[i]);
-				if (i != size - 1)
-					os << ",\n";
-			}
-			os << "]\n}";
-
-
-
-
-
-
-
-
-
-			return os
-				<< "frames: " << obj.frames
-				<< " means: " << obj.means
-				<< " stddevs: " << obj.stddevs
-				<< " exp_ext: " << obj.exp_ext
-				<< " exp_ms: " << obj.exp_ms;
-		}
 	} Frames;
 
 	std::array<int, 3> exposures = {5000, 20000, 40000};
@@ -125,7 +79,36 @@ protected:
 		frameset.shrink_to_fit();
 	}
 
+	friend std::ostream& operator<<(std::ostream& os, const std::unique_ptr<Frames> const& obj) {
+		os << "[Frame Structure]\n{\n";
+		if (obj->frames.empty()) {
+			return os << "\t\"frameCount\": null,\n}";
+		}
+		os << cv::format("\t\"frameCount\": %i,\n", obj->frames.size());
+		os << "\t\"frameDimensions\": " << obj->frames.front().size() << ",\n"; // , obj->frames.front().rows);
+		os << "\t\"frameType\": " << obj->frames.front().type() << ",\n"; // , obj->frames.front().rows);
+		os << cv::format("\t\"frameExposureDefault\": %i,\n", obj->exp_ms);
+		os << cv::format("\t\"frameExposureExtension\": %s,\n", obj->exp_ext);
 
+		// means
+		os << "\t\"means\":[ ";
+		auto size = obj->means.size();
+		for (auto i = 0; i < size; i++) {
+			os << cv::format("\"%f\"", obj->means[i]);
+			if (i != size - 1)
+				os << ",";
+		}
+		os << " ],\n";
+
+		os << "\t\"stddevs\":[ ";
+		size = obj->stddevs.size();
+		for (auto i = 0; i < size; i++) {
+			os << cv::format("\"%f\"", obj->stddevs[i]);
+			if (i != size - 1)
+				os << ",";
+		}
+		return os << " ]\n}\n";
+	}
 
 public:
 
