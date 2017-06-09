@@ -83,10 +83,16 @@ public: // constructors
 		generateKernel(3, 3, 1.0f);
 		anchor_ = cv::Point(-1, -1);
 		showWindows_ = showWindows;
-		if (showWindows) {
-			this->windowName = windowName;
+		this->windowName = windowName;
+		if (showWindows)
 			createWindow();
-		}
+	}
+
+	explicit FilterR(std::string windowName) : delta_(0.0), ddepth_(-1), border_(cv::BORDER_DEFAULT) {
+		generateKernel(3, 3, 1.0f);
+		anchor_ = cv::Point(-1, -1);
+		showWindows_ = false;
+		this->windowName = windowName;
 	}
 
 	FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows, std::string windowName) : kernel_(kernel)
@@ -98,6 +104,8 @@ public: // constructors
 		this->windowName = windowName;
 		if (showWindows) createWindow();
 	}
+
+
 
 	/**
 	* \brief

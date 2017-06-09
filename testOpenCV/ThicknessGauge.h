@@ -23,6 +23,7 @@
 #include "Calc/LineCalc.h"
 #include "Vimba/CameraData.h"
 #include "Vimba/GC2450MCamera.h"
+#include "Camera/Capture.h"
 
 using namespace tg;
 
@@ -48,71 +49,7 @@ public:
 	//	canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, false);
 	//}
 
-	using Data = struct Data {
-
-		// the points of the laser on the marking
-		std::vector<cv::Point2d> centerPoints;
-
-		// the points thwere the laser hits ground zero on the LEFT side of the marking
-		std::vector<cv::Point2d> leftPoints;
-
-		// the points thwere the laser hits ground zero on the RIGHT side of the marking
-		std::vector<cv::Point2d> rightPoints;
-
-		// the missing link to the left
-		std::vector<cv::Point2d> middleLeft;
-
-		// the missing link to the right
-		std::vector<cv::Point2d> middleRight;
-
-		// start location for the 3 point vectors
-		cv::Vec3d pointsStart;
-
-		// the camera meta data
-		std::unique_ptr<CameraData> cameraData = std::make_unique<CameraData>();
-
-		// the main camera
-		AVT::VmbAPI::CameraPtr cameraPtr;
-
-		// the name of the glob loaded (or "camera" for live feed)
-		std::string globName;
-
-		// the rectangle which includes the entire marking
-		cv::Rect2d markingRect;
-
-		// left border vector
-		cv::Vec4d leftBorder;
-
-		// right border vector
-		cv::Vec4d rightBorder;
-
-		// the base lines where the laser hits the actual ground-zero
-		cv::Vec4d baseLines;
-
-		// the locations for where the base lines intersect with the marking border
-		cv::Vec4d intersections;
-
-		// enclusure of the laser line
-		cv::Vec4d centerLine;
-
-		// the points where the intersections are cut.
-		// adjusted so potential unwanted information is not included in further calculations
-		cv::Vec2d intersectionCuts;
-
-		// the x coordinates for the pieces that are cut out.
-		cv::Vec4d middlePieces;
-
-		// the avg
-		double leftAvg;
-		double leftMiddleAvg;
-		double centerAvg;
-		double rightMiddleAvg;
-		double rightAvg;
-
-		// the difference between the baseline(s) and the laser line on the marking in sub-pixels
-		double difference;
-
-	};
+	
 
 	std::unique_ptr<Data> data; // there can be only one!
 
@@ -132,10 +69,18 @@ private:
 
 	std::unique_ptr<LineCalc> lineCalc = std::make_unique<LineCalc>();
 
-	std::unique_ptr<DrawHelper> draw = make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
+	std::unique_ptr<DrawHelper> draw = std::make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
+
+	std::unique_ptr<Capture> capture; // initialized in initVideoCapture()
 
 	// common canny with default settings for detecting marking borders
 	std::shared_ptr<CannyR> canny;
+
+	// filter used for marking detection
+	std::unique_ptr<FilterR> filter_marking = std::make_unique<FilterR>("Marking filter");
+
+	// filter used for base line detection
+	std::unique_ptr<FilterR> filter_baseline = std::make_unique<FilterR>("Baseline filter");
 
 	const double PIangle = CV_PI / 180;
 
@@ -157,12 +102,9 @@ private:
 
 public:
 
-	// opencv and misc settings objects
-
-	cv::VideoCapture cap;
-
 	// the following pointers are public on purpose!
 	std::unique_ptr<CalibrationSettings> cs = std::make_unique<CalibrationSettings>();
+
 	std::shared_ptr<Pixelz> pixels = std::make_shared<Pixelz>();
 
 	void initialize(std::string& glob_name);
@@ -186,11 +128,11 @@ public: // basic stuff to extract information
 
 private:
 
-	void computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
+	void computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
 
-	void processMatForLine(cv::Mat& org, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
+	void processMatForLine(cv::Mat& org, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) const;
 
-	cv::Rect2d computerMarkingRectangle(shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough);
+	cv::Rect2d computerMarkingRectangle(shared_ptr<HoughLinesR> hough);
 
 	void computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter);
 

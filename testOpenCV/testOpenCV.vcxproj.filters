@@ -138,6 +138,9 @@
     <ClCompile Include="Camera\Capture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">

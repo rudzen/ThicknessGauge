@@ -169,6 +169,7 @@
     <ClCompile Include="CV\GenericCV.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
+    <ClCompile Include="tg.cpp" />
     <ClCompile Include="UI\DrawHelper.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />

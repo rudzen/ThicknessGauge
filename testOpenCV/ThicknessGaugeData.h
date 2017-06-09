@@ -77,6 +77,7 @@ protected:
 			frameset.emplace_back(std::move(fra));
 		}
 		frameset.shrink_to_fit();
+		
 	}
 
 	friend std::ostream& operator<<(std::ostream& os, const std::unique_ptr<Frames> const& obj) {

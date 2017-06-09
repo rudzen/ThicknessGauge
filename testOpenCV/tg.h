@@ -1,6 +1,7 @@
 #pragma once
-#include <ostream>
+#include <memory>
 #include "Util/Util.h"
+#include "Vimba/CameraData.h"
 
 namespace tg {
 
@@ -26,5 +27,85 @@ namespace tg {
 	enum class GlobType { Test, Calibration, Sequence };
 
 	enum class FilterKernels { Simple3x3, Horizontal10x10 };
+
+	using Data = struct Data {
+
+		// the points of the laser on the marking
+		std::vector<cv::Point2d> centerPoints;
+
+		// the points thwere the laser hits ground zero on the LEFT side of the marking
+		std::vector<cv::Point2d> leftPoints;
+
+		// the points thwere the laser hits ground zero on the RIGHT side of the marking
+		std::vector<cv::Point2d> rightPoints;
+
+		// the missing link to the left
+		std::vector<cv::Point2d> middleLeft;
+
+		// the missing link to the right
+		std::vector<cv::Point2d> middleRight;
+
+		// start location for the 3 point vectors
+		cv::Vec3d pointsStart;
+
+		// the camera meta data
+		std::unique_ptr<CameraData> cameraData = std::make_unique<CameraData>();
+
+		// the main camera
+		AVT::VmbAPI::CameraPtr cameraPtr;
+
+		// the name of the glob loaded (or "camera" for live feed)
+		std::string globName;
+
+		// the rectangle which includes the entire marking
+		cv::Rect2d markingRect;
+
+		// left border vector
+		cv::Vec4d leftBorder;
+
+		// right border vector
+		cv::Vec4d rightBorder;
+
+		// the base lines where the laser hits the actual ground-zero
+		cv::Vec4d baseLines;
+
+		// the locations for where the base lines intersect with the marking border
+		cv::Vec4d intersections;
+
+		// enclusure of the laser line
+		cv::Vec4d centerLine;
+
+		// the points where the intersections are cut.
+		// adjusted so potential unwanted information is not included in further calculations
+		cv::Vec2d intersectionCuts;
+
+		// the x coordinates for the pieces that are cut out.
+		cv::Vec4d middlePieces;
+
+		// the avg
+		double leftAvg;
+		double leftMiddleAvg;
+		double centerAvg;
+		double rightMiddleAvg;
+		double rightAvg;
+
+		// the difference between the baseline(s) and the laser line on the marking in sub-pixels
+		double difference;
+
+	};
+
+
+	// output syncro lock setup..
+	enum SyncCout { IO_LOCK, IO_UNLOCK };
+
+	std::ostream& operator<<(std::ostream&, SyncCout);
+
+#define sync_cout std::cout << IO_LOCK
+#define sync_endl std::endl << IO_UNLOCK
+
+
+	// value alignment (to make sure any value is not negative!)
+	template <class T>
+	T alignValue(T value);
 
 }

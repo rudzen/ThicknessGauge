@@ -22,6 +22,10 @@
 #include <VimbaCPP/Include/VimbaSystem.h>
 #include "Camera/Capture.h"
 
+#include "tg.h"
+
+using namespace tg;
+
 /**
  * \brief Initializes the class and loads any aditional information
  * \param glob_name if "camera", use camera, otherwise load from glob folder
@@ -118,11 +122,17 @@ void ThicknessGauge::initialize(std::string& glob_name) {
  * (requires that OpenCV is compiled with the location of the PvAPI, deprecated version)
  */
 void ThicknessGauge::initVideoCapture() {
-	cap.open(CV_CAP_PVAPI);
-	Capture capture(cap);
-	capture.targetStdDev(63.0);
-	capture.deltaValue(2.0);
-	cout << "whoop: " << capture.detectExposure() << endl;
+	capture = std::make_unique<Capture>();
+	if (!capture->cap.open(CV_CAP_PVAPI)) {
+		sync_cout << "Failed to open using PV_API, attempting defatult";
+		if (!capture->cap.open(CV_CAP_ANY)) {
+			CV_Error(cv::Error::StsError, "Error while attempting to open capture device.");
+		}
+	}
+
+	capture->targetStdDev(63.0);
+	capture->deltaValue(2.0);
+	cout << "whoop: " << capture->detectExposure() << endl;
 
 }
 
@@ -140,8 +150,6 @@ void ThicknessGauge::initCalibrationSettings(string fileName) const {
  */
 void ThicknessGauge::generateGlob(std::string& name) {
 	initVideoCapture();
-	if (!cap.isOpened()) // check if we succeeded
-		throw CaptureFailException("Error while attempting to open capture device.");
 
 	Util::createDirectory(name);
 	auto pb_title = "Capturing glob " + name;
@@ -155,7 +163,7 @@ void ThicknessGauge::generateGlob(std::string& name) {
 	unsigned long progress = 0;
 	for (auto i = 0; i < frameCount_; ++i) {
 		pb.Progressed(++progress);
-		cap >> t;
+		capture->cap >> t;
 		cv::imwrite(name + "/img" + to_string(i) + ".png", t);
 	}
 	pb.Progressed(frameCount_);
@@ -182,12 +190,8 @@ void ThicknessGauge::computeMarkingHeight() {
 		//vector<cv::Mat> rightFrames(frameCount_);
 		//splitFrames(leftFrames, rightFrames);
 
-		// the filter used to determin the marking location in the frame
-		auto filter_marking = make_shared<FilterR>("Marking Filter", showWindows_);
+		// configure filters for show window
 		filter_marking->setShowWindows(showWindows_);
-
-		// filter to enhance the base line
-		auto filter_baseline = make_shared<FilterR>("Baseline Filter", showWindows_);
 		filter_baseline->setShowWindows(showWindows_);
 
 		// houghlines to determin where the actual marking is in the frame
@@ -197,7 +201,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		hough_vertical->setAngleLimit(30);
 		hough_vertical->setShowWindows(showWindows_);
 
-		data->markingRect = computerMarkingRectangle(filter_marking, hough_vertical);
+		data->markingRect = computerMarkingRectangle(hough_vertical);
 		hough_vertical->setMarkingRect(data->markingRect);
 
 		// check the resulting rectangle for weirdness
@@ -218,7 +222,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		// morph extension class
 		auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
 
-		computeBaseLineAreas(filter_baseline, hough_horizontal, morph);
+		computeBaseLineAreas(hough_horizontal, morph);
 		//std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
 		//std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
 
@@ -294,11 +298,10 @@ void ThicknessGauge::computeMarkingHeight() {
 
 /**
  * \brief Computes the base line areas and determine the actual base line.
- * \param filter The custom filter class
  * \param hough The houghlines class
  * \param morph The morphology class
  */
-void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
+void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
 
 	cv::Mat kernel_line_vertikal = (cv::Mat_<char>(4, 4) <<
 		0 , 0 , 1 , 1 ,
@@ -314,7 +317,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 		0
 	);
 
-	filter->setKernel(kernel_line_vertikal);
+	filter_baseline->setKernel(kernel_line_vertikal);
 
 	morph->setMethod(cv::MORPH_GRADIENT);
 	morph->setIterations(1);
@@ -398,7 +401,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 			auto h = left.clone();
 			hough->setOriginal(h);
 
-			processMatForLine(org, filter, hough, morph);
+			processMatForLine(org, hough, morph);
 
 			const auto& lines = hough->getRightLines(); // inner most side
 			for (auto& line : lines) {
@@ -441,7 +444,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 			auto h1 = right.clone();
 			hough->setOriginal(h1);
 
-			processMatForLine(org, filter, hough, morph);
+			processMatForLine(org, hough, morph);
 
 			const auto& lines = hough->getLeftLines(); // inner most side
 			for (auto& h : lines) {
@@ -497,15 +500,14 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<FilterR> filter, shared_ptr
 /**
  * \brief Processes the matrix for optimal output and computes the line information based on the results
  * \param org The matrix to perform the process on
- * \param filter The filter extension class used
  * \param hough The hough extension class used
  * \param morph The morphology extenstion class used
  */
-void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
-	filter->setImage(org);
-	filter->doFilter();
+void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) const {
+	filter_baseline->setImage(org);
+	filter_baseline->doFilter();
 
-	canny->setImage(filter->getResult());
+	canny->setImage(filter_baseline->getResult());
 	canny->doCanny();
 
 	morph->setImage(canny->getResult());
@@ -517,11 +519,10 @@ void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<FilterR> filter,
 
 /**
  * \brief Computes the location of the marking rectangle, this rectangle is used to determin the location where the laser is actually on the marking.
- * \param filter The custom filter class
  * \param hough The houghline class
  * \return The rectangle which was computed
  */
-cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<FilterR> filter, shared_ptr<HoughLinesR> hough) {
+cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR> hough) {
 
 	const std::string window_name = "test marking out";
 
@@ -536,7 +537,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<FilterR> filter, 
 		1 , 1 , 0 , 0
 	);
 
-	filter->setKernel(kernel_line_vertikal);
+	filter_marking->setKernel(kernel_line_vertikal);
 
 	vector<cv::Rect2d> markings(frameCount_);
 	vector<cv::Vec4d> left_borders(frameCount_);
@@ -594,9 +595,9 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<FilterR> filter, 
 
 		cv::Mat sparse;
 		for (auto i = 0; i < frames->frames.size(); i++) {
-			filter->setImage(frames->frames[i].clone());
-			filter->doFilter();
-			canny->setImage(filter->getResult());
+			filter_marking->setImage(frames->frames[i].clone());
+			filter_marking->doFilter();
+			canny->setImage(filter_marking->getResult());
 			canny->doCanny();
 
 			auto t = canny->getResult();
@@ -963,11 +964,6 @@ void ThicknessGauge::loadGlob(std::string& globName) {
  * \param exposure The exposure for the captured image (not implemented yet!)
  */
 void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int capture_count, unsigned long long int exposure) {
-	// check if we succeeded
-	if (!cap.isOpened()) {
-		CV_Error(cv::Error::StsError, "Error while attempting to open capture device.");
-	}
-
 	// TODO : add exposure adjustment for camera before capture!!!!
 
 	cv::Mat t;
@@ -988,11 +984,11 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 	for (auto& f : frameset) {
 		f->frames.clear();
 		f->frames.reserve(capture_count);
-		cap.set(CV_CAP_PROP_EXPOSURE, static_cast<double>(f->exp_ms));
+		capture->cap.set(CV_CAP_PROP_EXPOSURE, static_cast<double>(f->exp_ms));
 		//cout << "capturing with exposure : " << cap.get(CV_CAP_PROP_EXPOSURE) << endl;
 		for (unsigned int i = 0; i++ < capture_count;) {
 			pb.Progressed(pb_pos++);
-			cap >> t;
+			capture->cap >> t;
 			f->frames.emplace_back(t);
 			pb.Progressed(pb_pos++);
 			draw->showImage(window_name, t);

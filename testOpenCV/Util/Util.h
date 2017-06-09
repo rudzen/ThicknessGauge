@@ -3,8 +3,10 @@
 #include <opencv2/core/mat.hpp>
 #include <iostream>
 #include <fstream>
-#include "Stringtools.h"
+#include <sys/types.h>
 #include <sys/stat.h>
+#include "Stringtools.h"
+#include "../tg.h"
 
 #ifdef __unix__
 #include <direct.h>
@@ -86,12 +88,10 @@ public:
 		std::cerr << message << std::endl;
 	}
 
-
 	static void log(std::string& message, std::ofstream& filename) {
 		log(message);
 		filename << message << std::endl;
 	}
-
 
 	/** Brief Determines the highest of two values
 	* Max of two ints
