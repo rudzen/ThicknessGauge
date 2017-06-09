@@ -85,11 +85,14 @@
     <Filter Include="Header Files\Calc">
       <UniqueIdentifier>{95a9ed02-1d95-40ce-933a-0cd9eed7b109}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Calc">
+      <UniqueIdentifier>{8d0d2ab6-c7dc-4fe7-8d65-711faf706e80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Namespaces">
+      <UniqueIdentifier>{4fd45f3d-4fc5-4809-acb5-579360c38668}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TheOne.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ThicknessGauge.cpp">
       <Filter>Source Files\CV</Filter>
     </ClCompile>
@@ -114,37 +117,40 @@
     <ClCompile Include="Util\Util.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="CV\LaserR.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Calc\LineCalc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CV\HoughLinesR.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CV\GenericCV.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\DrawHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Calc\GaugeMath.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Vimba\GC2450MCamera.cpp">
       <Filter>Source Files\Vimba</Filter>
     </ClCompile>
+    <ClCompile Include="CV\GenericCV.cpp">
+      <Filter>Source Files\CV</Filter>
+    </ClCompile>
+    <ClCompile Include="Calc\GaugeMath.cpp">
+      <Filter>Source Files\Calc</Filter>
+    </ClCompile>
+    <ClCompile Include="Calc\LineCalc.cpp">
+      <Filter>Source Files\Calc</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\DrawHelper.cpp">
+      <Filter>Source Files\CV</Filter>
+    </ClCompile>
     <ClCompile Include="Vimba\CaptureAVTCamera.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="CV\HoughLinesR.cpp">
+      <Filter>Source Files\CV</Filter>
     </ClCompile>
     <ClCompile Include="Camera\Capture.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="namespaces\tg.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="CV\LaserR.cpp">
+      <Filter>Source Files\CV</Filter>
     </ClCompile>
     <ClCompile Include="namespaces\calc.cpp">
+      <Filter>Source Files\Namespaces</Filter>
+    </ClCompile>
+    <ClCompile Include="namespaces\tg.cpp">
+      <Filter>Source Files\Namespaces</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

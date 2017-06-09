@@ -1,11 +1,10 @@
+
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include "ThicknessGauge.h"
-#include "Calibrate/CalibrationTest.cpp"
+#include <VimbaCPP/Include/VimbaSystem.h>
+
 #include "tclap/CmdLine.h"
-#include "Exceptions/CaptureFailException.h"
-#include "Exceptions/CalibrationException.h"
-#include "Exceptions/TestException.h"
+
 #include "ArgClasses/CommandLineOptions.h"
 #include "ArgClasses/IntegerConstraint.h"
 #include "ArgClasses/FileConstraint.h"
@@ -15,10 +14,18 @@
 #include "ArgClasses/TestModeVisitor.h"
 #include "ArgClasses/BuildInfoVisitor.h"
 #include "ArgClasses/GlobModeVisitor.h"
-#include <VimbaCPP/Include/VimbaSystem.h>
+
+#include "Exceptions/CaptureFailException.h"
+#include "Exceptions/CalibrationException.h"
+#include "Exceptions/TestException.h"
+
 #include "Vimba/GC2450MCamera.h"
 #include "Vimba/CameraData.h"
 #include "Vimba/CameraFrame.h"
+
+#include "Calibrate/CalibrationTest.cpp"
+
+#include "ThicknessGauge.h"
 
 using namespace std;
 using namespace TCLAP;

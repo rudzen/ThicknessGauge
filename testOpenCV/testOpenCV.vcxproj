@@ -176,7 +176,7 @@
     <ClCompile Include="ThicknessGauge.cpp" />
     <ClCompile Include="IO\ImageSave.cpp" />
     <ClCompile Include="Calc\MiniCalc.cpp" />
-    <ClCompile Include="TheOne.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Util\Util.cpp" />
     <ClCompile Include="IO\VideoInfo.cpp" />
     <ClCompile Include="Vimba\CaptureAVTCamera.cpp" />
