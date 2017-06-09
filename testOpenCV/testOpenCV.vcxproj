@@ -170,6 +170,7 @@
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
     <ClCompile Include="namespaces\calc.cpp" />
+    <ClCompile Include="namespaces\filesystem.cpp" />
     <ClCompile Include="namespaces\tg.cpp" />
     <ClCompile Include="UI\DrawHelper.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="LineSparse.h" />
     <ClInclude Include="LineConfig.h" />
     <ClInclude Include="CV\Pixel.h" />
+    <ClInclude Include="namespaces\filesystem.h" />
     <ClInclude Include="UI\DrawHelper.h" />
     <ClInclude Include="UI\ProgressBar.h" />
     <ClInclude Include="Testing\TestConfig.h" />

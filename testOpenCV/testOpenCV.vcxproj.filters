@@ -153,6 +153,9 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="namespaces\filesystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -328,6 +331,9 @@
     </ClInclude>
     <ClInclude Include="Calc\MiniCalc.h">
       <Filter>Header Files\Calc</Filter>
+    </ClInclude>
+    <ClInclude Include="namespaces\filesystem.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
