@@ -76,11 +76,14 @@
     <Filter Include="Header Files\CV\Histogram">
       <UniqueIdentifier>{1b9254c4-7bb6-425b-9305-ee69155c6f8f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Vimba">
-      <UniqueIdentifier>{b66d1ead-998a-4110-877b-8102672dfd4c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Vimba">
       <UniqueIdentifier>{2ef3ffd4-2c0e-4338-8822-601751586905}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Camera\Vimba">
+      <UniqueIdentifier>{b66d1ead-998a-4110-877b-8102672dfd4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Calc">
+      <UniqueIdentifier>{95a9ed02-1d95-40ce-933a-0cd9eed7b109}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -209,9 +212,6 @@
     <ClInclude Include="Calibrate\CalibrationSettings.h">
       <Filter>Header Files\Camera\Calibrate</Filter>
     </ClInclude>
-    <ClInclude Include="Calc\MiniCalc.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
     <ClInclude Include="UI\ProgressBar.h">
       <Filter>Header Files\UI\ProgressBar</Filter>
     </ClInclude>
@@ -263,62 +263,65 @@
     <ClInclude Include="LineSparse.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="Exceptions\NoLineDetectedException.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CV\LaserR.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="_unused_crap\temp_unused.txt">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="_unused_crap\temp_mains.txt">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Calc\LineCalc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CV\GenericCV.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\DrawHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CV\MorphR.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CV\Kernels.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Calc\GaugeMath.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Vimba\GC2450MCamera.h">
-      <Filter>Header Files\Vimba</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\CameraData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\CaptureAVTCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\CameraFrame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\OpenCVVideoRecorder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\Capture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\CaptureInterface.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Camera\Vimba</Filter>
     </ClInclude>
     <ClInclude Include="namespaces\tg.h">
       <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
+    <ClInclude Include="Vimba\CameraData.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Vimba\CameraFrame.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\Capture.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Vimba\CaptureAVTCamera.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\CaptureInterface.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions\NoLineDetectedException.h">
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Vimba\OpenCVVideoRecorder.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\LaserR.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
     <ClInclude Include="namespaces\calc.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Namespaces</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\DrawHelper.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Calc\GaugeMath.h">
+      <Filter>Header Files\Calc</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\GenericCV.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\Kernels.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\MorphR.h">
+      <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="Calc\LineCalc.h">
+      <Filter>Header Files\Calc</Filter>
+    </ClInclude>
+    <ClInclude Include="Calc\MiniCalc.h">
+      <Filter>Header Files\Calc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
