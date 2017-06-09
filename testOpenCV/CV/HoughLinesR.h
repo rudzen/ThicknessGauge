@@ -3,8 +3,11 @@
 #include <opencv2/videostab/inpainting.hpp>
 #include <opencv2/highgui.hpp>
 #include <iostream>
+
 #include "BaseR.h"
 #include "../namespaces/tg.h"
+#include "../namespaces/calc.h"
+
 #include "Exceptions/NoLineDetectedException.h"
 
 /*
@@ -26,7 +29,6 @@
 `+.__._._+*/
 
 
-using namespace tg;
 using namespace std;
 
 class HoughLinesR : public BaseR {
@@ -35,7 +37,7 @@ public:
 
 	typedef struct LineV {
 		cv::Vec2f entry;
-		linePair points;
+		tg::linePair points;
 		std::vector<cv::Point_<float>> elements;
 
 		float slobe;
@@ -44,10 +46,10 @@ public:
 			slobe = 0.0f;
 		}
 
-		LineV(cv::Vec2f entry, linePair points)
+		LineV(cv::Vec2f entry, tg::linePair points)
 			: entry(entry),
 			  points(points) {
-			elements.reserve(cvRound(Util::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
+			elements.reserve(cvRound(calc::dis_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
 			slobe = 0.0f;
 		}
 
@@ -157,9 +159,9 @@ private:
 		cv::createTrackbar("threshold", windowName, &threshold, 100, thresholdcb, this);
 	}
 
-	linePair computePointPair(cv::Vec2f& line) const;
+	tg::linePair computePointPair(cv::Vec2f& line) const;
 
-	linePair computePointPair2(cv::Vec2f& line) const;
+	tg::linePair computePointPair2(cv::Vec2f& line) const;
 
 	void drawLines(vector<LineV>& linePairs, cv::Scalar colour);
 
@@ -359,7 +361,7 @@ inline int HoughLinesR::doVerticalHough() {
 
 }
 
-inline linePair HoughLinesR::computePointPair(cv::Vec2f& line) const {
+inline tg::linePair HoughLinesR::computePointPair(cv::Vec2f& line) const {
 	auto rho = line[0];
 	auto theta = line[1];
 	double a = cos(theta);
@@ -368,10 +370,10 @@ inline linePair HoughLinesR::computePointPair(cv::Vec2f& line) const {
 	auto y0 = b * rho;
 	cv::Point2f pt1(static_cast<float>(x0 + 1000 * (-b)), static_cast<float>(y0 + 1000 * (a)));
 	cv::Point2f pt2(static_cast<float>(x0 - 1000 * (-b)), static_cast<float>(y0 - 1000 * (a)));
-	return linePair(pt1, pt2);
+	return tg::linePair(pt1, pt2);
 }
 
-inline linePair HoughLinesR::computePointPair2(cv::Vec2f& line) const {
+inline tg::linePair HoughLinesR::computePointPair2(cv::Vec2f& line) const {
 	auto rho = line[0];
 	auto theta = line[1];
 
@@ -418,7 +420,7 @@ inline linePair HoughLinesR::computePointPair2(cv::Vec2f& line) const {
 	auto p0y = static_cast<float>(y0);
 	auto p1y = static_cast<float>(y1);
 
-	return linePair(cv::Point2f(p0x, p0y), cv::Point2f(p1x, p1y));
+	return tg::linePair(cv::Point2f(p0x, p0y), cv::Point2f(p1x, p1y));
 
 }
 

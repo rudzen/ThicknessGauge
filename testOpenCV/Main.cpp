@@ -27,8 +27,11 @@
 
 #include "ThicknessGauge.h"
 
+#include "namespaces/tg.h"
+
 using namespace std;
 using namespace TCLAP;
+using namespace tg;
 
 /*
  * Application return codes :
@@ -65,10 +68,6 @@ void saveNull(std::string filename) {
 
 int main(int argc, char** argv) {
 
-	//CameraFrame cameraFrame;
-	//cameraFrame.captureFrames();
-	//return 0;
-
 	auto return_value = false;
 	CommandLineOptions options;
 
@@ -77,7 +76,7 @@ int main(int argc, char** argv) {
 		if (parseArgs(argc, argv, options)) {
 			// unique case for build information
 			if (options.isBuildInfoMode()) {
-				Util::log(cv::getBuildInformation());
+				log_time << cv::getBuildInformation();
 				return 0;
 			}
 			// null save mode..
@@ -134,37 +133,27 @@ int main(int argc, char** argv) {
 	}
 	catch (ArgException& ae) {
 		string what = ae.what();
-		Util::loge("Exception suddenly happend (but what?)\n" + what);
+		log_timedate << "Exception suddenly happend (but what?)\n" + what << std::endl;
 		return -1;
 	}
 	catch (CaptureFailException& cfe) {
 		string what = cfe.what();
-		Util::loge("Exception suddenly happend (but what?)\n" + what);
+		log_timedate << "Exception suddenly happend (but what?)\n" + what << std::endl;
 		return -2;
 	}
 	catch (CalibrationException& cale) {
 		string what = cale.what();
-		Util::loge("Exception suddenly happend (but what?)\n" + what);
+		log_timedate << "Exception suddenly happend (but what?)\n" + what << std::endl;
 		return -3;
 	}
 	catch (TestException& te) {
 		string what = te.what();
-		Util::loge("Exception suddenly happend (but what?)\n" + what);
+		log_timedate << "Exception suddenly happend (but what?)\n" + what << std::endl;
 		return -4;
 	}
-	Util::log("\nSmooth operator...");
-
-	cout << return_value << endl;
+	log_time << cv::format("Smooth operator >> %i\n", return_value);
 
 	return 0;
-	//return returnValue ^ true;
-
-	//return testBazier();
-
-	//PrettyMenu menu;
-	//menu.show();
-
-	//string calibrate("calibrate");
 
 }
 

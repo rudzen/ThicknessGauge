@@ -177,7 +177,7 @@ inline void HistoPeak::processImage(cv::Mat& image, bool uniform, bool accumulat
 	for (auto i = 1; i < split; ++i) {
 		auto current = histImage_.at<float>(i);
 		if (current < lowest && current > 0) {
-			lowest = Util::round(current);
+			lowest = calc::round(current);
 		}
 	}
 

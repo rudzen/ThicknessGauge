@@ -5,6 +5,9 @@
 #include <opencv2/core/mat.hpp>
 #include "Util/Util.h"
 
+#include "../namespaces/calc.h"
+
+
 class Histogram {
 
 	int valueMax_;
@@ -22,7 +25,7 @@ class Histogram {
 
 	int hist_h = 1080;
 
-	int bin_w = Util::round(static_cast<double>(hist_w) / histSize);
+	int bin_w = calc::round(static_cast<double>(hist_w) / histSize);
 
 	std::vector<v2<int>> dale_;
 

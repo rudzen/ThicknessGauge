@@ -21,7 +21,7 @@
 
 class CaptureFailException : public std::exception {
 
-	string message_;
+	std::string message_;
 
 public:
 

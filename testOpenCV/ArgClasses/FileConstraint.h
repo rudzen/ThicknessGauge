@@ -3,7 +3,7 @@
 
 class FileConstraint : public TCLAP::Constraint<std::string> {
 
-	const string illegalChars = "\\/:?\"<>|";
+	const std::string illegalChars = "\\/:?\"<>|";
 
 	/**
 	 * \brief Checks if a file exists.
@@ -31,7 +31,7 @@ class FileConstraint : public TCLAP::Constraint<std::string> {
 
 	bool isNameLegal(const std::string& name) const {
 		for (auto it = name.begin(); it < name.end(); ++it) {
-			auto found = illegalChars.find(*it) != string::npos;
+			auto found = illegalChars.find(*it) != std::string::npos;
 			if (found)
 				return false;
 		}

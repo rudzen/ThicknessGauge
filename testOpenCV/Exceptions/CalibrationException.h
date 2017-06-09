@@ -19,13 +19,13 @@
   ||||  |   ||
   `+.__._._+*/
 
-class CalibrationException : public exception {
+class CalibrationException : public std::exception {
 
-	string message_;
+	std::string message_;
 
 public:
 
-	explicit CalibrationException(string message) : message_(message) { }
+	explicit CalibrationException(std::string message) : message_(message) { }
 
 	const char* what() const throw() override { return message_.c_str(); }
 

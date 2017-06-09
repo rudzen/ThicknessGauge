@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
-#include "Util/Util.h"
+#include <vector>
+#include <opencv2/opencv.hpp>
 #include "Vimba/CameraData.h"
 
 /**
@@ -105,21 +106,21 @@ namespace tg {
 #define sync_cout std::cout << SyncCout::IO_LOCK
 #define sync_endl std::endl << SyncCout::IO_UNLOCK
 
-	enum class LogTime { LOG_TIME_NONE, LOG_TIME_TIME, LOG_TIME_DATE };
+	enum class LogTime { LOG_TIME, LOG_DATE, LOG_TIME_DATE };
 
+	/**
+	 * \brief Overload of ostream to insert time and/or date beforehand
+	 * \return The processed ostream
+	 */
 	std::ostream& operator<<(std::ostream&, LogTime);
 
-#define log_none std::cout << LogTime::LOG_TIME_NONE;
-#define log_time std::cout << LogTime::LOG_TIME_TIME;
-#define log_date std::cout << LogTime::LOG_TIME_DATE;
-
+#define log_timedate std::cout << LogTime::LOG_TIME_DATE
+#define log_time std::cout << LogTime::LOG_TIME
+#define log_date std::cout << LogTime::LOG_DATE
 
 	// ----------------------------------------------
 
 	// ----------- misc utility functions -----------
-
-	// value alignment (to make sure any value is not negative!)
-
 
 	/**
 	 * \brief Aligns a value to be no less than 0
@@ -130,9 +131,32 @@ namespace tg {
 	template <class T>
 	__forceinline T alignMinValue(T value);
 
-	// time/date functions
+	/**
+	 * \brief Fetches the current time and date in specificed format.
+	 * For more information : http://www.cplusplus.com/reference/ctime/strftime/
+	 * \return Date and/or time related information as string
+	 */
+	std::string get_time_date(const std::string format);
+
+	/**
+	 * \brief Fetches the current time and date as Date and time representation (%c).
+	 * For more information : http://www.cplusplus.com/reference/ctime/strftime/
+	 * \return Date and time as string
+	 */
 	std::string get_time_date();
+
+	/**
+	 * \brief Fetches the current time as ISO 8601 time format (HH:MM:SS) (%T).
+	 * For more information : http://www.cplusplus.com/reference/ctime/strftime/
+	 * \return Time as string
+	 */
 	std::string get_time();
+
+	/**
+	 * \brief Fetches the current time as Short YYYY-MM-DD date (%F).
+	 * For more information : http://www.cplusplus.com/reference/ctime/strftime/
+	 * \return Date as string
+	 */
 	std::string get_date();
 
 

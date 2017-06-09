@@ -3,9 +3,9 @@
 #include <opencv2/highgui.hpp>
 #include <iostream>
 #include "BaseR.h"
-#include <opencv2/core/affine.hpp>
-#include "Exceptions/NoLineDetectedException.h"
-#include "HoughLinesR.h"
+
+#include "../namespaces/tg.h"
+#include "../namespaces/calc.h"
 
 /*
 	|  __
@@ -25,8 +25,6 @@
   ||||  |   ||
   `+.__._._+*/
 
-using namespace tg;
-
 class HoughLinesPR : public BaseR {
 
 public:
@@ -42,7 +40,7 @@ public:
 		LineH(cv::Vec4f entry, linePair points)
 			: entry(entry),
 			  points(points) {
-			elements.reserve(cvRound(Util::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
+			elements.reserve(cvRound(calc::dis_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
 		}
 
 		friend bool operator==(const LineH& lhs, const LineH& rhs) {
@@ -482,8 +480,8 @@ inline void HoughLinesPR::drawLine(int x1, int y1, int x2, int y2, cv::Scalar co
 }
 
 inline void HoughLinesPR::drawLine(float x1, float y1, float x2, float y2, cv::Scalar colour) {
-	cv::Point p1(Util::round(x1), Util::round(y1));
-	cv::Point p2(Util::round(x2), Util::round(y2));
+	cv::Point p1(calc::round(x1), calc::round(y1));
+	cv::Point p2(calc::round(x2), calc::round(y2));
 	drawLine(p1, p2, colour);
 }
 
