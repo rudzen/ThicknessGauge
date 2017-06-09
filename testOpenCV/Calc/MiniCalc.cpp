@@ -6,28 +6,6 @@ MiniCalc::MiniCalc() {
 MiniCalc::~MiniCalc() {
 }
 
-cv::Point2d MiniCalc::variance(cv::Point2d& mean, vector<cv::Point>& pixels) const {
-	if (mean.x < 0.0 || mean.y < 0.0 || pixels.empty())
-		return cv::Point2d(0.0, 0.0);
-
-	cv::Point2d variance;
-	auto size = pixels.size();
-	for (const auto& pixel_point : pixels) {
-		variance.x += (1.0 / (size - 1)) * pow(pixel_point.x - mean.x, 2.0);
-		variance.y += (1.0 / (size - 1)) * pow(pixel_point.y - mean.y, 2.0);
-	}
-
-	return variance;
-}
-
-int MiniCalc::calculateHighLow(vector<cv::Point>& pixels) {
-	for (auto& pixel_point : pixels) {
-		//cout << pixel_point << endl;
-	}
-
-	return 0;
-}
-
 int MiniCalc::highestPixelInLine(cv::Mat& image) const {
 	auto const halfImageY = image.size().height / 2;
 

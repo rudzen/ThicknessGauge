@@ -45,13 +45,10 @@ public:
 public:
 	MiniCalc();
 	~MiniCalc();
-	cv::Point2d variance(cv::Point2d& mean, vector<cv::Point>& pixels) const;
 
 	static double varianceCoefficient(double*__restrict s, int mean) {
 		return *s / mean * 100;
 	}
-
-	static int calculateHighLow(vector<cv::Point2i>& pixels);
 
 	int highestPixelInLine(cv::Mat& image) const;
 
@@ -234,6 +231,5 @@ public:
 		return cv::Vec4i(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
 
 	}
-
 
 };
