@@ -1,7 +1,6 @@
 #pragma once
 #include <opencv2/stitching/detail/warpers.hpp>
 #include "BaseR.h"
-#include "Util/Util.h"
 
 class SparseR : public BaseR {
 

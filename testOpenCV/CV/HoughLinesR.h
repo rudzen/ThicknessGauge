@@ -49,7 +49,7 @@ public:
 		LineV(cv::Vec2f entry, tg::linePair points)
 			: entry(entry),
 			  points(points) {
-			elements.reserve(cvRound(calc::dis_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
+			elements.reserve(cvRound(calc::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
 			slobe = 0.0f;
 		}
 

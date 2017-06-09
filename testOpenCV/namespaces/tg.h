@@ -159,5 +159,4 @@ namespace tg {
 	 */
 	std::string get_date();
 
-
 }

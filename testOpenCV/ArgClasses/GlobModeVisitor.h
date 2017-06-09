@@ -2,12 +2,16 @@
 #include <tclap/Visitor.h>
 #include <iostream>
 
+#include "../namespaces/tg.h"
+
+using namespace tg;
+
 class GlobModeVisitor : public TCLAP::Visitor {
 
 public:
 
 	void visit() override {
-		std::cout << "Glob mode set." << std::endl;
+		log_time << "Glob mode set." << std::endl;
 	}
 
 };

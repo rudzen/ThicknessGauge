@@ -170,6 +170,7 @@
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
     <ClCompile Include="namespaces\calc.cpp" />
+    <ClCompile Include="namespaces\cvr.cpp" />
     <ClCompile Include="namespaces\filesystem.cpp" />
     <ClCompile Include="namespaces\tg.cpp" />
     <ClCompile Include="UI\DrawHelper.cpp" />
@@ -178,7 +179,6 @@
     <ClCompile Include="IO\ImageSave.cpp" />
     <ClCompile Include="Calc\MiniCalc.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Util\Util.cpp" />
     <ClCompile Include="IO\VideoInfo.cpp" />
     <ClCompile Include="Vimba\CaptureAVTCamera.cpp" />
     <ClCompile Include="Vimba\GC2450MCamera.cpp" />
@@ -217,7 +217,9 @@
     <ClInclude Include="LineSparse.h" />
     <ClInclude Include="LineConfig.h" />
     <ClInclude Include="CV\Pixel.h" />
+    <ClInclude Include="namespaces\cvR.h" />
     <ClInclude Include="namespaces\filesystem.h" />
+    <ClInclude Include="namespaces\stl.h" />
     <ClInclude Include="UI\DrawHelper.h" />
     <ClInclude Include="UI\ProgressBar.h" />
     <ClInclude Include="Testing\TestConfig.h" />
@@ -232,7 +234,6 @@
     <ClInclude Include="Calc\MiniCalc.h" />
     <ClInclude Include="Util\Stringtools.h" />
     <ClInclude Include="ThicknessGaugeData.h" />
-    <ClInclude Include="Util\Util.h" />
     <ClInclude Include="Util\Vec.h" />
     <ClInclude Include="IO\VideoInfo.h" />
     <ClInclude Include="namespaces\tg.h" />

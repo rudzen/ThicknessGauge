@@ -7,6 +7,9 @@
 #include "CameraData.h"
 #include <VimbaCPP/Include/VimbaSystem.h>
 
+#include "../namespaces/tg.h"
+
+using namespace tg;
 
 class FrameObserver : public AVT::VmbAPI::IFrameObserver {
 
@@ -27,11 +30,11 @@ public:
 		VmbFrameStatusType eReceiveStatus;
 		if (VmbErrorSuccess == pFrame->GetReceiveStatus(eReceiveStatus)) {
 			if (VmbFrameStatusComplete == eReceiveStatus) {
-				std::cout << "frame received..\n";
+				log_time << "frame received..\n";
 				// Put your code here to react on a successfully received frame
 			}
 			else {
-				std::cout << "frame failed..\n";
+				log_time << "frame failed..\n";
 				// Put your code here to react on an unsuccessfully received frame
 			}
 		}

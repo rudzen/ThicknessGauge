@@ -40,7 +40,7 @@ public:
 		LineH(cv::Vec4f entry, linePair points)
 			: entry(entry),
 			  points(points) {
-			elements.reserve(cvRound(calc::dis_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
+			elements.reserve(cvRound(calc::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
 		}
 
 		friend bool operator==(const LineH& lhs, const LineH& rhs) {

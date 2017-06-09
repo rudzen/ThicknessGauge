@@ -114,9 +114,6 @@
     <ClCompile Include="IO\ImageSave.cpp">
       <Filter>Source Files\File</Filter>
     </ClCompile>
-    <ClCompile Include="Util\Util.cpp">
-      <Filter>Source Files\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Vimba\GC2450MCamera.cpp">
       <Filter>Source Files\Vimba</Filter>
     </ClCompile>
@@ -153,8 +150,11 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="namespaces\cvr.cpp">
+      <Filter>Source Files\Namespaces</Filter>
+    </ClCompile>
     <ClCompile Include="namespaces\filesystem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Namespaces</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -238,9 +238,6 @@
     </ClInclude>
     <ClInclude Include="Testing\TestConfig.h">
       <Filter>Header Files\CV\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\Util.h">
-      <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Util\Vec.h">
       <Filter>Header Files\CV\Data</Filter>
@@ -333,7 +330,13 @@
       <Filter>Header Files\Calc</Filter>
     </ClInclude>
     <ClInclude Include="namespaces\filesystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Namespaces</Filter>
+    </ClInclude>
+    <ClInclude Include="namespaces\cvR.h">
+      <Filter>Header Files\Namespaces</Filter>
+    </ClInclude>
+    <ClInclude Include="namespaces\stl.h">
+      <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

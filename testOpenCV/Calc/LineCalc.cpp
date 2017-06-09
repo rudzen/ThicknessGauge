@@ -1,6 +1,10 @@
 ﻿#include "LineCalc.h"
 #include <opencv2/core.hpp>
 
+#include "../namespaces/tg.h"
+
+using namespace tg;
+
 #ifdef CV_VERSION
 
 /**
@@ -60,7 +64,7 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontal_line, const cv::Ve
 
 	// check if there are two intersections
 	if (!(intersects_left & intersects_right)) {
-		Util::loge("Error in intersection detection.");
+		log_time << "Error in intersection detection.\n";
 		CV_Error(cv::Error::StsAssert, "Intersection points are invalid.");
 		return false;
 	}

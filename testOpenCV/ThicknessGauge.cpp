@@ -1,28 +1,38 @@
 #include <algorithm>
 #include <array>
+#include <opencv2/core/base.hpp>
+
 #include "ThicknessGauge.h"
+
 #include "Calc/MiniCalc.h"
-#include "Util/Util.h"
 #include "IO/ImageSave.h"
-#include "Exceptions/CaptureFailException.h"
-#include "UI/ProgressBar.h"
-#include "Histogram/Histogram.h"
 #include "IO/GlobGenerator.h"
+
+#include "UI/ProgressBar.h"
+
+#include "Histogram/Histogram.h"
 #include "Histogram/HistoPeak.h"
+
 #include "CV/CannyR.h"
 #include "CV/HoughLinesR.h"
 #include "CV/Pixel.h"
 #include "CV/FilterR.h"
 #include "CV/HoughLinesPR.h"
 #include "CV/SparseR.h"
-#include <opencv2/core/base.hpp>
+
 #include "UI/DrawHelper.h"
+
+#include "Exceptions/CaptureFailException.h"
+
 #include <VimbaC/Include/VmbCommonTypes.h>
 #include <VimbaCPP/Include/Camera.h>
 #include <VimbaCPP/Include/VimbaSystem.h>
+
 #include "Camera/Capture.h"
 
 #include "namespaces/tg.h"
+#include "namespaces/filesystem.h"
+#include "namespaces/stl.h"
 
 using namespace tg;
 
@@ -151,7 +161,7 @@ void ThicknessGauge::initCalibrationSettings(string fileName) const {
 void ThicknessGauge::generateGlob(std::string& name) {
 	initVideoCapture();
 
-	Util::createDirectory(name);
+	file::createDirectory(name);
 	auto pb_title = "Capturing glob " + name;
 
 	ProgressBar pb(frameCount_, pb_title.c_str());
@@ -232,7 +242,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		// grabs the in between parts and stores the data
 		//computerInBetween(filter_baseline, hough_horizontal, morph);
 
-		sync_cout << "intersection points: " << data->intersections << sync_endl;
+		log_time << "intersection points: " << data->intersections << endl;
 
 		// pixel cut off is based on the border of the marking..
 		cv::Vec2d intersect_cutoff = computeIntersectionCut(hough_vertical);
@@ -253,7 +263,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);
 		cv::Point2d line_right(line_left.x + data->markingRect.width, data->baseLines[3]);
 
-		sync_cout << "angle between baselines: " << lineCalc->angleBetweenLines(line_left, line_right) << sync_endl;
+		log_time << "angle between baselines: " << lineCalc->angleBetweenLines(line_left, line_right) << endl;
 
 		//std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
 		//std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
@@ -284,7 +294,7 @@ void ThicknessGauge::computeMarkingHeight() {
 
 		frameTime_ = static_cast<double>((time_end - time_start) / cv::getTickFrequency());
 
-		cout << "Total compute time (seconds) : " << frameTime_ << endl;
+		log_time << "Total compute time (seconds) : " << frameTime_ << endl;
 
 		if (draw->isEscapePressed(30))
 			return;
@@ -355,7 +365,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 	unsigned int frame_index = 2;
 	auto frames = frameset[frame_index].get();
 
-	Util::log(cv::format("computeBaseLineAreas using exposure set %i : %s (%i)", frame_index, frames->exp_ext, frames->exp_ms));
+	log_time << cv::format("computeBaseLineAreas using exposure set %i : %s (%i)\n", frame_index, frames->exp_ext, frames->exp_ms);
 
 	// generate baseline images..
 	for (auto i = frameCount_; i--;) {
@@ -406,7 +416,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 			const auto& lines = hough->getRightLines(); // inner most side
 			for (auto& line : lines) {
 				if (line.entry[0] > left_cutoff) {
-					Util::copyVector(line.elements, left_elements);
+					stl::copyVector(line.elements, left_elements);
 				}
 			}
 
@@ -419,7 +429,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 		auto left_boundry = cv::minAreaRect(left_elements);
 		auto left_boundry_rect = left_boundry.boundingRect();
 
-		cout << "left_boundry_rect: " << left_boundry_rect.y << endl;
+		log_time << "left_boundry_rect: " << left_boundry_rect.y << endl;
 
 		left_boundry_rect.width -= 40;
 
@@ -435,7 +445,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 		left_y += offset_y;
 		left_y += lineCalc->computeRealIntensityLine(t, data->leftPoints, t.rows, 0);
 
-		cout << "left baseline: " << left_y << endl;
+		log_time << "left baseline: " << left_y << endl;
 
 		// right
 
@@ -449,7 +459,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 			const auto& lines = hough->getLeftLines(); // inner most side
 			for (auto& h : lines) {
 				if (h.entry[2] < right_cutoff)
-					Util::copyVector(h.elements, right_elements);
+					stl::copyVector(h.elements, right_elements);
 			}
 
 			if (draw->isEscapePressed(30))
@@ -555,7 +565,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR> houg
 
 	auto frames = frameset[frame_index].get();
 
-	Util::log(cv::format("computerMarkingRectangle using exposure set %i : %s (%i)", frame_index, frames->exp_ext, frames->exp_ms));
+	log_time << cv::format("computerMarkingRectangle using exposure set %i : %s (%i)\n", frame_index, frames->exp_ext, frames->exp_ms);
 
 	auto accuRects = [image_height](vector<cv::Rect2d>& rects, cv::Rect2d& out) {
 		out.x = 0.0;
@@ -665,7 +675,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	auto frames = frameset[frame_index].get();
 
-	Util::log(cv::format("computeLaserLocations using exposure set %i : %s (%i)", frame_index, frames->exp_ext, frames->exp_ms));
+	log_time << cv::format("computeLaserLocations using exposure set %i : %s (%i)", frame_index, frames->exp_ext, frames->exp_ms);
 
 	for (auto& frame : frames->frames)
 		marking_frames.emplace_back(frame(data->markingRect));
@@ -745,7 +755,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 		// since theres some issues with using results vector, this works just as fine.
 		data->centerPoints.clear();
-		Util::copyVector(results, data->centerPoints);
+		stl::copyVector(results, data->centerPoints);
 
 		auto highest_total =  avg_height / static_cast<unsigned int>(frameCount_);
 
@@ -974,7 +984,7 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 		draw->makeWindow(window_name);
 	}
 
-	Util::log("Starting capture..");
+	log_time << "Starting capture..\n";
 
 	ProgressBar pb(static_cast<unsigned long>(capture_count * frameset.size() * 2), "Capturing..", std::cout);
 	pb.SetFrequencyUpdate(10);
@@ -1004,7 +1014,7 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 
 	cout << endl;
 
-	Util::log("Capture done.");
+	log_time << "Capture done.\n";
 
 }
 

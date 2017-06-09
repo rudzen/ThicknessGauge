@@ -112,15 +112,14 @@ int main(int argc, char** argv) {
 
 			thicknessGauge->saveData("output_mufmuf");
 
-			cout << "difference: " << data->difference << endl;
-
+			log_timedate << cv::format("difference: %f\n", data->difference);
 
 			//auto result = c.findMarkingLinePairs_(globName);
 			//cout << result << endl;
 			//returnValue = result.first.x != 0;
 			//returnValue = c.generatePlanarImage(globName);
 			//if (returnValue) {
-			cout << "done..\n";
+			log_time << "done..\n";
 			//}
 		}
 		else if (options.isCalibrationMode()) {

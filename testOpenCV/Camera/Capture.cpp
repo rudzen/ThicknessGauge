@@ -34,14 +34,14 @@ double Capture::detectExposure() {
 		cap >> t;
 		cv::meanStdDev(t, mean, stddev);
 
-		std::cout << cv::format("trying [exposure:%f] [mean:%f] [stddev:%f]\n", cap.get(CV_CAP_PROP_EXPOSURE), mean[0], stddev[0]);
+		log_time << cv::format("trying [exposure:%f] [mean:%f] [stddev:%f]\n", cap.get(CV_CAP_PROP_EXPOSURE), mean[0], stddev[0]);
 
 		imwrite(cv::format("images/exposuretest_%f.png", exposure), t);
 
 
 	}
 
-	std::cout << cv::format("BINGO [exposure:%f] [mean:%f] [stddev:%f]\n", exposure, mean[0], stddev[0]);
+	log_time << cv::format("BINGO [exposure:%f] [mean:%f] [stddev:%f]\n", exposure, mean[0], stddev[0]);
 
 	return exposure;
 }

@@ -2,12 +2,16 @@
 #include <tclap/Visitor.h>
 #include <iostream>
 
+#include "../namespaces/tg.h"
+
+using namespace tg;
+
 class TestModeVisitor : public TCLAP::Visitor {
 
 public:
 
 	void visit() override {
-		std::cout << "Test mode set." << std::endl;
+		log_time << "Test mode set." << std::endl;
 	}
 
 };

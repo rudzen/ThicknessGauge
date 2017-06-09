@@ -51,7 +51,7 @@ namespace calc {
 	*/
 	template <class T>
 	__forceinline
-	T dis_manhattan(const T x1, const T x2, const T y1, const T y2) {
+	T dist_manhattan(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return abs(x2 - x1 + y2 - y1);
 	}

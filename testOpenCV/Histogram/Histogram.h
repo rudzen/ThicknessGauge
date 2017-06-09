@@ -3,7 +3,6 @@
 #include <array>
 #include <ostream>
 #include <opencv2/core/mat.hpp>
-#include "Util/Util.h"
 
 #include "../namespaces/calc.h"
 

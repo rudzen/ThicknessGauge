@@ -1,5 +1,4 @@
 #include "Calc/MiniCalc.h"
-#include "Util/Util.h"
 
 MiniCalc::MiniCalc() {
 }

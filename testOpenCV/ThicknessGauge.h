@@ -4,12 +4,11 @@
 #include <opencv2/opencv.hpp>
 #include <memory>
 
-#include "Calc/MiniCalc.h"
 #include "ThicknessGaugeData.h"
 
-#include "namespaces/tg.h"
 #include "Calibrate/CalibrationSettings.h"
-#include "Util/Util.h"
+
+#include "UI/DrawHelper.h"
 
 #include "IO/GlobGenerator.h"
 #include "CV/Pixel.h"
@@ -18,12 +17,15 @@
 #include "CV/HoughLinesR.h"
 #include "CV/HoughLinesPR.h"
 #include "CV/LaserR.h"
-#include "UI/DrawHelper.h"
 #include "CV/MorphR.h"
+
 #include "Calc/LineCalc.h"
-#include "Vimba/CameraData.h"
+#include "Calc/MiniCalc.h"
+
 #include "Vimba/GC2450MCamera.h"
 #include "Camera/Capture.h"
+
+#include "namespaces/tg.h"
 
 using namespace tg;
 

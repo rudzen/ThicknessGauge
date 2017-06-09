@@ -9,7 +9,6 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "Util/Util.h"
 #include "Util/Stringtools.h"
 #include "../namespaces/tg.h"
 

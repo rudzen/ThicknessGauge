@@ -1,10 +1,9 @@
 #include "IO/ImageSave.h"
 #include "ThicknessGauge.h"
 #include "Util/Stringtools.h"
-#include "Util/Util.h"
 #include "Exceptions/InvalidFileException.h"
 
-using namespace utils;
+#include "../namespaces/filesystem.h"
 
 void ImageSave::SaveImage(cv::Mat* image) const {
 	SaveImage(image, fileName_);
@@ -14,9 +13,9 @@ void ImageSave::SaveImage(cv::Mat* image, string filename) const {
 
 	replace(filename.begin(), filename.end(), ' ', '_');
 
-	auto outFile = "./images/_" + to_string(timeStamp_) + '-' + filename + '.' + (!StringTools::endsWith(filename, m_FileExtensions.at(saveType_)) ? m_FileExtensions.at(saveType_) : "");
+	auto outFile = "./images/_" + to_string(timeStamp_) + '-' + filename + '.' + (!utils::StringTools::endsWith(filename, m_FileExtensions.at(saveType_)) ? m_FileExtensions.at(saveType_) : "");
 
-	if (!Util::validFileName(outFile)) {
+	if (!file::isNameLegal(outFile)) {
 		throw InvalidFileException("Invalid filename for " + outFile);
 	}
 

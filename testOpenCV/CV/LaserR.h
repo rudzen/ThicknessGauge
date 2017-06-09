@@ -1,14 +1,16 @@
 #pragma once
-#include "BaseR.h"
 #include <vector>
-#include "../Util/Vec.h"
-//#include <opencv2/core/mat.hpp>
 #include <opencv2/stitching/detail/warpers.hpp>
-#include <unordered_map>
 #include <iostream>
-#include "Util/Util.h"
 #include <ostream>
+
+#include "BaseR.h"
 #include "HoughLinesR.h"
+#include "../Util/Vec.h"
+
+#include "../namespaces/tg.h"
+
+using namespace tg;
 
 class LaserR : public BaseR {
 
@@ -117,7 +119,7 @@ inline void LaserR::configureXLine(vector<cv::Point2i>& nonZeroes, vector<v3<flo
 	auto ok = computeXLine();
 
 	if (!ok) {
-		Util::loge("Error while calculating weighted intensity distribution.");
+		log_time << "Error while calculating weighted intensity distribution.\n";
 		return;
 	}
 
