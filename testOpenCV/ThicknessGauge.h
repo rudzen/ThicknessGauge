@@ -7,7 +7,7 @@
 #include "Calc/MiniCalc.h"
 #include "ThicknessGaugeData.h"
 
-#include "tg.h"
+#include "namespaces/tg.h"
 #include "Calibrate/CalibrationSettings.h"
 #include "Util/Util.h"
 

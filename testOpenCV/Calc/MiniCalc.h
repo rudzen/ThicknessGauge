@@ -3,9 +3,10 @@
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
-#include "tg.h"
 #include "LineConfig.h"
 #include "../Util/Vec.h"
+
+#include "../namespaces/tg.h"
 
 using namespace std;
 using namespace tg;

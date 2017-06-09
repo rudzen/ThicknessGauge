@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <opencv2/core.hpp>
-#include "../tg.h"
+#include "../namespaces/tg.h"
 #include <opencv2/shape/shape_transformer.hpp>
 #include "CV/LaserR.h"
 

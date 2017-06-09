@@ -3,7 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include "VideoInfo.h"
-#include "tg.h"
+#include "../namespaces/tg.h"
 
 using namespace tg;
 

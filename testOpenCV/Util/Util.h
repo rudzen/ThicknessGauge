@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "Stringtools.h"
-#include "../tg.h"
+#include "../namespaces/tg.h"
 
 #ifdef __unix__
 #include <direct.h>
@@ -19,9 +19,6 @@
 class Util {
 
 public:
-
-	//static char* getTime();
-	static std::string getTime();
 
 	static std::string type2str(int type);
 

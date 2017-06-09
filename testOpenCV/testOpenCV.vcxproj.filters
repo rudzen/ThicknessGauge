@@ -138,7 +138,10 @@
     <ClCompile Include="Camera\Capture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tg.cpp">
+    <ClCompile Include="namespaces\tg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="namespaces\calc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -257,9 +260,6 @@
     <ClInclude Include="CV\HoughLinesPR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="tg.h">
-      <Filter>Header Files\Namespaces</Filter>
-    </ClInclude>
     <ClInclude Include="LineSparse.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
@@ -312,6 +312,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera\CaptureInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="namespaces\tg.h">
+      <Filter>Header Files\Namespaces</Filter>
+    </ClInclude>
+    <ClInclude Include="namespaces\calc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

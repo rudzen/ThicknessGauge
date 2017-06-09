@@ -4,7 +4,7 @@
 #include <opencv2/highgui.hpp>
 #include <iostream>
 #include "BaseR.h"
-#include "../tg.h"
+#include "../namespaces/tg.h"
 #include "Exceptions/NoLineDetectedException.h"
 
 /*

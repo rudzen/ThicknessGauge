@@ -4,9 +4,10 @@
 #include <opencv2/core.hpp>
 #include <string>
 #include <unordered_map>
-#include "tg.h"
 #include <opencv2/videostab/ring_buffer.hpp>
 #include <opencv2/highgui/highgui.hpp>
+
+#include "../namespaces/tg.h"
 
 class DrawHelper {
 

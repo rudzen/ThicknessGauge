@@ -8,15 +8,15 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
+
 #include "Util/Util.h"
 #include "Util/Stringtools.h"
-
-#ifndef _CRT_SECURE_NO_WARNINGS
-# define _CRT_SECURE_NO_WARNINGS
-#endif
+#include "../namespaces/tg.h"
 
 using namespace std;
 using namespace utils;
+using namespace tg;
+
 
 class Settings {
 
@@ -239,7 +239,7 @@ public:
 	                      double total_avg_err) const {
 		cv::FileStorage fs(s.outputFileName, cv::FileStorage::WRITE_BASE64);
 
-		fs << "calibration_Time" << Util::getTime();
+		fs << "calibration_Time" << get_time_date();
 
 		if (!rvecs.empty() || !reproj_errs.empty())
 			fs << "nrOfFrames" << static_cast<int>(max(rvecs.size(), reproj_errs.size()));

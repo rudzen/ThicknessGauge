@@ -22,7 +22,7 @@
 #include <VimbaCPP/Include/VimbaSystem.h>
 #include "Camera/Capture.h"
 
-#include "tg.h"
+#include "namespaces/tg.h"
 
 using namespace tg;
 
@@ -232,7 +232,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		// grabs the in between parts and stores the data
 		//computerInBetween(filter_baseline, hough_horizontal, morph);
 
-		std::cout << "intersection points: " << data->intersections << std::endl;
+		sync_cout << "intersection points: " << data->intersections << sync_endl;
 
 		// pixel cut off is based on the border of the marking..
 		cv::Vec2d intersect_cutoff = computeIntersectionCut(hough_vertical);
@@ -253,7 +253,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);
 		cv::Point2d line_right(line_left.x + data->markingRect.width, data->baseLines[3]);
 
-		cout << "angle between baselines: " << lineCalc->angleBetweenLines(line_left, line_right) << endl;
+		sync_cout << "angle between baselines: " << lineCalc->angleBetweenLines(line_left, line_right) << sync_endl;
 
 		//std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
 		//std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
@@ -1023,7 +1023,7 @@ bool ThicknessGauge::saveData(string filename) {
 	auto& tmp_mat = frameset.front()->frames.front();
 
 	fs << "Filename" << filename;
-	fs << "TimeSaved" << Util::getTime();
+	fs << "TimeSaved" << get_time_date();
 	fs << "ComputeTime" << frameTime_;
 	fs << "Difference" << data->difference;
 	fs << "MarkingRectangle" << data->markingRect;

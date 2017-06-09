@@ -3,6 +3,9 @@
 #include "Util/Util.h"
 #include "Vimba/CameraData.h"
 
+/**
+ * \brief Contains utilitary functionality for the entire program
+ */
 namespace tg {
 
 	typedef std::vector<cv::Point2d> vd;
@@ -94,18 +97,43 @@ namespace tg {
 
 	};
 
-
-	// output syncro lock setup..
-	enum SyncCout { IO_LOCK, IO_UNLOCK };
+	// ----------- output stuff ---------------
+	enum class SyncCout { IO_LOCK, IO_UNLOCK };
 
 	std::ostream& operator<<(std::ostream&, SyncCout);
 
-#define sync_cout std::cout << IO_LOCK
-#define sync_endl std::endl << IO_UNLOCK
+#define sync_cout std::cout << SyncCout::IO_LOCK
+#define sync_endl std::endl << SyncCout::IO_UNLOCK
 
+	enum class LogTime { LOG_TIME_NONE, LOG_TIME_TIME, LOG_TIME_DATE };
+
+	std::ostream& operator<<(std::ostream&, LogTime);
+
+#define log_none std::cout << LogTime::LOG_TIME_NONE;
+#define log_time std::cout << LogTime::LOG_TIME_TIME;
+#define log_date std::cout << LogTime::LOG_TIME_DATE;
+
+
+	// ----------------------------------------------
+
+	// ----------- misc utility functions -----------
 
 	// value alignment (to make sure any value is not negative!)
+
+
+	/**
+	 * \brief Aligns a value to be no less than 0
+	 * \tparam T The value type (only fundamental types allowed)
+	 * \param value The value to align
+	 * \return The aligned value
+	 */
 	template <class T>
-	T alignValue(T value);
+	__forceinline T alignMinValue(T value);
+
+	// time/date functions
+	std::string get_time_date();
+	std::string get_time();
+	std::string get_date();
+
 
 }

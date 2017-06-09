@@ -5,10 +5,14 @@
 #include <ostream>
 #include <opencv2/core/base.hpp>
 #include <iostream>
-#include "CaptureInterface.h"
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/videoio/videoio_c.h>
+
+#include "CaptureInterface.h"
+#include "../namespaces/tg.h"
+
+using namespace tg;
 
 /**
  * \brief Wrapper for generic camera capture.
@@ -32,12 +36,6 @@ private:
 
 	double delta_;
 
-	static double alignValue(double value) {
-		if (value < 0.0)
-			return 0.0;
-		return value;
-	}
-
 public:
 
 	cv::VideoCapture cap;
@@ -54,8 +52,8 @@ public:
 	}
 
 	void initialize(double exposure, double gain) {
-		exposure = alignValue(exposure);
-		gain = alignValue(gain);
+		exposure = alignMinValue(exposure);
+		gain = alignMinValue(gain);
 		setExposure(exposure);
 		setGain(gain);		
 	}
@@ -73,7 +71,7 @@ public:
 	}
 
 	void setBrightness(double value) {
-		value = alignValue(value);
+		value = alignMinValue(value);
 		cap.set(CV_CAP_PROP_BRIGHTNESS, value);
 		settings->brightness = value;
 	}
@@ -84,7 +82,7 @@ public:
 	}
 
 	void setContrast(double value) {
-		value = alignValue(value);
+		value = alignMinValue(value);
 		cap.set(CV_CAP_PROP_CONTRAST, value);
 		settings->contrast = value;
 	}
@@ -95,7 +93,7 @@ public:
 	}
 
 	void setExposure(double value) {
-		value = alignValue(value);
+		value = alignMinValue(value);
 		cap.set(CV_CAP_PROP_EXPOSURE, value);
 		settings->exposure = value;
 	}
@@ -106,7 +104,7 @@ public:
 	}
 
 	void setGain(double value) {
-		value = alignValue(value);
+		value = alignMinValue(value);
 		cap.set(CV_CAP_PROP_GAIN, value);
 		settings->gain = value;
 	}

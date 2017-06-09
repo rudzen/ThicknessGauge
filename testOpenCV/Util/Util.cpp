@@ -2,36 +2,6 @@
 #include <ctime>
 #include <opencv2/core/hal/interface.h>
 
-//char* Util::getTime() {
-//	struct tm newtime;
-//	auto now = time(nullptr);
-//	localtime_s(&newtime, &now);
-//	char buf[1024];
-//	strftime(buf, sizeof(buf) - 1, "%c", &newtime);
-//	return buf;
-//
-//	//	time_t tm;
-//	//	time(&tm);
-//	//#ifdef _WIN64
-//	//	struct tm *t2 = localtime(&tm);
-//	//#else
-//	//	struct tm *t2 = localtime(&tm);
-//	//#endif // _WIN64
-//	//
-//	//	char buf[1024];
-//	//	strftime(buf, sizeof(buf) - 1, "%c", t2);
-//	//	return buf;
-//}
-
-std::string Util::getTime() {
-	struct tm newtime;
-	auto now = time(nullptr);
-	localtime_s(&newtime, &now);
-	char buf[1024];
-	strftime(buf, sizeof(buf) - 1, "%c", &newtime);
-	return std::string(buf);
-}
-
 std::string Util::type2str(int type) {
 	std::string r;
 

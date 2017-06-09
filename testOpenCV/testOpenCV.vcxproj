@@ -169,7 +169,8 @@
     <ClCompile Include="CV\GenericCV.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
-    <ClCompile Include="tg.cpp" />
+    <ClCompile Include="namespaces\calc.cpp" />
+    <ClCompile Include="namespaces\tg.cpp" />
     <ClCompile Include="UI\DrawHelper.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
@@ -183,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
+    <ClInclude Include="namespaces\calc.h" />
     <ClInclude Include="Calc\GaugeMath.h" />
     <ClInclude Include="Calc\LineCalc.h" />
     <ClInclude Include="Camera\Capture.h" />
@@ -231,7 +233,7 @@
     <ClInclude Include="Util\Util.h" />
     <ClInclude Include="Util\Vec.h" />
     <ClInclude Include="IO\VideoInfo.h" />
-    <ClInclude Include="tg.h" />
+    <ClInclude Include="namespaces\tg.h" />
     <ClInclude Include="Vimba\CameraData.h" />
     <ClInclude Include="Vimba\CameraFrame.h" />
     <ClInclude Include="Vimba\CaptureAVTCamera.h" />
