@@ -62,10 +62,6 @@ protected:
 	std::array<std::string, 3> expusures_short = {"_5k", "_20k", "_40k"};
 	std::vector<std::unique_ptr<Frames>> frameset;
 
-	cv::Vec4f gaugeLine_;
-
-	bool gaugeLineSet_;
-
 	std::vector<cv::Mat> nulls_;
 
 	cv::Size imageSize_;
