@@ -50,6 +50,7 @@ protected:
 			stddevs.shrink_to_fit();
 			stddevs.reserve(frames.size());
 			for (auto& frame : frames) {
+				// TODO : replace with miniCalc function(s)
 				cv::meanStdDev(frame, mean, stddev);
 				means.emplace_back(mean[0]);
 				stddevs.emplace_back(stddev[0]);

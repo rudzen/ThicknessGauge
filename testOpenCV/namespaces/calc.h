@@ -1,5 +1,6 @@
 #pragma once
 #include <opencv2/core/core.hpp>
+#include "Util/Vec.h"
 
 /**
  * \brief Calculation utility functionality
@@ -56,6 +57,15 @@ namespace calc {
 		return abs(x2 - x1 + y2 - y1);
 	}
 
+	template <class T>
+	__forceinline
+	T dist_real(const T x1, const T x2, const T y1, const T y2) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+		T x = pow(x2 - x1, 2);
+		T y = pow(y2 - y1, 2);
+		return sqrt(x + y);
+	}
+
 #ifdef CV_VERSION
 	template <class T>
 	__forceinline
@@ -63,6 +73,30 @@ namespace calc {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return dist_manhattan(p1.x, p2.x, p1.y, p1.y);
 	}
+
+	template <class T>
+	__forceinline
+	double dist_real(cv::Point_<T>& p1, cv::Point_<T>& p2) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+		return dist_real(p1.x, p2.x, p1.y, p2.y);
+	}
+
+#else
+
+	template <class T>
+	__forceinline
+	double dist_manhattan(v2<T>& p1, v2<T>& p2) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+		return dist_manhattan(p1.x, p2.x, p1.y, p1.y);
+	}
+
+	template <class T>
+	__forceinline
+	double dist_real(v2<T>& p1, v2<T>& p2) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+		return dist_real(p1.x, p2.x, p1.y, p2.y);
+	}
+
 #endif
 
 	/** Brief Determines the highest of two values
@@ -78,11 +112,12 @@ namespace calc {
 		return cv::max(a, b);
 	}
 
-	/** Brief Determines the highest of two values
-	* Max of two ints
+	/** Brief Determines the highest of three values
+	* Max of three fundamental values
 	* @param a operand #1
 	* @param b operand #2
-	* @return the highest of the two operands, defaults to operand #1
+	* @param c operand #3
+	* @return the highest of the three operands
 	*/
 	template <class T>
 	__forceinline
