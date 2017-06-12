@@ -34,6 +34,7 @@
 #include "namespaces/filesystem.h"
 #include "namespaces/stl.h"
 #include "namespaces/filters.h"
+#include "namespaces/sort.h"
 
 using namespace tg;
 
@@ -1030,9 +1031,9 @@ bool ThicknessGauge::saveData(string filename) {
 	fs << "FirstFrame" << tmp_mat;
 	fs.release();
 
-	std::sort(data->leftPoints.begin(), data->leftPoints.end(), miniCalc->sortX);
-	std::sort(data->centerPoints.begin(), data->centerPoints.end(), miniCalc->sortX);
-	std::sort(data->rightPoints.begin(), data->rightPoints.end(), miniCalc->sortX);
+	sort::sort_pixels_x_ascending(data->leftPoints);
+	sort::sort_pixels_x_ascending(data->centerPoints);
+	sort::sort_pixels_x_ascending(data->rightPoints);
 
 	std::ofstream file_output(filename + ".1.left.intensitet.txt");
 
@@ -1191,7 +1192,8 @@ bool ThicknessGauge::getSparseY(cv::Mat& image, vi& output) const {
 	findNonZero(image, pix);
 
 	// sort the list in X
-	sort(pix.begin(), pix.end(), miniCalc->sortX);
+	
+	sort::sort_pixels_x_ascending(pix);
 
 	auto x = pix.front().x;
 	auto y = 0;

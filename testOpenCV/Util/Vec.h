@@ -95,7 +95,7 @@ public:
 		return v2<T>(x + that.x, y + that.y);
 	}
 
-	v2 operator+(const cv::Vec<T, 2>& & that) {
+	v2 operator+(const cv::Vec<T, 2>& that) {
 		return v2<T>(x + that.x, y + that.y);
 	}
 
@@ -145,10 +145,10 @@ public:
 		this->y *= that->y;
 	}
 
-	virtual void operator*=(const double k) {
-		this->x *= k;
-		this->y *= k;
-	}
+	//virtual void operator*=(const double k) {
+	//	this->x *= k;
+	//	this->y *= k;
+	//}
 
 	int operator/(const v2& that) {
 		return v2(x, y) * that == 0 ? 1 : 0;

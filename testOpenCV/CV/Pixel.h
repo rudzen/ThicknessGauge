@@ -123,7 +123,7 @@ public:
 		vector<cv::Point> pix;
 		findNonZero(image, pix);
 
-		sort(pix.begin(), pix.end(), mini_calc.sortX);
+		sort::sort_pixels_x_ascending(pix);
 
 		auto intensitySum = 0.0;
 		auto yAvg = 0.0;

@@ -1,18 +1,22 @@
 #pragma once
+
+#ifdef CV_VERSION
 #include <opencv2/core/core.hpp>
+#else
 #include "Util/Vec.h"
+#endif
+
+#if defined(_MSC_VER) && !defined(inline)
+#define inline __forceinline
+#elif defined(__GNUC__) && !defined(inline)
+#define inline __always_inline
+#endif
 
 /**
  * \brief Calculation utility functionality
  * Contains optional OpenCV overloads for quick access
  */
 namespace calc {
-
-#ifdef _MSC_VER
-#define inline __forceinline
-#elif __GNUC__
-#define inline __always_inline
-#endif
 
 	enum class SlobeDirection {
 		VERTICAL, HORIZONTAL, DESCENDING, ASCENDING
@@ -139,7 +143,8 @@ namespace calc {
 			by = p1_y;
 			ax = p2_x;
 			ay = p2_y;
-		} else {
+		}
+		else {
 			bx = p2_x;
 			by = p2_y;
 			ax = p1_x;

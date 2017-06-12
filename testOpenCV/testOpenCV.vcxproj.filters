@@ -335,6 +335,9 @@
     <ClInclude Include="namespaces\stl.h">
       <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
+    <ClInclude Include="namespaces\sort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

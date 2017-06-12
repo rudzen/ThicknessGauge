@@ -43,7 +43,7 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
 	pixels.reserve(input.cols);
 
 	// sort the list in X
-	sort(pix.begin(), pix.end(), sortX);
+	sort::sort_pixels_x_ascending(pix);
 
 	auto x = pix.front().x;
 	auto count = 0;

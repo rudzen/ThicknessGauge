@@ -7,6 +7,7 @@
 #include "../Util/Vec.h"
 
 #include "../namespaces/tg.h"
+#include "namespaces/sort.h"
 
 using namespace std;
 using namespace tg;
@@ -15,22 +16,17 @@ class MiniCalc {
 
 public:
 
-	struct pixelYsort {
-		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
-		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
-		bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.y < pt2.y; }
-	} sortY;
+	//struct pixelYsort {
+	//	bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
+	//	bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
+	//	bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.y < pt2.y; }
+	//} sortY;
 
-	struct pixelXsort {
-		bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
-		bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
-		bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.x < pt2.x; }
-	} sortX;
-
-	void sortContours(vector<vector<cv::Point>>& contours) {
-		auto contourComparator = [](vector<cv::Point> a, vector<cv::Point> b) { return contourArea(a) > contourArea(b); };
-		sort(contours.begin(), contours.end(), contourComparator);
-	}
+	//struct pixelXsort {
+	//	bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
+	//	bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
+	//	bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.x < pt2.x; }
+	//} sortX;
 
 
 public:
@@ -58,7 +54,7 @@ public:
 		elements.emplace_back(cv::Point(0, target.rows));
 		elements.emplace_back(cv::Point(target.cols, target.rows));
 
-		sort(elements.begin(), elements.end(), sortX);
+		sort::sort_pixels_x_ascending(elements);
 
 		auto size = elements.size();
 

@@ -218,6 +218,7 @@
     <ClInclude Include="CV\Pixel.h" />
     <ClInclude Include="namespaces\cvR.h" />
     <ClInclude Include="namespaces\filesystem.h" />
+    <ClInclude Include="namespaces\sort.h" />
     <ClInclude Include="namespaces\stl.h" />
     <ClInclude Include="UI\DrawHelper.h" />
     <ClInclude Include="UI\ProgressBar.h" />
