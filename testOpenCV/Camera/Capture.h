@@ -48,10 +48,13 @@ public:
 	~Capture() = default;
 
 	void initialize() {
+		cap.set(CV_CAP_PROP_SETTINGS, 1);
 		initialize(5000.0, 0.0);
 	}
 
 	void initialize(double exposure, double gain) {
+		cap.set(CV_CAP_PROP_AUTO_EXPOSURE, 0);
+		cap.set(CV_CAP_PROP_PVAPI_PIXELFORMAT, 0);
 		exposure = alignMinValue(exposure);
 		gain = alignMinValue(gain);
 		setExposure(exposure);
