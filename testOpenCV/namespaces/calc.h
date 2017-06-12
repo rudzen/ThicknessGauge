@@ -50,14 +50,14 @@ namespace calc {
 	* @param y2 Point #2 y
 	* @return The manhattan distance between the two points
 	*/
-	template <class T>
+	template <typename  T>
 	__forceinline
 	T dist_manhattan(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return abs(x2 - x1 + y2 - y1);
 	}
 
-	template <class T>
+	template <typename T>
 	__forceinline
 	T dist_real(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
@@ -67,14 +67,14 @@ namespace calc {
 	}
 
 #ifdef CV_VERSION
-	template <class T>
+	template <typename T>
 	__forceinline
 	double dist_manhattan(cv::Point_<T>& p1, cv::Point_<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return dist_manhattan(p1.x, p2.x, p1.y, p1.y);
 	}
 
-	template <class T>
+	template <typename T>
 	__forceinline
 	double dist_real(cv::Point_<T>& p1, cv::Point_<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
@@ -83,14 +83,14 @@ namespace calc {
 
 #else
 
-	template <class T>
+	template <typename T>
 	__forceinline
 	double dist_manhattan(v2<T>& p1, v2<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return dist_manhattan(p1.x, p2.x, p1.y, p1.y);
 	}
 
-	template <class T>
+	template <typename T>
 	__forceinline
 	double dist_real(v2<T>& p1, v2<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
