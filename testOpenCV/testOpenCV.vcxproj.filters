@@ -317,9 +317,6 @@
     <ClInclude Include="CV\GenericCV.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="CV\Kernels.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
     <ClInclude Include="CV\MorphR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>

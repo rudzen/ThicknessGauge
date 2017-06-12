@@ -195,7 +195,6 @@
     <ClInclude Include="CV\CannyR.h" />
     <ClInclude Include="CV\GenericCV.h" />
     <ClInclude Include="CV\HoughLinesR.h" />
-    <ClInclude Include="CV\Kernels.h" />
     <ClInclude Include="CV\LaserR.h" />
     <ClInclude Include="CV\MorphR.h" />
     <ClInclude Include="Exceptions\CalibrationException.h" />
