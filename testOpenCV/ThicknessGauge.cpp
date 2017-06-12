@@ -246,7 +246,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		log_time << "intersection points: " << data->intersections << endl;
 
 		// pixel cut off is based on the border of the marking..
-		cv::Vec2d intersect_cutoff = computeIntersectionCut(hough_vertical);
+		auto intersect_cutoff = computeIntersectionCut(hough_vertical);
 
 		data->intersectionCuts[0] = data->intersections[0] - intersect_cutoff[0];
 		data->intersectionCuts[3] = data->intersections[3] + intersect_cutoff[1];
@@ -264,7 +264,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);
 		cv::Point2d line_right(line_left.x + data->markingRect.width, data->baseLines[3]);
 
-		log_time << "angle between baselines: " << lineCalc->angleBetweenLines(line_left, line_right) << endl;
+		log_time << "angle between baselines: " << calc::angle_between_lines(line_left, line_right) << endl;
 
 		//std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
 		//std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);

@@ -8,40 +8,6 @@ using namespace tg;
 #ifdef CV_VERSION
 
 /**
- * \brief Computes intersection points based on 4 points (2 x 2)
- * \param o1 Point one of pair one
- * \param p1 Point one of pair two
- * \param o2 Point two of pair one
- * \param p2 Point two of pair two
- * \param result The resulting point of intersection
- * \return true if intersection was found, otherwise false
- */
-bool LineCalc::intersection(cv::Point2d o1, cv::Point2d p1, cv::Point2d o2, cv::Point2d p2, cv::Point2d& result) const {
-
-	auto d1 = p1 - o1;
-	auto d2 = p2 - o2;
-
-	auto cross = d1.x * d2.y - d1.y * d2.x;
-	if (abs(cross) < /*EPS*/1e-8) return false;
-
-	auto x = o2 - o1;
-
-	auto t1 = (x.x * d2.y - x.y * d2.x) / cross;
-	result = o1 + d1 * t1;
-	return true;
-}
-
-/** @overload
- * \param border The border vector containing x/y coordinates for both borders
- * \param line The line vector The line for which to check intersections with borders
- * \param result The resulting point coordinates if they intersect
- * \return true if intersection was found, otherwise false
- */
-bool LineCalc::intersection(const cv::Vec4d& border, cv::Vec4d& line, cv::Point2d& result) const {
-	return intersection(cv::Point2d(border[0], border[1]), cv::Point2d(line[0], line[1]), cv::Point2d(border[2], border[3]), cv::Point2d(line[2], line[3]), result);
-}
-
-/**
  * \brief Computes the intersection points based on horizontal line and two borders
  * \param horizontal_line The horizontal line
  * \param left_border The left border
@@ -59,8 +25,8 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontal_line, const cv::Ve
 	cv::Point2d right_intersection;
 
 	// check intersection for both sides
-	auto intersects_left = intersection(left_border, horizontal_line, left_intersection);
-	auto intersects_right = intersection(right_border, horizontal_line, right_intersection);
+	auto intersects_left = calc::intersection(left_border, horizontal_line, left_intersection);
+	auto intersects_right = calc::intersection(right_border, horizontal_line, right_intersection);
 
 	// check if there are two intersections
 	if (!(intersects_left & intersects_right)) {
@@ -170,50 +136,6 @@ double LineCalc::computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2
 
 	return avg;
 
-}
-
-/**
- * \brief Computes the inner angle between two points both intersection with a center point
- * \param point1 The first point
- * \param point2 The second point
- * \param center The center point
- * \return The angle in degrees
- */
-double LineCalc::innerAngle(cv::Point2d& point1, cv::Point2d& point2, cv::Point2d& center) const {
-
-	auto dist1 = cv::sqrt((point1.x - center.x) * (point1.x - center.x) + (point1.y - center.y) * (point1.y - center.y));
-	auto dist2 = cv::sqrt((point2.x - center.x) * (point2.x - center.x) + (point2.y - center.y) * (point2.y - center.y));
-
-	double ax, ay;
-	double bx, by;
-
-	auto cx = center.x;
-	auto cy = center.y;
-
-	// checking for closest point to c
-	if (dist1 < dist2) {
-		bx = point1.x;
-		by = point1.y;
-		ax = point2.x;
-		ay = point2.y;
-	}
-	else {
-		bx = point2.x;
-		by = point2.y;
-		ax = point1.x;
-		ay = point1.y;
-	}
-
-	auto q1 = cx - ax;
-	auto q2 = cy - ay;
-	auto p1 = bx - ax;
-	auto p2 = by - ay;
-
-	auto a = acos((p1 * q1 + p2 * q2) / (cv::sqrt(p1 * p1 + p2 * p2) * cv::sqrt(q1 * q1 + q2 * q2)));
-
-	a *= 180 / CV_PI;
-
-	return a;
 }
 
 #endif

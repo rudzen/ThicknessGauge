@@ -141,9 +141,6 @@
     <ClCompile Include="CV\LaserR.cpp">
       <Filter>Source Files\CV</Filter>
     </ClCompile>
-    <ClCompile Include="namespaces\calc.cpp">
-      <Filter>Source Files\Namespaces</Filter>
-    </ClCompile>
     <ClCompile Include="namespaces\tg.cpp">
       <Filter>Source Files\Namespaces</Filter>
     </ClCompile>
