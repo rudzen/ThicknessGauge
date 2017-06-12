@@ -103,16 +103,18 @@ public:
 		return v2<T>(x + that.x, y + that.y);
 	}
 
-	v2 operator+=(const v2 &that) {
-		return v2<T>(x + that.x, y + that.y);
+	void operator+=(const v2 &that) {
+		this->x += that.x;
+		this->y += that.y;
 	}
 
 	v2 operator-(const v2 &that) {
 		return v2<T>(x - that.x, y - that.y);
 	}
 
-	v2 operator-=(const v2 &that) {
-		return v2<T>(x - that.x, y - that.y);
+	void operator-=(const v2 &that) {
+		this->x -= that.x;
+		this->y -= that.y;
 	}
 
 	// Operator : Scalarproduct (dotproduct)
@@ -124,12 +126,14 @@ public:
 		return v2<T>(k * x, k * y);
 	}
 
-	v2 operator*=(const v2 &that) {
-		return v2<T>(x, y) * that;
+	void operator*=(const v2 &that) {
+		this->x *= that->x;
+		this->y *= that->y;
 	}
 
-	v2 operator*=(const double k) {
-		return v2<T>(x, y) * k;
+	virtual void operator*=(const double k) {
+		this->x *= k;
+		this->y *= k;
 	}
 
 	int operator/(const v2 &that) {
@@ -161,7 +165,7 @@ public:
 	}
 
 	T angle(const v2 &that) {
-		return (v2(x, y) * that) / (len() * that.len());
+		return (this * that) / (len() * that.len());
 	}
 
 	virtual T len() const {
@@ -172,6 +176,11 @@ public:
 		return v2<T>(-y, x);
 	}
 
+	void crossTo(v2& that) {
+		that.x = -this->y;
+		that.y = this->x;
+	}
+
 	T det(const v2 &that) {
 		return cross() * that;
 	}
@@ -180,8 +189,8 @@ public:
 		return det(that) == 0 ? 1 : 0;
 	}
 
-	virtual bool hasValue() {
-		return this->x != 0 || this->y != 0;
+	virtual bool real() {
+		return this->x + this->y == 0;
 	}
 
 	friend std::size_t hash_value(const v2& obj) {
@@ -277,8 +286,8 @@ public:
 		return v3<T>(this->x, this->y, this->z) * that / (len() * that.len());
 	}
 
-	bool hasValue() override {
-		return this->x != 0 || this->y != 0 || this->z != 0;
+	bool real() override {
+		return this->x + this->y + this->z == 0;
 	}
 
 	friend std::size_t hash_value(const v3& obj) {
@@ -353,7 +362,7 @@ public:
 
 	// Operator : Scalarproduct (dotproduct)
 	T operator*(const v4 &that) override {
-		return (this->x * that.x) + (this->y * that.y) + (this->z * that.z) + (this->w * that->);
+		return (this->x * that.x) + (this->y * that.y) + (this->z * that.z) + (this->w * that->w);
 	}
 
 	v4 operator*(const double k) {
@@ -376,8 +385,8 @@ public:
 		return v4<T>(this->x, this->y, this->z) * that / (len() * that.len());
 	}
 
-	bool hasValue() override {
-		return this->x != 0 || this->y != 0 || this->z != 0 || this->w != 0;
+	bool real() override {
+		return this->x == 0 || this->y == 0 || this->z == 0 || this->w == 0;
 	}
 
 	friend std::size_t hash_value(const v4& obj) {
