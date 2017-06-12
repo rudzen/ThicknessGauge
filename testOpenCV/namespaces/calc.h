@@ -61,13 +61,31 @@ namespace calc {
 		return abs(x2 - x1 + y2 - y1);
 	}
 
+	/**
+	 * \brief Computes the distance (pyta)
+	 * \tparam T The type indicator
+	 * \param x1 X of first point
+	 * \param x2 X of second point
+	 * \param y1 Y of first point
+	 * \param y2 Y of second point
+	 * \return The distance (rooted)
+	 */
 	template <typename T>
 	__forceinline
-	T dist_real(const T x1, const T x2, const T y1, const T y2) {
+	double dist_real(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		T x = pow(x2 - x1, 2);
 		T y = pow(y2 - y1, 2);
 		return sqrt(x + y);
+	}
+
+	template <typename T>
+	__forceinline
+	double angle_points(const T x1, const T x2, const T y1, const T y2) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+		T x = std::pow(x2 - x1, 2);
+		T y = std::pow(y2 - y1, 2);
+		return std::sqrt(x + y);
 	}
 
 	template <typename T>
@@ -90,6 +108,36 @@ namespace calc {
 		return SlobeDirection::HORIZONTAL;
 	}
 
+	/**
+	 * \brief Solves a quadratic equation
+	 * \tparam T The base type
+	 * \param a a operand
+	 * \param b b operand
+	 * \param c c operanc
+	 * \return Tuple in format <bool, T, T>, where bool indicates if both roots are real regardless if they are the same or not.
+	 */
+	template <typename T>
+	__forceinline
+	std::tuple<bool, T, T> quadratic_equation(T a, T b, T c) {
+
+		double a2 = a * a;
+		double det = b * b - 2 * a2 * c;
+
+		if (det > 0.0) {
+			det = std::sqrt(det);
+			return std::tuple<bool, T, T>(true, (-b + det) / a2, (-b - det) / a2);
+		}
+		
+		if (det == 0.0) {
+			det = std::sqrt(det);
+			T res = (-b + det) / a2;
+			return std::tuple<bool, T, T>(true, res, res);
+		}
+		
+		return std::tuple<bool, T, T>(true, -b / a2, std::sqrt(-det) / a2);
+
+	}
+
 #ifdef CV_VERSION
 	template <typename T>
 	__forceinline
@@ -102,7 +150,7 @@ namespace calc {
 	__forceinline
 	double dist_real(cv::Point_<T>& p1, cv::Point_<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
-		return dist_real(p1.x, p2.x, p1.y, p2.y);
+		return cv::norm(p2 - p1);
 	}
 
 	template <typename T>
@@ -111,8 +159,6 @@ namespace calc {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return slope(p1.x, p2.x, p1.y, p2.y);
 	}
-
-
 
 #else
 
@@ -136,6 +182,8 @@ namespace calc {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return slope(p1.x, p2.x, p1.y, p2.y);
 	}
+
+
 
 #endif
 
