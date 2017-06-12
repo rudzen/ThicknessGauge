@@ -156,6 +156,9 @@
     <ClCompile Include="namespaces\filesystem.cpp">
       <Filter>Source Files\Namespaces</Filter>
     </ClCompile>
+    <ClCompile Include="namespaces\filters.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">

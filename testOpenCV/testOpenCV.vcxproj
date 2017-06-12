@@ -172,6 +172,7 @@
     <ClCompile Include="namespaces\calc.cpp" />
     <ClCompile Include="namespaces\cvr.cpp" />
     <ClCompile Include="namespaces\filesystem.cpp" />
+    <ClCompile Include="namespaces\filters.h" />
     <ClCompile Include="namespaces\tg.cpp" />
     <ClCompile Include="UI\DrawHelper.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />

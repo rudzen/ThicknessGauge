@@ -33,6 +33,7 @@
 #include "namespaces/tg.h"
 #include "namespaces/filesystem.h"
 #include "namespaces/stl.h"
+#include "namespaces/filters.h"
 
 using namespace tg;
 
@@ -313,21 +314,8 @@ void ThicknessGauge::computeMarkingHeight() {
  */
 void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
 
-	cv::Mat kernel_line_vertikal = (cv::Mat_<char>(4, 4) <<
-		0 , 0 , 1 , 1 ,
-		0 , 1 , 1 , 1 ,
-		1 , 1 , 1 , 0 ,
-		1 , 1 , 0 , 0
-	);
 
-	cv::Mat kernel_horizontal_line = (cv::Mat_<char>(4, 1) <<
-		0 ,
-		1 ,
-		1 ,
-		0
-	);
-
-	filter_baseline->setKernel(kernel_line_vertikal);
+	filter_baseline->setKernel(filters::kernel_line_left_to_right);
 
 	morph->setMethod(cv::MORPH_GRADIENT);
 	morph->setIterations(1);
@@ -540,14 +528,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR> houg
 		draw->makeWindow(window_name);
 	}
 
-	cv::Mat kernel_line_vertikal = (cv::Mat_<char>(4, 4) <<
-		0 , 0 , 1 , 1 ,
-		0 , 1 , 1 , 1 ,
-		1 , 1 , 1 , 0 ,
-		1 , 1 , 0 , 0
-	);
-
-	filter_marking->setKernel(kernel_line_vertikal);
+	filter_marking->setKernel(filters::kernel_line_left_to_right);
 
 	vector<cv::Rect2d> markings(frameCount_);
 	vector<cv::Vec4d> left_borders(frameCount_);
