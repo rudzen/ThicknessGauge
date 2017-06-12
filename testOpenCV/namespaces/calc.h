@@ -182,6 +182,19 @@ namespace calc {
 
 	}
 
+	/**
+	 * \brief Computes mu
+	 * Simple mu computation helper function for use with Interpolate and Bezier calculations
+	 * \param current_pos The current position
+	 * \param in_between How many points there are in the source position and the target position
+	 * \return The computed mu
+	 */
+	template <typename T>
+	__forceinline
+	double mu(T current_pos, T in_between) {
+		return current_pos / in_between;
+	}
+
 #ifdef CV_VERSION
 	template <typename T>
 	__forceinline

@@ -13,15 +13,6 @@ using namespace tg;
 
 class MiniCalc {
 
-private:
-
-	cv::Point2i lowestPixel_;
-	cv::Point2i highestPixel_;
-
-	cv::Point2d mean_;
-
-	cv::Point2d variance_;
-
 public:
 
 	struct pixelYsort {
@@ -54,17 +45,6 @@ public:
 
 	/* Converts pixels from an image to a singular line vector in X, where Y is the mean of all pixels located at that given X in the image */
 	bool generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point2f>& pixels, vector<cv::Point2f>& gradientPixels) const;
-
-	/**
-	 * \brief Computes mu
-	 * Simple mu computation helper function for use with Interpolate and Bezier calculations
-	 * \param currentPosition The current position
-	 * \param inBetweenCount How many points there are in the source position and the target position
-	 * \return The computed mu
-	 */
-	static double computeMu(double currentPosition, double inBetweenCount) {
-		return currentPosition / inBetweenCount;
-	}
 
 	/**
 	 * \brief Fills the gabs in the elements with simple linear lines
@@ -139,14 +119,6 @@ public:
 
 	}
 
-	double computeWeigthedIntensity(vi& elements, int x, int y) {
-		return 0.0;
-	}
-
-	double computeWeigthedIntensity(vi& elements, cv::Point point) {
-		return computeWeigthedIntensity(elements, point.x, point.y);
-	}
-
 	static void getElementsX(vi& input, vi& output, int x) {
 		for (auto& e : input) {
 			if (e.x == x)
@@ -171,7 +143,6 @@ public:
 		cv::fitLine(pixels, result, config.getDistType(), config.getParams(), config.getReps(), config.getAepa());
 		return true;
 	}
-
 
 	/**
 	 * \brief Crude cutoff of pixels from image based on Y
