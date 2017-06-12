@@ -7,6 +7,10 @@
  */
 namespace calc {
 
+	enum class SlobeDirection {
+		VERTICAL, HORIZONTAL, DESCENDING, ASCENDING
+	};
+
 	/**
 	* Round to the nearest integer (stolen from opencv)
 	* @param value The value to round
@@ -50,7 +54,7 @@ namespace calc {
 	* @param y2 Point #2 y
 	* @return The manhattan distance between the two points
 	*/
-	template <typename  T>
+	template <typename T>
 	__forceinline
 	T dist_manhattan(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
@@ -64,6 +68,26 @@ namespace calc {
 		T x = pow(x2 - x1, 2);
 		T y = pow(y2 - y1, 2);
 		return sqrt(x + y);
+	}
+
+	template <typename T>
+	__forceinline
+	double slope(const T x1, const T x2, const T y1, const T y2) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+		T dx = x2 - x1;
+		T dy = y2 - y1;
+		return dy / dx;
+	}
+
+	__forceinline
+	SlobeDirection slobe_direction(const double slope) {
+		if (std::isinf(slope))
+			return SlobeDirection::VERTICAL;
+		if (slope < 0.0)
+			return SlobeDirection::DESCENDING;
+		if (slope > 0.0)
+			return SlobeDirection::ASCENDING;
+		return SlobeDirection::HORIZONTAL;
 	}
 
 #ifdef CV_VERSION
@@ -81,6 +105,15 @@ namespace calc {
 		return dist_real(p1.x, p2.x, p1.y, p2.y);
 	}
 
+	template <typename T>
+	__forceinline
+	double slope(cv::Point_<T>& p1, cv::Point_<T>& p2) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+		return slope(p1.x, p2.x, p1.y, p2.y);
+	}
+
+
+
 #else
 
 	template <typename T>
@@ -95,6 +128,13 @@ namespace calc {
 	double dist_real(v2<T>& p1, v2<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return dist_real(p1.x, p2.x, p1.y, p2.y);
+	}
+
+	template <typename T>
+	__forceinline
+	double slope(v2<T>& p1, v2<T>& p2) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+		return slope(p1.x, p2.x, p1.y, p2.y);
 	}
 
 #endif
