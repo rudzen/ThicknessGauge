@@ -4,8 +4,15 @@
 
 /**
  * \brief Calculation utility functionality
+ * Contains optional OpenCV overloads for quick access
  */
 namespace calc {
+
+#ifdef _MSC_VER
+#define inline __forceinline
+#elif __GNUC__
+#define inline __always_inline
+#endif
 
 	enum class SlobeDirection {
 		VERTICAL, HORIZONTAL, DESCENDING, ASCENDING
@@ -16,7 +23,7 @@ namespace calc {
 	* @param value The value to round
 	* @return Nearest integer as double
 	*/
-	__forceinline
+	inline
 	int round(double value) {
 #if ((defined _MSC_VER && defined _M_X64) || (defined __GNUC__ && defined __x86_64__ \
     && defined __SSE2__ && !defined __APPLE__) || CV_SSE2) && !defined(__CUDACC__)
@@ -55,7 +62,7 @@ namespace calc {
 	* @return The manhattan distance between the two points
 	*/
 	template <typename T>
-	__forceinline
+	inline
 	T dist_manhattan(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return abs(x2 - x1 + y2 - y1);
@@ -71,7 +78,7 @@ namespace calc {
 	 * \return The distance (rooted)
 	 */
 	template <typename T>
-	__forceinline
+	inline
 	double dist_real(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		T x = pow(x2 - x1, 2);
@@ -80,7 +87,7 @@ namespace calc {
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double angle_points(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		T x = std::pow(x2 - x1, 2);
@@ -89,7 +96,7 @@ namespace calc {
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double slope(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		T dx = x2 - x1;
@@ -97,7 +104,7 @@ namespace calc {
 		return dy / dx;
 	}
 
-	__forceinline
+	inline
 	SlobeDirection slobe_direction(const double slope) {
 		if (std::isinf(slope))
 			return SlobeDirection::VERTICAL;
@@ -109,13 +116,13 @@ namespace calc {
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double angle_between_lines(T x1, T x2, T y1, T y2) {
 		return atan((y1 - y2) / (x2 - x1) * 180 / CV_PI);
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double angle_inner_points(const T p1_x, const T p2_x, const T c_x, const T p1_y, const T p2_y, const T c_y) {
 		auto dist1 = cv::sqrt((p1_x - c_x) * (p1_x - c_x) + (p1_y - c_y) * (p1_y - c_y));
 		auto dist2 = cv::sqrt((p2_x - c_x) * (p2_x - c_x) + (p2_y - c_y) * (p2_y - c_y));
@@ -132,8 +139,7 @@ namespace calc {
 			by = p1_y;
 			ax = p2_x;
 			ay = p2_y;
-		}
-		else {
+		} else {
 			bx = p2_x;
 			by = p2_y;
 			ax = p1_x;
@@ -161,7 +167,7 @@ namespace calc {
 	 * \return Tuple in format <bool, T, T>, where bool indicates if both roots are real regardless if they are the same or not.
 	 */
 	template <typename T>
-	__forceinline
+	inline
 	std::tuple<bool, T, T> quadratic_equation(T a, T b, T c) {
 
 		double a2 = a * a;
@@ -190,35 +196,35 @@ namespace calc {
 	 * \return The computed mu
 	 */
 	template <typename T>
-	__forceinline
+	inline
 	double mu(T current_pos, T in_between) {
 		return current_pos / in_between;
 	}
 
 #ifdef CV_VERSION
 	template <typename T>
-	__forceinline
+	inline
 	double dist_manhattan(cv::Point_<T>& p1, cv::Point_<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return dist_manhattan(p1.x, p2.x, p1.y, p1.y);
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double dist_real(cv::Point_<T>& p1, cv::Point_<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return cv::norm(p2 - p1);
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double slope(cv::Point_<T>& p1, cv::Point_<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return slope(p1.x, p2.x, p1.y, p2.y);
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double angle_between_lines(cv::Point_<T>& p1, cv::Point_<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return atan((p1.y - p2.y) / (p2.x - p1.x) * 180 / CV_PI);
@@ -232,7 +238,7 @@ namespace calc {
 	* \return The angle in degrees
 	*/
 	template <typename T>
-	__forceinline
+	inline
 	double angle_inner_points(const cv::Point_<T>& p1, const cv::Point_<T>& p2, const cv::Point_<T>& c) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return angle_inner_points(p1.x, p2.x, c.x, p1.y, p2.y, c.y);
@@ -248,7 +254,7 @@ namespace calc {
 	* \return true if intersection was found, otherwise false
 	*/
 	template <typename T>
-	__forceinline
+	inline
 	bool intersection(cv::Point_<T> o1, cv::Point_<T> p1, cv::Point_<T> o2, cv::Point_<T> p2, cv::Point_<T>& result) {
 
 		auto d1 = p1 - o1;
@@ -272,7 +278,7 @@ namespace calc {
 	* \return true if intersection was found, otherwise false
 	*/
 	template <typename T>
-	__forceinline
+	inline
 	bool intersection(const cv::Vec<T, 4>& border, cv::Vec<T, 4>& line, cv::Point_<T>& result) {
 		return intersection(cv::Point_<T>(border[0], border[1]), cv::Point_<T>(line[0], line[1]), cv::Point_<T>(border[2], border[3]), cv::Point_<T>(line[2], line[3]), result);
 	}
@@ -280,35 +286,35 @@ namespace calc {
 #else
 
 	template <typename T>
-	__forceinline
+	inline
 	double dist_manhattan(v2<T>& p1, v2<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return dist_manhattan(p1.x, p2.x, p1.y, p1.y);
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double dist_real(v2<T>& p1, v2<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return dist_real(p1.x, p2.x, p1.y, p2.y);
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double slope(v2<T>& p1, v2<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return slope(p1.x, p2.x, p1.y, p2.y);
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double angle_between_lines(v2<T>& p1, v2<T>& p2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return atan((p1.y - p2.y) / (p2.x - p1.x) * 180 / CV_PI);
 	}
 
 	template <typename T>
-	__forceinline
+	inline
 	double angle_inner_points(const v2<T>& p1, const v2<T>& p2, const v2<T>& c) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return angle_inner_points(p1.x, p2.x, c.x, p1.y, p2.y, c.y);
@@ -324,7 +330,7 @@ namespace calc {
 	* \return true if intersection was found, otherwise false
 	*/
 	template <typename T>
-	__forceinline
+	inline
 	bool intersection(v2<T> o1, v2<T> p1, v2<T> o2, v2<T> p2, v2<T>& result) {
 
 		auto d1 = p1 - o1;
@@ -351,7 +357,7 @@ namespace calc {
 	* @return the highest of the two operands, defaults to operand #1
 	*/
 	template <class T>
-	__forceinline
+	inline
 	T maxval(T a, T b) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return max(a, b);
@@ -365,7 +371,7 @@ namespace calc {
 	* @return the highest of the three operands
 	*/
 	template <class T>
-	__forceinline
+	inline
 	T maxval(T a, T b, T c) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return maxval(maxval(a, b), c);
