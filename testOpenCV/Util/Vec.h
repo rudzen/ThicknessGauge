@@ -37,7 +37,7 @@
 
 using namespace std;
 
-template<class T>
+template <class T>
 class v2 {
 public:
 	virtual ~v2() = default;
@@ -59,14 +59,16 @@ public:
 	                        , y(std::move(other.y)) {}
 
 	v2& operator=(const v2& other) {
-		if (this == &other) return *this;
+		if (this == &other)
+			return *this;
 		x = other.x;
 		y = other.y;
 		return *this;
 	}
 
 	v2& operator=(v2&& other) noexcept {
-		if (this == &other) return *this;
+		if (this == &other)
+			return *this;
 		x = std::move(other.x);
 		y = std::move(other.y);
 		return *this;
@@ -84,12 +86,22 @@ public:
 		y = p.y;
 	}
 
-	v2 operator+(const cv::Point_<T> &that) {
+	explicit v2(cv::Vec<T, 2>& p) {
+		x = p.x;
+		y = p.y;
+	}
+
+	v2 operator+(const cv::Point_<T>& that) {
+		return v2<T>(x + that.x, y + that.y);
+	}
+
+	v2 operator+(const cv::Vec<T, 2>& & that) {
 		return v2<T>(x + that.x, y + that.y);
 	}
 
 #endif
 	T x;
+
 	T y;
 
 	friend bool operator==(const v2& lhs, const v2& rhs) {
@@ -97,36 +109,38 @@ public:
 				&& lhs.y == rhs.y;
 	}
 
-	friend bool operator!=(const v2& lhs, const v2& rhs) { return !(lhs == rhs); }
+	friend bool operator!=(const v2& lhs, const v2& rhs) {
+		return !(lhs == rhs);
+	}
 
-	v2 operator+(const v2 &that) {
+	v2 operator+(const v2& that) {
 		return v2<T>(x + that.x, y + that.y);
 	}
 
-	void operator+=(const v2 &that) {
+	void operator+=(const v2& that) {
 		this->x += that.x;
 		this->y += that.y;
 	}
 
-	v2 operator-(const v2 &that) {
+	v2 operator-(const v2& that) {
 		return v2<T>(x - that.x, y - that.y);
 	}
 
-	void operator-=(const v2 &that) {
+	void operator-=(const v2& that) {
 		this->x -= that.x;
 		this->y -= that.y;
 	}
 
 	// Operator : Scalarproduct (dotproduct)
-	T operator*(const v2 &that) {
+	T operator*(const v2& that) {
 		return (x * that.x) + (y * that.y);
 	}
 
-	virtual v2 operator*(const T &k) {
+	virtual v2 operator*(const T& k) {
 		return v2<T>(k * x, k * y);
 	}
 
-	void operator*=(const v2 &that) {
+	void operator*=(const v2& that) {
 		this->x *= that->x;
 		this->y *= that->y;
 	}
@@ -136,19 +150,19 @@ public:
 		this->y *= k;
 	}
 
-	int operator/(const v2 &that) {
+	int operator/(const v2& that) {
 		return v2(x, y) * that == 0 ? 1 : 0;
 	}
 
-	int operator<(const v2 &that) {
+	int operator<(const v2& that) {
 		return len() < that.len();
 	}
 
-	int operator>(const v2 &that) {
+	int operator>(const v2& that) {
 		return len() > that.len();
 	}
 
-	int operator==(const v2 &that) {
+	int operator==(const v2& that) {
 		return x == that.x & y == that.y;
 	}
 
@@ -156,15 +170,15 @@ public:
 		return v2<T>(-x, -y);
 	}
 
-	v2 project_onto(const v2 &that) {
+	v2 project_onto(const v2& that) {
 		return this * (v2(x, y) * that / pow(len(), 2));
 	}
 
-	T project_len(const v2 &that) {
+	T project_len(const v2& that) {
 		return abs(v2(x, y) * that / len());
 	}
 
-	T angle(const v2 &that) {
+	T angle(const v2& that) {
 		return (this * that) / (len() * that.len());
 	}
 
@@ -181,11 +195,11 @@ public:
 		that.y = this->x;
 	}
 
-	T det(const v2 &that) {
+	T det(const v2& that) {
 		return cross() * that;
 	}
 
-	int parallel(const v2 &that) {
+	int parallel(const v2& that) {
 		return det(that) == 0 ? 1 : 0;
 	}
 
@@ -202,13 +216,13 @@ public:
 
 };
 
-template<class T>
-ostream &operator<<(ostream &stream, v2<T> v) {
+template <class T>
+ostream& operator<<(ostream& stream, v2<T> v) {
 	stream << '[' << v.x << ',' << v.y << ']';
 	return stream;
 }
 
-template<class T>
+template <class T>
 class v3 : public v2<T> {
 public:
 
@@ -231,14 +245,16 @@ public:
 	                        , z(std::move(other.z)) {}
 
 	v3& operator=(const v3& other) {
-		if (this == &other) return *this;
+		if (this == &other)
+			return *this;
 		v2<T>::operator =(other);
 		z = other.z;
 		return *this;
 	}
 
 	v3& operator=(v3&& other) noexcept {
-		if (this == &other) return *this;
+		if (this == &other)
+			return *this;
 		v2<T>::operator =(std::move(other));
 		z = std::move(other.z);
 		return *this;
@@ -251,13 +267,15 @@ public:
 				&& lhs.z == rhs.z;
 	}
 
-	friend bool operator!=(const v3& lhs, const v3& rhs) { return !(lhs == rhs); }
+	friend bool operator!=(const v3& lhs, const v3& rhs) {
+		return !(lhs == rhs);
+	}
 
-	virtual v3 operator+(const v3 &that) {
+	virtual v3 operator+(const v3& that) {
 		return v3<T>(this->x + that.x, this->y + that.y, this->z + that.z);
 	}
 
-	v3 operator-(const v3 &that) {
+	v3 operator-(const v3& that) {
 		return v3<T>(this->x - that.x, this->y - that.y, this->z - that.z);
 	}
 
@@ -274,15 +292,15 @@ public:
 		return abs(sqrt(this->x * this->x + this->y * this->y + this->z * this->z));
 	}
 
-	v3 cross(const v3 &that) {
+	v3 cross(const v3& that) {
 		return v3<T>(this->y * that.z - this->z * this->y, this->z * that.x - this->x * that.z, this->x * that.y - that.y - this->x);
 	}
 
-	T parallelogram_area(const v3 &that) {
+	T parallelogram_area(const v3& that) {
 		return abs(cross(that).len());
 	}
 
-	T angle(const v3 &that) {
+	T angle(const v3& that) {
 		return v3<T>(this->x, this->y, this->z) * that / (len() * that.len());
 	}
 
@@ -298,16 +316,15 @@ public:
 	}
 };
 
-template<class T>
-ostream &operator<<(ostream &stream, v3<T> v) {
+template <class T>
+ostream& operator<<(ostream& stream, v3<T> v) {
 	stream << '[' << v.x << ',' << v.y << ',' << v.z << ']';
 	return stream;
 }
 
-
 /////////////////////////////////////
 
-template<class T>
+template <class T>
 class v4 : public v3<T> {
 public:
 
@@ -330,14 +347,16 @@ public:
 	                        , w(std::move(other.w)) {}
 
 	v4& operator=(const v4& other) {
-		if (this == &other) return *this;
+		if (this == &other)
+			return *this;
 		v3<T>::operator =(other);
 		w = other.w;
 		return *this;
 	}
 
 	v4& operator=(v4&& other) noexcept {
-		if (this == &other) return *this;
+		if (this == &other)
+			return *this;
 		v3<T>::operator =(std::move(other));
 		w = std::move(other.w);
 		return *this;
@@ -350,18 +369,20 @@ public:
 				&& lhs.w == rhs.w;
 	}
 
-	friend bool operator!=(const v4& lhs, const v4& rhs) { return !(lhs == rhs); }
+	friend bool operator!=(const v4& lhs, const v4& rhs) {
+		return !(lhs == rhs);
+	}
 
-	v4 operator+(const v4 &that) {
+	v4 operator+(const v4& that) {
 		return v4<T>(this->x + that.x, this->y + that.y, this->z + that.z, this->w + that.w);
 	}
 
-	v4 operator-(const v4 &that) {
+	v4 operator-(const v4& that) {
 		return v4<T>(this->x - that.x, this->y - that.y, this->z - that.z, this->w - that.w);
 	}
 
 	// Operator : Scalarproduct (dotproduct)
-	T operator*(const v4 &that) override {
+	T operator*(const v4& that) override {
 		return (this->x * that.x) + (this->y * that.y) + (this->z * that.z) + (this->w * that->w);
 	}
 
@@ -373,15 +394,15 @@ public:
 		return abs(sqrt(this->x * this->x + this->y * this->y + this->z * this->z));
 	}
 
-	v4 cross(const v4 &that) {
+	v4 cross(const v4& that) {
 		return v4<T>(this->y * that.z - this->z * this->y, this->z * that.x - this->x * that.z, this->x * that.y - that.y - this->x);
 	}
 
-	T parallelogram_area(const v4 &that) {
+	T parallelogram_area(const v4& that) {
 		return abs(cross(that).len());
 	}
 
-	T angle(const v4 &that) {
+	T angle(const v4& that) {
 		return v4<T>(this->x, this->y, this->z) * that / (len() * that.len());
 	}
 
@@ -397,8 +418,8 @@ public:
 	}
 };
 
-template<class T>
-ostream &operator<<(ostream &stream, v4<T> v) {
+template <class T>
+ostream& operator<<(ostream& stream, v4<T> v) {
 	stream << '[' << v.x << ',' << v.y << ',' << v.z << ',' << v.w << ']';
 	return stream;
 }
