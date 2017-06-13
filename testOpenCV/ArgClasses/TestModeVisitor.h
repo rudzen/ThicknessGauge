@@ -10,8 +10,8 @@ class TestModeVisitor : public TCLAP::Visitor {
 
 public:
 
-	void visit() override {
-		log_time << "Test mode set." << std::endl;
-	}
+    void visit() override {
+        log_time << "Test mode set." << std::endl;
+    }
 
 };

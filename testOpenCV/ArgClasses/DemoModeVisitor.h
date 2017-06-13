@@ -7,11 +7,11 @@
 using namespace tg;
 
 class DemoModeVisitor : public TCLAP::Visitor {
-	
+
 public:
 
-	void visit() override {
-		log_time << "Demo mode set." << std::endl;
-	}
+    void visit() override {
+        log_time << "Demo mode set." << std::endl;
+    }
 
 };

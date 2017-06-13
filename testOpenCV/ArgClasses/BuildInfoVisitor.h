@@ -6,8 +6,8 @@ class BuildInfoVisitor : public TCLAP::Visitor {
 
 public:
 
-	void visit() override {
-		std::cout << "Showing build info." << std::endl;
-	}
+    void visit() override {
+        std::cout << "Showing build info." << std::endl;
+    }
 
 };

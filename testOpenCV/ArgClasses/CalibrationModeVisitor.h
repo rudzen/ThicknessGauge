@@ -6,8 +6,8 @@ class CalibrationModeVisitor : public TCLAP::Visitor {
 
 public:
 
-	void visit() override {
-		std::cout << "Calibration mode set.[NOT IMPLEMENTED FULLY YET]" << std::endl;
-	}
+    void visit() override {
+        std::cout << "Calibration mode set.[NOT IMPLEMENTED FULLY YET]" << std::endl;
+    }
 
 };

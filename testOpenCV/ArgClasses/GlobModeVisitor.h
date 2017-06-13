@@ -10,8 +10,8 @@ class GlobModeVisitor : public TCLAP::Visitor {
 
 public:
 
-	void visit() override {
-		log_time << "Glob mode set." << std::endl;
-	}
+    void visit() override {
+        log_time << "Glob mode set." << std::endl;
+    }
 
 };
