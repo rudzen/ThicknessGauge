@@ -15,188 +15,173 @@ using namespace tg;
 class MiniCalc {
 
 public:
+    MiniCalc();
+    ~MiniCalc();
 
-	//struct pixelYsort {
-	//	bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.y < pt2.y; }
-	//	bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.y < pt2.y; }
-	//	bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.y < pt2.y; }
-	//} sortY;
+    static double varianceCoefficient(double*__restrict s, int mean) {
+        return *s / mean * 100;
+    }
 
-	//struct pixelXsort {
-	//	bool operator()(cv::Point2i pt1, cv::Point2i pt2) const { return pt1.x < pt2.x; }
-	//	bool operator()(cv::Point2d pt1, cv::Point2d pt2) const { return pt1.x < pt2.x; }
-	//	bool operator()(cv::Point2f pt1, cv::Point2f pt2) const { return pt1.x < pt2.x; }
-	//} sortX;
+    int highestPixelInLine(cv::Mat& image) const;
 
+    /* Converts pixels from an image to a singular line vector in X, where Y is the mean of all pixels located at that given X in the image */
+    bool generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point2f>& pixels, vector<cv::Point2f>& gradientPixels) const;
 
-public:
-	MiniCalc();
-	~MiniCalc();
+    /**
+     * \brief Fills the gabs in the elements with simple linear lines
+     * \param elements The elements to fill gabs in
+     * \param target The target matrix
+     * \param barrier The current known location of the baseLevel, default is 0, which means all gabs will be filled
+     * \return Vector (2D) representing the number of elements filled in both X and Y
+     */
+    v2<double> fillElementGabs(vi& elements, cv::Mat& target, int barrier = 0) const {
 
-	static double varianceCoefficient(double*__restrict s, int mean) {
-		return *s / mean * 100;
-	}
+        elements.emplace_back(cv::Point(0, target.rows));
+        elements.emplace_back(cv::Point(target.cols, target.rows));
 
-	int highestPixelInLine(cv::Mat& image) const;
+        sort::sort_pixels_x_ascending(elements);
 
-	/* Converts pixels from an image to a singular line vector in X, where Y is the mean of all pixels located at that given X in the image */
-	bool generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point2f>& pixels, vector<cv::Point2f>& gradientPixels) const;
+        auto size = elements.size();
 
-	/**
-	 * \brief Fills the gabs in the elements with simple linear lines
-	 * \param elements The elements to fill gabs in
-	 * \param target The target matrix
-	 * \param barrier The current known location of the baseLevel, default is 0, which means all gabs will be filled
-	 * \return Vector (2D) representing the number of elements filled in both X and Y
-	 */
-	v2<double> fillElementGabs(vi& elements, cv::Mat& target, int barrier = 0) const {
+        elements.emplace_back(elements.front());
 
-		elements.emplace_back(cv::Point(0, target.rows));
-		elements.emplace_back(cv::Point(target.cols, target.rows));
+        auto first = elements.front().x;
 
-		sort::sort_pixels_x_ascending(elements);
+        vector<cv::Point> gabLine;
 
-		auto size = elements.size();
+        v2<double> sum;
+        auto gab = false;
 
-		elements.emplace_back(elements.front());
+        for (auto i = first; i < size; ++i) {
+            if (elements[i].y > target.rows - barrier)
+                continue;
+            if (i + 1 == size)
+                break;
+            auto posX = elements[i].x;
+            auto nextX = elements[i + 1].x;
+            auto dif = nextX - posX;
+            if (dif < 2) {
+                // no gab in x, try with y !!
+                auto posY = elements[i].y;
+                auto nextY = elements[i + 1].y;
+                auto diffY = nextY - posY;
+                if (diffY < 4)
+                    continue;
+                gab = true;
+            }
+            if (gab) {
+                line(target, elements[i], elements[i + 1], cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
+                sum.x += abs(elements[i + 1].x - elements[i].x);
+                sum.y += abs(elements[i + 1].y - elements[i].y);
+            }
+            gab ^= true;
+        }
 
-		auto first = elements.front().x;
+        return sum;
+    }
 
-		vector<cv::Point> gabLine;
+    static double computeYSum(vi& elements) {
+        auto sum = 0.0;
+        for (auto& e : elements)
+            sum += e.y;
+        return sum;
+    }
 
-		v2<double> sum;
-		auto gab = false;
+    double computeWeigthedY(vi& elements, int x) {
 
-		for (auto i = first; i < size; ++i) {
-			if (elements[i].y > target.rows - barrier)
-				continue;
-			if (i + 1 == size)
-				break;
-			auto posX = elements[i].x;
-			auto nextX = elements[i + 1].x;
-			auto dif = nextX - posX;
-			if (dif < 2) {
-				// no gab in x, try with y !!
-				auto posY = elements[i].y;
-				auto nextY = elements[i + 1].y;
-				auto diffY = nextY - posY;
-				if (diffY < 4)
-					continue;
-				gab = true;
-			}
-			if (gab) {
-				line(target, elements[i], elements[i + 1], cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
-				sum.x += abs(elements[i + 1].x - elements[i].x);
-				sum.y += abs(elements[i + 1].y - elements[i].y);
-			}
-			gab ^= true;
-		}
+        vi temp;
 
-		return sum;
-	}
+        getElementsX(elements, temp, x);
 
-	static double computeYSum(vi& elements) {
-		auto sum = 0.0;
-		for (auto& e : elements)
-			sum += e.y;
-		return sum;
-	}
+        if (temp.empty())
+            return 0.0;
 
-	double computeWeigthedY(vi& elements, int x) {
+        return computeYSum(temp) / static_cast<double>(temp.size());
 
-		vi temp;
+    }
 
-		getElementsX(elements, temp, x);
+    static void getElementsX(vi& input, vi& output, int x) {
+        for (auto& e : input) {
+            if (e.x == x)
+                output.emplace_back(e);
+        }
+    }
 
-		if (temp.empty())
-			return 0.0;
+    static void getElementsY(vi& input, vi& output, int y) {
+        for (auto& e : input) {
+            if (e.y == y)
+                output.emplace_back(e);
+        }
+    }
 
-		return computeYSum(temp) / static_cast<double>(temp.size());
+    /**
+     * \brief Computes a line from a vector of pixels points
+     * \param pixels The pixels to calculate the line from
+     * \param result The resulting line
+     * \return true if line was created, otherwise false
+     */
+    static bool computerCompleteLine(vi& pixels, cv::Vec4f& result, LineConfig& config) {
+        cv::fitLine(pixels, result, config.getDistType(), config.getParams(), config.getReps(), config.getAepa());
+        return true;
+    }
 
-	}
+    /**
+     * \brief Crude cutoff of pixels from image based on Y
+     * \param image The image data
+     * \param output The output vector
+     * \param y_limit The limit in height
+     * \return true if something was found, otherwise false
+     */
+    static bool getActualPixels(cv::Mat& image, vi& output, int y_limit);
 
-	static void getElementsX(vi& input, vi& output, int x) {
-		for (auto& e : input) {
-			if (e.x == x)
-				output.emplace_back(e);
-		}
-	}
+    static bool getActualPixels(vi& pixels, vi& target, double y_limit, double image_height);
 
-	static void getElementsY(vi& input, vi& output, int y) {
-		for (auto& e : input) {
-			if (e.y == y)
-				output.emplace_back(e);
-		}
-	}
+    /**
+     * \brief Computes the average (mean) intensity of the entire image
+     * \param image The image to calculate meaned intensity of
+     * \return the avg
+     */
+    double computeIntensityMean(cv::Mat& image) const {
 
-	/**
-	 * \brief Computes a line from a vector of pixels points
-	 * \param pixels The pixels to calculate the line from
-	 * \param result The resulting line
-	 * \return true if line was created, otherwise false
-	 */
-	static bool computerCompleteLine(vi& pixels, cv::Vec4f& result, LineConfig& config) {
-		cv::fitLine(pixels, result, config.getDistType(), config.getParams(), config.getReps(), config.getAepa());
-		return true;
-	}
+        vector<cv::Mat> channels;
+        cv::split(image, channels);
+        auto m = cv::mean(channels[0]);
 
-	/**
-	 * \brief Crude cutoff of pixels from image based on Y
-	 * \param image The image data
-	 * \param output The output vector
-	 * \param y_limit The limit in height
-	 * \return true if something was found, otherwise false
-	 */
-	static bool getActualPixels(cv::Mat& image, vi& output, int y_limit);
+        return m[0];
 
-	static bool getActualPixels(vi& pixels, vi& target, double y_limit, double image_height);
+    }
 
-	/**
-	 * \brief Computes the average (mean) intensity of the entire image
-	 * \param image The image to calculate meaned intensity of
-	 * \return the avg
-	 */
-	double computeIntensityMean(cv::Mat& image) const {
+    /**
+     * \brief Computes the average (mean) intensity and the standard deviation of the same of the entire image
+     * \param image The image to calculate meaned intensity and standard deviation of the mean on
+     * \return the avg as a 2d double precision float vector
+     */
+    static cv::Vec2d intensityStdDev(cv::Mat& image) {
 
-		vector<cv::Mat> channels;
-		cv::split(image, channels);
-		auto m = cv::mean(channels[0]);
+        cv::Scalar mean;
+        cv::Scalar stdDev;
+        cv::meanStdDev(image, mean, stdDev);
 
-		return m[0];
+        return cv::Vec2d(mean[0], stdDev[0]);
 
-	}
+    }
 
-	/**
-	 * \brief Computes the average (mean) intensity and the standard deviation of the same of the entire image
-	 * \param image The image to calculate meaned intensity and standard deviation of the mean on
-	 * \return the avg as a 2d double precision float vector
-	 */
-	static cv::Vec2d intensityStdDev(cv::Mat& image) {
+    /**
+     * \brief Retrieve the location of both the minimum and the maximum point in an image
+     * \param image The image to perform the operation on
+     * \param minVal The minimum value acceptable
+     * \param maxVal The maximum value acceptable
+     * \return 4d vector with both points
+     */
+    static cv::Vec4i getMinMaxLoc(cv::Mat& image, double minVal, double maxVal) {
 
-		cv::Scalar mean;
-		cv::Scalar stdDev;
-		cv::meanStdDev(image, mean, stdDev);
+        cv::Point minLoc;
+        cv::Point maxLoc;
 
-		return cv::Vec2d(mean[0], stdDev[0]);
+        cv::minMaxLoc(image, &minVal, &maxVal, &minLoc, &maxLoc);
 
-	}
+        return cv::Vec4i(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
 
-	/**
-	 * \brief Retrieve the location of both the minimum and the maximum point in an image
-	 * \param image The image to perform the operation on
-	 * \param minVal The minimum value acceptable
-	 * \param maxVal The maximum value acceptable
-	 * \return 4d vector with both points
-	 */
-	static cv::Vec4i getMinMaxLoc(cv::Mat& image, double minVal, double maxVal) {
-
-		cv::Point minLoc;
-		cv::Point maxLoc;
-
-		cv::minMaxLoc(image, &minVal, &maxVal, &minLoc, &maxLoc);
-
-		return cv::Vec4i(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
-
-	}
+    }
 
 };

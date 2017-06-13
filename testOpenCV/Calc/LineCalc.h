@@ -12,11 +12,11 @@ public:
 
 #ifdef CV_VERSION
 
-	bool computeIntersectionPoints(cv::Vec4d horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output) const;
+    bool computeIntersectionPoints(cv::Vec4d horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output) const;
 
-	static void adjustMarkingRect(cv::Rect2d& marking_rect, cv::Vec4d& intersection_points, double buffer);
+    static void adjustMarkingRect(cv::Rect2d& marking_rect, cv::Vec4d& intersection_points, double buffer);
 
-	static void adjustBaseLines(cv::Vec4d& base_lines, cv::Vec4d& intersection_points, double buffer);
+    static void adjustBaseLines(cv::Vec4d& base_lines, cv::Vec4d& intersection_points, double buffer);
 
 #endif
 

@@ -17,31 +17,31 @@ using namespace tg;
  */
 bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output) const {
 
-	// align horizontal line
-	horizontal_line[0] = left_border[0];
-	horizontal_line[2] = right_border[2];
+    // align horizontal line
+    horizontal_line[0] = left_border[0];
+    horizontal_line[2] = right_border[2];
 
-	cv::Point2d left_intersection;
-	cv::Point2d right_intersection;
+    cv::Point2d left_intersection;
+    cv::Point2d right_intersection;
 
-	// check intersection for both sides
-	auto intersects_left = calc::intersection(left_border, horizontal_line, left_intersection);
-	auto intersects_right = calc::intersection(right_border, horizontal_line, right_intersection);
+    // check intersection for both sides
+    auto intersects_left = calc::intersection(left_border, horizontal_line, left_intersection);
+    auto intersects_right = calc::intersection(right_border, horizontal_line, right_intersection);
 
-	// check if there are two intersections
-	if (!(intersects_left & intersects_right)) {
-		log_time << "Error in intersection detection.\n";
-		CV_Error(cv::Error::StsAssert, "Intersection points are invalid.");
-		return false;
-	}
+    // check if there are two intersections
+    if (!(intersects_left & intersects_right)) {
+        log_time << "Error in intersection detection.\n";
+        CV_Error(cv::Error::StsAssert, "Intersection points are invalid.");
+        return false;
+    }
 
-	// assign result to output vector
-	output[0] = left_intersection.x;
-	output[1] = left_intersection.y;
-	output[2] = right_intersection.x;
-	output[3] = right_intersection.y;
+    // assign result to output vector
+    output[0] = left_intersection.x;
+    output[1] = left_intersection.y;
+    output[2] = right_intersection.x;
+    output[3] = right_intersection.y;
 
-	return true;
+    return true;
 
 }
 
@@ -53,13 +53,13 @@ bool LineCalc::computeIntersectionPoints(cv::Vec4d horizontal_line, const cv::Ve
  */
 void LineCalc::adjustMarkingRect(cv::Rect2d& marking_rect, cv::Vec4d& intersection_points, double buffer) {
 
-	if (marking_rect.x == 0)
-		CV_Error(cv::Error::BadROISize, "Marking rectangle start position is zero.");		
-	else if (marking_rect.width == 0)
-		CV_Error(cv::Error::BadROISize, "Marking rectangle width is zero.");
+    if (marking_rect.x == 0)
+    CV_Error(cv::Error::BadROISize, "Marking rectangle start position is zero.");
+    else if (marking_rect.width == 0)
+    CV_Error(cv::Error::BadROISize, "Marking rectangle width is zero.");
 
-	marking_rect.x = intersection_points[0] + buffer;
-	marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
+    marking_rect.x = intersection_points[0] + buffer;
+    marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
 
 }
 
@@ -70,9 +70,9 @@ void LineCalc::adjustMarkingRect(cv::Rect2d& marking_rect, cv::Vec4d& intersecti
  * \param buffer The buffer
  */
 void LineCalc::adjustBaseLines(cv::Vec4d& base_lines, cv::Vec4d& intersection_points, double buffer) {
-	
-	base_lines[0] = intersection_points[0] - buffer;
-	base_lines[2] = intersection_points[2] + buffer;
+
+    base_lines[0] = intersection_points[0] - buffer;
+    base_lines[2] = intersection_points[2] + buffer;
 
 }
 
