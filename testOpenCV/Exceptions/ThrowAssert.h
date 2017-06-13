@@ -82,7 +82,7 @@ public:
         std::ostringstream outputStream;
 
         if (!message.empty()) {
-            outputStream << '[' << tg::get_time() << "]: " << message << ": ";
+            outputStream << message << ": ";
         }
 
         std::string expressionString = expression;

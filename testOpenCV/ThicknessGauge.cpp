@@ -690,42 +690,55 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	stl::populate_x(results, image_size.width);
 
+    auto failures = 0;
+
 	while (running) {
 
 		auto avg_height = 0.0;
 
 		stl::reset_point_y(results);
 
-		for (auto i = frameCount_; i--;) {
 
-			cv::Mat base_frame;
+	    for (auto i = frameCount_; i--;) {
 
-			// TODO : replace with custom filter if needed
-			cv::bilateralFilter(marking_frames[i], base_frame, 3, 20, 10);
+	        try {
 
-			//cv::Mat t;
-			//GenericCV::adaptiveThreshold(baseFrame, t, &thresholdLevel);
+	            cv::Mat base_frame;
 
-			threshold(base_frame, base_frame, binaryThreshold_, 255, CV_THRESH_BINARY);
+	            // TODO : replace with custom filter if needed
+	            cv::bilateralFilter(marking_frames[i], base_frame, 3, 20, 10);
 
-			GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
+	            //cv::Mat t;
+	            //GenericCV::adaptiveThreshold(baseFrame, t, &thresholdLevel);
 
-			/* RECT CUT METHOD */
-			avg_height += calc::weighted_avg(base_frame, data->centerPoints);
+	            threshold(base_frame, base_frame, binaryThreshold_, 255, CV_THRESH_BINARY);
 
-            throw_assert(!validate::valid_pix_vec(data->centerPoints), "Centerpoints failed validation!!!");
+	            GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
-			for (auto& centerpoint : data->centerPoints)
-				results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
+	            /* RECT CUT METHOD */
+	            avg_height += calc::weighted_avg(base_frame, data->centerPoints);
 
-			if (draw->isEscapePressed(30))
-				running = false;
+	            throw_assert(!validate::valid_pix_vec(data->centerPoints), "Centerpoints failed validation!!!");
 
-			if (showWindows_ && !i && running) {
-				cv::cvtColor(marking_frames[i], tmpOut, CV_GRAY2BGR);
-				//rect_draw = laser_area;
-			}
-		}
+	            for (auto& centerpoint : data->centerPoints)
+	                results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
+
+	            if (draw->isEscapePressed(30))
+	                running = false;
+
+	            if (showWindows_ && !i && running) {
+	                cv::cvtColor(marking_frames[i], tmpOut, CV_GRAY2BGR);
+	                //rect_draw = laser_area;
+	            }
+
+	        } catch (std::exception& e) {
+	            log_time << e.what() << std::endl;
+	            failures++;
+	        }
+
+	    }
+
+        log_time << cv::format("Center point data gathering failures : %i\n", failures);
 
 		data->pointsStart[1] = data->centerPoints.front().x + data->markingRect.x;
 
