@@ -11,6 +11,8 @@
 
 namespace validate {
 
+#ifdef CV_VERSION
+
 	/**
 	 * \brief Validates a rectangle that its boundries are all valid numbers
 	 * \tparam T The type of rectangle
@@ -71,16 +73,33 @@ namespace validate {
 		if (vec.empty())
 			return false;
 
-		auto valid_pix = [](cv::Point_<T>& p) {
+		auto invalid_pix = [](cv::Point_<T>& p) {
 			return p.x < 0 || p.y < 0;
 		};
 
-		auto it = find_if(vec.begin(), vec.end(), valid_pix);
+		auto it = find_if(vec.begin(), vec.end(), invalid_pix);
 
 		return it != vec.end();
 
-
 	}
+
+	template <typename T, int cn, int lower_boundry>
+	inline
+	bool valid_vec2(cv::Vec<T ,cn>& v) {
+		for (auto val : v)
+			if (val < lower_boundry)
+				return false;
+
+		return true;
+	}
+	
+
+
+
+
+#endif
+
+
 
 
 
