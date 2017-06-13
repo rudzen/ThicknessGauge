@@ -20,28 +20,28 @@ class ProgressBar {
 
 public:
 
-	ProgressBar();
-	explicit ProgressBar(unsigned long n_, const char *description_ = "", std::ostream& out_ = std::cerr);
+    ProgressBar();
+    explicit ProgressBar(unsigned long n_, const char* description_ = "", std::ostream& out_ = std::cerr);
 
-	void SetFrequencyUpdate(unsigned long frequency_update_);
-	void SetStyle(const char* unit_bar_, const char* unit_space_);
+    void SetFrequencyUpdate(unsigned long frequency_update_);
+    void SetStyle(const char* unit_bar_, const char* unit_space_);
 
-	void Progressed(unsigned long idx_);
+    void Progressed(unsigned long idx_);
 
 private:
 
-	unsigned long n;
-	unsigned int desc_width;
-	unsigned long frequency_update;
-	std::ostream* out;
+    unsigned long n;
+    unsigned int desc_width;
+    unsigned long frequency_update;
+    std::ostream* out;
 
-	const char *description;
-	const char *unit_bar;
-	const char *unit_space;
+    const char* description;
+    const char* unit_bar;
+    const char* unit_space;
 
-	void ClearBarField() const;
-	static int GetConsoleWidth();
-	int GetBarLength() const;
+    void ClearBarField() const;
+    static int GetConsoleWidth();
+    int GetBarLength() const;
 
 };
 
