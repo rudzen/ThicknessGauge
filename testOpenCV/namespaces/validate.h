@@ -73,11 +73,11 @@ namespace validate {
         if (vec.empty())
             return false;
 
-        auto invalid_pix = [](cv::Point_<T>& p) {
-            return p.x < 0 || p.y < 0;
+        auto valid_pix = [](cv::Point_<T>& p) {
+            return p.x >= 0 && p.y >= 0;
         };
 
-        auto it = find_if(vec.begin(), vec.end(), invalid_pix);
+        auto it = find_if(vec.begin(), vec.end(), valid_pix);
 
         return it != vec.end();
 
@@ -106,98 +106,62 @@ namespace validate {
         using namespace tg;
         using namespace std;
 
-        bool failed = false;
+        log_time << "Data verification initiated.\n";
 
-        if (data->globName.empty()) {
-            failed = true;
-        } else {
+        size_t failures = 0;
 
-        }
+        if (data->globName.empty())
+        log_time << cv::format("Val: globName failed [%i], name = %s\n", ++failures, data->globName);
 
+        if (data->cameraPtr == nullptr)
+        log_time << cv::format("Val: cameraPtr failed [%i], == nullptr\n", ++failures);
 
-        if (data->cameraPtr == nullptr) {
-            log_time << "cameraPtr failed." << endl;
-            failed = true;
-        } else {
-            log_time << "cameraPtr ok." << endl;
-        }
+        if (!valid_pix_vec(data->centerPoints))
+        log_time << cv::format("Val: centerPoints failed [%i], size == %i\n", ++failures, data->centerPoints.size());
 
-        if (!valid_pix_vec(data->centerPoints)) {
-            log_time << "centerPoints failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
-        }
+        if (!valid_pix_vec(data->leftPoints))
+        log_time << cv::format("Val: leftPoints failed [%i], size = %i\n", ++failures, data->leftPoints.size());
 
-        if (!valid_pix_vec(data->leftPoints)) {
-            log_time << "leftPoints failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
-        }
-
-        if (!valid_pix_vec(data->rightPoints)) {
-            log_time << "rightPoints failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
-        }
+        if (!valid_pix_vec(data->rightPoints))
+        log_time << cv::format("rightPoints failed, size = %i\n", data->rightPoints.size());
 
         if (!valid_vec2(data->pointsStart)) {
-            log_time << "pointsStart failed." << endl;
-        } else {
-            log_time << "centerPoints ok." << endl;
+            log_time << cv::format("pointsStart failed, data = %d,%d,%d\n", data->pointsStart[0], data->pointsStart[1], data->pointsStart[2]);
         }
 
         if (!valid_vec2(data->leftBorder)) {
-            log_time << "leftBorder failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
-        }
-        if (!valid_vec2(data->rightBorder)) {
-            log_time << "rightBorder failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
+            log_time << cv::format("leftBorder failed, data = %d,%d,%d,%d\n", data->leftBorder[0], data->leftBorder[1], data->leftBorder[2], data->leftBorder[3]);
         }
 
-        if (!valid_vec2(data->centerLine)) {
-            log_time << "centerLine failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
-        }
+        //if (!valid_vec2(data->rightBorder)) {
+        //    failures.append(cv::format("rightBorder failed, data = %d,%d,%d,%d\n", data->rightBorder[0], data->rightBorder[1], data->rightBorder[2], data->rightBorder[3]));
+        //}
 
-        if (data->leftAvg < 0.0) {
-            log_time << "leftAvg failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
-        }
+        //if (!valid_vec2(data->centerLine)) {
+        //    failures.append(cv::format("centerLine failed, data = %d,%d,%d,%d\n", data->centerLine[0], data->centerLine[1], data->centerLine[2], data->centerLine[3]));
+        //}
 
-        if (data->centerAvg < 0.0) {
-            log_time << "centerAvg failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
-        }
+        //if (data->leftAvg < 0.0)
+        //    failures.append(cv::format("leftAvg failed, data = %f\n", data->leftAvg));
 
-        if (data->rightAvg < 0.0) {
-            log_time << "rightAvg failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
-        }
+        //if (data->centerAvg < 0.0)
+        //    failures.append(cv::format("centerAvg failed, data = %f\n", data->centerAvg));
 
-        if (data->difference < 0.0) {
-            log_time << "difference failed." << endl;
-            failed = true;
-        } else {
-            log_time << "centerPoints ok." << endl;
-        }
+        //if (data->rightAvg < 0.0)
+        //    failures.append(cv::format("rightAvg failed, data = %f\n", data->rightAvg));
 
-        return true;
+        //if (data->difference < 0.0)
+        //    failures.append(cv::format("difference failed, data = %f\n", data->difference));
+
+        //if (failures.empty())
+        //    return true;
+
+        if (failures == 0)
+            return true;
+
+        log_time << cv::format("Val: Failures = %i\n", failures);
+
+        return false;
     }
 
 #endif

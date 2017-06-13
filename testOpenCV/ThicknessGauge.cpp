@@ -285,6 +285,9 @@ void ThicknessGauge::computeMarkingHeight() {
         if (showWindows_)
             draw->removeAllWindows();
 
+        // do a quick pass of validation before modifying the data
+        validate::valid_data(data);
+
         // adjust line points
         for (auto& p : data->leftPoints)
             p.y = imageSize_.height - p.y;
@@ -301,6 +304,7 @@ void ThicknessGauge::computeMarkingHeight() {
 
         if (draw->isEscapePressed(30))
             return;
+
 
     } catch (cv::Exception& e) {
         cerr << cv::format("Exception caught in computeMarkingHeight().\n%s\n", e.msg.c_str());
@@ -716,7 +720,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
                 /* RECT CUT METHOD */
                 avg_height += calc::weighted_avg(base_frame, data->centerPoints);
 
-                throw_assert(!validate::valid_pix_vec(data->centerPoints), "Centerpoints failed validation!!!");
+                throw_assert(validate::valid_pix_vec(data->centerPoints), "Centerpoints failed validation!!!");
 
                 for (auto& centerpoint : data->centerPoints)
                     results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
@@ -845,7 +849,6 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<Ho
 
     cv::imwrite("__left_.png", base.front());
     cv::imwrite("__right_.png", mark.front());
-
 
 }
 
