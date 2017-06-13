@@ -77,7 +77,7 @@ namespace validate {
 
 		auto it = find_if(vec.begin(), vec.end(), valid_pix);
 
-		return it == vec.end();
+		return it != vec.end();
 
 
 	}
