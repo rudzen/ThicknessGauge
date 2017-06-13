@@ -7,20 +7,20 @@
 #endif
 
 namespace file {
-	
-	const std::string illegal_chars = "\\/:?\"<>|";
 
-	bool createDirectory(const std::string& pathname);
+    const std::string illegal_chars = "\\/:?\"<>|";
 
-	bool isDirectory(const std::string& path);
+    bool createDirectory(const std::string& pathname);
 
-	/**
-	 * \brief Checks if a file exists.
-	 * \param name The filename to check
-	 * \return true if exists, otherwise false
-	 */
-	bool isFile(const std::string& name);
+    bool isDirectory(const std::string& path);
 
-	bool isNameLegal(const std::string& name);
+    /**
+     * \brief Checks if a file exists.
+     * \param name The filename to check
+     * \return true if exists, otherwise false
+     */
+    bool isFile(const std::string& name);
+
+    bool isNameLegal(const std::string& name);
 
 }
