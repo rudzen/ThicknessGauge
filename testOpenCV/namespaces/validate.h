@@ -43,7 +43,7 @@ namespace validate {
 
 		auto valid_rectangle = [rect](cv::Rect_<T>& boundry)-> bool {
 
-			if (!(validate_rect(rect) & validate_rect(boundry)))
+			if (!validate_rect(rect) || !validate_rect(boundry))
 				return false;
 
 			if (!validate_rect(rect))
