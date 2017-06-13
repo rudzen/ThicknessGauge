@@ -2,39 +2,39 @@
 
 using CaptureSettings = struct CaptureSettings {
 
-	double brightness;
+    double brightness;
 
-	double contrast;
+    double contrast;
 
-	double saturation;
+    double saturation;
 
-	double hue;
+    double hue;
 
-	double gain;
+    double gain;
 
-	double exposure;
+    double exposure;
 
-	bool Rgb;
+    bool Rgb;
 
-	double white_balance_u;
+    double white_balance_u;
 
-	double white_balance_v;
+    double white_balance_v;
 
-	bool rectification;
+    bool rectification;
 
-	double iso_speed;
+    double iso_speed;
 
-	double buffersize;
-	
+    double buffersize;
+
 };
 
 class CaptureInterface {
 
 protected:
-	~CaptureInterface() = default;
+    ~CaptureInterface() = default;
 
 public:
 
-	virtual void retrieveAllInfo() = 0;
+    virtual void retrieveAllInfo() = 0;
 
 };

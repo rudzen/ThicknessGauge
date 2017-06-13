@@ -29,115 +29,119 @@ class Capture : public CaptureInterface {
 
 private:
 
-	std::unique_ptr<CaptureSettings> settings = std::make_unique<CaptureSettings>();
+    std::unique_ptr<CaptureSettings> settings = std::make_unique<CaptureSettings>();
 
-	// The target stddev to set configuration for.
-	double targetStdDev_;
+    // The target stddev to set configuration for.
+    double targetStdDev_;
 
-	double delta_;
+    double delta_;
 
 public:
 
-	cv::VideoCapture cap;
+    cv::VideoCapture cap;
 
-	Capture() {
-		targetStdDev_ = NAN;
-		delta_ = NAN;
-	}
+    Capture() {
+        targetStdDev_ = NAN;
+        delta_ = NAN;
+    }
 
-	~Capture() = default;
+    ~Capture() = default;
 
-	void initialize() {
-		cap.set(CV_CAP_PROP_SETTINGS, 1);
-		initialize(5000.0, 0.0);
-	}
+    void initialize() {
+        cap.set(CV_CAP_PROP_SETTINGS, 1);
+        initialize(5000.0, 0.0);
+    }
 
-	void initialize(double exposure, double gain) {
-		cap.set(CV_CAP_PROP_AUTO_EXPOSURE, 0);
-		cap.set(CV_CAP_PROP_PVAPI_PIXELFORMAT, 0);
-		exposure = alignMinValue(exposure);
-		gain = alignMinValue(gain);
-		setExposure(exposure);
-		setGain(gain);		
-	}
+    void initialize(double exposure, double gain) {
+        cap.set(CV_CAP_PROP_AUTO_EXPOSURE, 0);
+        cap.set(CV_CAP_PROP_PVAPI_PIXELFORMAT, 0);
+        exposure = alignMinValue(exposure);
+        gain = alignMinValue(gain);
+        setExposure(exposure);
+        setGain(gain);
+    }
 
-	bool isOpen() const {
-		return cap.isOpened();
-	}
+    bool isOpen() const {
+        return cap.isOpened();
+    }
 
-	void targetStdDev(const double target) {
-		targetStdDev_ = target;
-	}
+    void targetStdDev(const double target) {
+        targetStdDev_ = target;
+    }
 
-	void deltaValue(const double delta) {
-		delta_ = delta;
-	}
+    void deltaValue(const double delta) {
+        delta_ = delta;
+    }
 
-	void setBrightness(double value) {
-		value = alignMinValue(value);
-		cap.set(CV_CAP_PROP_BRIGHTNESS, value);
-		settings->brightness = value;
-	}
+    void setBrightness(double value) {
+        value = alignMinValue(value);
+        cap.set(CV_CAP_PROP_BRIGHTNESS, value);
+        settings->brightness = value;
+    }
 
-	double getBrightness(bool repoll = true) const {
-		if (repoll) settings->brightness = cap.get(CV_CAP_PROP_BRIGHTNESS);
-		return settings->brightness;
-	}
+    double getBrightness(bool repoll = true) const {
+        if (repoll)
+            settings->brightness = cap.get(CV_CAP_PROP_BRIGHTNESS);
+        return settings->brightness;
+    }
 
-	void setContrast(double value) {
-		value = alignMinValue(value);
-		cap.set(CV_CAP_PROP_CONTRAST, value);
-		settings->contrast = value;
-	}
+    void setContrast(double value) {
+        value = alignMinValue(value);
+        cap.set(CV_CAP_PROP_CONTRAST, value);
+        settings->contrast = value;
+    }
 
-	double getContrast(bool repoll = true) const {
-		if (repoll) settings->contrast = cap.get(CV_CAP_PROP_CONTRAST);
-		return settings->contrast;
-	}
+    double getContrast(bool repoll = true) const {
+        if (repoll)
+            settings->contrast = cap.get(CV_CAP_PROP_CONTRAST);
+        return settings->contrast;
+    }
 
-	void setExposure(double value) {
-		value = alignMinValue(value);
-		cap.set(CV_CAP_PROP_EXPOSURE, value);
-		settings->exposure = value;
-	}
+    void setExposure(double value) {
+        value = alignMinValue(value);
+        cap.set(CV_CAP_PROP_EXPOSURE, value);
+        settings->exposure = value;
+    }
 
-	double getExposure(bool repoll = true) const {
-		if (repoll) settings->exposure = cap.get(CV_CAP_PROP_EXPOSURE);
-		return settings->exposure;
-	}
+    double getExposure(bool repoll = true) const {
+        if (repoll)
+            settings->exposure = cap.get(CV_CAP_PROP_EXPOSURE);
+        return settings->exposure;
+    }
 
-	void setGain(double value) {
-		value = alignMinValue(value);
-		cap.set(CV_CAP_PROP_GAIN, value);
-		settings->gain = value;
-	}
+    void setGain(double value) {
+        value = alignMinValue(value);
+        cap.set(CV_CAP_PROP_GAIN, value);
+        settings->gain = value;
+    }
 
-	double getGain(bool repoll = true) const {
-		if (repoll) settings->gain = cap.get(CV_CAP_PROP_GAIN);
-		return settings->gain;
-	}
+    double getGain(bool repoll = true) const {
+        if (repoll)
+            settings->gain = cap.get(CV_CAP_PROP_GAIN);
+        return settings->gain;
+    }
 
-	void retrieveAllInfo() final;
+    void retrieveAllInfo() final;
 
-	double detectExposure();
+    double detectExposure();
 
-	friend std::ostream& operator<<(std::ostream& os, const Capture& obj) {
-		os << "Capture device settings :\n";
-		os << cv::format("brightness: %f\n", obj.settings->brightness);
-		os << cv::format("contrast: %f\n", obj.settings->contrast);
-		os << cv::format("saturation: %f\n", obj.settings->saturation);
-		os << cv::format("hue: %f\n", obj.settings->hue);
-		os << cv::format("gain: %f\n", obj.settings->gain);
-		os << cv::format("exposure: %f\n", obj.settings->exposure);
-		os << cv::format("Rgb: %f\n", obj.settings->Rgb);
-		os << cv::format("white_balance_u: %f\n", obj.settings->white_balance_u);
-		os << cv::format("white_balance_v: %f\n", obj.settings->white_balance_v);
-		os << cv::format("rectification: %f\n", obj.settings->rectification);
-		os << cv::format("iso_speed: %f\n", obj.settings->iso_speed);
-		os << cv::format("buffersize: %f\n", obj.settings->buffersize);
-		os << cv::format("Brightness: %f\n", obj.settings->brightness);
-		os << cv::format("Brightness: %f\n", obj.settings->brightness);
-		os << cv::format("Brightness: %f\n", obj.settings->brightness);
-		return os;
-	}
+    friend std::ostream& operator<<(std::ostream& os, const Capture& obj) {
+        os << "Capture device settings :\n";
+        os << cv::format("brightness: %f\n", obj.settings->brightness);
+        os << cv::format("contrast: %f\n", obj.settings->contrast);
+        os << cv::format("saturation: %f\n", obj.settings->saturation);
+        os << cv::format("hue: %f\n", obj.settings->hue);
+        os << cv::format("gain: %f\n", obj.settings->gain);
+        os << cv::format("exposure: %f\n", obj.settings->exposure);
+        os << cv::format("Rgb: %f\n", obj.settings->Rgb);
+        os << cv::format("white_balance_u: %f\n", obj.settings->white_balance_u);
+        os << cv::format("white_balance_v: %f\n", obj.settings->white_balance_v);
+        os << cv::format("rectification: %f\n", obj.settings->rectification);
+        os << cv::format("iso_speed: %f\n", obj.settings->iso_speed);
+        os << cv::format("buffersize: %f\n", obj.settings->buffersize);
+        os << cv::format("Brightness: %f\n", obj.settings->brightness);
+        os << cv::format("Brightness: %f\n", obj.settings->brightness);
+        os << cv::format("Brightness: %f\n", obj.settings->brightness);
+        return os;
+    }
 };
