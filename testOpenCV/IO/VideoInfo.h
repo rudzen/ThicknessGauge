@@ -2,53 +2,52 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 
-enum class VideoCodec
-{
-	Mjpeg
+enum class VideoCodec {
+    Mjpeg
 };
 
-enum class VideoColour
-{
-	Colour, Grey
+enum class VideoColour {
+    Colour, Grey
 };
 
 class VideoInfo {
 
 public:
 
-	VideoInfo(): Fps_(25.0), codec_(0), colour_(false) {
-	}
+    VideoInfo()
+        : Fps_(25.0), codec_(0), colour_(false) {
+    }
 
-	int GetCodec() const;
+    int GetCodec() const;
 
-	void SetCodec(VideoCodec codec);
+    void SetCodec(VideoCodec codec);
 
-	double GetFPS() const;
+    double GetFPS() const;
 
-	void SetFPS(float FPS);
+    void SetFPS(float FPS);
 
-	cv::Size GetSize() const;
+    cv::Size GetSize() const;
 
-	void SetSize(int x, int y);
+    void SetSize(int x, int y);
 
-	void SetSize(cv::Size size);
+    void SetSize(cv::Size size);
 
-	bool IsColour() const;
+    bool IsColour() const;
 
-	void SetColour(VideoColour colour);
+    void SetColour(VideoColour colour);
 
 private:
 
-	const std::map<VideoCodec, int> m_VideoCodecs = { { VideoCodec::Mjpeg, CV_FOURCC('M', 'J', 'P', 'G') } };
+    const std::map<VideoCodec, int> m_VideoCodecs = {{VideoCodec::Mjpeg, CV_FOURCC('M', 'J', 'P', 'G')}};
 
-	const std::map<VideoColour, bool> m_VideoColour = { { VideoColour::Colour, true },{ VideoColour::Grey, false } };
+    const std::map<VideoColour, bool> m_VideoColour = {{VideoColour::Colour, true},{VideoColour::Grey, false}};
 
-	cv::Size videoSize_;
+    cv::Size videoSize_;
 
-	double Fps_;
+    double Fps_;
 
-	int codec_;
+    int codec_;
 
-	bool colour_;
+    bool colour_;
 
 };

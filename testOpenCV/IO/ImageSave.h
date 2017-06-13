@@ -16,57 +16,65 @@ class ImageSave : public VideoInfo {
 
 public:
 
-	ImageSave() : ImageSave("", SaveType::Image_Png, Information::Basic) { }
+    ImageSave()
+        : ImageSave("", SaveType::Image_Png, Information::Basic) {
+    }
 
-	explicit ImageSave(std::string FileName) : ImageSave(FileName, SaveType::Image_Png, Information::Basic) { }
+    explicit ImageSave(std::string FileName)
+        : ImageSave(FileName, SaveType::Image_Png, Information::Basic) {
+    }
 
-	ImageSave(std::string FileName, SaveType SaveType) : ImageSave(FileName, SaveType, Information::Basic) { }
+    ImageSave(std::string FileName, SaveType SaveType)
+        : ImageSave(FileName, SaveType, Information::Basic) {
+    }
 
-	ImageSave(ImageSave &imageSave) : ImageSave(imageSave.fileName_, imageSave.saveType_, imageSave.information_) { }
+    ImageSave(ImageSave& imageSave)
+        : ImageSave(imageSave.fileName_, imageSave.saveType_, imageSave.information_) {
+    }
 
-	ImageSave(std::string FileName, SaveType save_type, Information information) : saveType_(save_type), information_(information), fileName_(FileName) {
-		UpdateTimeStamp();
-	}
+    ImageSave(std::string FileName, SaveType save_type, Information information)
+        : saveType_(save_type), information_(information), fileName_(FileName) {
+        UpdateTimeStamp();
+    }
 
-	~ImageSave() {
-		videoWriter_.~VideoWriter();
-	}
+    ~ImageSave() {
+        videoWriter_.~VideoWriter();
+    }
 
-	void SaveImage(cv::Mat *image) const;
+    void SaveImage(cv::Mat* image) const;
 
-	void SaveImage(cv::Mat *image, std::string filename) const;
+    void SaveImage(cv::Mat* image, std::string filename) const;
 
-	void OpenVideo();
+    void OpenVideo();
 
-	void CloseVideo();
+    void CloseVideo();
 
-	void SaveVideoFrame(cv::Mat &image);
+    void SaveVideoFrame(cv::Mat& image);
 
-	void SetSaveType(const SaveType type);
+    void SetSaveType(const SaveType type);
 
-	SaveType GetSaveMode() const;
+    SaveType GetSaveMode() const;
 
-	void SetInformation(const Information information);
+    void SetInformation(const Information information);
 
-	Information GetInformation() const;
+    Information GetInformation() const;
 
-	void UpdateTimeStamp();
+    void UpdateTimeStamp();
 
-	void SetFileName(std::string FileName);
+    void SetFileName(std::string FileName);
 
 private:
 
-	cv::VideoWriter videoWriter_;
+    cv::VideoWriter videoWriter_;
 
-	const std::map<SaveType, std::string> m_FileExtensions = { { SaveType::Image_Jpeg, "jpg" },{ SaveType::Image_Png, "png" },{ SaveType::Video, "avi" } };
+    const std::map<SaveType, std::string> m_FileExtensions = {{SaveType::Image_Jpeg, "jpg"},{SaveType::Image_Png, "png"},{SaveType::Video, "avi"}};
 
-	SaveType saveType_;
+    SaveType saveType_;
 
-	Information information_;
+    Information information_;
 
-	std::string fileName_;
+    std::string fileName_;
 
-	int64 timeStamp_;
+    int64 timeStamp_;
 
 };
-
