@@ -21,12 +21,14 @@
 
 class CalibrationException : public std::exception {
 
-	std::string message_;
+    std::string message_;
 
 public:
 
-	explicit CalibrationException(std::string message) : message_(message) { }
+    explicit CalibrationException(std::string message)
+        : message_(message) {
+    }
 
-	const char* what() const throw() override { return message_.c_str(); }
+    const char* what() const throw() override { return message_.c_str(); }
 
 };

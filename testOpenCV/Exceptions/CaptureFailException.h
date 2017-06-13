@@ -21,12 +21,14 @@
 
 class CaptureFailException : public std::exception {
 
-	std::string message_;
+    std::string message_;
 
 public:
 
-	explicit CaptureFailException(std::string message) : message_(message) { }
+    explicit CaptureFailException(std::string message)
+        : message_(message) {
+    }
 
-	const char* what() const throw() override { return message_.c_str(); }
+    const char* what() const throw() override { return message_.c_str(); }
 
 };

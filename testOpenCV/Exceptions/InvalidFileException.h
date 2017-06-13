@@ -19,14 +19,16 @@
   ||||  |   ||
   `+.__._._+*/
 
-class InvalidFileException : public exception {
+class InvalidFileException : public std::exception {
 
-	string message_;
+    std::string message_;
 
 public:
 
-	explicit InvalidFileException(string message) : message_(message) { }
+    explicit InvalidFileException(std::string message)
+        : message_(message) {
+    }
 
-	const char* what() const throw() override { return message_.c_str(); }
+    const char* what() const throw() override { return message_.c_str(); }
 
 };

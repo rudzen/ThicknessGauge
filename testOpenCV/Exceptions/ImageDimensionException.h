@@ -21,12 +21,14 @@
 
 class ImageDimensionException : public std::exception {
 
-	std::string message_;
+    std::string message_;
 
 public:
 
-	explicit ImageDimensionException(std::string message) : message_(message) { }
+    explicit ImageDimensionException(std::string message)
+        : message_(message) {
+    }
 
-	const char* what() const throw() override { return message_.c_str(); }
+    const char* what() const throw() override { return message_.c_str(); }
 
 };
