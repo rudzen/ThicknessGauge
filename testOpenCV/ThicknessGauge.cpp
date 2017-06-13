@@ -37,6 +37,7 @@
 #include "namespaces/sort.h"
 #include "namespaces/validate.h"
 #include "Exceptions/ThrowAssert.h"
+#include "namespaces/cvR.h"
 
 using namespace tg;
 
@@ -240,7 +241,7 @@ void ThicknessGauge::computeMarkingHeight() {
         //std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
 
         // compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
-        lineCalc->computeIntersectionPoints(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
+        calc::computeIntersectionPoints(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
 
         // grabs the in between parts and stores the data
         //computerInBetween(filter_baseline, hough_horizontal, morph);
@@ -257,10 +258,12 @@ void ThicknessGauge::computeMarkingHeight() {
         data->middlePieces[0] = data->intersectionCuts[0];
         data->middlePieces[1] = data->intersectionCuts[3] - data->intersectionCuts[0];
 
-        lineCalc->adjustMarkingRect(data->markingRect, data->intersections, intersect_cutoff[0]);
+        if (!validate::validate_rect(data->markingRect)) {
+            CV_Error(cv::Error::BadROISize, "Marking rectangle dimensions are fatal.");
+        }
 
         // adjust the baselines according to the intersection points. (could perhaps be useful in the future)
-        //lineCalc->adjustBaseLines(data->baseLines, data->intersections, intersect_cutoff[0]);
+        cvr::adjust_marking_rect(data->markingRect, data->intersections, intersect_cutoff[0]);
 
         // testing angles between baseline.. should be max 5 degrees
         cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);

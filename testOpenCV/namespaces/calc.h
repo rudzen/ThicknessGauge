@@ -364,6 +364,17 @@ namespace calc {
     }
 
     /**
+    * \brief Computes the intersection points based on horizontal line and two borders
+    * \tparam T 
+    * \param horizontal_line The horizontal line
+    * \param left_border The left border
+    * \param right_border The right border
+    * \param output The resulting intersection points (if any)
+    * \return true if intersection points where computed, otherwise false
+    */
+    bool computeIntersectionPoints(cv::Vec4d& horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output);
+
+    /**
     * \brief Computes the intensity centroid for each X in the Y direction.
     * This gives the weighted Y position based off the intensity levels across that single X column
     * \param image The image to perform the computation on
