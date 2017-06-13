@@ -1,5 +1,9 @@
 #pragma once
 #include <opencv2/core/core.hpp>
+#include <opencv2/videostab/inpainting.hpp>
+
+#include "tg.h"
+#include "stl.h"
 
 #ifndef CV_VERSION
 #include "Util/Vec.h"
@@ -294,6 +298,117 @@ namespace calc {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return intersection(cv::Point_<T>(border[0], border[1]), cv::Point_<T>(line[0], line[1]), cv::Point_<T>(border[2], border[3]), cv::Point_<T>(line[2], line[3]), result);
 	}
+
+	/**
+	* \brief Computes the intensity centroid for each X in the Y direction.
+	* This gives the weighted Y position based off the intensity levels across that single X column
+	* \param image The image to perform the computation on
+	* \param output The output vector of points
+	* \param upper_limit The upper limit of the rectangular cut out
+	* \param lower_limit The lower limit of the rectangular cut out
+	* \return The avg of the computed Y value across the entirety of the image matrix with regards to cut offs
+	*/
+	template <typename T>
+	double real_intensity_line(cv::Mat& image, std::vector<cv::Point_<T>>& output, int upper_limit, int lower_limit) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+
+		// grab sizes
+		auto cols = image.cols;
+		//auto rows = image.rows; // not used for anything atm
+
+		// cut out rectangle without any X value set
+		cv::Rect_<T> cutOut(0.0, lower_limit, 1.0, upper_limit);
+
+		// populate the output vector with column based X values and zero Y
+		stl::populate_x(output, cols);
+
+		for (auto& v : output) {
+			// adjust cutOut rectangle for current position
+			cutOut.x = v.x;
+
+			// create a new matrix based of the settings 
+			auto B = cv::Mat(image, cutOut);
+
+			// perform moments on the matrix without treating it as a binary image (which it is NOT)
+			auto m = cv::moments(B, false);
+
+			// compute x & y
+			//auto x = m.m10 / m.m00; // x is not used, so no need to calculate it
+			auto y = m.m01 / m.m00;
+
+			// only include values above 0.0 in y-pos
+			if (y > 0.0)
+				v.y = y;
+		}
+
+		return compute_y_avg(output);
+	}
+
+	template <typename T>
+	inline
+	double weighted_avg(cv::Mat& image, std::vector<cv::Point_<T>>& target_vector) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+		std::vector<cv::Point> non_zero_elements(image.rows * image.cols);
+		findNonZero(image, non_zero_elements);
+		auto laser_area = boundingRect(non_zero_elements);
+		auto t = image(laser_area);
+		return real_intensity_line(t, target_vector, t.rows, 0) + laser_area.y;
+	}
+
+
+	template <typename T>
+	inline
+	double compute_y_avg(std::vector<cv::Point_<T>>& vec) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+
+		auto sum = 0.0;
+
+		if (vec.empty())
+			return sum;
+
+		for (const auto& v : vec)
+			sum += v.y;
+
+		return sum / vec.size();
+	}
+
+	template <typename T>
+	inline
+	double compute_x_avg(std::vector<cv::Point_<T>>& vec) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+
+		auto sum = 0.0;
+
+		if (vec.empty())
+			return sum;
+
+		for (const auto& v : vec)
+			sum += v.x;
+
+		return sum / vec.size();
+	}
+
+	template <typename T>
+	inline
+	cv::Vec2d compute_xy_avg(std::vector<cv::Point_<T>>& vec) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+
+		cv::Vec2d sum(0.0, 0.0);
+
+		if (vec.empty())
+			return sum;
+
+		for (const auto& v : vec) {
+			sum[0] += v.x;
+			sum[1] += v.y;
+		}
+
+		sum[0] /= vec.size();
+		sum[1] /= vec.size();
+
+		return cv::Vec2d(sum);
+	}
+
 
 #else
 

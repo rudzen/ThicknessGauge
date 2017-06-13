@@ -432,7 +432,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 		auto t = org(left_boundry_rect);
 		left_y = static_cast<double>(left_boundry_rect.y);
 		left_y += offset_y;
-		left_y += lineCalc->computeRealIntensityLine(t, data->leftPoints, t.rows, 0);
+		left_y += calc::real_intensity_line(t, data->leftPoints, t.rows, 0);
 
 		log_time << "left baseline: " << left_y << endl;
 
@@ -473,7 +473,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 
 		t = org(right_boundry_rect);
 		right_y = static_cast<double>(right_boundry_rect.y);
-		right_y += lineCalc->computeRealIntensityLine(t, data->rightPoints, t.rows, 0);
+		right_y += calc::real_intensity_line(t, data->rightPoints, t.rows, 0);
 		right_y += offset_y;
 
 		cout << "right baseline: " << right_y << endl;
@@ -703,14 +703,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
 			/* RECT CUT METHOD */
-			std::vector<cv::Point> non_zero_elements(base_frame.rows * base_frame.cols);
-			findNonZero(base_frame, non_zero_elements);
-			//cout << non_zero_elements << endl;
-			auto laser_area = cv::boundingRect(non_zero_elements);
-			auto t = base_frame(laser_area);
-			avg_height += laser_area.y;
-			avg_height += lineCalc->computeRealIntensityLine(t, data->centerPoints, t.rows, 0);
-			//highest_pixel -= laser_area.height;
+			avg_height += calc::weighted_avg(base_frame, data->centerPoints);
 
 			for (auto& centerpoint : data->centerPoints)
 				results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
@@ -720,7 +713,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 			if (showWindows_ && !i && running) {
 				cv::cvtColor(marking_frames[i], tmpOut, CV_GRAY2BGR);
-				rect_draw = laser_area;
+				//rect_draw = laser_area;
 			}
 		}
 

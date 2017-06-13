@@ -45,9 +45,10 @@ namespace stl {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		vec.clear();
 		vec.reserve(limit);
-		T zero = static_cast<T>(0);
 		for (auto i = 0; i < limit; i++)
-			vec.emplace_back(cv::Point_<T>(static_cast<T>(i), zero));
+			vec.emplace_back(cv::Point_<T>(i, 0));
+
+		vec.shrink_to_fit();
 	}
 
 	/**

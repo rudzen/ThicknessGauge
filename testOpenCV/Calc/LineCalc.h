@@ -18,8 +18,6 @@ public:
 
 	static void adjustBaseLines(cv::Vec4d& base_lines, cv::Vec4d& intersection_points, double buffer);
 
-	static double computeRealIntensityLine(cv::Mat& image, std::vector<cv::Point2d>& output, int upper_limit, int lower_limit);
-	
 #endif
 
 
