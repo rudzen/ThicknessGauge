@@ -680,15 +680,13 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 	std::vector<cv::Point2d> results(image_size.width);
 
-	for (auto i = 0; i < image_size.width; i++)
-		results[i].x = i;
+	stl::populate_x(results, image_size.width);
 
 	while (running) {
 
 		auto avg_height = 0.0;
 
-		for (auto i = 0; i < image_size.width; i++)
-			results[i].y = 0.0;
+		stl::reset_point_y(results);
 
 		for (auto i = frameCount_; i--;) {
 
@@ -772,6 +770,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 }
 
+[[deprecated("Not really needed anymore, but still hangs around like a bad fruit")]]
 void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
 
 	// temporary function to compute the middle pieces, just for the lulz, not going to be used in calculations (yet).
