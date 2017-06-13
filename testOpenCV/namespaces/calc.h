@@ -21,6 +21,13 @@
  */
 namespace calc {
 
+#define C_PI   3.1415926535897932384626433832795
+#define C_2PI  6.283185307179586476925286766559
+#define C_LOG2 0.69314718055994530941723212145818
+
+	/**
+	 * \brief Indicated the direction of a slobe
+	 */
 	enum class SlobeDirection {
 		VERTICAL,
 		HORIZONTAL,
@@ -96,21 +103,37 @@ namespace calc {
 		return sqrt(x + y);
 	}
 
+	inline
+	double rad_to_deg(double radians) {
+		return radians * 180 / C_PI;
+	}
+
+	/**
+	 * \brief Determin the angle between two points in radians
+	 * \tparam T Typename
+	 * \param x1 X of first point
+	 * \param x2 X of second point
+	 * \param y1 Y of first point
+	 * \param y2 Y of second point;
+	 * \return The angle in radians
+	 */
 	template <typename T>
 	inline
-	double angle_points(const T x1, const T x2, const T y1, const T y2) {
+	double angle_between_points(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
-		T x = std::pow(x2 - x1, 2);
-		T y = std::pow(y2 - y1, 2);
-		return std::sqrt(x + y);
+#ifdef CV_VERSION
+		return cv::fastAtan2(y2 - y1, x2 - x1);
+#else
+		return atan2(y2 - y1, x2 - x1);
+#endif
 	}
 
 	template <typename T>
 	inline
 	double slope(const T x1, const T x2, const T y1, const T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
-		T dx = x2 - x1;
-		T dy = y2 - y1;
+		double dx = x2 - x1;
+		double dy = y2 - y1;
 		return dy / dx;
 	}
 
@@ -125,11 +148,20 @@ namespace calc {
 		return SlobeDirection::HORIZONTAL;
 	}
 
+	/**
+	 * \brief 
+	 * \tparam T 
+	 * \param x1 
+	 * \param x2 
+	 * \param y1 
+	 * \param y2 
+	 * \return 
+	 */
 	template <typename T>
 	inline
 	double angle_between_lines(T x1, T x2, T y1, T y2) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
-		return atan((y1 - y2) / (x2 - x1) * 180 / CV_PI);
+		return atan((y1 - y2) / (x2 - x1));
 	}
 
 	template <typename T>
@@ -181,7 +213,7 @@ namespace calc {
 	 */
 	template <typename T>
 	inline
-	std::tuple<bool, T, T> quadratic_equation(T a, T b, T c) {
+	std::tuple<bool, double, double> quadratic_equation(T a, T b, T c) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
 		double a2 = a * a;
@@ -189,16 +221,16 @@ namespace calc {
 
 		if (det > 0.0) {
 			det = std::sqrt(det);
-			return std::tuple<bool, T, T>(true, (-b + det) / a2, (-b - det) / a2);
+			return std::make_tuple(true, (-b + det) / a2, (-b - det) / a2);
 		}
 
 		if (det == 0.0) {
 			det = std::sqrt(det);
-			T res = (-b + det) / a2;
-			return std::tuple<bool, T, T>(true, res, res);
+			double res = (-b + det) / a2;
+			return std::make_tuple(true, res, res);
 		}
 
-		return std::tuple<bool, T, T>(true, -b / a2, std::sqrt(-det) / a2);
+		return std::make_tuple(true, -b / a2, std::sqrt(-det) / a2);
 
 	}
 
@@ -341,7 +373,7 @@ namespace calc {
 				v.y = y;
 		}
 
-		return compute_y_avg(output);
+		return avg_y(output);
 	}
 
 	template <typename T>
@@ -358,7 +390,7 @@ namespace calc {
 
 	template <typename T>
 	inline
-	double compute_y_avg(std::vector<cv::Point_<T>>& vec) {
+	double avg_y(std::vector<cv::Point_<T>>& vec) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
 		auto sum = 0.0;
@@ -374,7 +406,23 @@ namespace calc {
 
 	template <typename T>
 	inline
-	double compute_x_avg(std::vector<cv::Point_<T>>& vec) {
+	double avg_y(cv::Vec<T, 4>& vec) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+
+		return (vec[1] + vec[3]) / 2;
+	}
+
+	template <typename T>
+	inline
+	double avg_y(cv::Vec<T, 6>& vec) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+
+		return (vec[1] + vec[3] + vec[5]) * (1 / 3);
+	}
+
+	template <typename T>
+	inline
+	double avg_x(std::vector<cv::Point_<T>>& vec) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
 		auto sum = 0.0;
@@ -390,7 +438,23 @@ namespace calc {
 
 	template <typename T>
 	inline
-	cv::Vec2d compute_xy_avg(std::vector<cv::Point_<T>>& vec) {
+	double avg_x(cv::Vec<T, 4>& vec) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+
+		return (vec[0] + vec[2]) / 2;
+	}
+
+	template <typename T>
+	inline
+	double avg_x(cv::Vec<T, 6>& vec) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+
+		return (vec[0] + vec[2] + vec[4]) * (1 / 3);
+	}
+
+	template <typename T>
+	inline
+	cv::Vec2d avg_xy(std::vector<cv::Point_<T>>& vec) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
 		cv::Vec2d sum(0.0, 0.0);
