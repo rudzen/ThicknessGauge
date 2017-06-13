@@ -66,7 +66,12 @@ namespace calc {
 #else
 		/* it's ok if round does not comply with IEEE754 standard;
 		the tests should allow +/-1 difference when the tested functions use round */
+#ifdef CV_VERSION
+		return static_cast<int>(cv::floor(d + 0.5));
+#else
 		return static_cast<int>(floor(d + 0.5));
+#endif
+
 #endif
 	}
 
@@ -103,6 +108,11 @@ namespace calc {
 		return sqrt(x + y);
 	}
 
+	/**
+	 * \brief Converts radians to degrees
+	 * \param radians The radians to be converted
+	 * \return The angle in degrees
+	 */
 	inline
 	double rad_to_deg(double radians) {
 		return radians * 180 / C_PI;
@@ -128,6 +138,15 @@ namespace calc {
 #endif
 	}
 
+	/**
+	 * \brief Calculates the slobe between two points
+	 * \tparam T The type
+	 * \param x1 X of point 1
+	 * \param x2 X of point 2
+	 * \param y1 Y of point 1
+	 * \param y2 Y of point 2
+	 * \return The slobe
+	 */
 	template <typename T>
 	inline
 	double slope(const T x1, const T x2, const T y1, const T y2) {
@@ -137,6 +156,11 @@ namespace calc {
 		return dy / dx;
 	}
 
+	/**
+	 * \brief Determine slobe direction
+	 * \param slope The slobe to determin
+	 * \return Enum for slobe direction
+	 */
 	inline
 	SlobeDirection slobe_direction(const double slope) {
 		if (std::isinf(slope))
@@ -149,12 +173,12 @@ namespace calc {
 	}
 
 	/**
-	 * \brief 
-	 * \tparam T 
-	 * \param x1 
-	 * \param x2 
-	 * \param y1 
-	 * \param y2 
+	 * \brief Angle between lines
+	 * \tparam T Type
+	 * \param x1 X of point 1
+	 * \param x2 X of point 2
+	 * \param y1 Y of point 1
+	 * \param y2 Y of point 2
 	 * \return 
 	 */
 	template <typename T>
@@ -164,6 +188,17 @@ namespace calc {
 		return atan((y1 - y2) / (x2 - x1));
 	}
 
+	/**
+	 * \brief Calculates the angle between two points with a specified central point
+	 * \tparam T The type
+	 * \param p1_x X of point 1
+	 * \param p2_x X of point 2
+	 * \param c_x X of central point
+	 * \param p1_y Y of point 1
+	 * \param p2_y Y of point 2
+	 * \param c_y Y of central point
+	 * \return The angle in radians
+	 */
 	template <typename T>
 	inline
 	double angle_inner_points(const T p1_x, const T p2_x, const T c_x, const T p1_y, const T p2_y, const T c_y) {
@@ -197,8 +232,6 @@ namespace calc {
 		auto p_2 = by - ay;
 
 		auto a = acos((p_1 * q_1 + p_2 * q_2) / (std::sqrt(p_1 * p_1 + p_2 * p_2) * std::sqrt(q_1 * q_1 + q_2 * q_2)));
-
-		a *= 180 / CV_PI;
 
 		return a;
 	}
