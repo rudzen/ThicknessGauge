@@ -55,7 +55,7 @@ namespace validate {
 
 		};
 
-		return valid_rectangle(cv::Rect(cv::Point(0,0), boundry.size()));
+		return valid_rectangle(cv::Rect(cv::Point(0, 0), boundry.size()));
 
 	}
 
@@ -69,7 +69,7 @@ namespace validate {
 	inline
 	bool valid_pix_vec(std::vector<cv::Point_<T>>& vec) {
 		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
-		
+
 		if (vec.empty())
 			return false;
 
@@ -83,25 +83,133 @@ namespace validate {
 
 	}
 
-	template <typename T, int cn, int lower_boundry>
+	template <typename T, int cn>
 	inline
-	bool valid_vec2(cv::Vec<T ,cn>& v) {
-		for (auto val : v)
-			if (val < lower_boundry)
-				return false;
+	bool valid_vec2(cv::Vec<T, cn>& v) {
+        for (auto i = 0; i < cn; i++)
+            if (v[i] < 0)
+                return false;
 
 		return true;
 	}
-	
 
 
+	/**
+	 * \brief Validates the entirety of the data structure
+	 * \param data Pointer for the data
+	 * \return true if a-okay, otherwise false
+	 */
+	inline
+	bool valid_data(std::shared_ptr<tg::Data> data) {
+
+		// logging is temporary !
+		using namespace tg;
+		using namespace std;
+
+		bool failed = false;
+
+		if (data->globName.empty()) {
+			failed = true;
+		}
+		else {
+
+		}
+
+
+		if (data->cameraPtr == nullptr) {
+			log_time << "cameraPtr failed." << endl;
+			failed = true;
+		}
+		else {
+			log_time << "cameraPtr ok." << endl;
+		}
+
+		if (!valid_pix_vec(data->centerPoints)) {
+			log_time << "centerPoints failed." << endl;
+			failed = true;
+		}
+		else {
+			log_time << "centerPoints ok." << endl;
+		}
+
+		if (!valid_pix_vec(data->leftPoints)) {
+            log_time << "leftPoints failed." << endl;
+            failed = true;
+		}
+		else {
+            log_time << "centerPoints ok." << endl;
+        }
+
+		if (!valid_pix_vec(data->rightPoints)) {
+            log_time << "rightPoints failed." << endl;
+            failed = true;
+		}
+		else {
+            log_time << "centerPoints ok." << endl;
+        }
+
+		if (!valid_vec2(data->pointsStart)) {
+            log_time << "pointsStart failed." << endl;
+        }
+		else {
+            log_time << "centerPoints ok." << endl;
+        }
+
+		if (!valid_vec2(data->leftBorder)) {
+            log_time << "leftBorder failed." << endl;
+            failed = true;
+		}
+		else {
+            log_time << "centerPoints ok." << endl;
+        }
+        if (!valid_vec2(data->rightBorder)) {
+            log_time << "rightBorder failed." << endl;
+            failed = true;
+		}
+		else {
+            log_time << "centerPoints ok." << endl;
+        }
+
+        if (!valid_vec2(data->centerLine)) {
+            log_time << "centerLine failed." << endl;
+            failed = true;
+        } else {
+            log_time << "centerPoints ok." << endl;
+        }
+
+        if (data->leftAvg < 0.0) {
+            log_time << "leftAvg failed." << endl;
+            failed = true;
+        } else {
+            log_time << "centerPoints ok." << endl;
+        }
+
+        if (data->centerAvg < 0.0) {
+            log_time << "centerAvg failed." << endl;
+            failed = true;
+        } else {
+            log_time << "centerPoints ok." << endl;
+        }
+
+        if (data->rightAvg < 0.0) {
+            log_time << "rightAvg failed." << endl;
+            failed = true;
+        } else {
+            log_time << "centerPoints ok." << endl;
+        }
+
+        if (data->difference < 0.0) {
+            log_time << "difference failed." << endl;
+            failed = true;
+        } else {
+            log_time << "centerPoints ok." << endl;
+        }
+
+
+	}
 
 
 #endif
-
-
-
-
 
 
 }

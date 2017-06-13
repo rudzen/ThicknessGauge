@@ -54,7 +54,7 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options);
 void saveNull(std::string filename) {
 
 	// quick and dirty hack to save null image quickly
-	cout << cv::format("Enter delay in seconds before capture to %s\n>", filename);
+    log_time << cv::format("Enter delay in seconds before capture to %s\n>", filename);
 	int t;
 	cin >> t;
 	cv::setNumThreads(2);
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
 		thicknessGauge->initCalibrationSettings(options.getCameraFile());
 		cv::setNumThreads(options.getNumOpenCvThreads());
 
-		//cout << options << endl;
+		//log_time << options << endl;
 
 		if (options.isGlobMode()) {
 			// TODO : use capture for file reading?!
@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
 			log_timedate << cv::format("difference: %f\n", data->difference);
 
 			//auto result = c.findMarkingLinePairs_(globName);
-			//cout << result << endl;
+			//log_time << result << endl;
 			//returnValue = result.first.x != 0;
 			//returnValue = c.generatePlanarImage(globName);
 			//if (returnValue) {
@@ -352,8 +352,8 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 //		//is.SaveImage(&output, "OutputTest " + std::to_string(i));
 //
 //		ff = (static_cast<float>(i) / max) * 100;
-//		cout << "                                                            " << '\xd';
-//		cout << '\xd' << ff << "%";
+//		log_time << "                                                            " << '\xd';
+//		log_time << '\xd' << ff << "%";
 //
 //	}
 //

@@ -250,31 +250,31 @@ inline void HoughLinesPR::computeBorders() {
 inline void HoughLinesPR::rhocb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setTheta(value);
-	cout << cv::format("%s rho : %i\n", that->windowName, value);
+    log_time << cv::format("%s rho : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::thetacb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setTheta(value);
-	cout << cv::format("%s theta : %i\n", that->windowName, value);
+    log_time << cv::format("%s theta : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::thresholdcb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setThreshold(value);
-	cout << cv::format("%s threshold : %i\n", that->windowName, value);
+    log_time << cv::format("%s threshold : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::maxLineGabcb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setMaxLineGab(value);
-	cout << cv::format("%s maxLineGab : %i\n", that->windowName, value);
+    log_time << cv::format("%s maxLineGab : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::minLineLencb(int value, void* userData) {
 	auto that = static_cast<HoughLinesPR*>(userData);
 	that->setMinLineLen(value);
-	cout << cv::format("%s minLineLen : %i\n", that->windowName, value);
+    log_time << cv::format("%s minLineLen : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::doHorizontalHough() {

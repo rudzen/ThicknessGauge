@@ -181,42 +181,6 @@ inline void HistoPeak::processImage(cv::Mat& image, bool uniform, bool accumulat
 		}
 	}
 
-	//cv::Mat dst, cdst;
-	//cv::Canny(image, dst, 60, 90, 3);
-	//cv::cvtColor(dst, cdst, CV_GRAY2BGR);
-	///// Canny detector
-
-	///// Using Canny's output as a mask, we display our result
-	//dst = cv::Scalar::all(0);
-	//vector<cv::Vec2f> lines;
-	//auto baseAngle = CV_PI / 180;
-	////HoughLines(dst, lines, 1, baseAngle, 20, 0, 0);
-	//HoughLines(dst, lines, 1, baseAngle, 100);
-	//cout << "#HoughLines : " << lines.size() << endl;
-	////cdst = cv::Mat::zeros(image.rows, image.cols, image.type());
-	//for (size_t i = 0; i < lines.size(); i++) {
-	//	auto theta = lines[i][1];
-	//	cout << theta << endl;
-	//	//		if (theta>baseAngle * 170 || theta<baseAngle * 10) {
-	//	auto rho = lines[i][0];
-	//	double a = cos(theta);
-	//	double b = sin(theta);
-	//	auto x0 = a * rho;
-	//	auto y0 = b * rho;
-	//	cv::Point pt1(cvRound(x0 + 1000 * (-b)), cvRound(y0 + 1000 * (a)));
-	//	cv::Point pt2(cvRound(x0 - 1000 * (-b)), cvRound(y0 - 1000 * (a)));
-	//	line(cdst, pt1, pt2, cv::Scalar(0, 0, 255), 3, CV_AA);
-	//	//		}
-	//}
-
-	////vector<cv::Vec4i> lines;
-	////HoughLinesP(dst, lines, 1, (CV_PI / 180) * 45.0, 50, 80, 5);
-	////for (size_t i = 0; i < lines.size(); i++) {
-	////	auto l = lines[i];
-	////	line(cdst, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0, 0, 255), 3, CV_AA);
-	////}
-	//imshow("detected lines", cdst);
-
 	imshow("colour me freaky   0-30", colourMeDirty(0, 30, cv::Scalar(0, 0, 255)));
 	imshow("colour me freaky 31-100", colourMeDirty(31, 100, cv::Scalar(0, 0, 255)));
 	imshow("colour me freaky 101-150", colourMeDirty(101, 150, cv::Scalar(255, 0, 255)));

@@ -35,6 +35,8 @@
 #include "namespaces/stl.h"
 #include "namespaces/filters.h"
 #include "namespaces/sort.h"
+#include "namespaces/validate.h"
+#include "Exceptions/ThrowAssert.h"
 
 using namespace tg;
 
@@ -73,51 +75,51 @@ void ThicknessGauge::initialize(std::string& glob_name) {
 		//VmbInterfaceType cam_interface_type;
 		//auto error = data->cameraPtr->GetInterfaceType(cam_interface_type);
 		//if (error == VmbErrorSuccess) {
-		//	cout << "cam_interface_type ok.\n";
+		//	log_time << "cam_interface_type ok.\n";
 		//}
 
 		//VmbAccessModeType cam_interface_permissions;
 		//error = data->cameraPtr->GetPermittedAccess(cam_interface_permissions);
 		//if (error == VmbErrorSuccess) {
-		//	cout << "cam_interface_permissions ok.\n";
+		//	log_time << "cam_interface_permissions ok.\n";
 		//}
 
 		////error = data->cameraPtr->Open(VmbAccessModeFull);
 		////if (error == VmbErrorSuccess) {
-		////	cout << "Open ok.\n";
+		////	log_time << "Open ok.\n";
 		////}
 
 		//AVT::VmbAPI::FeaturePtr featPtr;
 		//error = data->cameraPtr->GetFeatureByName("ExposureTimeAbs", featPtr);
 		//if (error == VmbErrorSuccess) {
-		//	cout << "ExposureTimeAbs ok.\n";
+		//	log_time << "ExposureTimeAbs ok.\n";
 		//}
 		//else {
-		//	cout << "ExposureTimeAbs fail.\n";
+		//	log_time << "ExposureTimeAbs fail.\n";
 		//}
 
 		//std::string value;
 		//error = featPtr->GetValue(value);
 		//if (error == VmbErrorSuccess) {
-		//	cout << "GetValue ok. " << value << "\n";
+		//	log_time << "GetValue ok. " << value << "\n";
 		//	error = featPtr->SetValue(1);
 		//	if (error == VmbErrorSuccess) {
-		//		cout << "SetValue ok.\n";
+		//		log_time << "SetValue ok.\n";
 		//	}
 		//}
 
 		//error = data->cameraPtr->Close();
 		//if (error == VmbErrorSuccess) {
-		//	cout << "Close ok.\n";
+		//	log_time << "Close ok.\n";
 		//}
 
 		//auto res = data->camera.GetExposureTimeAbsFeature(featPtr);
 		//if (VmbErrorSuccess == res) {
-		//	cout << "Camera feature retrieved.." << endl;
+		//	log_time << "Camera feature retrieved.." << endl;
 		//	VmbInt32_t exposure_low = 40000;
 		//	featPtr->SetValue(exposure_low);
 		//} else {
-		//	cout << "Camera feature retrieval failed !.." << endl;
+		//	log_time << "Camera feature retrieval failed !.." << endl;
 		//}
 
 		//system.Shutdown();
@@ -144,7 +146,7 @@ void ThicknessGauge::initVideoCapture() {
 
 	capture->targetStdDev(63.0);
 	capture->deltaValue(2.0);
-	cout << "whoop: " << capture->detectExposure() << endl;
+    log_time << "whoop: " << capture->detectExposure() << endl;
 
 }
 
@@ -192,7 +194,7 @@ void ThicknessGauge::computeMarkingHeight() {
 		// test print for all framesets
 		for (auto& f:  frameset) {
 			f->compute();
-			cout << f << endl;
+            log_time << f << endl;
 		}
 
 		uint64 time_start = cv::getTickCount();
@@ -340,11 +342,19 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 	left_baseline.width = marking.x;
 	left_baseline.height = quarter;
 
+    if (!validate::validate_rect(left_baseline)) {
+        log_time << "Validation error for left_baseline in computeBaseLineAreas()." << endl;
+    }
+
 	cv::Rect2d right_baseline;
 	right_baseline.x = marking.x + marking.width;
 	right_baseline.y = base_line_y;
 	right_baseline.width = imageSize_.width - right_baseline.x;
 	right_baseline.height = quarter;
+
+    if (!validate::validate_rect(right_baseline)) {
+        log_time << "Validation error for right_baseline in computeBaseLineAreas()." << endl;
+    }
 
 	// cannot be resized
 	vector<cv::Mat> left_frames;
@@ -469,14 +479,14 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 				running = false;
 		}
 
-		cout << "right_boundry_rect: " << right_boundry_rect.y << endl;
+        log_time << "right_boundry_rect: " << right_boundry_rect.y << endl;
 
 		t = org(right_boundry_rect);
 		right_y = static_cast<double>(right_boundry_rect.y);
 		right_y += calc::real_intensity_line(t, data->rightPoints, t.rows, 0);
 		right_y += offset_y;
 
-		cout << "right baseline: " << right_y << endl;
+        log_time << "right baseline: " << right_y << endl;
 
 		// forcefully break out of the loop
 		if (!showWindows_)
@@ -489,6 +499,10 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
 	data->baseLines[1] = left_y;
 	data->baseLines[2] = 0.0;
 	data->baseLines[3] = right_y;
+
+    if (!validate::valid_vec2(data->baseLines)) {
+        log_time << "Validation error for data->baseLines in computeBaseLineAreas()." << endl;
+    }
 
 	if (showWindows_) {
 		draw->removeWindow(window_left);
@@ -625,13 +639,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR> houg
 	if (showWindows_)
 		draw->removeWindow(window_name);
 
-	auto validRectangle = [output]()-> bool {
-		return output.width > 0.0 && output.height > 0.0;
-	};
-
-	bool valid_rect = validRectangle();
-
-	if (valid_rect) {
+	if (validate::validate_rect(output)) {
 		data->leftBorder = left_border_result;
 		data->rightBorder = right_border_result;
 		hough->leftBorder(left_border_result);
@@ -671,7 +679,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 	// local copy of real baseline
 
 	auto base = (data->baseLines[1] + data->baseLines[3]) / 2;
-	std::cout << "baseline vector : " << data->baseLines << endl;
+    log_time << "baseline vector : " << data->baseLines << endl;
 
 	cv::Mat tmpOut;
 	cv::Rect rect_draw;
@@ -705,6 +713,8 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 			/* RECT CUT METHOD */
 			avg_height += calc::weighted_avg(base_frame, data->centerPoints);
 
+            throw_assert(!validate::valid_pix_vec(data->centerPoints), "Centerpoints failed validation!!!");
+
 			for (auto& centerpoint : data->centerPoints)
 				results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
 
@@ -734,11 +744,11 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 
 		avg_height = 0.0;
 
-		std::cout << cv::format("base: %f\n", base);
-		std::cout << cv::format("highestPixelTotal: %f\n", highest_total);
+        log_time << cv::format("base: %f\n", base);
+        log_time << cv::format("highestPixelTotal: %f\n", highest_total);
 
 		data->difference = base - highest_total;
-		std::cout << cv::format("diff from baseline: %f\n", data->difference);
+        log_time << cv::format("diff from baseline: %f\n", data->difference);
 
 		if (!running || !showWindows_)
 			break;
@@ -790,9 +800,9 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<Ho
 
 	auto quarter = image_size.height >> 2;
 
-	cout << "data->markingRect: " << data->markingRect << endl;
-	cout << "data->leftBorder" << data->leftBorder << endl;
-	cout << "data->rightBorder" << data->rightBorder << endl;
+    log_time << "data->markingRect: " << data->markingRect << endl;
+    log_time << "data->leftBorder" << data->leftBorder << endl;
+    log_time << "data->rightBorder" << data->rightBorder << endl;
 
 	left_base_roi.x = data->leftBorder[0] + (data->leftBorder[2] - data->leftBorder[0]) / 2;
 	left_base_roi.y = image_size.height - quarter;
@@ -800,7 +810,7 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<Ho
 	left_base_roi.width = data->intersections[0] - data->markingRect.x;
 	left_base_roi.height = quarter;
 
-	cout << "in between: left_base_roi -> " << left_base_roi << endl;
+    log_time << "in between: left_base_roi -> " << left_base_roi << endl;
 
 	// TODO : insert check for centerline boundries crossing over border
 	left_laser_roi.x = data->intersections[0] - data->intersections[1];
@@ -809,7 +819,7 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<Ho
 	left_laser_roi.width = data->leftBorder[2] - data->intersections[0];
 	left_laser_roi.height = image_size.height;
 
-	cout << "in between: left_laser_roi -> " << left_laser_roi << endl;
+    log_time << "in between: left_laser_roi -> " << left_laser_roi << endl;
 
 	// grab the left left baseline
 	for (auto& f : frame->frames) {
@@ -891,12 +901,10 @@ void ThicknessGauge::addNulls() {
 	nulls_.reserve(files.size());
 
 	for (auto& f : files) {
-		std::cout << cv::format("loading null file : %s\n", f.c_str());
+        log_time << cv::format("loading null file : %s\n", f.c_str());
 		nulls_.emplace_back(cv::imread(f, CV_8UC1));
+        log_time << nulls_.back().size() << endl;
 	}
-
-	for (auto& n : nulls_)
-		std::cout << n.size() << endl;
 
 }
 
@@ -1000,7 +1008,7 @@ bool ThicknessGauge::saveData(string filename) {
 		return false;
 	}
 
-	std::cout << cv::format("Saving data..\n");
+    log_time << cv::format("Saving data..\n");
 
 	cv::Vec3i sizes(static_cast<int>(data->leftPoints.size()), static_cast<int>(data->centerPoints.size()), static_cast<int>(data->rightPoints.size()));
 

@@ -344,6 +344,9 @@
     <ClInclude Include="namespaces\validate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Exceptions\ThrowAssert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

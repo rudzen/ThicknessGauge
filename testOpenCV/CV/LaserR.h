@@ -97,7 +97,7 @@ inline bool LaserR::computeXLine() {
 		for (auto& intensity : xl.i) { sum += xl.i.size() * intensity; }
 		xl.y = 100.0f / sum;
 		ok = true;
-		cout << "x / y: " << xl.x << " / " << xl.y << endl;
+        log_time << "x / y: " << xl.x << " / " << xl.y << endl;
 	}
 
 	return ok;

@@ -66,13 +66,13 @@
 //		}
 //	}
 //	if (err == VmbErrorSuccess) {
-//		std::cout << "Opening camera with ID: " << cameraID << "\n";
+//		log_time << "Opening camera with ID: " << cameraID << "\n";
 //		err = vimbaApiController.StartContinuousImageAcquisition(cameraID);
 //	}
 //
 //	if (err != VmbErrorSuccess) {
 //		std::string strError = vimbaApiController.ErrorCodeToMessage(err);
-//		std::cout << "\nAn error occured:" << strError << "\n";
+//		log_time << "\nAn error occured:" << strError << "\n";
 //		return false;
 //	}
 //
@@ -99,8 +99,8 @@
 //	double delay = (t2 - t1).ToDouble() / 1000000.0;
 //	fps = 20.0 / delay;
 //
-//	std::cout << "Camera properties\n";
-//	std::cout << "width = " << width << std::endl << " height = " << height << " fps = " << fps << std::endl;
+//	log_time << "Camera properties\n";
+//	log_time << "width = " << width << std::endl << " height = " << height << " fps = " << fps << std::endl;
 //
 //	playTimestep.Assign(1000000.0 / fps);
 //	startTime = wxGetUTCTimeUSec();
@@ -132,7 +132,7 @@
 //
 //		// did not get a frame, wait a bit before retrying
 //		wxMicroSleep(100);
-//		//	std::cout << "Waiting for a frame... " << startTime << "\t" << wxGetUTCTimeUSec() << std::endl;
+//		//	log_time << "Waiting for a frame... " << startTime << "\t" << wxGetUTCTimeUSec() << std::endl;
 //	}
 //
 //	frameNumber++;

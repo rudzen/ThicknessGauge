@@ -103,7 +103,6 @@ public:
 				continue;
 
 			sum += uc_pixel[0];
-			//cout << "sum is now : " << sum << "\n";
 			count++;
 			uc_pixel++;
 		}
@@ -152,8 +151,8 @@ public:
 		//intensitySum /= elements.size();
 		//yAvg /= elements.size();
 
-		//cout << "Intensity avg/x " << intensitySum << "/" << x << endl;
-		//cout << "yAvg/x " << yAvg << "/" << x << endl;
+		//log_time << "Intensity avg/x " << intensitySum << "/" << x << endl;
+		//log_time << "yAvg/x " << yAvg << "/" << x << endl;
 
 
 		return highest;

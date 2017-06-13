@@ -186,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
+    <ClInclude Include="Exceptions\ThrowAssert.h" />
     <ClInclude Include="namespaces\calc.h" />
     <ClInclude Include="Calc\GaugeMath.h" />
     <ClInclude Include="Calc\LineCalc.h" />

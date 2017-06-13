@@ -53,7 +53,7 @@ public:
 
 	
 
-	std::unique_ptr<Data> data; // there can be only one!
+	std::shared_ptr<Data> data; // there can be only one!
 
 public: // data return point
 

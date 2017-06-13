@@ -318,7 +318,7 @@ public:
 	                    vector<vector<cv::Point2f>> image_points, vector<cv::Mat>& rvecs, vector<cv::Mat>& tvecs,
 	                    vector<float>& reproj_errs, double& total_avg_err) const {
 
-		cout << "Configuring matricies.." << endl;
+		log_time << "Configuring matricies.." << endl;
 
 		camera_matrix = cv::Mat::eye(3, 3, CV_64F);
 		if (s.flag & CV_CALIB_FIX_ASPECT_RATIO)
@@ -326,20 +326,20 @@ public:
 
 		dist_coeffs = cv::Mat::zeros(8, 1, CV_64F);
 
-		cout << "Calculating board corner positions and resizing object points.." << endl;
+        log_time << "Calculating board corner positions and resizing object points.." << endl;
 
 		vector<vector<cv::Point3f>> objectPoints(1);
 		calcBoardCornerPositions(s.boardSize, s.squareSize, objectPoints[0], s.calibrationPattern);
 
 		objectPoints.resize(image_points.size(), objectPoints[0]);
 
-		cout << "Configuring camera intrinsic & extrinsic parameters." << endl;
+        log_time << "Configuring camera intrinsic & extrinsic parameters." << endl;
 
 		//Find intrinsic and extrinsic camera parameters
 		auto rms = calibrateCamera(objectPoints, image_points, image_size, camera_matrix,
 		                           dist_coeffs, rvecs, tvecs, s.flag | CV_CALIB_FIX_K4 | CV_CALIB_FIX_K5);
 
-		cout << "Re-projection error reported by calibrateCamera: " << rms << endl;
+        log_time << "Re-projection error reported by calibrateCamera: " << rms << endl;
 
 		auto ok = checkRange(camera_matrix) && checkRange(dist_coeffs);
 
@@ -376,8 +376,7 @@ public:
 		double totalAvgErr = 0;
 
 		auto ok = runCalibration(s, image_size, camera_matrix, dist_coeffs, image_points, rvecs, tvecs, reprojErrs, totalAvgErr);
-		cout << (ok ? "Calibration succeeded" : "Calibration failed")
-			<< ". avg re projection error = " << totalAvgErr;
+        log_time << cv::format("Calibration %s. avg re projection error = %f", (ok ? "succeeded" : "failed"), totalAvgErr);
 
 		if (ok)
 			saveCameraParams(s, image_size, camera_matrix, dist_coeffs, rvecs, tvecs, reprojErrs, image_points, totalAvgErr);
@@ -392,7 +391,7 @@ public:
 		cv::FileStorage fs(inputSettingsFile, cv::FileStorage::READ);
 
 		if (!fs.isOpened()) {
-			cout << "Could not open the configuration file: \"" << inputSettingsFile << "\"" << endl;
+			log_time << "Could not open the configuration file: \"" << inputSettingsFile << "\"" << endl;
 			return -1;
 		}
 
@@ -401,7 +400,7 @@ public:
 		fs.release();
 
 		if (!s.good_input) {
-			cout << "Invalid input detected. Stopping calibration. " << endl;
+			log_time << "Invalid input detected. Stopping calibration. " << endl;
 			return -1;
 		}
 
@@ -505,7 +504,7 @@ public:
 			}
 
 			//------------------------------ Show image and check for input commands -------------------
-			cout << s.imageList[s.atImageList] << endl;
+            log_time << s.imageList[s.atImageList] << endl;
 			imshow("Image View", view);
 			auto key = static_cast<char>(cv::waitKey(s.inputCapture.isOpened() ? 50 : s.delay));
 

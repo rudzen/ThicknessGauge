@@ -72,7 +72,7 @@ class FilterR : public BaseR {
 		auto that = static_cast<FilterR*>(userData);
 		auto oldVal = that->getDelta();
 		that->setDelta(static_cast<double>(value));
-		cout << cv::format("%s delta : %i -> %i\n", that->windowName, oldVal, value);
+        log_time << cv::format("%s delta : %i -> %i\n", that->windowName, oldVal, value);
 	}
 
 public: // constructors

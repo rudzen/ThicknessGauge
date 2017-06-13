@@ -324,7 +324,7 @@ inline void Line::differentiateIntensity() {
 	for (auto i = 1; i < size; ++i) {
 		intensity_[allSparse_[i].x] = frame_.at<unsigned char>(allSparse_[i]) - frame_.at<unsigned char>(allSparse_[i - 1]);
 		//auto val = intensity_[allSparse_[i].x];
-		//cout << val << endl;
+		//log_time << val << endl;
 	}
 
 }

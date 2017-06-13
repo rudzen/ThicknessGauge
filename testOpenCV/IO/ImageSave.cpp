@@ -42,7 +42,7 @@ void ImageSave::OpenVideo() {
 }
 
 void ImageSave::CloseVideo() {
-	cout << m_FileExtensions.at(saveType_) << GetCodec() << GetFPS() << GetSize() << IsColour();
+    log_time << m_FileExtensions.at(saveType_) << GetCodec() << GetFPS() << GetSize() << IsColour();
 	videoWriter_.release();
 }
 
