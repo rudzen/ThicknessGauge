@@ -1,8 +1,7 @@
 #pragma once
-
-#ifdef CV_VERSION
 #include <opencv2/core/core.hpp>
-#else
+
+#ifndef CV_VERSION
 #include "Util/Vec.h"
 #endif
 
@@ -19,7 +18,10 @@
 namespace calc {
 
 	enum class SlobeDirection {
-		VERTICAL, HORIZONTAL, DESCENDING, ASCENDING
+		VERTICAL,
+		HORIZONTAL,
+		DESCENDING,
+		ASCENDING
 	};
 
 	/**
@@ -122,12 +124,14 @@ namespace calc {
 	template <typename T>
 	inline
 	double angle_between_lines(T x1, T x2, T y1, T y2) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return atan((y1 - y2) / (x2 - x1) * 180 / CV_PI);
 	}
 
 	template <typename T>
 	inline
 	double angle_inner_points(const T p1_x, const T p2_x, const T c_x, const T p1_y, const T p2_y, const T c_y) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		auto dist1 = cv::sqrt((p1_x - c_x) * (p1_x - c_x) + (p1_y - c_y) * (p1_y - c_y));
 		auto dist2 = cv::sqrt((p2_x - c_x) * (p2_x - c_x) + (p2_y - c_y) * (p2_y - c_y));
 
@@ -174,6 +178,7 @@ namespace calc {
 	template <typename T>
 	inline
 	std::tuple<bool, T, T> quadratic_equation(T a, T b, T c) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
 		double a2 = a * a;
 		double det = b * b - 2 * a2 * c;
@@ -203,6 +208,7 @@ namespace calc {
 	template <typename T>
 	inline
 	double mu(T current_pos, T in_between) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return current_pos / in_between;
 	}
 
@@ -261,7 +267,7 @@ namespace calc {
 	template <typename T>
 	inline
 	bool intersection(cv::Point_<T> o1, cv::Point_<T> p1, cv::Point_<T> o2, cv::Point_<T> p2, cv::Point_<T>& result) {
-
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		auto d1 = p1 - o1;
 		auto d2 = p2 - o2;
 
@@ -285,6 +291,7 @@ namespace calc {
 	template <typename T>
 	inline
 	bool intersection(const cv::Vec<T, 4>& border, cv::Vec<T, 4>& line, cv::Point_<T>& result) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 		return intersection(cv::Point_<T>(border[0], border[1]), cv::Point_<T>(line[0], line[1]), cv::Point_<T>(border[2], border[3]), cv::Point_<T>(line[2], line[3]), result);
 	}
 
@@ -337,6 +344,7 @@ namespace calc {
 	template <typename T>
 	inline
 	bool intersection(v2<T> o1, v2<T> p1, v2<T> o2, v2<T> p2, v2<T>& result) {
+		static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
 		auto d1 = p1 - o1;
 		auto d2 = p2 - o2;
