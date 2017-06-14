@@ -1,6 +1,6 @@
 #pragma once
 
-#include <opencv2/core/types.hpp>
+#include <opencv2/core/core.hpp>
 
 #if defined(_MSC_VER) && !defined(inline)
 #define inline __forceinline
@@ -10,17 +10,18 @@
 
 namespace stl {
 
-    template <typename T>
-    void copyVector(T& source, T& destination) {
+    template <typename T1, typename T2>
+    void copyVector(T1& source, T2& destination) {
+        static_assert(std::is_convertible<T1, T2>::value, "Types are not convertible.");
         destination.reserve(source.size() + destination.size());
         destination.insert(destination.begin(), source.begin(), source.end());
     }
 
-    template <typename T>
-    void copyVector(const T& source, T& destination) {
-        destination.reserve(source.size() + destination.size());
-        destination.insert(destination.begin(), source.begin(), source.end());
-    }
+    //template <typename T>
+    //void copyVector(const T& source, T& destination) {
+    //    destination.reserve(source.size() + destination.size());
+    //    destination.insert(destination.begin(), source.begin(), source.end());
+    //}
 
     template <typename T>
     inline
@@ -42,7 +43,7 @@ namespace stl {
     template <typename T>
     inline
     void populate_x(std::vector<cv::Point_<T>>& vec, const size_t limit) {
-        static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         vec.clear();
         vec.reserve(limit);
         for (auto i = 0; i < limit; i++)
@@ -59,15 +60,9 @@ namespace stl {
     template <typename T>
     inline
     void reset_point_y(std::vector<cv::Point_<T>>& vec) {
-        static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         T zero = static_cast<T>(0);
-        for (auto& v : vec) {
-            v.y = zero;
-        }
-        //for (auto i = 0; i < vec.size(); i++) {
-        //	vec[i].y = zero;
-        //}
-
+        std::for_each(vec.begin(), vec.end(), [zero](cv::Point_<T>& p) { p.y = zero; });
     }
 
 

@@ -25,6 +25,29 @@ namespace calc {
 #define C_2PI  6.283185307179586476925286766559
 #define C_LOG2 0.69314718055994530941723212145818
 
+    namespace line {
+
+        template <typename T1, typename T2>
+        inline
+        void adjust_base_lines(cv::Vec<T1, 4>& base_lines, cv::Vec<T1, 4>& intersection_points, T2 buffer) {
+            static_assert(std::is_same<T1, T2>::value, "requires identical types.");
+            static_assert(std::is_same<T2, double>::value, "buffer must be double floating point.");
+
+            base_lines[0] = intersection_points[0] - buffer;
+            base_lines[2] = intersection_points[2] + buffer;
+
+        }
+
+                /**
+ * \brief Adjusts the baselines according to intersection points and specified buffer
+ * \param base_lines The baseline
+ * \param intersection_points The intersection points
+ * \param buffer The buffer
+ */
+
+
+    }
+
     /**
      * \brief Indicated the direction of a slobe
      */
@@ -144,7 +167,8 @@ namespace calc {
 
     /**
      * \brief Calculates the slobe between two points
-     * \tparam T The type
+     * \tparam T1 The type of point 1
+     * \tparam T2 The type of point 2
      * \param x1 X of point 1
      * \param x2 X of point 2
      * \param y1 Y of point 1

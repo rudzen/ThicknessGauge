@@ -19,7 +19,6 @@
 #include "CV/LaserR.h"
 #include "CV/MorphR.h"
 
-#include "Calc/LineCalc.h"
 #include "Calc/MiniCalc.h"
 
 #include "Vimba/GC2450MCamera.h"
@@ -67,8 +66,6 @@ public: // data return point
 private:
 
     std::unique_ptr<MiniCalc> miniCalc = std::make_unique<MiniCalc>();
-
-    std::unique_ptr<LineCalc> lineCalc = std::make_unique<LineCalc>();
 
     std::unique_ptr<DrawHelper> draw = std::make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
 

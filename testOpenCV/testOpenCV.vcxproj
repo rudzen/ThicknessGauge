@@ -162,7 +162,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Calc\GaugeMath.cpp" />
-    <ClCompile Include="Calc\LineCalc.cpp" />
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
     <ClCompile Include="Camera\Capture.cpp" />
@@ -188,7 +187,6 @@
     <ClInclude Include="Exceptions\ThrowAssert.h" />
     <ClInclude Include="namespaces\calc.h" />
     <ClInclude Include="Calc\GaugeMath.h" />
-    <ClInclude Include="Calc\LineCalc.h" />
     <ClInclude Include="Camera\Capture.h" />
     <ClInclude Include="Camera\CaptureInterface.h" />
     <ClInclude Include="CV\BaseR.h" />
