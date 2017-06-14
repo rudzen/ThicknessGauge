@@ -13,46 +13,36 @@ namespace sort {
     template <typename T>
     inline
     void sort_contours(std::vector<std::vector<cv::Point_<T>>>& contours) {
-        auto contourComparator = [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) {
-            return contourArea(a) > contourArea(b);
-        };
-        std::sort(contours.begin(), contours.end(), contourComparator);
+        static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
+        std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) { return contourArea(a) > contourArea(b); });
     }
 
     template <typename T>
     inline
     void sort_pixels_x_ascending(std::vector<cv::Point_<T>>& vector) {
-        auto x_comparator = [](cv::Point_<T> p1, cv::Point_<T> p2) {
-            return p1.x < p2.x;
-        };
-        std::sort(vector.begin(), vector.end(), x_comparator);
+        static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
+        std::sort(vector.begin(), vector.end(), [](cv::Point_<T> p1, cv::Point_<T> p2) { return p1.x < p2.x; });
     }
 
     template <typename T>
     inline
     void sort_pixels_x_descending(std::vector<cv::Point_<T>>& vector) {
-        auto x_comparator = [](cv::Point_<T> p1, cv::Point_<T> p2) {
-            return p1.x > p2.x;
-        };
-        std::sort(vector.begin(), vector.end(), x_comparator);
+        static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
+        std::sort(vector.begin(), vector.end(), [](cv::Point_<T> p1, cv::Point_<T> p2) { return p1.x > p2.x; });
     }
 
     template <typename T>
     inline
     void sort_pixels_y_ascending(std::vector<cv::Point_<T>>& vector) {
-        auto x_comparator = [](cv::Point_<T> p1, cv::Point_<T> p2) {
-            return p1.y < p2.y;
-        };
-        std::sort(vector.begin(), vector.end(), x_comparator);
+        static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
+        std::sort(vector.begin(), vector.end(), [](cv::Point_<T> p1, cv::Point_<T> p2) { return p1.y < p2.y; });
     }
 
     template <typename T>
     inline
     void sort_pixels_y_descending(std::vector<cv::Point_<T>>& vector) {
-        auto x_comparator = [](cv::Point_<T> p1, cv::Point_<T> p2) {
-            return p1.y > p2.y;
-        };
-        std::sort(vector.begin(), vector.end(), x_comparator);
+        static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
+        std::sort(vector.begin(), vector.end(), [](cv::Point_<T> p1, cv::Point_<T> p2) { return p1.y > p2.y; });
     }
 
 }

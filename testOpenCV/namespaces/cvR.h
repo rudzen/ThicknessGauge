@@ -2,6 +2,8 @@
 #include <string>
 #include <opencv2/core/types.hpp>
 #include "validate.h"
+#include "sort.h"
+#include "calc.h"
 
 #if defined(_MSC_VER) && !defined(inline)
 #define inline __forceinline
@@ -11,6 +13,8 @@
 
 // helper functions for open cv related stuff.
 namespace cvr {
+
+    
 
     std::string type2str(int type);
 
@@ -121,6 +125,70 @@ namespace cvr {
 
         return cv::Vec<T1, 4>(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
 
+    }
+
+
+    /**
+     * \brief Computes the gabs in a vector of points and populates them in target vector
+     * \param elements The elements to fill gabs in
+     * \param target The target vector of points
+     * \param barrier The current known location of the baseLevel, default is 0, which means all gabs will be filled
+     * \return  representing the number of elements filled in both X and Y
+     */
+    template <typename T>
+    inline
+    cv::Vec<T, 2> fill_pixel_gabs(cv::Point_<T>& elements, std::vector<cv::Point_<T>>& target, T barrier = 0) {
+        static_assert(std::is_arithmetic<T>::value, "Incompatible type");
+
+        // set limits in elements to ensure gab finding in empty image
+        elements.emplace_back(cv::Point_<T>(0, target.rows));
+        elements.emplace_back(cv::Point_<T>(target.cols, target.rows));
+
+        sort::sort_pixels_x_ascending(elements);
+
+        auto size = elements.size();
+
+        elements.emplace_back(elements.front());
+
+        // skip ahead to first element.
+        auto first = elements.front().x;
+
+        cv::Point_<T> sum;
+
+        auto gab = false;
+
+        for (auto i = first; i < size; ++i) {
+            if (elements[i].y > target.rows - barrier)
+                continue;
+            if (i + 1 == size)
+                break;
+            auto x_pos = elements[i].x;
+            auto x_next = elements[i + 1].x;
+            auto dif = x_next - x_pos;
+            if (dif < 2) {
+                // no gab in x, try with y !!
+                auto y_pos = elements[i].y;
+                auto y_next = elements[i + 1].y;
+                auto y_diff = y_next - y_pos;
+                if (y_diff < 4)
+                    continue;
+                gab = true;
+            }
+            if (gab) {
+                // construct line and populate output vector
+                //cv::Mat tmp(elements[i + 1].x - elements[i].x, calc::maxval(elements[i + 1].y, elements[i].y), CV_8U);
+                auto it = cv::LineIterator(cv::Mat(elements[i + 1].x - elements[i].x, calc::maxval(elements[i + 1].y, elements[i].y), CV_8U), elements[i], elements[i + 1], 8);
+                for (auto& p : it)
+                    target.emplace_back(p);
+
+                //line(target, elements[i], elements[i + 1], cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
+                sum.x += abs(elements[i + 1].x - elements[i].x);
+                sum.y += abs(elements[i + 1].y - elements[i].y);
+            }
+            gab ^= true;
+        }
+
+        return cv::Vec<T, 2>(sum);
     }
 
 }
