@@ -1,12 +1,13 @@
 #include "filesystem.h"
 
-
 namespace file {
 
-    bool createDirectory(const std::string& pathname) {
-
+    bool create_directory(const std::string& pathname) {
 #ifdef __unix__
+        if (!is_name_legal(std::string(r.begin(), r.end())))
+            return false;
 		mkdir(pathname.c_str());
+        return true;
 #else
         auto slength = static_cast<int>(pathname.length()) + 1;
         auto len = MultiByteToWideChar(CP_ACP, 0, pathname.c_str(), slength, nullptr, 0);
@@ -14,15 +15,14 @@ namespace file {
         MultiByteToWideChar(CP_ACP, 0, pathname.c_str(), slength, buf, len);
         std::wstring r(buf);
         delete[] buf;
-        if (!isNameLegal(std::string(r.begin(), r.end())))
+        if (!is_name_legal(std::string(r.begin(), r.end())))
             return false;
         auto done = CreateDirectory(r.c_str(), nullptr);
         return done;
 #endif
     }
 
-
-    bool isDirectory(const std::string& pathname) {
+    bool is_directory(const std::string& pathname) {
         struct stat info;
         if (stat(pathname.c_str(), &info) != 0)
             return false;
@@ -31,26 +31,19 @@ namespace file {
         return false;
     }
 
-    bool isFile(const std::string& name) {
+    bool is_file(const std::string& name) {
 #ifdef _MSC_VER
-
-        // should only be POSIX, but M$ is weird..
-
         struct stat buffer;
         return (stat(name.c_str(), &buffer) == 0);
-
 #else
-        // this was originaly only for _MSC_VER, but alas!
 		if (auto file = fopen(name.c_str(), "r")) {
 			fclose(file);
 			return true;
 		}
 		return false;
-
 #endif
     }
-
-    __forceinline bool isNameLegal(const std::string& name) {
+    __forceinline bool is_name_legal(const std::string& name) {
         for (auto& c : name) {
             if (illegal_chars.find(c) != std::string::npos)
                 return false;

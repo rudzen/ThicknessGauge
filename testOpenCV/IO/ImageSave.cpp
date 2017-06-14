@@ -15,7 +15,7 @@ void ImageSave::SaveImage(cv::Mat* image, string filename) const {
 
     auto outFile = "./images/_" + to_string(timeStamp_) + '-' + filename + '.' + (!utils::StringTools::endsWith(filename, m_FileExtensions.at(saveType_)) ? m_FileExtensions.at(saveType_) : "");
 
-    if (!file::isNameLegal(outFile)) {
+    if (!file::is_name_legal(outFile)) {
         throw InvalidFileException("Invalid filename for " + outFile);
     }
 

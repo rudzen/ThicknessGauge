@@ -165,7 +165,7 @@ void ThicknessGauge::initCalibrationSettings(string fileName) const {
 void ThicknessGauge::generateGlob(std::string& name) {
     initVideoCapture();
 
-    file::createDirectory(name);
+    file::create_directory(name);
     auto pb_title = "Capturing glob " + name;
 
     ProgressBar pb(frameCount_, pb_title.c_str());

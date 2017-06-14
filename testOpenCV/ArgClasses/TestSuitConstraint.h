@@ -27,7 +27,7 @@ public:
     * \param value - The value that will be checked.
     */
     bool check(const std::string& value) const override {
-        return file::isNameLegal(value) && value != "input";
+        return file::is_name_legal(value) && value != "input";
     }
 
 
