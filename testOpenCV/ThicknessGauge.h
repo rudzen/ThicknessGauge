@@ -129,19 +129,19 @@ public: // basic stuff to extract information
 
 private:
 
-    void computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
+    void computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph);
 
-    void processMatForLine(cv::Mat& org, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) const;
+    void processMatForLine(cv::Mat& org, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) const;
 
-    cv::Rect2d computerMarkingRectangle(shared_ptr<HoughLinesR> hough);
+    cv::Rect2d computerMarkingRectangle(shared_ptr<HoughLinesR>& hough);
 
-    void computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter);
+    void computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr<FilterR>& filter);
 
-    void computerInBetween(shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph);
+    void computerInBetween(shared_ptr<FilterR>& filter, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph);
 
 private: /* helper functions */
 
-    cv::Vec2d computeIntersectionCut(shared_ptr<HoughLinesR> hough);
+    cv::Vec2d computeIntersectionCut(shared_ptr<HoughLinesR>& hough);
 
     static double computeHoughPMinLine(double minLen, cv::Rect2d& rect);
 

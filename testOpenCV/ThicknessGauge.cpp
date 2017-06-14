@@ -291,13 +291,14 @@ void ThicknessGauge::computeMarkingHeight() {
         // do a quick pass of validation before modifying the data
         validate::valid_data(data);
 
-        // adjust line points
-        for (auto& p : data->leftPoints)
+
+        auto adjust_points = [&](cv::Point2d& p) {
             p.y = imageSize_.height - p.y;
-        for (auto& p : data->rightPoints)
-            p.y = imageSize_.height - p.y;
-        for (auto& p : data->centerPoints)
-            p.y = imageSize_.height - p.y;
+        };
+
+        std::for_each(data->leftPoints.begin(), data->leftPoints.end(), adjust_points);
+        std::for_each(data->rightPoints.begin(), data->rightPoints.end(), adjust_points);
+        std::for_each(data->centerPoints.begin(), data->centerPoints.end(), adjust_points);
 
         uint64 time_end = cv::getTickCount();
 
@@ -320,7 +321,7 @@ void ThicknessGauge::computeMarkingHeight() {
  * \param hough The houghlines class
  * \param morph The morphology class
  */
-void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
+void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) {
 
 
     filter_baseline->setKernel(filters::kernel_line_left_to_right);
@@ -521,7 +522,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR> hough, shared
  * \param hough The hough extension class used
  * \param morph The morphology extenstion class used
  */
-void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) const {
+void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) const {
     filter_baseline->setImage(org);
     filter_baseline->doFilter();
 
@@ -540,7 +541,7 @@ void ThicknessGauge::processMatForLine(cv::Mat& org, shared_ptr<HoughLinesPR> ho
  * \param hough The houghline class
  * \return The rectangle which was computed
  */
-cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR> hough) {
+cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hough) {
 
     const std::string window_name = "test marking out";
 
@@ -661,7 +662,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR> houg
  * \param laser The laser class
  * \param filter The custom filter class
  */
-void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<FilterR> filter) {
+void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr<FilterR>& filter) {
 
     // generate frames with marking
     std::vector<cv::Mat> marking_frames;
@@ -791,7 +792,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR> laser, shared_ptr<
 }
 
 [[deprecated("Not really needed anymore, but still hangs around like a bad fruit")]]
-void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<HoughLinesPR> hough, shared_ptr<MorphR> morph) {
+void ThicknessGauge::computerInBetween(shared_ptr<FilterR>& filter, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) {
 
     // temporary function to compute the middle pieces, just for the lulz, not going to be used in calculations (yet).
 
@@ -856,7 +857,7 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR> filter, shared_ptr<Ho
 }
 
 
-cv::Vec2d ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR> hough) {
+cv::Vec2d ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR>& hough) {
     auto left_border = hough->getLeftBorder();
     auto right_border = hough->getRightBorder();
 
