@@ -2,6 +2,7 @@
 
 #include <array>
 #include <ostream>
+#include "Calc/MiniCalc.h"
 
 class ThicknessGaugeData {
 
@@ -14,14 +15,14 @@ protected:
      * easily by pointing.. like..
      * auto frames = frameset[frameset_index].get();
      */
-    typedef struct Frames {
+    struct Frames {
         std::vector<cv::Mat> frames;
         std::vector<double> means;
         std::vector<double> stddevs;
         std::string exp_ext;
         int exp_ms;
 
-        Frames(const std::string& expExt, int expMs)
+        Frames(const std::string& expExt, double expMs)
             : exp_ext(expExt),
               exp_ms(expMs) {
         }
@@ -41,24 +42,22 @@ protected:
          * \brief Computes mean and stddev based on the contained frames.
          */
         void compute() {
-            cv::Scalar mean;
-            cv::Scalar stddev;
             means.clear();
             means.shrink_to_fit();
             means.reserve(frames.size());
             stddevs.clear();
             stddevs.shrink_to_fit();
             stddevs.reserve(frames.size());
+
             for (auto& frame : frames) {
-                // TODO : replace with miniCalc function(s)
-                cv::meanStdDev(frame, mean, stddev);
-                means.emplace_back(mean[0]);
-                stddevs.emplace_back(stddev[0]);
+                cv::Vec2d ms = cvr::computeIntensityMean(frame);
+                means.emplace_back(ms[0]);
+                stddevs.emplace_back(ms[1]);
             }
         }
-    } Frames;
+    };
 
-    std::array<int, 3> exposures = {5000, 20000, 40000};
+    std::array<double, 3> exposures = {5000.0, 20000.0, 40000.0};
     std::array<std::string, 3> expusures_short = {"_5k", "_20k", "_40k"};
     std::vector<std::unique_ptr<Frames>> frameset;
 
@@ -74,7 +73,6 @@ protected:
             frameset.emplace_back(std::move(fra));
         }
         frameset.shrink_to_fit();
-
     }
 
     friend std::ostream& operator<<(std::ostream& os, const std::unique_ptr<Frames> const& obj) {

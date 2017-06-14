@@ -139,7 +139,7 @@ private:
 
 private: /* helper functions */
 
-    cv::Vec2d computeIntersectionCut(shared_ptr<HoughLinesR>& hough);
+    static cv::Vec2d computeIntersectionCut(shared_ptr<HoughLinesR>& hough);
 
     static double computeHoughPMinLine(double minLen, cv::Rect2d& rect);
 

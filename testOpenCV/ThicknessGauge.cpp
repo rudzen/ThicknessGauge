@@ -670,7 +670,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
 
     auto frames = frameset[frame_index].get();
 
-    log_time << cv::format("computeLaserLocations using exposure set %i : %s (%i)", frame_index, frames->exp_ext, frames->exp_ms);
+    log_time << cv::format("computeLaserLocations using exposure set %i : %s (%i)\n", frame_index, frames->exp_ext, frames->exp_ms);
 
     for (auto& frame : frames->frames)
         marking_frames.emplace_back(frame(data->markingRect));
@@ -682,8 +682,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
     auto image_size = marking_frames.front().size();
 
     // local copy of real baseline
-
-    auto base = (data->baseLines[1] + data->baseLines[3]) / 2;
+    auto base = calc::avg_y(data->baseLines);
     log_time << "baseline vector : " << data->baseLines << endl;
 
     cv::Mat tmpOut;

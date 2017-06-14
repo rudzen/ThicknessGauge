@@ -37,7 +37,7 @@
 
 using namespace std;
 
-template <class T>
+template <typename T>
 class v2 {
 public:
     virtual ~v2() = default;
@@ -90,9 +90,23 @@ public:
         y = p.y;
     }
 
+    template <typename Y>
+    explicit v2(cv::Point_<Y>& p) {
+        static_assert(std::is_convertible<Y, T>::value, "Invalid type.");
+        x = static_cast<T>(p.x);
+        y = static_cast<T>(p.y);
+    }
+
     explicit v2(cv::Vec<T, 2>& p) {
-        x = p.x;
-        y = p.y;
+        x = p[0];
+        y = p[1];
+    }
+
+    template <typename Y>
+    explicit v2(cv::Vec<T, 2>& p) {
+        static_assert(std::is_convertible<Y, T>::value, "Invalid type.");
+        x = static_cast<T>(p.x);
+        y = static_cast<T>(p.y);
     }
 
     v2 operator+(const cv::Point_<T>& that) {
@@ -135,8 +149,8 @@ public:
         this->y -= that.y;
     }
 
-    // Operator : Scalarproduct (dotproduct)
     T operator*(const v2& that) {
+        // Operator : Scalarproduct (dotproduct)
         return (x * that.x) + (y * that.y);
     }
 
@@ -149,29 +163,37 @@ public:
         this->y *= that->y;
     }
 
-    //virtual void operator*=(const double k) {
-    //	this->x *= k;
-    //	this->y *= k;
-    //}
-
-    int operator/(const v2& that) {
-        return v2(x, y) * that == 0 ? 1 : 0;
+    template <typename Y>
+    void operator*=(Y k) {
+        static_assert(std::is_arithmetic<Y>::value, "Not a valid type");
+        this->x *= k;
+        this->y *= k;
     }
 
-    int operator<(const v2& that) {
+    template <typename Y>
+    bool operator/(const v2<Y>& that) {
+        static_assert(std::is_arithmetic<Y>::value, "Not a valid type");
+        return this * that == 0 ? true : false;
+    }
+
+    template <typename Y>
+    bool operator<(const v2& that) {
+        static_assert(std::is_arithmetic<Y>::value, "Not a valid type");
         return len() < that.len();
     }
 
-    int operator>(const v2& that) {
+    template <typename Y>
+    bool operator>(const v2& that) {
         return len() > that.len();
     }
 
-    int operator==(const v2& that) {
+    bool operator==(const v2& that) {
         return x == that.x & y == that.y;
     }
 
-    v2 operator!() {
-        return v2<T>(-x, -y);
+    void operator!() {
+        x = -x;
+        y = -y;
     }
 
     v2 project_onto(const v2& that) {
