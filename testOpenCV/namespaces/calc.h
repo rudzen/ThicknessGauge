@@ -658,6 +658,21 @@ namespace calc {
         return maxval(maxval(a, b), c);
     }
 
+    /**
+     * \brief Stupid fast value in-between check
+     * \tparam T Value type of boundries
+     * \param value The value to check
+     * \param lower The lower boundry
+     * \param upper The upper boundry
+     * \return true if value is in between lower and upper
+     */
+    template <typename T>
+    inline
+    bool in_between(int value, T lower, T upper) {
+        static_assert(std::is_integral<T>::value, "invalid type.");
+        return (static_cast<unsigned>(value) - static_cast<unsigned>(lower) < static_cast<unsigned>(upper) - static_cast<unsigned>(lower));
+    }
+
     template <typename T1, typename T2>
     inline
     constexpr double variance_coeff(T1 s, T2 mean) {
