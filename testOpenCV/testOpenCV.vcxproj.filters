@@ -150,11 +150,11 @@
     <ClCompile Include="namespaces\filesystem.cpp">
       <Filter>Source Files\Namespaces</Filter>
     </ClCompile>
-    <ClCompile Include="namespaces\filters.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="namespaces\calc.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Namespaces</Filter>
+    </ClCompile>
+    <ClCompile Include="namespaces\filters.h">
+      <Filter>Source Files\Namespaces</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -333,13 +333,13 @@
       <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
     <ClInclude Include="namespaces\sort.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="namespaces\validate.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
     <ClInclude Include="Exceptions\ThrowAssert.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="namespaces\validate.h">
+      <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
