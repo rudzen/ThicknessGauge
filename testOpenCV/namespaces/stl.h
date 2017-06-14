@@ -17,12 +17,6 @@ namespace stl {
         destination.insert(destination.begin(), source.begin(), source.end());
     }
 
-    //template <typename T>
-    //void copyVector(const T& source, T& destination) {
-    //    destination.reserve(source.size() + destination.size());
-    //    destination.insert(destination.begin(), source.begin(), source.end());
-    //}
-
     template <typename T>
     inline
     void sort_contours(std::vector<std::vector<cv::Point_<T>>>& contours) {
