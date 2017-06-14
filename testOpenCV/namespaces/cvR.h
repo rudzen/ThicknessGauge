@@ -225,6 +225,55 @@ namespace cvr {
     int highest_y_in_image(cv::Mat& image);
 
     /**
+     * \brief Crude cutoff of pixels from image based on Y
+     * \param image The image data
+     * \param output The output vector
+     * \param y_limit The limit in height
+     * \return true if something was found, otherwise false
+     */
+    template <typename T>
+    inline
+    bool get_pix_above_y(cv::Mat& image, std::vector<cv::Point_<T>>& output, int y_limit) {
+        static_assert(std::is_arithmetic<T>::value, "Incompatible types for element extraction.");
+
+        std::vector<cv::Point> result;
+        cv::findNonZero(image, result);
+        y_limit = abs(image.rows - y_limit);
+        for (auto& p : result) {
+            if (p.y <= y_limit)
+                output.emplace_back(p);
+        }
+        return !output.empty();
+    }
+
+    /**
+     * \brief Crude cutoff of pixels from image based on Y
+     * \param pixels The image data in vector of pixels
+     * \param target The output vector
+     * \param y_limit The limit in height
+     * \return true if something was found, otherwise false
+     */
+    template <typename T>
+    inline
+    bool get_pix_above_y(std::vector<cv::Point_<T>>& pixels, std::vector<cv::Point_<T>>& target, double y_limit, double image_height) {
+        static_assert(std::is_arithmetic<T>::value, "Incompatible types for element extraction.");
+
+        if (!target.empty())
+            target.clear();
+
+        y_limit = abs(image_height - y_limit);
+
+        target.reserve(calc::round(y_limit));
+
+        for (auto& p : pixels) {
+            if (p.y <= y_limit)
+                target.emplace_back(p);
+        }
+
+        return !target.empty();
+    }
+
+    /**
      * \brief Converts an image type to string
      * \param type The type to convert
      * \return The type as string

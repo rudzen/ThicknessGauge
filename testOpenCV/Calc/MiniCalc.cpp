@@ -58,29 +58,4 @@ bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::
     return true;
 }
 
-bool MiniCalc::getActualPixels(cv::Mat& image, vi& output, int y_limit) {
-    vi result;
-    cv::findNonZero(image, result);
-    y_limit = abs(image.rows - y_limit);
-    for (auto& p : result) {
-        if (p.y <= y_limit)
-            output.emplace_back(p);
-    }
-    return !output.empty();
-}
 
-bool MiniCalc::getActualPixels(vi& pixels, vi& target, double y_limit, double image_height) {
-    if (!target.empty())
-        target.clear();
-
-    y_limit = abs(image_height - y_limit);
-
-    target.reserve(cvRound(y_limit));
-
-    for (auto& p : pixels) {
-        if (p.y <= y_limit)
-            target.emplace_back(p);
-    }
-
-    return !target.empty();
-}

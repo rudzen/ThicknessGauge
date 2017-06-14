@@ -16,10 +16,9 @@ namespace tg {
         default: ;
         }
         return os;
-
     }
 
-    std::ostream& operator<<(std::ostream& os, LogTime lt) {
+    std::ostream& operator<<(std::ostream& os, const LogTime lt) {
 
         os << '[';
 

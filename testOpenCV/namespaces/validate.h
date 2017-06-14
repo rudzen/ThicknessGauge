@@ -21,7 +21,7 @@ namespace validate {
      */
     template <typename T>
     inline
-    bool validate_rect(cv::Rect_<T>& rect) {
+    bool validate_rect(const cv::Rect_<T>& rect) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
         auto valid_rectangle = [rect]()-> bool {
@@ -40,7 +40,7 @@ namespace validate {
      */
     template <typename T>
     inline
-    bool validate_rect(cv::Rect_<T>& rect, cv::Mat& boundry) {
+    bool validate_rect(const cv::Rect_<T>& rect, const cv::Mat& boundry) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
         auto valid_rectangle = [rect](cv::Rect_<T>& boundry)-> bool {
@@ -73,11 +73,7 @@ namespace validate {
         if (vec.empty())
             return false;
 
-        auto valid_pix = [](cv::Point_<T>& p) {
-            return p.x >= 0 && p.y >= 0;
-        };
-
-        auto it = find_if(vec.begin(), vec.end(), valid_pix);
+        auto it = find_if(vec.begin(), vec.end(), [](cv::Point_<T>& p) { return p.x >= 0 && p.y >= 0; });
 
         return it != vec.end();
 
@@ -85,7 +81,7 @@ namespace validate {
 
     template <typename T, int cn>
     inline
-    bool valid_vec2(cv::Vec<T, cn>& v) {
+    bool valid_vec2(const cv::Vec<T, cn>& v) {
         for (auto i = 0; i < cn; i++)
             if (v[i] < 0)
                 return false;
@@ -101,7 +97,7 @@ namespace validate {
      */
     template <typename T>
     inline
-    bool valid_data(std::shared_ptr<tg::Data<T>> data) {
+    bool valid_data(const std::shared_ptr<tg::Data<T>>& data) {
 
         // logging is temporary !
         using namespace tg;

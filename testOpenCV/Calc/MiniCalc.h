@@ -33,16 +33,7 @@ public:
         return true;
     }
 
-    /**
-     * \brief Crude cutoff of pixels from image based on Y
-     * \param image The image data
-     * \param output The output vector
-     * \param y_limit The limit in height
-     * \return true if something was found, otherwise false
-     */
-    static bool getActualPixels(cv::Mat& image, vi& output, int y_limit);
 
-    static bool getActualPixels(vi& pixels, vi& target, double y_limit, double image_height);
 
 
 
