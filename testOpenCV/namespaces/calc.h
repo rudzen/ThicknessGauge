@@ -27,6 +27,14 @@ namespace calc {
 
     namespace line {
 
+        /**
+         * \brief Adjusts the baselines according to intersection points and specified buffer
+         * \tparam T1 Type one, should be, must be floating point
+         * \tparam T2 Type two, must be identicala type to Type one
+         * \param base_lines The baseline
+         * \param intersection_points The intersection points
+         * \param buffer The buffer to add to left side and substract from right side
+         */
         template <typename T1, typename T2>
         inline
         void adjust_base_lines(cv::Vec<T1, 4>& base_lines, cv::Vec<T1, 4>& intersection_points, T2 buffer) {
@@ -37,14 +45,6 @@ namespace calc {
             base_lines[2] = intersection_points[2] + buffer;
 
         }
-
-        /**
-* \brief Adjusts the baselines according to intersection points and specified buffer
-* \param base_lines The baseline
-* \param intersection_points The intersection points
-* \param buffer The buffer
-*/
-
 
     }
 
@@ -464,6 +464,12 @@ namespace calc {
     }
 
 
+    /**
+     * \brief Calculates the avg of all the Y values in the vector of points
+     * \tparam T The type of the points
+     * \param vec The vector containing the points
+     * \return 0.0 if vector is empty, else the avg of the Y values for all the points
+     */
     template <typename T>
     inline
     double avg_y(std::vector<cv::Point_<T>>& vec) {
@@ -480,6 +486,12 @@ namespace calc {
         return sum / vec.size();
     }
 
+    /**
+     * \brief Calculates the avg of all the X values in the vector of points
+     * \tparam T The type of the points
+     * \param vec The vector containing the points
+     * \return 0.0 if vector is empty, else the avg of the X values for all the points
+     */
     template <typename T, int cn>
     inline
     double avg_y(cv::Vec<T, cn>& vec) {
