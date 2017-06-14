@@ -21,7 +21,7 @@ class LineConfig {
      * DIST_WELSCH	= distance = c^2/2(1-exp(-(x/c)^2)), c = 2.9846
      * DIST_HUBER	= distance = |x|<c ? x^2/2 : c(|x|-c/2), c=1.345 
      */
-    int distType_;
+    cv::DistanceTypes distType_;
 
     /**
      * \brief Numerical parameter ( C ) for some types of distances. If it is 0, an optimal value is chosen.
@@ -39,7 +39,7 @@ class LineConfig {
     double aepa_;
 
 public:
-    LineConfig(const int distType, const double params, const double reps, const double aepa)
+    LineConfig(const cv::DistanceTypes distType, const double params, const double reps, const double aepa)
         : distType_(distType),
           params_(params),
           reps_(reps),
@@ -53,11 +53,11 @@ public:
         : distType_(cv::DIST_L12), params_(0.0), reps_(0.01), aepa_(0.01) {
     }
 
-    int getDistType() const {
+    cv::DistanceTypes getDistType() const {
         return distType_;
     }
 
-    void setDistType(int distType) {
+    void setDistType(cv::DistanceTypes distType) {
         distType_ = distType;
     }
 

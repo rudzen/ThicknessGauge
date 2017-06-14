@@ -38,12 +38,12 @@ namespace calc {
 
         }
 
-                /**
- * \brief Adjusts the baselines according to intersection points and specified buffer
- * \param base_lines The baseline
- * \param intersection_points The intersection points
- * \param buffer The buffer
- */
+        /**
+* \brief Adjusts the baselines according to intersection points and specified buffer
+* \param base_lines The baseline
+* \param intersection_points The intersection points
+* \param buffer The buffer
+*/
 
 
     }
@@ -644,6 +644,14 @@ namespace calc {
     T maxval(T a, T b, T c) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return maxval(maxval(a, b), c);
+    }
+
+    template <typename T1, typename T2>
+    inline
+    constexpr double variance_coeff(T1 s, T2 mean) {
+        static_assert(std::is_same<T1, double>::value, "s must be double floating point.");
+        static_assert(std::is_convertible<T1, T2>::value, "s and mean must be convertible.");
+        return s / mean * 100.0;
     }
 
 }

@@ -34,4 +34,35 @@ namespace cvr {
         return r;
     }
 
+    double computeIntensityMean(cv::Mat& image) {
+
+        std::vector<cv::Mat> channels;
+        cv::split(image, channels);
+        auto m = cv::mean(channels[0]);
+
+        return m[0];
+
+    }
+
+    cv::Vec2d intensityStdDev(cv::Mat& image) {
+
+        cv::Scalar mean;
+        cv::Scalar stdDev;
+        cv::meanStdDev(image, mean, stdDev);
+
+        return cv::Vec2d(mean[0], stdDev[0]);
+
+    }
+
+    cv::Vec4i getMinMaxLoc(cv::Mat& image, double minVal, double maxVal) {
+
+        cv::Point minLoc;
+        cv::Point maxLoc;
+
+        cv::minMaxLoc(image, &minVal, &maxVal, &minLoc, &maxLoc);
+
+        return cv::Vec4i(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
+
+    }
+
 }

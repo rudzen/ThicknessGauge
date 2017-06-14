@@ -291,7 +291,6 @@ void ThicknessGauge::computeMarkingHeight() {
         // do a quick pass of validation before modifying the data
         validate::valid_data(data);
 
-
         auto adjust_points = [&](cv::Point2d& p) {
             p.y = imageSize_.height - p.y;
         };
@@ -322,7 +321,6 @@ void ThicknessGauge::computeMarkingHeight() {
  * \param morph The morphology class
  */
 void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) {
-
 
     filter_baseline->setKernel(filters::kernel_line_left_to_right);
 
@@ -368,6 +366,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
 
     //frame pointer for the desired frame set
     unsigned int frame_index = 2;
+
     auto frames = frameset[frame_index].get();
 
     log_time << cv::format("computeBaseLineAreas using exposure set %i : %s (%i)\n", frame_index, frames->exp_ext, frames->exp_ms);

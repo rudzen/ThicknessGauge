@@ -27,4 +27,43 @@ namespace cvr {
         marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
     }
 
+    template <typename T1, typename T2>
+    inline
+    void gather_elemenents_x(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 x) {
+        for (auto& e : input)
+            if (e.x == x)
+                output.emplace_back(e);
+    }
+
+    template <typename T1, typename T2>
+    inline
+    void gather_elemenents_y(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 y) {
+        for (auto& e : input)
+            if (e.y == y)
+                output.emplace_back(e);
+    }
+
+    /**
+     * \brief Computes the average (mean) intensity of the entire image
+     * \param image The image to calculate meaned intensity of
+     * \return the avg
+     */
+    double computeIntensityMean(cv::Mat& image);
+
+    /**
+     * \brief Computes the average (mean) intensity and the standard deviation of the same of the entire image
+     * \param image The image to calculate meaned intensity and standard deviation of the mean on
+     * \return the avg as a 2d double precision float vector
+     */
+    cv::Vec2d intensityStdDev(cv::Mat& image);
+
+    /**
+     * \brief Retrieve the location of both the minimum and the maximum point in an image
+     * \param image The image to perform the operation on
+     * \param minVal The minimum value acceptable
+     * \param maxVal The maximum value acceptable
+     * \return 4d vector with both points
+     */
+    cv::Vec4i getMinMaxLoc(cv::Mat& image, double minVal, double maxVal);
+
 }
