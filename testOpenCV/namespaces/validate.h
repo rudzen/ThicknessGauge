@@ -99,8 +99,9 @@ namespace validate {
      * \param data Pointer for the data
      * \return true if a-okay, otherwise false
      */
+    template <typename T>
     inline
-    bool valid_data(std::shared_ptr<tg::Data> data) {
+    bool valid_data(std::shared_ptr<tg::Data<T>> data) {
 
         // logging is temporary !
         using namespace tg;
@@ -110,20 +111,25 @@ namespace validate {
 
         size_t failures = 0;
 
-        if (data->globName.empty())
-        log_time << cv::format("Val: globName failed [%i], name = %s\n", ++failures, data->globName);
+        if (data->globName.empty()) {
+            log_time << cv::format("Val: globName failed [%i], name = %s\n", ++failures, data->globName);
+        }
 
-        if (data->cameraPtr == nullptr)
-        log_time << cv::format("Val: cameraPtr failed [%i], == nullptr\n", ++failures);
+        if (data->cameraPtr == nullptr) {
+            log_time << cv::format("Val: cameraPtr failed [%i], == nullptr\n", ++failures);
+        }
 
-        if (!valid_pix_vec(data->centerPoints))
-        log_time << cv::format("Val: centerPoints failed [%i], size == %i\n", ++failures, data->centerPoints.size());
+        if (!valid_pix_vec(data->centerPoints)) {
+            log_time << cv::format("Val: centerPoints failed [%i], size == %i\n", ++failures, data->centerPoints.size());
+        }
 
-        if (!valid_pix_vec(data->leftPoints))
-        log_time << cv::format("Val: leftPoints failed [%i], size = %i\n", ++failures, data->leftPoints.size());
+        if (!valid_pix_vec(data->leftPoints)) {
+            log_time << cv::format("Val: leftPoints failed [%i], size = %i\n", ++failures, data->leftPoints.size());
+        }
 
-        if (!valid_pix_vec(data->rightPoints))
-        log_time << cv::format("rightPoints failed, size = %i\n", data->rightPoints.size());
+        if (!valid_pix_vec(data->rightPoints)) {
+            log_time << cv::format("rightPoints failed, size = %i\n", data->rightPoints.size());
+        }
 
         if (!valid_vec2(data->pointsStart)) {
             log_time << cv::format("pointsStart failed, data = %d,%d,%d\n", data->pointsStart[0], data->pointsStart[1], data->pointsStart[2]);
@@ -133,35 +139,33 @@ namespace validate {
             log_time << cv::format("leftBorder failed, data = %d,%d,%d,%d\n", data->leftBorder[0], data->leftBorder[1], data->leftBorder[2], data->leftBorder[3]);
         }
 
-        //if (!valid_vec2(data->rightBorder)) {
-        //    failures.append(cv::format("rightBorder failed, data = %d,%d,%d,%d\n", data->rightBorder[0], data->rightBorder[1], data->rightBorder[2], data->rightBorder[3]));
-        //}
+        if (!valid_vec2(data->rightBorder)) {
+            log_time << cv::format("rightBorder failed, data = %d,%d,%d,%d\n", data->rightBorder[0], data->rightBorder[1], data->rightBorder[2], data->rightBorder[3]);
+        }
 
-        //if (!valid_vec2(data->centerLine)) {
-        //    failures.append(cv::format("centerLine failed, data = %d,%d,%d,%d\n", data->centerLine[0], data->centerLine[1], data->centerLine[2], data->centerLine[3]));
-        //}
+        if (!valid_vec2(data->centerLine)) {
+            log_time << cv::format("centerLine failed, data = %d,%d,%d,%d\n", data->centerLine[0], data->centerLine[1], data->centerLine[2], data->centerLine[3]);
+        }
 
-        //if (data->leftAvg < 0.0)
-        //    failures.append(cv::format("leftAvg failed, data = %f\n", data->leftAvg));
+        if (data->leftAvg < 0.0) {
+            log_time << cv::format("leftAvg failed, data = %f\n", data->leftAvg);
+        }
 
-        //if (data->centerAvg < 0.0)
-        //    failures.append(cv::format("centerAvg failed, data = %f\n", data->centerAvg));
+        if (data->centerAvg < 0.0) {
+            log_time << cv::format("centerAvg failed, data = %f\n", data->centerAvg);
+        }
 
-        //if (data->rightAvg < 0.0)
-        //    failures.append(cv::format("rightAvg failed, data = %f\n", data->rightAvg));
+        if (data->rightAvg < 0.0) {
+            log_time << cv::format("rightAvg failed, data = %f\n", data->rightAvg);
+        }
 
-        //if (data->difference < 0.0)
-        //    failures.append(cv::format("difference failed, data = %f\n", data->difference));
-
-        //if (failures.empty())
-        //    return true;
-
-        if (failures == 0)
-            return true;
+        if (data->difference < 0.0) {
+            log_time << cv::format("difference failed, data = %f\n", data->difference);
+        }
 
         log_time << cv::format("Val: Failures = %i\n", failures);
 
-        return false;
+        return failures == 0;
     }
 
 #endif

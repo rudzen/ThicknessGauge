@@ -32,25 +32,48 @@ namespace tg {
 
     enum class FilterKernels { Simple3x3, Horizontal10x10 };
 
-    using Data = struct Data {
+    enum class ValidationStatus { SUCESS, FAIL, ACCEPTABLE };
+
+    enum class DataMemberIndex {
+        CenterPoints,
+        LeftPoints,
+        RightPoints,
+        PointsStart,
+        CameraData,
+        CameraPtr,
+        GlobName,
+        MarkingRect,
+        LeftBorder,
+        RightBorder,
+        CenterLine,
+        BaseLines,
+        Intersections,
+        IntersectionCuts,
+        MiddlePieces,
+        LeftAvg,
+        CenterAvg,
+        RightAvg,
+        Difference
+    };
+
+
+    typedef std::tuple<DataMemberIndex, bool, ValidationStatus, std::string> ValidationResult;
+
+    template <class T>
+    class Data {
+    public:
 
         // the points of the laser on the marking
-        std::vector<cv::Point2d> centerPoints;
+        std::vector<cv::Point_<T>> centerPoints;
 
         // the points thwere the laser hits ground zero on the LEFT side of the marking
-        std::vector<cv::Point2d> leftPoints;
+        std::vector<cv::Point_<T>> leftPoints;
 
         // the points thwere the laser hits ground zero on the RIGHT side of the marking
-        std::vector<cv::Point2d> rightPoints;
-
-        // the missing link to the left
-        std::vector<cv::Point2d> middleLeft;
-
-        // the missing link to the right
-        std::vector<cv::Point2d> middleRight;
+        std::vector<cv::Point_<T>> rightPoints;
 
         // start location for the 3 point vectors
-        cv::Vec3d pointsStart;
+        cv::Vec<T, 3> pointsStart;
 
         // the camera meta data
         std::unique_ptr<CameraData> cameraData = std::make_unique<CameraData>();
@@ -62,39 +85,74 @@ namespace tg {
         std::string globName;
 
         // the rectangle which includes the entire marking
-        cv::Rect2d markingRect;
+        cv::Rect_<T> markingRect;
 
         // left border vector
-        cv::Vec4d leftBorder;
+        cv::Vec<T, 4> leftBorder;
 
         // right border vector
-        cv::Vec4d rightBorder;
+        cv::Vec<T, 4> rightBorder;
 
         // the base lines where the laser hits the actual ground-zero
-        cv::Vec4d baseLines;
+        cv::Vec<T, 4> baseLines;
 
         // the locations for where the base lines intersect with the marking border
-        cv::Vec4d intersections;
+        cv::Vec<T, 4> intersections;
 
         // enclusure of the laser line
-        cv::Vec4d centerLine;
+        cv::Vec<T, 4> centerLine;
 
         // the points where the intersections are cut.
         // adjusted so potential unwanted information is not included in further calculations
-        cv::Vec2d intersectionCuts;
+        cv::Vec<T, 2> intersectionCuts;
 
         // the x coordinates for the pieces that are cut out.
-        cv::Vec4d middlePieces;
+        cv::Vec<T, 4> middlePieces;
+
+        // validation results for the individual members of this structure
+        std::vector<ValidationResult> validationResults;
+
+        // overall validation status for this structure
+        ValidationStatus status;
 
         // the avg
-        double leftAvg;
-        double leftMiddleAvg;
-        double centerAvg;
-        double rightMiddleAvg;
-        double rightAvg;
+        T leftAvg;
+        T leftMiddleAvg;
+        T centerAvg;
+        T rightMiddleAvg;
+        T rightAvg;
 
         // the difference between the baseline(s) and the laser line on the marking in sub-pixels
-        double difference;
+        T difference;
+
+        static std::string DataMemberName(DataMemberIndex index) {
+            switch (index) {
+            case DataMemberIndex::CenterPoints: return "CenterPoints";
+            case DataMemberIndex::LeftPoints: return "LeftPoints";
+            case DataMemberIndex::RightPoints: return "RightPoints";
+            case DataMemberIndex::PointsStart: return "PointsStart";
+            case DataMemberIndex::CameraData: return "CameraData";
+            case DataMemberIndex::CameraPtr: return "CameraPtr";
+            case DataMemberIndex::GlobName: return "GlobName";
+            case DataMemberIndex::MarkingRect: return "MarkingRect";
+            case DataMemberIndex::LeftBorder: return "LeftBorder";
+            case DataMemberIndex::RightBorder: return "RightBorder";
+            case DataMemberIndex::BaseLines: return "BaseLines";
+            case DataMemberIndex::Intersections: return "Intersections";
+            case DataMemberIndex::IntersectionCuts: return "IntersectionCuts";
+            case DataMemberIndex::MiddlePieces: return "MiddlePieces";
+            case DataMemberIndex::LeftAvg: return "LeftAvg";
+            case DataMemberIndex::CenterAvg: return "CenterAvg";
+            case DataMemberIndex::RightAvg: return "RightAvg";
+            case DataMemberIndex::Difference: return "Difference";
+            default: return "feeeeek";
+            }
+        }
+
+        inline
+        void addValidationResult(DataMemberIndex index, bool ok, ValidationStatus validation, std::string information) {
+            validationResults.emplace_back(ValidationResult(index, ok, validation, information));
+        }
 
     };
 

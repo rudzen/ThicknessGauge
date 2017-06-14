@@ -31,12 +31,13 @@ using namespace tg;
 /*
 The main controller class
 */
+
 class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
 
     ThicknessGauge(int frameCount, bool showWindows, bool saveVideo, int binaryThreshold, int lineThreshold)
-        : data(new Data()), frameCount_(frameCount),
+        : data(std::make_shared<Data<double>>()), frameCount_(frameCount),
           showWindows_(showWindows),
           saveVideo_(saveVideo),
           binaryThreshold_(binaryThreshold),
@@ -51,12 +52,12 @@ public:
     //}
 
 
-    std::shared_ptr<Data> data; // there can be only one!
+    std::shared_ptr<Data<double>> data; // there can be only one!
 
 public: // data return point
-
-    Data* getData() const {
-        return data.get();
+    template <typename T>
+    std::shared_ptr<Data<T>> getData() const {
+        return data;
     }
 
     //AVT::VmbAPI::CameraPtr* getCamera() const {

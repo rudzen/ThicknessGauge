@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
 
             thicknessGauge->computeMarkingHeight();
 
-            auto data = thicknessGauge->getData(); // virker :-)
+            auto data = thicknessGauge->getData<double>(); // virker :-)
 
             thicknessGauge->saveData("output_mufmuf");
 
