@@ -23,6 +23,7 @@ namespace cvr {
     template <typename T>
     inline
     void adjust_marking_rect(cv::Rect_<T>& marking_rect, cv::Vec<T, 4>& intersection_points, T buffer) {
+        static_assert(std::is_floating_point<T>::value, "Marking rectangles should only be treated as floating points.");
         marking_rect.x = intersection_points[0] + buffer;
         marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
     }
@@ -41,6 +42,22 @@ namespace cvr {
         for (auto& e : input)
             if (e.y == y)
                 output.emplace_back(e);
+    }
+
+    template <typename T1, typename T2>
+    inline
+    void gather_elements_y(cv::Mat& image, std::vector<cv::Point_<T1>>& out, T2 y) {
+        static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "Invalid type for element extration.");
+        static_assert(std::is_convertible<T1, T2>::value, "Incompatible types for element extraction.");
+        cv::findNonZero(image(cv::Rect(0, y, image.cols, 1)), out);
+    }
+
+    template <typename T1, typename T2>
+    inline
+    void gather_elements_x(cv::Mat& image, std::vector<cv::Point_<T1>>& out, T2 x) {
+        static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "Invalid type for element extration.");
+        static_assert(std::is_convertible<T1, T2>::value, "Incompatible types for element extraction.");
+        cv::findNonZero(image(cv::Rect(x, 0, 1, image.rows)), out);
     }
 
     /**

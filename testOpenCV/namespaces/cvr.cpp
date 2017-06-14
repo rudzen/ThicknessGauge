@@ -31,7 +31,7 @@ namespace cvr {
         r += "C";
         r += (chans + '0');
 
-        return r;
+        return std::string(r);
     }
 
     double computeIntensityMean(cv::Mat& image) {
@@ -44,24 +44,30 @@ namespace cvr {
 
     }
 
-    cv::Vec2d intensityStdDev(cv::Mat& image) {
+    template <typename T>
+    inline
+    cv::Vec<T, 2> intensityStdDev(cv::Mat& image) {
+        static_assert(std::is_floating_point<T>::value, "Only floating points makes sense");
 
         cv::Scalar mean;
         cv::Scalar stdDev;
         cv::meanStdDev(image, mean, stdDev);
 
-        return cv::Vec2d(mean[0], stdDev[0]);
+        return cv::Vec<T, 2>(mean[0], stdDev[0]);
 
     }
 
-    cv::Vec4i getMinMaxLoc(cv::Mat& image, double minVal, double maxVal) {
+    template <typename T>
+    inline
+    cv::Vec<T, 4> getMinMaxLoc(cv::Mat& image, double minVal, double maxVal) {
+        static_assert(std::is_integral<T>::value, "Only integral type is allowed.");
 
         cv::Point minLoc;
         cv::Point maxLoc;
 
         cv::minMaxLoc(image, &minVal, &maxVal, &minLoc, &maxLoc);
 
-        return cv::Vec4i(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
+        return cv::Vec<T, 4>(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
 
     }
 

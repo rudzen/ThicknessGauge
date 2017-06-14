@@ -110,15 +110,9 @@ int main(int argc, char** argv) {
 
             thicknessGauge->saveData("output_mufmuf");
 
-            log_timedate << cv::format("difference: %f\n", data->difference);
+            log_time << cv::format("difference: %f\n", data->difference);
 
-            //auto result = c.findMarkingLinePairs_(globName);
-            //log_time << result << endl;
-            //returnValue = result.first.x != 0;
-            //returnValue = c.generatePlanarImage(globName);
-            //if (returnValue) {
             log_time << "done..\n";
-            //}
         } else if (options.isCalibrationMode()) {
             throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
         } else if (options.isTestMode()) {
