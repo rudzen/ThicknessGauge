@@ -6,25 +6,6 @@ MiniCalc::MiniCalc() {
 MiniCalc::~MiniCalc() {
 }
 
-int MiniCalc::highestPixelInLine(cv::Mat& image) const {
-    auto const halfImageY = image.size().height / 2;
-
-    vector<vector<cv::Point>> contours;
-    findContours(image, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-
-    cv::Rect highestRect(0, 0, 0, 0);
-
-    for (auto i = 0; i < contours.size(); ++i) {
-        auto r = boundingRect(contours[i]);
-        if (/* halfImageY < r.y && */ r.y > highestRect.y) {
-            highestRect = r;
-        }
-        //cout << r << endl;
-    }
-
-    return highestRect.y;
-}
-
 [[deprecated("not really used anymore, but could still prove useful in the future")]]
 bool MiniCalc::generatePlanarPixels(cv::Mat& input, cv::Mat& output, vector<cv::Point2f>& pixels, vector<cv::Point2f>& gradient_pixels) const {
 

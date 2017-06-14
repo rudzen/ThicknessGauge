@@ -34,8 +34,22 @@ namespace cvr {
         return std::string(r);
     }
 
+    int highest_y_in_image(cv::Mat& image) {
 
+        std::vector<std::vector<cv::Point>> contours;
 
+        findContours(image, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+        cv::Rect highest(0, 0, 0, 0);
+
+        for (auto& c : contours) {
+            auto r = cv::boundingRect(c);
+            if (r.y > highest.y)
+                highest = r;
+        }
+
+        return highest.y;
+    }
 
 
 }

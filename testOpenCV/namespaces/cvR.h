@@ -14,10 +14,6 @@
 // helper functions for open cv related stuff.
 namespace cvr {
 
-    
-
-    std::string type2str(int type);
-
     /**
     * \brief Adjust the marking rectangle based on the intersection points and specified buffer
     * \param marking_rect The rectangle to adjust
@@ -30,38 +26,6 @@ namespace cvr {
         static_assert(std::is_floating_point<T>::value, "Marking rectangles should only be treated as floating points.");
         marking_rect.x = intersection_points[0] + buffer;
         marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
-    }
-
-    template <typename T1, typename T2>
-    inline
-    void gather_elemenents_x(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 x) {
-        for (auto& e : input)
-            if (e.x == x)
-                output.emplace_back(e);
-    }
-
-    template <typename T1, typename T2>
-    inline
-    void gather_elemenents_y(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 y) {
-        for (auto& e : input)
-            if (e.y == y)
-                output.emplace_back(e);
-    }
-
-    template <typename T1, typename T2>
-    inline
-    void gather_elements_y(cv::Mat& image, std::vector<cv::Point_<T1>>& out, T2 y) {
-        static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "Invalid type for element extration.");
-        static_assert(std::is_convertible<T1, T2>::value, "Incompatible types for element extraction.");
-        cv::findNonZero(image(cv::Rect(0, y, image.cols, 1)), out);
-    }
-
-    template <typename T1, typename T2>
-    inline
-    void gather_elements_x(cv::Mat& image, std::vector<cv::Point_<T1>>& out, T2 x) {
-        static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "Invalid type for element extration.");
-        static_assert(std::is_convertible<T1, T2>::value, "Incompatible types for element extraction.");
-        cv::findNonZero(image(cv::Rect(x, 0, 1, image.rows)), out);
     }
 
     /**
@@ -80,7 +44,6 @@ namespace cvr {
         return m[0];
 
     }
-
 
     /**
      * \brief Computes the average (mean) intensity and the standard deviation of the same of the entire image
@@ -126,7 +89,6 @@ namespace cvr {
         return cv::Vec<T1, 4>(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
 
     }
-
 
     /**
      * \brief Computes the gabs in a vector of points and populates them in target vector
@@ -190,5 +152,83 @@ namespace cvr {
 
         return cv::Vec<T, 2>(sum);
     }
+
+    /**
+     * \brief Gather all elements in vector of points that matches a specific X position
+     * \tparam T1 Type of input points and X value
+     * \tparam T2 Type of output points
+     * \param input Input vector to look through
+     * \param output Output vector to copy the elements to
+     * \param x The X value to look for
+     */
+    template <typename T1, typename T2>
+    inline
+    void gather_elemenents_x(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 x) {
+        for (auto& e : input)
+            if (e.x == x)
+                output.emplace_back(e);
+    }
+
+    /**
+     * \brief Gather all elements in an image that matches a specific X position
+     * \tparam T1 Type of input points and X value
+     * \tparam T2 Type of output points
+     * \param image Input image to grab the pixels from
+     * \param out Output vector to copy the elements to
+     * \param x The X value to look for
+     */
+    template <typename T1, typename T2>
+    inline
+    void gather_elements_x(cv::Mat& image, std::vector<cv::Point_<T1>>& out, T2 x) {
+        static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "Invalid type for element extration.");
+        static_assert(std::is_convertible<T1, T2>::value, "Incompatible types for element extraction.");
+        cv::findNonZero(image(cv::Rect(x, 0, 1, image.rows)), out);
+    }
+
+    /**
+     * \brief Gather all elements in vector of points that matches a specific Y position
+     * \tparam T1 Type of input points and Y value
+     * \tparam T2 Type of output points
+     * \param input Input vector to look through
+     * \param output Output vector to copy the elements to
+     * \param y The Y value to look for
+     */
+    template <typename T1, typename T2>
+    inline
+    void gather_elemenents_y(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 y) {
+        for (auto& e : input)
+            if (e.y == y)
+                output.emplace_back(e);
+    }
+
+    /**
+     * \brief Gather all elements in an image that matches a specific Y position
+     * \tparam T1 Type of input points and Y value
+     * \tparam T2 Type of output points
+     * \param image Input image to grab the pixels from
+     * \param out Output vector to copy the elements to
+     * \param y The Y value to look for
+     */
+    template <typename T1, typename T2>
+    inline
+    void gather_elements_y(cv::Mat& image, std::vector<cv::Point_<T1>>& out, T2 y) {
+        static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "Invalid type for element extration.");
+        static_assert(std::is_convertible<T1, T2>::value, "Incompatible types for element extraction.");
+        cv::findNonZero(image(cv::Rect(0, y, image.cols, 1)), out);
+    }
+
+    /**
+     * \brief Locates the highest pixel in the image
+     * \param image The image to look in
+     * \return The Y value of the highest located pixel as int
+     */
+    int highest_y_in_image(cv::Mat& image);
+
+    /**
+     * \brief Converts an image type to string
+     * \param type The type to convert
+     * \return The type as string
+     */
+    std::string type2str(int type);
 
 }
