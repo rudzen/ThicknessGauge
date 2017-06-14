@@ -35,7 +35,7 @@ protected:
             means.clear();
             stddevs.clear();
             exp_ext = "";
-            exp_ms = 0;
+            exp_ms = 0.0;
         }
 
         /**
@@ -49,8 +49,9 @@ protected:
             stddevs.shrink_to_fit();
             stddevs.reserve(frames.size());
 
+            cv::Vec2d ms;
             for (auto& frame : frames) {
-                cv::Vec2d ms = cvr::computeIntensityMean(frame);
+                cvr::compute_intensity_dtd_dev(frame, ms);
                 means.emplace_back(ms[0]);
                 stddevs.emplace_back(ms[1]);
             }

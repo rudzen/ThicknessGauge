@@ -192,10 +192,10 @@ void ThicknessGauge::computeMarkingHeight() {
     try {
 
         // test print for all framesets
-        //for (auto& f: frameset) {
-        //    f->compute();
-        //    log_time << f << endl;
-        //}
+        for (auto& f: frameset) {
+            f->compute();
+            log_time << f << endl;
+        }
 
         uint64 time_start = cv::getTickCount();
 
