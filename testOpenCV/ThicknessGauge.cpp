@@ -14,7 +14,6 @@
 
 #include "CV/CannyR.h"
 #include "CV/HoughLinesR.h"
-#include "CV/Pixel.h"
 #include "CV/FilterR.h"
 #include "CV/HoughLinesPR.h"
 #include "CV/SparseR.h"
@@ -46,7 +45,6 @@ using namespace tg;
  */
 void ThicknessGauge::initialize(std::string& glob_name) {
     data->globName = glob_name;
-    canny->setPixelz(pixels);
     addNulls();
 
     // determin where to get the frames from.
@@ -1165,7 +1163,7 @@ bool ThicknessGauge::getSparseY(cv::Mat& image, vi& output) const {
             }
             highest = 0;
         }
-        auto intensity = Pixelz::getElementIntensity(image, p);
+        auto intensity = pixel::get_intensity(image, p);
         if (intensity >= highest) {
             highest = p.y;
             x = p.x;

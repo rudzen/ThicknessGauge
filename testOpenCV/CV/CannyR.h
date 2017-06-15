@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 #include "BaseR.h"
-#include "Pixel.h"
+#include "../namespaces/pixel.h"
 #include "../namespaces/tg.h"
 
 /*
@@ -29,8 +29,6 @@
 class CannyR : public BaseR {
 
     cv::Mat edges_;
-
-    std::shared_ptr<Pixelz> pPixelz;
 
     int threshold1_;
 
@@ -102,9 +100,6 @@ public:
         return edges_;
     }
 
-    void setPixelz(const std::shared_ptr<Pixelz>& pixelz) {
-        pPixelz = pixelz;
-    }
 };
 
 inline void CannyR::threshold1cb(int value, void* user_data) {
@@ -131,7 +126,7 @@ inline void CannyR::apertureSizecb(int value, void* user_data) {
 inline void CannyR::gradientcb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);
     that->setGradient(value);
-    string boltab[2] = {"false", "true"};
+    std::string boltab[2] = {"false", "true"};
     using namespace tg;
     log_time << cv::format("Canny gradient : %s\n", boltab[static_cast<bool>(value)]);
 }
@@ -141,7 +136,7 @@ inline void CannyR::doCanny() {
     Canny(image_, edges_, threshold1_, threshold2_, apertureSize_, gradient_ > 0);
 
     if (removePepperNoise_)
-        pPixelz->removePepperNoise(image_);
+        pixel::remove_pepper_noise(image_);
 
     if (showWindow_)
         imshow(windowName, edges_);

@@ -11,7 +11,6 @@
 #include "UI/DrawHelper.h"
 
 #include "IO/GlobGenerator.h"
-#include "CV/Pixel.h"
 #include "CV/CannyR.h"
 #include "CV/FilterR.h"
 #include "CV/HoughLinesR.h"
@@ -97,8 +96,6 @@ public:
 
     // the following pointers are public on purpose!
     std::unique_ptr<CalibrationSettings> cs = std::make_unique<CalibrationSettings>();
-
-    std::shared_ptr<Pixelz> pixels = std::make_shared<Pixelz>();
 
     void initialize(std::string& glob_name);
 

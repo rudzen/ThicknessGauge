@@ -156,6 +156,9 @@
     <ClCompile Include="namespaces\filters.h">
       <Filter>Source Files\Namespaces</Filter>
     </ClCompile>
+    <ClCompile Include="namespaces\pixel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -254,9 +257,6 @@
     <ClInclude Include="CV\FilterR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="CV\Pixel.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
     <ClInclude Include="CV\BaseR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
@@ -334,6 +334,9 @@
     </ClInclude>
     <ClInclude Include="CV\LineSparse.h">
       <Filter>Header Files\CV</Filter>
+    </ClInclude>
+    <ClInclude Include="namespaces\pixel.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
