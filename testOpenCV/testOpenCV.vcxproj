@@ -211,8 +211,8 @@
     <ClInclude Include="Histogram\HistoPeak.h" />
     <ClInclude Include="ArgClasses\IntegerConstraint.h" />
     <ClInclude Include="Exceptions\InvalidFileException.h" />
-    <ClInclude Include="LineSparse.h" />
-    <ClInclude Include="LineConfig.h" />
+    <ClInclude Include="CV\LineSparse.h" />
+    <ClInclude Include="CV\LineConfig.h" />
     <ClInclude Include="CV\Pixel.h" />
     <ClInclude Include="namespaces\cvR.h" />
     <ClInclude Include="namespaces\filesystem.h" />

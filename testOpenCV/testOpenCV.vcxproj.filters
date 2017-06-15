@@ -161,9 +161,6 @@
     <ClInclude Include="ThicknessGaugeData.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="LineConfig.h">
-      <Filter>Header Files\CV\Data</Filter>
-    </ClInclude>
     <ClInclude Include="Histogram\Histogram.h">
       <Filter>Header Files\CV\Histogram</Filter>
     </ClInclude>
@@ -263,9 +260,6 @@
     <ClInclude Include="CV\HoughLinesPR.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="LineSparse.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
     <ClInclude Include="_unused_crap\temp_unused.txt">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -334,6 +328,12 @@
     </ClInclude>
     <ClInclude Include="namespaces\validate.h">
       <Filter>Header Files\Namespaces</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\LineConfig.h">
+      <Filter>Header Files\CV\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\LineSparse.h">
+      <Filter>Header Files\CV</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
