@@ -278,7 +278,9 @@ inline void HoughLinesR::computeBorders() {
     cv::Rect2d rightRoi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
 
     computeRectFromLines(leftLines_, leftRoi);
+    throw_assert(validate::validate_rect(leftRoi), "Left ROI rect failed validation!!!");
     computeRectFromLines(rightLines_, rightRoi);
+    throw_assert(validate::validate_rect(rightRoi), "Right ROI rect failed validation!!!");
 
     auto imgHeight = static_cast<double>(image_.rows);
 
@@ -292,13 +294,12 @@ inline void HoughLinesR::computeBorders() {
     leftBorder_[1] = imgHeight;
     leftBorder_[2] = leftRoi.x + leftRoi.width;
     leftBorder_[3] = 0.0f;
+    throw_assert((validate::valid_vec<float, 4>(leftBorder_)), "Left border failed validation!!!");
 
     rightBorder_[0] = rightRoi.x;
     rightBorder_[1] = 0.0f;
     rightBorder_[2] = rightRoi.x + rightRoi.width;
     rightBorder_[3] = imgHeight;
-
-    throw_assert((validate::valid_vec<float, 4>(leftBorder_)), "Left border failed validation!!!");
     throw_assert((validate::valid_vec<float, 4>(rightBorder_)), "Right border failed validation!!!");
 
     if (showWindows_) {

@@ -17,7 +17,8 @@ void HoughLinesR::computeMeta() {
     auto center = image_.cols / 2;
 
     for (auto& a : allLines_) {
-        a.slobe = (a.entry[3] - a.entry[1]) / (a.entry[2] - a.entry[0]);
+        a.slobe = calc::slope(a.entry[0], a.entry[2], a.entry[2], a.entry[3]);
+        //a.slobe = (a.entry[3] - a.entry[1]) / (a.entry[2] - a.entry[0]);
         if (a.points.first.x < center)
             leftLines_.emplace_back(a);
         else
@@ -27,6 +28,7 @@ void HoughLinesR::computeMeta() {
     auto lSize = leftLines_.size();
     auto rSize = rightLines_.size();
 
+    // TODO : replace with throw asserts ?
     if (lSize + rSize == 0)
         throw NoLineDetectedException("No marking lines detected.");
 
