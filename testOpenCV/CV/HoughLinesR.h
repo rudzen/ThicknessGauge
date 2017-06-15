@@ -7,8 +7,10 @@
 #include "BaseR.h"
 #include "../namespaces/tg.h"
 #include "../namespaces/calc.h"
+#include "../namespaces/validate.h"
 
 #include "Exceptions/NoLineDetectedException.h"
+#include "Exceptions/ThrowAssert.h"
 
 /*
    |  __
@@ -74,12 +76,8 @@ public:
     } LineV;
 
     struct lineVsizeSort {
-        bool operator()(LineV l1, LineV l2) const { return l1.elements.size() < l2.elements.size(); }
+        bool operator()(LineV& l1, LineV& l2) const { return l1.elements.size() < l2.elements.size(); }
     } lineVsizeSort;
-
-    struct lineVYSort {
-        bool operator()(cv::Point2f p1, cv::Point2f p2) const { return p1.y < p2.y; }
-    } lineVYSort;
 
 private:
 
@@ -191,7 +189,7 @@ private:
         if (theta == 0)
             theta++;
         this->theta_ = theta;
-        angle_ = degree * theta;
+        angle_ = calc::DEGREES * theta;
     }
 
     void setThreshold(int threshold) {
@@ -288,6 +286,7 @@ inline void HoughLinesR::computeBorders() {
     markingRect.y = leftRoi.y;
     markingRect.width = rightRoi.x - leftRoi.x + rightRoi.width;
     markingRect.height = imgHeight;
+    throw_assert(validate::validate_rect(markingRect), "Marking rect failed validation!!!");
 
     leftBorder_[0] = leftRoi.x;
     leftBorder_[1] = imgHeight;
@@ -298,6 +297,9 @@ inline void HoughLinesR::computeBorders() {
     rightBorder_[1] = 0.0f;
     rightBorder_[2] = rightRoi.x + rightRoi.width;
     rightBorder_[3] = imgHeight;
+
+    throw_assert((validate::valid_vec<float, 4>(leftBorder_)), "Left border failed validation!!!");
+    throw_assert((validate::valid_vec<float, 4>(rightBorder_)), "Right border failed validation!!!");
 
     if (showWindows_) {
         drawLine(leftBorder_);
@@ -310,19 +312,22 @@ inline void HoughLinesR::computeBorders() {
 inline void HoughLinesR::rhocb(int value, void* user_data) {
     auto that = static_cast<HoughLinesR*>(user_data);
     that->setTheta(value);
-    cout << cv::format("%s rho : %i\n", that->windowName, value);
+    using namespace tg;
+    log_time << cv::format("%s rho : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesR::thetacb(int value, void* user_data) {
     auto that = static_cast<HoughLinesR*>(user_data);
     that->setTheta(value);
-    cout << cv::format("%s theta : %i\n", that->windowName, value);
+    using namespace tg;
+    log_time << cv::format("%s theta : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesR::thresholdcb(int value, void* user_data) {
     auto that = static_cast<HoughLinesR*>(user_data);
     that->setThreshold(value);
-    cout << cv::format("%s threshold : %i\n", that->windowName, value);
+    using namespace tg;
+    log_time << cv::format("%s threshold : %i\n", that->windowName, value);
 }
 
 
@@ -332,7 +337,7 @@ inline int HoughLinesR::doVerticalHough() {
         lines_.clear();
 
     //cv::HoughLines(image, lines, rho, angle, threshold, srn, stn, minTheta, maxTheta);
-    HoughLines(image_, lines_, 1, degree, threshold, 0, 0);
+    HoughLines(image_, lines_, 1, calc::DEGREES, threshold, 0, 0);
 
     //std::cout << "doVerticalHough # lines : " << lines.size();
 
@@ -342,12 +347,15 @@ inline int HoughLinesR::doVerticalHough() {
     allLines_.clear();
     allLines_.reserve(lines_.size());
 
+    auto pos = 0;
+
     for (auto& line : lines_) {
         auto theta = line[1];
-        if (theta <= degree * (180 - angleLimit_) && theta >= degree * angleLimit_)
+        if (theta <= calc::DEGREES * (180 - angleLimit_) && theta >= calc::DEGREES * angleLimit_)
             continue;
         auto p = computePointPair(line);
         allLines_.emplace_back(LineV(line, p));
+        pos++;
     }
 
     if (allLines_.empty())

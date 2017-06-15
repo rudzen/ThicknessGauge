@@ -132,7 +132,7 @@ public:
           threshold_(threshold),
           minLineLen_(minLineLen),
           showWindow_(showWindow) {
-        angle_ = degree * theta;
+        angle_ = calc::DEGREES * theta;
         minTheta_ = 0.0;
         maxTheta_ = CV_PI;
         angleLimit_ = 0;
@@ -186,7 +186,7 @@ private:
         if (theta == 0)
             theta++;
         this->theta_ = theta;
-        angle_ = degree * theta;
+        angle_ = calc::DEGREES * theta;
     }
 
     void setThreshold(int threshold) {

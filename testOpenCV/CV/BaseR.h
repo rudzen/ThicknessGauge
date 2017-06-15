@@ -38,8 +38,6 @@ protected:
 
     int imageOffset = 0;
 
-    const double degree = CV_PI * (1.0 / 180.0);
-
     std::string windowName;
 
     bool showWindows_ = false;
