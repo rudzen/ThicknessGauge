@@ -42,7 +42,8 @@ public:
         tg::linePair points;
         std::vector<cv::Point_<float>> elements;
 
-        float slobe;
+        double slobe;
+        calc::SlobeDirection slobe_direction = calc::SlobeDirection::HORIZONTAL;
 
         LineV() {
             slobe = 0.0f;

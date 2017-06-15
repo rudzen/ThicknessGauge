@@ -16,9 +16,12 @@ void HoughLinesR::computeMeta() {
 
     auto center = image_.cols / 2;
 
+    using namespace tg;
+
     for (auto& a : allLines_) {
-        a.slobe = calc::slope(a.entry[0], a.entry[2], a.entry[2], a.entry[3]);
-        //a.slobe = (a.entry[3] - a.entry[1]) / (a.entry[2] - a.entry[0]);
+        a.slobe = calc::slope(a.entry[0], a.entry[2], a.entry[1], a.entry[3]);
+        // TODO : do something in regards to the slobe
+        //log_time << cv::format("slobe calc : %f\n", a.slobe);
         if (a.points.first.x < center)
             leftLines_.emplace_back(a);
         else
