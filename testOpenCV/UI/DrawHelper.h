@@ -31,6 +31,7 @@ public:
     void makeWindow(std::string name);
 
     void removeWindow(std::string& name) const;
+
     void removeWindow(const std::string& name) const;
 
     void removeAllWindows() const;

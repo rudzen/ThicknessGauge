@@ -63,7 +63,7 @@ public: // data return point
 
 private:
 
-    std::unique_ptr<DrawHelper> draw = std::make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
+    //std::unique_ptr<DrawHelper> draw = std::make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
 
     std::unique_ptr<Capture> capture; // initialized in initVideoCapture()
 

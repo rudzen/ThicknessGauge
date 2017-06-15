@@ -215,6 +215,7 @@
     <ClInclude Include="CV\LineSparse.h" />
     <ClInclude Include="CV\LineConfig.h" />
     <ClInclude Include="namespaces\cvR.h" />
+    <ClInclude Include="namespaces\draw.h" />
     <ClInclude Include="namespaces\filesystem.h" />
     <ClInclude Include="namespaces\pixel.h" />
     <ClInclude Include="namespaces\sort.h" />

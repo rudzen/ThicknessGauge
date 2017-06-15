@@ -36,6 +36,7 @@
 #include "namespaces/validate.h"
 #include "Exceptions/ThrowAssert.h"
 #include "namespaces/cvR.h"
+#include "namespaces/draw.h"
 
 using namespace tg;
 
@@ -284,7 +285,7 @@ void ThicknessGauge::computeMarkingHeight() {
         computeLaserLocations(laser, filter_laser);
 
         if (showWindows_)
-            draw->removeAllWindows();
+            draw::removeAllWindows();
 
         // do a quick pass of validation before modifying the data
         validate::valid_data(data);
@@ -303,7 +304,7 @@ void ThicknessGauge::computeMarkingHeight() {
 
         log_time << "Total compute time (seconds) : " << frameTime_ << endl;
 
-        if (draw->is_escape_pressed(30))
+        if (draw::is_escape_pressed(30))
             return;
 
 
@@ -329,8 +330,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
     const std::string window_right = "test baseline right";
 
     if (showWindows_) {
-        draw->makeWindow(window_left);
-        draw->makeWindow(window_right);
+        draw::makeWindow(window_left);
+        draw::makeWindow(window_right);
     }
 
     auto quarter = static_cast<double>(imageSize_.height) / 4.0;
@@ -422,7 +423,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
                 }
             }
 
-            if (draw->is_escape_pressed(30))
+            if (draw::is_escape_pressed(30))
                 running = false;
 
         }
@@ -436,9 +437,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
         left_boundry_rect.width -= 40;
 
         if (showWindows_) {
-            draw->drawRectangle(org, left_boundry_rect, cv::Scalar(255, 255, 255));
-            draw->showImage(window_left, org);
-            if (draw->is_escape_pressed(30))
+            draw::drawRectangle(org, left_boundry_rect, cv::Scalar(255, 255, 255));
+            draw::showImage(window_left, org);
+            if (draw::is_escape_pressed(30))
                 running = false;
         }
 
@@ -464,7 +465,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
                     stl::copyVector(h.elements, right_elements);
             }
 
-            if (draw->is_escape_pressed(30))
+            if (draw::is_escape_pressed(30))
                 running = false;
 
         }
@@ -476,9 +477,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
         right_boundry_rect.x += 40;
 
         if (showWindows_) {
-            draw->drawRectangle(org, right_boundry_rect, cv::Scalar(255, 255, 255));
-            draw->showImage(window_right, org);
-            if (draw->is_escape_pressed(30))
+            draw::drawRectangle(org, right_boundry_rect, cv::Scalar(255, 255, 255));
+            draw::showImage(window_right, org);
+            if (draw::is_escape_pressed(30))
                 running = false;
         }
 
@@ -508,8 +509,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
     }
 
     if (showWindows_) {
-        draw->removeWindow(window_left);
-        draw->removeWindow(window_right);
+        draw::removeWindow(window_left);
+        draw::removeWindow(window_right);
     }
 }
 
@@ -543,7 +544,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
     const std::string window_name = "test marking out";
 
     if (showWindows_) {
-        draw->makeWindow(window_name);
+        draw::makeWindow(window_name);
     }
 
     filter_marking->setKernel(filters::kernel_line_left_to_right);
@@ -620,7 +621,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
             markings.emplace_back(hough->getMarkingRect());
             left_borders.emplace_back(hough->getLeftBorder());
             right_borders.emplace_back(hough->getRightBorder());
-            if (draw->is_escape_pressed(30))
+            if (draw::is_escape_pressed(30))
                 running = false;
         }
 
@@ -632,15 +633,15 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
             running = false;
         else {
             auto marking_test = frames->frames.front().clone();
-            draw->drawRectangle(marking_test, output, cv::Scalar(128, 128, 128));
-            draw->showImage(window_name, marking_test);
-            if (draw->is_escape_pressed(30))
+            draw::drawRectangle(marking_test, output, cv::Scalar(128, 128, 128));
+            draw::showImage(window_name, marking_test);
+            if (draw::is_escape_pressed(30))
                 running = false;
         }
     }
 
     if (showWindows_)
-        draw->removeWindow(window_name);
+        draw::removeWindow(window_name);
 
     if (validate::validate_rect(output)) {
         data->leftBorder = left_border_result;
@@ -675,7 +676,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
 
     const std::string window_name = "test height";
     if (showWindows_)
-        draw->makeWindow(window_name);
+        draw::makeWindow(window_name);
 
     auto image_size = marking_frames.front().size();
 
@@ -725,7 +726,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
                 for (auto& centerpoint : data->centerPoints)
                     results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
 
-                if (draw->is_escape_pressed(30))
+                if (draw::is_escape_pressed(30))
                     running = false;
 
                 if (showWindows_ && !i && running) {
@@ -769,12 +770,12 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
             break;
 
         if (showWindows_) {
-            draw->drawRectangle(tmpOut, rect_draw, cv::Scalar(255, 0, 0));
-            draw->drawHorizontalLine(&tmpOut, cvRound(highest_total), cv::Scalar(0, 255, 0));
-            draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
-            draw->drawText(&tmpOut, cv::format("%f pixels", data->difference), TextDrawPosition::UpperLeft, cv::Scalar(255, 255, 255));
-            draw->showImage(window_name, tmpOut);
-            if (draw->is_escape_pressed(30))
+            draw::drawRectangle(tmpOut, rect_draw, cv::Scalar(255, 0, 0));
+            draw::drawHorizontalLine(&tmpOut, cvRound(highest_total), cv::Scalar(0, 255, 0));
+            draw::drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
+            draw::drawText(&tmpOut, cv::format("%f pixels", data->difference), TextDrawPosition::UpperLeft, cv::Scalar(255, 255, 255));
+            draw::showImage(window_name, tmpOut);
+            if (draw::is_escape_pressed(30))
                 running = false;
         } else {
             break;
@@ -783,7 +784,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
     }
 
     if (showWindows_)
-        draw->removeWindow(window_name);
+        draw::removeWindow(window_name);
 
 }
 
@@ -941,8 +942,8 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 
     const std::string window_name = "cap";
     if (showWindows_) {
-        draw->showWindows(true);
-        draw->makeWindow(window_name);
+        draw::showWindows = true;
+        draw::makeWindow(window_name);
     }
 
     log_time << "Starting capture..\n";
@@ -962,8 +963,8 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
             capture->cap >> t;
             f->frames.emplace_back(t);
             pb.Progressed(pb_pos++);
-            draw->showImage(window_name, t);
-            if (draw->is_escape_pressed(30)) {
+            draw::showImage(window_name, t);
+            if (draw::is_escape_pressed(30)) {
                 // nothing :P
             }
         }
@@ -1059,10 +1060,10 @@ bool ThicknessGauge::saveData(string filename) {
 
     // testing height stuff drawing HERE
 
-    draw->showWindows(true);
+    draw::showWindows = true;
     const std::string diff_text = cv::format("diff (px): %f", data->difference);
-    draw->drawText(&overlay, diff_text, tg::TextDrawPosition::UpperRight, default_col);
-    draw->drawText(&overview, diff_text, tg::TextDrawPosition::UpperRight, default_bw);
+    draw::drawText(&overlay, diff_text, tg::TextDrawPosition::UpperRight, default_col);
+    draw::drawText(&overview, diff_text, tg::TextDrawPosition::UpperRight, default_bw);
 
     // LEFT
 
@@ -1070,8 +1071,8 @@ bool ThicknessGauge::saveData(string filename) {
 
     cv::Point2d base_left_p1(data->pointsStart[1] - data->leftPoints.size() - cut_buffer, data->baseLines[1]);
     cv::Point2d base_left_p2(data->pointsStart[1] - cut_buffer, base_left_p1.y);
-    draw->drawLine(overlay, base_left_p1, base_left_p2, cv::Scalar(255, 0.0, 0.0));
-    draw->drawLine(overview, base_left_p1, base_left_p2, cv::Scalar(255, 0.0, 0.0));
+    draw::drawLine(overlay, base_left_p1, base_left_p2, cv::Scalar(255, 0.0, 0.0));
+    draw::drawLine(overview, base_left_p1, base_left_p2, cv::Scalar(255, 0.0, 0.0));
     //paintY(overlay, data->leftPoints, data->pointsStart[1] - data->leftPoints.size(), 0.0, default_col);
     //paintY(overview, data->leftPoints, data->pointsStart[1] - data->leftPoints.size(), 0.0, default_bw);
 
@@ -1079,8 +1080,8 @@ bool ThicknessGauge::saveData(string filename) {
 
     cv::Point2d marking_p1(base_left_p2.x + cut_buffer * 2, base_left_p1.y - data->difference);
     cv::Point2d marking_p2(marking_p1.x + data->centerPoints.size() - cut_buffer * 2, marking_p1.y);
-    draw->drawLine(overlay, marking_p1, marking_p2, cv::Scalar(255.0, 0.0, 0.0));
-    //draw->drawLine(overview, marking_p1, marking_p2, cv::Scalar(255.0, 0.0, 0.0));
+    draw::drawLine(overlay, marking_p1, marking_p2, cv::Scalar(255.0, 0.0, 0.0));
+    //draw::drawLine(overview, marking_p1, marking_p2, cv::Scalar(255.0, 0.0, 0.0));
     paintY(overlay, data->centerPoints, marking_p1.x - cut_buffer, -data->difference, default_col);
     paintY(overview, data->centerPoints, marking_p1.x - cut_buffer, -data->difference, default_bw);
 
@@ -1088,8 +1089,8 @@ bool ThicknessGauge::saveData(string filename) {
 
     cv::Point2d base_right_p1(marking_p2.x + cut_buffer * 2, data->baseLines[3]);
     cv::Point2d base_right_p2(base_right_p1.x + data->rightPoints.size(), base_right_p1.y);
-    draw->drawLine(overlay, base_right_p1, base_right_p2, cv::Scalar(255.0, 0.0, 0.0));
-    draw->drawLine(overview, base_right_p1, base_right_p2, cv::Scalar(255.0, 0.0, 0.0));
+    draw::drawLine(overlay, base_right_p1, base_right_p2, cv::Scalar(255.0, 0.0, 0.0));
+    draw::drawLine(overview, base_right_p1, base_right_p2, cv::Scalar(255.0, 0.0, 0.0));
     //paintY(overlay, data->rightPoints, base_right_p1.x, -data->difference, default_col);
     //paintY(overview, data->rightPoints, base_right_p1.x, -data->difference, default_bw);
 
@@ -1215,5 +1216,5 @@ bool ThicknessGauge::isShowWindows() const {
 
 void ThicknessGauge::setShowWindows(bool showWindows) {
     showWindows_ = showWindows;
-    draw->showWindows(showWindows);
+    draw::showWindows = showWindows;
 }

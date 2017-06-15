@@ -447,6 +447,7 @@ inline void HoughLinesR::drawLines(vector<LineV>& line_pairs, cv::Scalar colour)
     }
 }
 
+
 inline void HoughLinesR::drawLine(cv::Vec4d& line) {
     cv::Point2d p1(line[0], line[1]);
     cv::Point2d p2(line[2], line[3]);
