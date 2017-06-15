@@ -164,6 +164,7 @@ namespace calc {
 
     /**
      * \brief Converts radians to degrees
+     * \tparam T The type, only floating point allowed
      * \param radians The radians to be converted
      * \return The angle in degrees
      */
@@ -173,6 +174,20 @@ namespace calc {
         static_assert(std::is_floating_point<T>::value, "rad_to_deg is only possible for floating point.");
         return radians * DEGREES;
     }
+
+    /**
+     * \brief Converts degrees to radians
+     * \tparam T The type, only floating point allowed
+     * \param degrees The degrees to convert
+     * \return The degrees in radians
+     */
+    template <typename T>
+    inline
+    double deg_to_rad(T degrees) {
+        static_assert(std::is_floating_point<T>::value, "deg_to_rad is only possible for floating point.");
+        return degrees * RADIANS;
+    }
+
 
     /**
      * \brief Determin the angle between two points in radians
