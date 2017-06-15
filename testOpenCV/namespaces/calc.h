@@ -394,6 +394,36 @@ namespace calc {
         return atan((p1.y - p2.y) / (p2.x - p1.x));
     }
 
+
+    /**
+     * \brief Calculates the angle of a 2D vector in degrees.
+     * Invokes the OpenCV function fastAtan2 which calculates the full-range angle of an input 2D vector.
+     * \tparam T The type, only floating points.
+     * \param x The x-coordinate
+     * \param y The y-coordinate
+     * \return The angle in radians
+     */
+    template <typename T>
+    inline
+    double angle_from_zero(T x, T y) {
+        static_assert(std::is_floating_point<T>::value, "only possible with floating points");
+        return deg_to_rad(cv::fastAtan2(x, y));
+    }
+
+    /**
+     * \brief Calculates the angle of a 2D vector in degrees.
+     * Invokes the OpenCV function fastAtan2 which calculates the full-range angle of an input 2D vector.
+     * \tparam T The type
+     * \param point The point with x- and y-coordinates
+     * \return The angle in degrees
+     */
+    template <typename T>
+    inline
+    double angle_from_zero(cv::Point_<T>& point) {
+        static_assert(std::is_floating_point<T>::value, "only possible with floating points");
+        return angle_from_zero(point.x, point.y);
+    }
+
     /**
     * \brief Computes the inner angle between two points both intersection with a center point
     * \param p1 The first point
