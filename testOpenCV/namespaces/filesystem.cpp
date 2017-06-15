@@ -1,10 +1,26 @@
 #include "filesystem.h"
+#include <vector>
+#include <sstream>
+#include "stl.h"
 
 namespace file {
 
 #if defined(_MSC_VER) && !defined(inline)
 #define inline __forceinline
 #endif
+
+    constexpr char path_seperator =
+#ifdef _WIN32
+                            '\\';
+#else
+                            '/';
+#endif
+
+    using path_legal = struct path {
+        std::vector<std::string> legal_part;
+        std::vector<std::string> complete_path;
+        bool any_legal;
+    };
 
     bool create_directory(const std::string& pathname) {
 #ifdef __unix__
@@ -47,6 +63,38 @@ namespace file {
 		return false;
 #endif
     }
+
+    inline
+    path_legal is_path_legal(const std::string& full_path) {
+        path_legal current;
+
+        current.any_legal = false;
+
+        if (full_path.empty())
+            return current;
+
+        std::istringstream ss(full_path);
+        std::string token;
+
+        token.reserve(full_path.size());
+
+        while(getline(ss, token, path_seperator))
+            current.complete_path.emplace_back(token);
+
+        token.clear();
+
+        for (auto& p : current.complete_path) {
+            token += p;
+            token += path_seperator;
+            if (!is_directory(token))
+                break;
+            current.legal_part.emplace_back(token);
+            current.any_legal = true;
+        }
+
+        return current;
+    }
+    
 
     inline
     bool is_name_legal(const std::string& name) {

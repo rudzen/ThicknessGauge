@@ -55,7 +55,6 @@ namespace calc {
 
             base_lines[0] = intersection_points[0] - buffer;
             base_lines[2] = intersection_points[2] + buffer;
-
         }
 
         /**
@@ -187,7 +186,6 @@ namespace calc {
         static_assert(std::is_floating_point<T>::value, "deg_to_rad is only possible for floating point.");
         return degrees * RADIANS;
     }
-
 
     /**
      * \brief Determin the angle between two points in radians
@@ -406,13 +404,12 @@ namespace calc {
     template <typename T>
     inline
     double angle_from_zero(T x, T y) {
-        static_assert(std::is_floating_point<T>::value, "only possible with floating points");
+        static_assert(std::is_floating_point<T>::value, "only possible with floating points.");
         return deg_to_rad(cv::fastAtan2(x, y));
     }
 
     /**
-     * \brief Calculates the angle of a 2D vector in degrees.
-     * Invokes the OpenCV function fastAtan2 which calculates the full-range angle of an input 2D vector.
+     * @overload
      * \tparam T The type
      * \param point The point with x- and y-coordinates
      * \return The angle in degrees
