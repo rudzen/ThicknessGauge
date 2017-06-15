@@ -49,16 +49,16 @@ void ThicknessGauge::initialize(std::string& glob_name) {
 
     // determin where to get the frames from.
     if (glob_name == "camera") {
-        //AVT::VmbAPI::CameraPtrVector cameras;
-        //auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
-        //if (VmbErrorSuccess == system.Startup()) {
-        //	if (VmbErrorSuccess == system.GetCameras(cameras)) {
-        //		data->cameraData->parse(cameras);
-        //	}
-        //	if (cameras.empty())
-        //		Util::loge("Error, no cameras currently available.");
-        //	data->cameraPtr = cameras.front();
-        //}
+        AVT::VmbAPI::CameraPtrVector cameras;
+        auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
+        if (VmbErrorSuccess == system.Startup()) {
+        	if (VmbErrorSuccess == system.GetCameras(cameras)) {
+        		data->cameraData->parse(cameras);
+        	}
+        	if (cameras.empty())
+                log_time << "Error, no cameras currently available.";
+        	data->cameraPtr = cameras.front();
+        }
 
         ////		const char* pCameraID,
         ////const char* pCameraName,
@@ -191,7 +191,7 @@ void ThicknessGauge::computeMarkingHeight() {
         // test print for all framesets
         for (auto& f: frameset) {
             f->compute();
-            log_time << f << endl;
+            //log_time << f << endl;
         }
 
         uint64 time_start = cv::getTickCount();

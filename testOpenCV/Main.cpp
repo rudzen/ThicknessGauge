@@ -91,6 +91,8 @@ int main(int argc, char** argv) {
         thicknessGauge->initCalibrationSettings(options.getCameraFile());
         cv::setNumThreads(options.getNumOpenCvThreads());
 
+        log_time << cv::format("OpenCV Optimization use %b\n", cv::useOptimized());
+
         //log_time << options << endl;
 
         if (options.isGlobMode()) {

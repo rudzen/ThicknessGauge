@@ -117,7 +117,7 @@ namespace validate {
             log_time << cv::format("Val: globName failed [%i], name = %s\n", ++failures, data->globName);
         }
 
-        if (data->cameraPtr == nullptr) {
+        if (data->cameraPtr == nullptr && data->globName == "camera") {
             log_time << cv::format("Val: cameraPtr failed [%i], == nullptr\n", ++failures);
         }
 
