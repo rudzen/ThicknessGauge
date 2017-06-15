@@ -77,7 +77,7 @@ public:
     } LineV;
 
     struct lineVsizeSort {
-        bool operator()(LineV& l1, LineV& l2) const { return l1.elements.size() < l2.elements.size(); }
+        bool operator()(const LineV& l1, const LineV& l2) const { return l1.elements.size() < l2.elements.size(); }
     } lineVsizeSort;
 
 private:

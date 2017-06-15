@@ -969,6 +969,8 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
         }
     }
 
+    throw_assert(t.rows == 256, "shiet, husk nu at indstille kameraets roi!");
+
     setImageSize(t.size());
 
     pb.Progressed(100);

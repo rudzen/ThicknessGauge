@@ -48,8 +48,10 @@ void HoughLinesR::computeMeta() {
             left.elements.emplace_back(it.pos());
     }
 
+    auto line_sort = [](const LineV& l1, const LineV& l2) { return l1.elements.size() < l2.elements.size(); };
+
     if (lSize > 1)
-        sort(leftLines_.begin(), leftLines_.end(), lineVsizeSort);
+        std::sort(leftLines_.begin(), leftLines_.end(), line_sort);
 
     for (auto& right : rightLines_) {
         cv::LineIterator it(image_, right.points.first, right.points.second, 8);
@@ -59,6 +61,6 @@ void HoughLinesR::computeMeta() {
     }
 
     if (rSize > 1)
-        sort(rightLines_.begin(), rightLines_.end(), lineVsizeSort);
+        std::sort(rightLines_.begin(), rightLines_.end(), line_sort);
 
 }
