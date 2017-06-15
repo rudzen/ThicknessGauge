@@ -40,15 +40,7 @@ namespace tg {
         return os << "]: ";
 
     }
-
-    template <class T>
-    T alignMinValue(T value) {
-        static_assert(std::is_fundamental<T>::value, "alignment is only possible for fundamental types.");
-        if (value < 0)
-            value = 0;
-        return value;
-    }
-
+ 
     std::string get_time_date(const std::string format) {
         struct tm newtime;
         auto now = time(nullptr);

@@ -53,8 +53,8 @@ public:
     void initialize(double exposure, double gain) {
         cap.set(CV_CAP_PROP_AUTO_EXPOSURE, 0);
         cap.set(CV_CAP_PROP_PVAPI_PIXELFORMAT, 0);
-        exposure = alignMinValue(exposure);
-        gain = alignMinValue(gain);
+        exposure = align_min_value(exposure);
+        gain = align_min_value(gain);
         setExposure(exposure);
         setGain(gain);
     }
@@ -72,7 +72,7 @@ public:
     }
 
     void setBrightness(double value) {
-        value = alignMinValue(value);
+        value = align_min_value(value);
         cap.set(CV_CAP_PROP_BRIGHTNESS, value);
         settings->brightness = value;
     }
@@ -84,7 +84,7 @@ public:
     }
 
     void setContrast(double value) {
-        value = alignMinValue(value);
+        value = align_min_value(value);
         cap.set(CV_CAP_PROP_CONTRAST, value);
         settings->contrast = value;
     }
@@ -96,7 +96,7 @@ public:
     }
 
     void setExposure(double value) {
-        value = alignMinValue(value);
+        value = align_min_value(value);
         cap.set(CV_CAP_PROP_EXPOSURE, value);
         settings->exposure = value;
     }
@@ -108,7 +108,7 @@ public:
     }
 
     void setGain(double value) {
-        value = alignMinValue(value);
+        value = align_min_value(value);
         cap.set(CV_CAP_PROP_GAIN, value);
         settings->gain = value;
     }

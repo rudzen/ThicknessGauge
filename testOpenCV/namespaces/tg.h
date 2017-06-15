@@ -1,4 +1,3 @@
-
 //          Copyright Rudy Alex Kohn 2017.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -155,45 +154,27 @@ namespace tg {
             }
         }
 
-        inline
         void addValidationResult(DataMemberIndex index, bool ok, ValidationStatus validation, std::string information) {
             validationResults.emplace_back(ValidationResult(index, ok, validation, information));
         }
 
     };
 
-    // ----------- output stuff ---------------
-    enum class SyncCout { IO_LOCK, IO_UNLOCK };
-
-    std::ostream& operator<<(std::ostream&, SyncCout);
-
-#define sync_cout std::cout << SyncCout::IO_LOCK
-#define sync_endl std::endl << SyncCout::IO_UNLOCK
-
-    enum class LogTime { LOG_TIME, LOG_DATE, LOG_TIME_DATE };
-
-    /**
-     * \brief Overload of ostream to insert time and/or date beforehand
-     * \return The processed ostream
-     */
-    std::ostream& operator<<(std::ostream&, LogTime);
-
-#define log_timedate std::cout << LogTime::LOG_TIME_DATE
-#define log_time std::cout << LogTime::LOG_TIME
-#define log_date std::cout << LogTime::LOG_DATE
-
-    // ----------------------------------------------
-
     // ----------- misc utility functions -----------
 
     /**
      * \brief Aligns a value to be no less than 0
      * \tparam T The value type (only fundamental types allowed)
-     * \param value The value to align
+     * \param value_to_align The value to align
      * \return The aligned value
      */
-    template <class T>
-    __forceinline T alignMinValue(T value);
+    template <typename T>
+    T align_min_value(T value_to_align, T min_val = 0) {
+        static_assert(std::is_fundamental<T>::value, "alignment is only possible for fundamental types.");
+        if (value_to_align < min_val)
+            value_to_align = 0;
+        return value_to_align;
+    }
 
     /**
      * \brief Fetches the current time and date in specificed format.
@@ -222,5 +203,28 @@ namespace tg {
      * \return Date as string
      */
     std::string get_date();
+
+    // ----------- output stuff ---------------
+    enum class SyncCout { IO_LOCK, IO_UNLOCK };
+
+    std::ostream& operator<<(std::ostream&, SyncCout);
+
+#define sync_cout std::cout << SyncCout::IO_LOCK
+#define sync_endl std::endl << SyncCout::IO_UNLOCK
+
+    enum class LogTime { LOG_TIME, LOG_DATE, LOG_TIME_DATE };
+
+    /**
+     * \brief Overload of ostream to insert time and/or date beforehand
+     * \return The processed ostream
+     */
+    std::ostream& operator<<(std::ostream&, LogTime);
+
+#define log_timedate std::cout << LogTime::LOG_TIME_DATE
+#define log_time std::cout << LogTime::LOG_TIME
+#define log_date std::cout << LogTime::LOG_DATE
+
+    // ----------------------------------------------
+
 
 }
