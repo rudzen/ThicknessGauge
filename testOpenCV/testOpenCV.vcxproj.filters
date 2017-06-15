@@ -91,6 +91,12 @@
     <Filter Include="Source Files\Namespaces">
       <UniqueIdentifier>{4fd45f3d-4fc5-4809-acb5-579360c38668}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Diagrams">
+      <UniqueIdentifier>{055eb84c-2fec-4847-93b1-d1c355e728e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bugs">
+      <UniqueIdentifier>{52aafad6-2d5a-4d88-a479-ec46ba58b439}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThicknessGauge.cpp">
@@ -344,9 +350,13 @@
     <None Include="_run_test.bat">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="ClassDiagram.cd" />
+    <None Include="ClassDiagram.cd">
+      <Filter>Diagrams</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Intersection bug.txt" />
+    <Text Include="Intersection bug.txt">
+      <Filter>Bugs</Filter>
+    </Text>
   </ItemGroup>
 </Project>
