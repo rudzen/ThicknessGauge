@@ -5,10 +5,8 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
-#include <opencv2/core/mat.hpp>
-#include <opencv2/shape/hist_cost.hpp>
 
-namespace sort {
+namespace sorter {
 
 #if defined(_MSC_VER) && !defined(inline)
 #define inline __forceinline
