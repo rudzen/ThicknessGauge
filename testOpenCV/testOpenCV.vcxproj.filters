@@ -355,5 +355,6 @@
     <Text Include="Intersection bug.txt">
       <Filter>Bugs</Filter>
     </Text>
+    <Text Include="LICENSE_1_0.txt" />
   </ItemGroup>
 </Project>

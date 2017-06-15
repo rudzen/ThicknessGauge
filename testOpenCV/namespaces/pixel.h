@@ -1,3 +1,9 @@
+
+//          Copyright Rudy Alex Kohn 2017.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+
 #pragma once
 #include <opencv2/core/mat.hpp>
 #include "CV/LineConfig.h"
@@ -50,6 +56,7 @@ namespace pixel {
     template <typename T>
     inline
     double getLineAvgIntensity(cv::Mat& image, cv::Vec<T, 4>& vector, int connectivity = 8, bool left_to_right = false) {
+        static_assert(std::is_arithmetic<T>::value, "feck, nan.");
 
         cv::LineIterator it(image, cv::Point(calc::round(vector[0]), calc::round(vector[1])), cv::Point(calc::round(vector[2]), calc::round(vector[3])), connectivity, left_to_right);
 

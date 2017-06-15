@@ -1,6 +1,4 @@
-﻿// Rudy Alex Kohn
-
-#pragma once
+﻿#pragma once
 #include <memory>
 #include <ostream>
 #include <opencv2/core/base.hpp>

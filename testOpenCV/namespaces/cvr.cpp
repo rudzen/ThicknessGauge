@@ -1,3 +1,9 @@
+
+//          Copyright Rudy Alex Kohn 2017.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+
 #include "cvR.h"
 #include <opencv2/core/hal/interface.h>
 
@@ -58,15 +64,15 @@ namespace cvr {
 
         findContours(image, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
-        cv::Rect highest(0, 0, 0, 0);
+        int highest_y = 0;;
 
         for (auto& c : contours) {
             auto r = cv::boundingRect(c);
-            if (r.y > highest.y)
-                highest = r;
+            if (r.y > highest_y)
+                highest_y = r.y;
         }
 
-        return highest.y;
+        return highest_y;
     }
 
 

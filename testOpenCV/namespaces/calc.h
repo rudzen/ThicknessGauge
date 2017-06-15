@@ -1,4 +1,11 @@
+
+//          Copyright Rudy Alex Kohn 2017.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+
 #pragma once
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/videostab/inpainting.hpp>
 
@@ -135,9 +142,7 @@ namespace calc {
             return true;
         }
 
-
-    }
-
+    } // namespace pixels
 
     /**
      * \brief Indicated the direction of a slobe
@@ -283,8 +288,7 @@ namespace calc {
     template <typename T1, typename T2>
     inline
     double slope(const T1 x1, const T2 x2, const T1 y1, const T2 y2) {
-        static_assert(std::is_arithmetic<T1>::value, "slope is only possible for arithmetic types.");
-        static_assert(std::is_arithmetic<T2>::value, "slope is only possible for arithmetic types.");
+        static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "slope is only possible for arithmetic types.");
         static_assert(std::is_convertible<T1, T2>::value, "slope argument types must be convertible.");
         double dx = x2 - x1;
         double dy = y2 - y1;
@@ -558,64 +562,6 @@ namespace calc {
         return cv::Vec<T, 2>(40.0, 40.0);
     }
 
-
-    /**
-    * \brief Computes the intensity centroid for each X in the Y direction.
-    * This gives the weighted Y position based off the intensity levels across that single X column
-    * \param image The image to perform the computation on
-    * \param output The output vector of points
-    * \param upper_limit The upper limit of the rectangular cut out
-    * \param lower_limit The lower limit of the rectangular cut out
-    * \return The avg of the computed Y value across the entirety of the image matrix with regards to cut offs
-    */
-    template <typename T>
-    double real_intensity_line(cv::Mat& image, std::vector<cv::Point_<T>>& output, int upper_limit, int lower_limit) {
-        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
-
-        // grab sizes
-        auto cols = image.cols;
-        //auto rows = image.rows; // not used for anything atm
-
-        // cut out rectangle without any X value set
-        cv::Rect_<T> cutOut(0.0, lower_limit, 1.0, upper_limit);
-
-        // populate the output vector with column based X values and zero Y
-        stl::populate_x(output, cols);
-
-        for (auto& v : output) {
-            // adjust cutOut rectangle for current position
-            cutOut.x = v.x;
-
-            // create a new matrix based of the settings 
-            auto B = cv::Mat(image, cutOut);
-
-            // perform moments on the matrix without treating it as a binary image (which it is NOT)
-            auto m = cv::moments(B, false);
-
-            // compute x & y
-            //auto x = m.m10 / m.m00; // x is not used, so no need to calculate it
-            auto y = m.m01 / m.m00;
-
-            // only include values above 0.0 in y-pos
-            if (y > 0.0)
-                v.y = y;
-        }
-
-        return avg_y(output);
-    }
-
-    template <typename T>
-    inline
-    double weighted_avg(cv::Mat& image, std::vector<cv::Point_<T>>& target_vector) {
-        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
-        std::vector<cv::Point> non_zero_elements(image.rows * image.cols);
-        findNonZero(image, non_zero_elements);
-        auto laser_area = boundingRect(non_zero_elements);
-        auto t = image(laser_area);
-        return real_intensity_line(t, target_vector, t.rows, 0) + laser_area.y;
-    }
-
-
     /**
      * \brief Calculates the avg of all the Y values in the vector of points
      * \tparam T The type of the points
@@ -657,7 +603,6 @@ namespace calc {
     inline
     double avg_y(cv::Vec<T, 6>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
-
         return (vec[1] + vec[3] + vec[5]) * (1 / 3);
     }
 
@@ -681,7 +626,6 @@ namespace calc {
     inline
     double avg_x(cv::Vec<T, 4>& vec) {
         static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
-
         return (vec[0] + vec[2]) / 2;
     }
 
@@ -689,7 +633,6 @@ namespace calc {
     inline
     double avg_x(cv::Vec<T, 6>& vec) {
         static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
-
         return (vec[0] + vec[2] + vec[4]) * (1 / 3);
     }
 
@@ -714,8 +657,72 @@ namespace calc {
         return cv::Vec2d(sum);
     }
 
+   /**
+    * \brief Computes the intensity centroid for each X in the Y direction.
+    * This gives the weighted Y position based off the intensity levels across that single X column
+    * \param image The image to perform the computation on
+    * \param output The output vector of points
+    * \param upper_limit The upper limit of the rectangular cut out
+    * \param lower_limit The lower limit of the rectangular cut out
+    * \return The avg of the computed Y value across the entirety of the image matrix with regards to cut offs
+    */
+    template <typename T>
+    double real_intensity_line(cv::Mat& image, std::vector<cv::Point_<T>>& output, int upper_limit, int lower_limit) {
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
+
+        // grab sizes
+        auto cols = image.cols;
+        //auto rows = image.rows; // not used for anything atm
+
+        // cut out rectangle without any X value set
+        cv::Rect_<T> cut_rect(0.0, lower_limit, 1.0, upper_limit);
+
+        // populate the output vector with column based X values and zero Y
+        stl::populate_x(output, cols);
+
+        for (auto& v : output) {
+            // adjust cutOut rectangle for current position
+            cut_rect.x = v.x;
+
+            // create a new matrix based of the settings 
+            auto B = cv::Mat(image, cut_rect);
+
+            // perform moments on the matrix without treating it as a binary image (which it is NOT)
+            auto m = cv::moments(B, false);
+
+            // compute x & y
+            //auto x = m.m10 / m.m00; // x is not used, so no need to calculate it
+            auto y = m.m01 / m.m00;
+
+            // only include values above 0.0 in y-pos
+            if (y > 0.0)
+                v.y = y;
+        }
+
+        return avg_y(output);
+    }
+
+    /**
+     * \brief Computes the avg mass weigth position based on intensity
+     * \tparam T Point type
+     * \param image The image, a good idea to narrow it for the area in question
+     * \param target_vector Will be populated with 0->N of X and weighted mass of intensity in Y for each column (x)
+     * \return The avg of the whole result based on the values in the target vector
+     */
+    template <typename T>
+    inline
+    double weighted_avg(cv::Mat& image, std::vector<cv::Point_<T>>& target_vector) {
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
+        std::vector<cv::Point> non_zero_elements(image.rows * image.cols);
+        findNonZero(image, non_zero_elements);
+        auto laser_area = boundingRect(non_zero_elements);
+        auto t = image(laser_area);
+        return real_intensity_line(t, target_vector, t.rows, 0) + laser_area.y;
+    }
 
 #else
+
+    /* shadow versions of most functions for custom class instead of points (might not be complete!!!!!) */
 
 	template <typename T>
 	inline
