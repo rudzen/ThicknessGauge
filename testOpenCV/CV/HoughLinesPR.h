@@ -31,13 +31,13 @@ public:
 
     typedef struct LineH {
         cv::Vec4f entry;
-        linePair points;
+        tg::linePair points;
         std::vector<cv::Point2f> elements;
 
         LineH() {
         }
 
-        LineH(cv::Vec4f entry, linePair points)
+        LineH(cv::Vec4f entry, tg::linePair points)
             : entry(entry),
               points(points) {
             elements.reserve(cvRound(calc::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
@@ -73,23 +73,23 @@ private:
 
     cv::Mat output;
 
-    vector<cv::Vec4f> lines;
+    std::vector<cv::Vec4f> lines;
 
-    vector<LineH> allLines;
-    vector<LineH> rightLines;
-    vector<LineH> leftLines;
+    std::vector<LineH> allLines;
+    std::vector<LineH> rightLines;
+    std::vector<LineH> leftLines;
 
 
 public:
-    const vector<LineH>& getAllLines() const {
+    const std::vector<LineH>& getAllLines() const {
         return allLines;
     }
 
-    const vector<LineH>& getRightLines() const {
+    const std::vector<LineH>& getRightLines() const {
         return rightLines;
     }
 
-    const vector<LineH>& getLeftLines() const {
+    const std::vector<LineH>& getLeftLines() const {
         return leftLines;
     }
 
@@ -156,7 +156,7 @@ private:
 
     void bresenham();
 
-    static linePair HoughLinesPR::computePointPair(cv::Vec4f& line);
+    static tg::linePair HoughLinesPR::computePointPair(cv::Vec4f& line);
 
     double getAngle(cv::Vec4f& vec) const;
 
@@ -164,7 +164,7 @@ private:
 
     double getAngle(int x1, int x2, int y1, int y2) const;
 
-    static bool splitLinesInX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double* leftCenter, double* rightCenter);
+    static bool splitLinesInX(std::vector<LineH>& source, std::vector<LineH>& right, std::vector<LineH>& left, double x, double* leftCenter, double* rightCenter);
 
     // callbacks
 
@@ -197,11 +197,11 @@ public:
 
     void doHorizontalHough();
 
-    void drawLine(vector<linePair>& linePairs, cv::Scalar colour);
+    void drawLine(std::vector<tg::linePair>& linePairs, cv::Scalar colour);
 
-    void drawLines(vector<cv::Vec4f>& lines, cv::Scalar colour);
+    void drawLines(std::vector<cv::Vec4f>& lines, cv::Scalar colour);
 
-    void drawLines(vector<LineH>& lines, cv::Scalar colour);
+    void drawLines(std::vector<LineH>& lines, cv::Scalar colour);
 
     void drawLine(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour);
 
@@ -250,30 +250,35 @@ inline void HoughLinesPR::computeBorders() {
 inline void HoughLinesPR::rhocb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->setTheta(value);
+    using namespace tg;
     log_time << cv::format("%s rho : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::thetacb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->setTheta(value);
+    using namespace tg;
     log_time << cv::format("%s theta : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::thresholdcb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->setThreshold(value);
+    using namespace tg;
     log_time << cv::format("%s threshold : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::maxLineGabcb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->setMaxLineGab(value);
+    using namespace tg;
     log_time << cv::format("%s maxLineGab : %i\n", that->windowName, value);
 }
 
 inline void HoughLinesPR::minLineLencb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->setMinLineLen(value);
+    using namespace tg;
     log_time << cv::format("%s minLineLen : %i\n", that->windowName, value);
 }
 
@@ -390,8 +395,8 @@ inline void HoughLinesPR::bresenham() {
 
 }
 
-inline linePair HoughLinesPR::computePointPair(cv::Vec4f& line) {
-    return linePair(cv::Point2f(line[0], line[1]), cv::Point2f(line[2], line[3]));
+inline tg::linePair HoughLinesPR::computePointPair(cv::Vec4f& line) {
+    return tg::linePair(cv::Point2f(line[0], line[1]), cv::Point2f(line[2], line[3]));
 }
 
 inline double HoughLinesPR::getAngle(cv::Vec4f& vec) const {
@@ -406,7 +411,7 @@ inline double HoughLinesPR::getAngle(int x1, int x2, int y1, int y2) const {
     return atan2(y1 - y2, x1 - x2);
 }
 
-inline bool HoughLinesPR::splitLinesInX(vector<LineH>& source, vector<LineH>& right, vector<LineH>& left, double x, double* left_center, double* right_center) {
+inline bool HoughLinesPR::splitLinesInX(std::vector<LineH>& source, std::vector<LineH>& right, std::vector<LineH>& left, double x, double* left_center, double* right_center) {
 
     *left_center = 0.0;
     *right_center = 0.0;
@@ -434,7 +439,7 @@ inline bool HoughLinesPR::splitLinesInX(vector<LineH>& source, vector<LineH>& ri
 
 }
 
-inline void HoughLinesPR::drawLine(vector<linePair>& line_pairs, cv::Scalar colour) {
+inline void HoughLinesPR::drawLine(std::vector<tg::linePair>& line_pairs, cv::Scalar colour) {
     if (!showWindow_)
         return;
 
@@ -444,7 +449,7 @@ inline void HoughLinesPR::drawLine(vector<linePair>& line_pairs, cv::Scalar colo
     }
 }
 
-inline void HoughLinesPR::drawLines(vector<cv::Vec4f>& lines, cv::Scalar colour) {
+inline void HoughLinesPR::drawLines(std::vector<cv::Vec4f>& lines, cv::Scalar colour) {
     if (!showWindow_)
         return;
 
@@ -452,7 +457,7 @@ inline void HoughLinesPR::drawLines(vector<cv::Vec4f>& lines, cv::Scalar colour)
         drawLine(line, colour);
 }
 
-inline void HoughLinesPR::drawLines(vector<LineH>& lines, cv::Scalar colour) {
+inline void HoughLinesPR::drawLines(std::vector<LineH>& lines, cv::Scalar colour) {
     if (!showWindow_)
         return;
 

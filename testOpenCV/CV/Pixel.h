@@ -1,8 +1,8 @@
 #pragma once
-#include <opencv2/core/mat.hpp>
+#include <opencv2/core/core.hpp>
 #include "Util/Vec.h"
+#include "../namespaces/sort.h"
 #include <iostream>
-#include "Calc/MiniCalc.h"
 
    /*
 	|  __
@@ -117,7 +117,7 @@ public:
      * \param mini_calc For sorting struct only
      * \return The location of the highest pixel location
      */
-    int Pixelz::getHighestYpixel(cv::Mat& image, int x, MiniCalc& mini_calc) const {
+    int Pixelz::getHighestYpixel(cv::Mat& image, int x) const {
         auto highest = image.rows;
         vector<cv::Point> pix;
         findNonZero(image, pix);

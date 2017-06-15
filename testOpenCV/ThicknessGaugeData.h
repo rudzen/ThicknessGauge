@@ -2,7 +2,7 @@
 
 #include <array>
 #include <ostream>
-#include "Calc/MiniCalc.h"
+#include "namespaces/cvR.h"
 
 class ThicknessGaugeData {
 

@@ -6,6 +6,7 @@
 #include <memory>
 #include "BaseR.h"
 #include "Pixel.h"
+#include "../namespaces/tg.h"
 
 /*
 	|  __
@@ -109,18 +110,21 @@ public:
 inline void CannyR::threshold1cb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);
     that->setThreshold1(value);
+    using namespace tg;
     log_time << cv::format("Canny threshold 1 : %i\n", value);
 }
 
 inline void CannyR::threshold2cb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);
     that->setThreshold2(value);
+    using namespace tg;
     log_time << cv::format("Canny threshold 2 : %i\n", value);
 }
 
 inline void CannyR::apertureSizecb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);
     that->setApertureSize(value);
+    using namespace tg;
     log_time << cv::format("Canny apertureSize : %i\n", value);
 }
 
@@ -128,6 +132,7 @@ inline void CannyR::gradientcb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);
     that->setGradient(value);
     string boltab[2] = {"false", "true"};
+    using namespace tg;
     log_time << cv::format("Canny gradient : %s\n", boltab[static_cast<bool>(value)]);
 }
 

@@ -4,7 +4,6 @@
 
 #include "ThicknessGauge.h"
 
-#include "Calc/MiniCalc.h"
 #include "IO/ImageSave.h"
 #include "IO/GlobGenerator.h"
 

@@ -108,9 +108,6 @@
     <ClCompile Include="Calibrate\CalibrationTest.cpp">
       <Filter>Source Files\Camera\Calibrate</Filter>
     </ClCompile>
-    <ClCompile Include="Calc\MiniCalc.cpp">
-      <Filter>Source Files\CV</Filter>
-    </ClCompile>
     <ClCompile Include="UI\ProgressBar.cpp">
       <Filter>Source Files\UI\ProgressBar</Filter>
     </ClCompile>
@@ -313,9 +310,6 @@
     </ClInclude>
     <ClInclude Include="CV\MorphR.h">
       <Filter>Header Files\CV</Filter>
-    </ClInclude>
-    <ClInclude Include="Calc\MiniCalc.h">
-      <Filter>Header Files\Calc</Filter>
     </ClInclude>
     <ClInclude Include="namespaces\filesystem.h">
       <Filter>Header Files\Namespaces</Filter>
