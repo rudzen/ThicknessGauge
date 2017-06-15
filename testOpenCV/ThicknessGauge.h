@@ -81,8 +81,6 @@ private:
     // filter used for base line detection
     std::unique_ptr<FilterR> filter_baseline = std::make_unique<FilterR>("Baseline filter");
 
-    const double PIangle = CV_PI / 180;
-
     double frameTime_ = 0.0;
 
     int frameCount_;
@@ -150,8 +148,6 @@ private: /* helper functions */
     void captureFrames(unsigned int frame_index, unsigned int capture_count, unsigned long long int exposure);
 
 private:
-
-    double sumColumn(cv::Mat& image, int x);
 
     void computerGaugeLine(cv::Mat& output);
 

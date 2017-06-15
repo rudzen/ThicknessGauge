@@ -20,7 +20,9 @@ protected:
         std::vector<double> means;
         std::vector<double> stddevs;
         std::string exp_ext;
-        int exp_ms;
+        double exp_ms;
+
+        Frames() = delete;
 
         Frames(const std::string& expExt, double expMs)
             : exp_ext(expExt),

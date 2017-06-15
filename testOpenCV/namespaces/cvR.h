@@ -274,6 +274,32 @@ namespace cvr {
     }
 
     /**
+    * \brief Sums the intensity for a specific coloumn in a matrix
+    * \param image The image matrix to sum from
+    * \param x The X column to sum
+    * \return The avg intensity for specified column
+    */
+    template <typename T1, typename T2>
+    inline
+    double sum_column_intensity(cv::Mat_<T1>& image, T2 x) {
+        static_assert(std::is_arithmetic<T1>::value && std::is_integral<T2>::value, "invalid type");
+
+        auto sum = 0;
+        auto count = 0;
+
+        for (auto col = 0; col < image.cols; ++col) {
+            auto uc_pixel = image.data + x * image.step;
+            T1 intensity = uc_pixel[0];
+            if (intensity == 0)
+                continue;
+            sum += intensity;
+            count++;
+        }
+
+        return sum / static_cast<double>(count);
+    }
+
+    /**
      * \brief Converts an image type to string
      * \param type The type to convert
      * \return The type as string

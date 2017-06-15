@@ -21,9 +21,13 @@
  */
 namespace calc {
 
-#define C_PI   3.1415926535897932384626433832795
-#define C_2PI  6.283185307179586476925286766559
-#define C_LOG2 0.69314718055994530941723212145818
+    constexpr double PI = 3.1415926535897932384626433832795;
+
+    constexpr double DEGREES = PI / 180;
+
+    constexpr double PIx2 = 2 * PI;
+
+    constexpr double LOG2 = 0.69314718055994530941723212145818;
 
     namespace line {
 
@@ -142,7 +146,7 @@ namespace calc {
     inline
     double rad_to_deg(T radians) {
         static_assert(std::is_floating_point<T>::value, "rad_to_deg is only possible for floating point.");
-        return radians * 180 / C_PI;
+        return radians * DEGREES;
     }
 
     /**
@@ -335,11 +339,19 @@ namespace calc {
         return slope(p1.x, p2.x, p1.y, p2.y);
     }
 
+    /**
+     * @overload
+     * \tparam T1 Type of line point one
+     * \tparam T2 Type of line point two
+     * \param p1 Line point 1
+     * \param p2 Line point 2
+     * \return The angle in radians
+     */
     template <typename T1, typename T2>
     inline
     double angle_between_lines(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "angle_between_lines is only possible for arithmetic types.");
-        return atan((p1.y - p2.y) / (p2.x - p1.x) * (180 / CV_PI));
+        return atan((p1.y - p2.y) / (p2.x - p1.x));
     }
 
     /**
@@ -405,7 +417,7 @@ namespace calc {
     * \param output The resulting intersection points (if any)
     * \return true if intersection points where computed, otherwise false
     */
-    bool computeIntersectionPoints(cv::Vec4d& horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output);
+    bool compute_intersection_points(cv::Vec4d& horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output);
 
     /**
     * \brief Computes the intensity centroid for each X in the Y direction.
@@ -680,5 +692,6 @@ namespace calc {
         static_assert(std::is_convertible<T1, T2>::value, "s and mean must be convertible.");
         return s / mean * 100.0;
     }
+
 
 }

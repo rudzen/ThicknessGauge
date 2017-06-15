@@ -241,7 +241,7 @@ void ThicknessGauge::computeMarkingHeight() {
         //std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
 
         // compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
-        calc::computeIntersectionPoints(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
+        calc::compute_intersection_points(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
 
         // grabs the in between parts and stores the data
         //computerInBetween(filter_baseline, hough_horizontal, morph);
@@ -305,7 +305,7 @@ void ThicknessGauge::computeMarkingHeight() {
 
         log_time << "Total compute time (seconds) : " << frameTime_ << endl;
 
-        if (draw->isEscapePressed(30))
+        if (draw->is_escape_pressed(30))
             return;
 
 
@@ -424,7 +424,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
                 }
             }
 
-            if (draw->isEscapePressed(30))
+            if (draw->is_escape_pressed(30))
                 running = false;
 
         }
@@ -440,7 +440,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
         if (showWindows_) {
             draw->drawRectangle(org, left_boundry_rect, cv::Scalar(255, 255, 255));
             draw->showImage(window_left, org);
-            if (draw->isEscapePressed(30))
+            if (draw->is_escape_pressed(30))
                 running = false;
         }
 
@@ -466,7 +466,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
                     stl::copyVector(h.elements, right_elements);
             }
 
-            if (draw->isEscapePressed(30))
+            if (draw->is_escape_pressed(30))
                 running = false;
 
         }
@@ -480,7 +480,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
         if (showWindows_) {
             draw->drawRectangle(org, right_boundry_rect, cv::Scalar(255, 255, 255));
             draw->showImage(window_right, org);
-            if (draw->isEscapePressed(30))
+            if (draw->is_escape_pressed(30))
                 running = false;
         }
 
@@ -622,7 +622,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
             markings.emplace_back(hough->getMarkingRect());
             left_borders.emplace_back(hough->getLeftBorder());
             right_borders.emplace_back(hough->getRightBorder());
-            if (draw->isEscapePressed(30))
+            if (draw->is_escape_pressed(30))
                 running = false;
         }
 
@@ -636,7 +636,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
             auto marking_test = frames->frames.front().clone();
             draw->drawRectangle(marking_test, output, cv::Scalar(128, 128, 128));
             draw->showImage(window_name, marking_test);
-            if (draw->isEscapePressed(30))
+            if (draw->is_escape_pressed(30))
                 running = false;
         }
     }
@@ -727,7 +727,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
                 for (auto& centerpoint : data->centerPoints)
                     results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
 
-                if (draw->isEscapePressed(30))
+                if (draw->is_escape_pressed(30))
                     running = false;
 
                 if (showWindows_ && !i && running) {
@@ -774,9 +774,9 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
             draw->drawRectangle(tmpOut, rect_draw, cv::Scalar(255, 0, 0));
             draw->drawHorizontalLine(&tmpOut, cvRound(highest_total), cv::Scalar(0, 255, 0));
             draw->drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
-            draw->drawText(&tmpOut, cv::format("%f pixels", data->difference), TextDrawPosition::UpperLeft);
+            draw->drawText(&tmpOut, cv::format("%f pixels", data->difference), TextDrawPosition::UpperLeft, cv::Scalar(255, 255, 255));
             draw->showImage(window_name, tmpOut);
-            if (draw->isEscapePressed(30))
+            if (draw->is_escape_pressed(30))
                 running = false;
         } else {
             break;
@@ -999,7 +999,7 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
             f->frames.emplace_back(t);
             pb.Progressed(pb_pos++);
             draw->showImage(window_name, t);
-            if (draw->isEscapePressed(30)) {
+            if (draw->is_escape_pressed(30)) {
                 // nothing :P
             }
         }
@@ -1136,30 +1136,6 @@ bool ThicknessGauge::saveData(string filename) {
     cv::imwrite("_overview.png", overview);
 
     return true;
-}
-
-/**
- * \brief Sums the intensity for a specific coloumn in a matrix
- * \param image The image matrix to sum from
- * \param x The X column to sum
- * \return The avg intensity for specified column
- */
-double ThicknessGauge::sumColumn(cv::Mat& image, int x) {
-
-    auto sum = 0;
-    auto count = 0;
-
-    for (auto col = 0; col < image.cols; ++col) {
-        auto uc_pixel = image.data + x * image.step;
-        int intensity = uc_pixel[0];
-        if (intensity == 0)
-            continue;
-        sum += intensity;
-        count++;
-    }
-
-    return sum / static_cast<double>(count);
-
 }
 
 void ThicknessGauge::computerGaugeLine(cv::Mat& output) {

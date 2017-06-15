@@ -2,6 +2,10 @@
 
 namespace file {
 
+#if defined(_MSC_VER) && !defined(inline)
+#define inline __forceinline
+#endif
+
     bool create_directory(const std::string& pathname) {
 #ifdef __unix__
         if (!is_name_legal(std::string(r.begin(), r.end())))
@@ -43,7 +47,9 @@ namespace file {
 		return false;
 #endif
     }
-    __forceinline bool is_name_legal(const std::string& name) {
+
+    inline
+    bool is_name_legal(const std::string& name) {
         for (auto& c : name) {
             if (illegal_chars.find(c) != std::string::npos)
                 return false;

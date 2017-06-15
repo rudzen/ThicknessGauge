@@ -4,8 +4,6 @@
 
 #if defined(_MSC_VER) && !defined(inline)
 #define inline __forceinline
-#elif defined(__GNUC__) && !defined(inline)
-#define inline __always_inline
 #endif
 
 namespace stl {
@@ -20,10 +18,7 @@ namespace stl {
     template <typename T>
     inline
     void sort_contours(std::vector<std::vector<cv::Point_<T>>>& contours) {
-        auto contourComparator = [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) {
-            return contourArea(a) > contourArea(b);
-        };
-        std::sort(contours.begin(), contours.end(), contourComparator);
+        std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) { return contourArea(a) > contourArea(b); });
     }
 
 #ifdef CV_VERSION

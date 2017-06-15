@@ -6,7 +6,7 @@ namespace calc {
 
     using namespace tg;
 
-    bool computeIntersectionPoints(cv::Vec4d& horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output) {
+    bool compute_intersection_points(cv::Vec4d& horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output) {
         // align horizontal line
         horizontal_line[0] = left_border[0];
         horizontal_line[2] = right_border[2];

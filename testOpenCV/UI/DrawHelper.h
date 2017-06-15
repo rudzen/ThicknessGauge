@@ -17,6 +17,10 @@ private:
 
     bool showWindows_;
 
+    static char get_key(const int delay) {
+        return static_cast<char>(cv::waitKey(delay));
+    }
+
 public:
 
     explicit DrawHelper(cv::Scalar colour)
@@ -34,12 +38,8 @@ public:
     void showImage(std::string& windowName, cv::Mat& image) const;
     void showImage(const std::string& name, cv::Mat& image) const;
 
-    static char getKey(const int delay) {
-        return static_cast<char>(cv::waitKey(delay));
-    }
-
-    bool isEscapePressed(const int delay) const {
-        return showWindows_ && getKey(delay) == 27;
+    bool is_escape_pressed(const int delay) const {
+        return showWindows_ && get_key(delay) == 27;
     }
 
     void drawLine(cv::Mat& image, cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour) const {
