@@ -14,6 +14,26 @@
 // helper functions for open cv related stuff.
 namespace cvr {
 
+    // helper functions to clear opencv structures without creating new objects
+    namespace clear {
+        
+        template <typename T, int cn>
+        inline
+        void vec(cv::Vec<T ,cn>& vec) {
+            auto pos = cn;
+            while (pos)
+                vec[pos--] = static_cast<T>(0);
+        }
+
+        template <typename T>
+        inline
+        void rect(cv::Rect_<T>& rect) {
+            rect.x = rect.y = rect.height = rect.width = static_cast<T>(0);
+        }
+
+
+    }
+
     /**
     * \brief Adjust the marking rectangle based on the intersection points and specified buffer
     * \param marking_rect The rectangle to adjust
@@ -42,7 +62,6 @@ namespace cvr {
         cv::Scalar_<T> m = cv::mean(channels[0]);
 
         return m[0];
-
     }
 
     /**
@@ -61,7 +80,6 @@ namespace cvr {
 
         output[0] = mean[0];
         output[1] = std_dev[0];
-
     }
 
     /**
@@ -87,7 +105,6 @@ namespace cvr {
         cv::minMaxLoc(image, &min, &max, &minLoc, &maxLoc);
 
         return cv::Vec<T1, 4>(minLoc.x, minLoc.y, maxLoc.x, maxLoc.y);
-
     }
 
     /**

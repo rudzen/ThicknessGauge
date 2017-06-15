@@ -4,6 +4,8 @@
 
 #include "tg.h"
 #include "stl.h"
+#include "validate.h"
+#include "LineConfig.h"
 
 #ifndef CV_VERSION
 #include "Util/Vec.h"
@@ -23,9 +25,15 @@ namespace calc {
 
     constexpr double PI = 3.1415926535897932384626433832795;
 
-    constexpr double DEGREES = PI / 180;
+    constexpr double PI_2 = PI / 2.0;
 
-    constexpr double PIx2 = 2 * PI;
+    constexpr double PI_4 = PI / 4.0;
+
+    constexpr double DEGREES = PI / 180.0;
+
+    constexpr double RADIANS = 180.0 / PI;
+
+    constexpr double PIx2 = 2.0 * PI;
 
     constexpr double LOG2 = 0.69314718055994530941723212145818;
 
@@ -48,6 +56,23 @@ namespace calc {
             base_lines[0] = intersection_points[0] - buffer;
             base_lines[2] = intersection_points[2] + buffer;
 
+        }
+
+        /**
+         * \brief Computes a line from a vector of pixels points
+         * \param pixels The pixels to calculate the line from
+         * \param result The resulting line as 4 point float vec
+         * \return true if line was created, otherwise false
+         */
+        template <typename T>
+        inline
+        bool compute_line_fitting(std::vector<cv::Point_<T>>& pixels, cv::Vec4f& result, LineConfig& config) {
+            cv::Vec4f results;
+            cv::fitLine(pixels, results, config.getDistType(), config.getParams(), config.getReps(), config.getAepa());
+            if (!validate::valid_vec<float, 4>(results))
+                return false;
+            result = results;
+            return true;
         }
 
     }
@@ -418,6 +443,16 @@ namespace calc {
     * \return true if intersection points where computed, otherwise false
     */
     bool compute_intersection_points(cv::Vec4d& horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output);
+
+    template <typename T>
+    inline
+    cv::Vec<T, 2> compute_intersection_cut(const cv::Vec<T, 4>& left_border, const cv::Vec<T, 4>& right_border) {
+
+        // TODO : do something here
+
+        return cv::Vec<T, 2>(40.0, 40.0);
+    }
+
 
     /**
     * \brief Computes the intensity centroid for each X in the Y direction.

@@ -137,8 +137,6 @@ private:
 
 private: /* helper functions */
 
-    static cv::Vec2d computeIntersectionCut(shared_ptr<HoughLinesR>& hough);
-
     static double computeHoughPMinLine(double minLen, cv::Rect2d& rect);
 
     void loadGlob(std::string& globName);

@@ -249,7 +249,7 @@ void ThicknessGauge::computeMarkingHeight() {
         log_time << "intersection points: " << data->intersections << endl;
 
         // pixel cut off is based on the border of the marking..
-        auto intersect_cutoff = computeIntersectionCut(hough_vertical);
+        auto intersect_cutoff = calc::compute_intersection_cut(hough_vertical->getLeftBorder(), hough_vertical->getRightBorder());
 
         data->intersectionCuts[0] = data->intersections[0] - intersect_cutoff[0];
         data->intersectionCuts[3] = data->intersections[3] + intersect_cutoff[1];
@@ -269,7 +269,8 @@ void ThicknessGauge::computeMarkingHeight() {
         cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);
         cv::Point2d line_right(line_left.x + data->markingRect.width, data->baseLines[3]);
 
-        log_time << "angle between baselines: " << calc::angle_between_lines(line_left, line_right) << endl;
+        auto angle = calc::angle_between_lines(line_left, line_right);
+        log_time << cv::format("Angle between baselines: [r/d] = [%f/%f]\n", angle, calc::rad_to_deg(angle));
 
         //std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
         //std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
@@ -505,7 +506,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
     data->baseLines[2] = 0.0;
     data->baseLines[3] = right_y;
 
-    if (!validate::valid_vec2(data->baseLines)) {
+    if (!validate::valid_vec(data->baseLines)) {
         log_time << "Validation error for data->baseLines in computeBaseLineAreas()." << endl;
     }
 
@@ -854,14 +855,6 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR>& filter, shared_ptr<H
 
 }
 
-
-cv::Vec2d ThicknessGauge::computeIntersectionCut(shared_ptr<HoughLinesR>& hough) {
-    auto left_border = hough->getLeftBorder();
-    auto right_border = hough->getRightBorder();
-
-    return cv::Vec2d(40.0, 40.0);
-}
-
 /**
  * \brief Computes the minimum houghline lenght for properlistic houghline
  * \tparam minLen The minimim length of the line
@@ -899,24 +892,24 @@ void ThicknessGauge::addNulls() {
 
 /**
  * \brief Loads a glob from disk and stores them in a vector
- * \param globName The name of the glob to load (foldername)
+ * \param glob_name The name of the glob to load (foldername)
  */
-void ThicknessGauge::loadGlob(std::string& globName) {
+void ThicknessGauge::loadGlob(std::string& glob_name) {
 
     for (auto i = 0; i < frameset.size(); i++) {
 
         auto frames = frameset[i].get();
 
-        cout << frames->exp_ext << endl;
+        //cout << frames->exp_ext << endl;
 
-        globGenerator.setPattern(globName + expusures_short[i]);
+        globGenerator.setPattern(glob_name + expusures_short[i]);
         globGenerator.setRecursive(false);
         globGenerator.generateGlob();
 
         auto files = globGenerator.getFiles();
 
         if (files.empty()) {
-            CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", globName + expusures_short[i]));
+            CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", glob_name + expusures_short[i]));
         }
 
         auto size = static_cast<int>(files.size());

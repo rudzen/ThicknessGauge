@@ -81,7 +81,7 @@ namespace validate {
 
     template <typename T, int cn>
     inline
-    bool valid_vec2(const cv::Vec<T, cn>& v) {
+    bool valid_vec(const cv::Vec<T, cn>& v) {
         for (auto i = 0; i < cn; i++)
             if (v[i] < 0)
                 return false;
@@ -127,19 +127,19 @@ namespace validate {
             log_time << cv::format("rightPoints failed, size = %i\n", data->rightPoints.size());
         }
 
-        if (!valid_vec2(data->pointsStart)) {
+        if (!valid_vec(data->pointsStart)) {
             log_time << cv::format("pointsStart failed, data = %d,%d,%d\n", data->pointsStart[0], data->pointsStart[1], data->pointsStart[2]);
         }
 
-        if (!valid_vec2(data->leftBorder)) {
+        if (!valid_vec(data->leftBorder)) {
             log_time << cv::format("leftBorder failed, data = %d,%d,%d,%d\n", data->leftBorder[0], data->leftBorder[1], data->leftBorder[2], data->leftBorder[3]);
         }
 
-        if (!valid_vec2(data->rightBorder)) {
+        if (!valid_vec(data->rightBorder)) {
             log_time << cv::format("rightBorder failed, data = %d,%d,%d,%d\n", data->rightBorder[0], data->rightBorder[1], data->rightBorder[2], data->rightBorder[3]);
         }
 
-        if (!valid_vec2(data->centerLine)) {
+        if (!valid_vec(data->centerLine)) {
             log_time << cv::format("centerLine failed, data = %d,%d,%d,%d\n", data->centerLine[0], data->centerLine[1], data->centerLine[2], data->centerLine[3]);
         }
 
