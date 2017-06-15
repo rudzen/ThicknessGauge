@@ -31,6 +31,12 @@ namespace cvr {
             rect.x = rect.y = rect.height = rect.width = static_cast<T>(0);
         }
 
+        template <typename T>
+        inline
+        void point(cv::Point_<T>& p) {
+            p.x = static_cast<T>(0);
+            p.y = static_cast<T>(0);
+        }
 
     }
 
