@@ -140,7 +140,7 @@ private:
 
     void computerGaugeLine(cv::Mat& output);
 
-    bool getSparseY(cv::Mat& image, vi& output) const;
+    bool getSparseY(cv::Mat& image, std::vector<cv::Point>& output) const;
 
 public: // getters and setters
 

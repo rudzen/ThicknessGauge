@@ -1136,11 +1136,11 @@ void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
 }
 
 [[deprecated("Replaced by Line class, which has an improved interface")]]
-bool ThicknessGauge::getSparseY(cv::Mat& image, vi& output) const {
+bool ThicknessGauge::getSparseY(cv::Mat& image, std::vector<cv::Point>& output) const {
 
     output.reserve(image.cols);
 
-    vi pix;
+    std::vector<cv::Point> pix;
 
     pix.reserve(image.cols);
 

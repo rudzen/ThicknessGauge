@@ -14,9 +14,6 @@
  */
 namespace tg {
 
-    typedef std::vector<cv::Point2d> vd;
-    typedef std::vector<cv::Point2i> vi;
-
     typedef std::pair<cv::Point2f, cv::Point2f> linePair;
 
     enum Side { Left = 0, Right = 1, Center = 2 };
