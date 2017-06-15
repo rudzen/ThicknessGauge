@@ -112,7 +112,6 @@ public:
      */
     static void differentiateY(std::vector<cv::Point2i>& input, std::vector<cv::Point2i>& output);
 
-
     /**
      * \brief Diffirentiates twice :>
      */

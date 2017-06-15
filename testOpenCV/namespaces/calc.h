@@ -1,4 +1,3 @@
-
 //          Copyright Rudy Alex Kohn 2017.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -42,6 +41,49 @@ namespace calc {
     constexpr double PIx2 = 2.0 * PI;
 
     constexpr double LOG2 = 0.69314718055994530941723212145818;
+
+   /**
+    * Round to the nearest integer (stolen from opencv)
+    * @param value The value to round
+    * @return Nearest integer as double
+    */
+    template <typename T>
+    inline
+    int round(T value) {
+        static_assert(std::is_same<T, double>::value || std::is_same<T, float>::value, "round is only possible for floating points.");
+#if ((defined _MSC_VER && defined _M_X64) || (defined __GNUC__ && defined __x86_64__ \
+    && defined __SSE2__ && !defined __APPLE__) || CV_SSE2) && !defined(__CUDACC__)
+		__m128d t = _mm_set_sd(value);
+		return _mm_cvtsd_si32(t);
+#elif defined _MSC_VER && defined _M_IX86
+        int t;
+        __asm
+        {
+            fld value;
+            fistp t;
+        }
+        return t;
+#elif ((defined _MSC_VER && defined _M_ARM) || defined CV_ICC || \
+        defined __GNUC__) && defined HAVE_TEGRA_OPTIMIZATION
+		TEGRA_ROUND_DBL(value);
+#elif defined CV_ICC || defined __GNUC__
+# if defined ARM_ROUND_DBL
+		ARM_ROUND_DBL(value);
+# else
+		return static_cast<int>(lrint(value));
+# endif
+#else
+        /* it's ok if round does not comply with IEEE754 standard;
+        the tests should allow +/-1 difference when the tested functions use round */
+#ifdef CV_VERSION
+		return static_cast<int>(cv::floor(d + 0.5));
+#else
+		return static_cast<int>(floor(d + 0.5));
+#endif
+
+#endif
+    }
+
 
     namespace line {
 
@@ -106,7 +148,7 @@ namespace calc {
             pixels.reserve(input.cols);
 
             // sort the list in X
-            sort::sort_pixels_x_ascending(pix);
+            sorter::sort_pixels_x_ascending(pix);
 
             auto x = pix.front().x;
             auto count = 0;
@@ -117,8 +159,8 @@ namespace calc {
             for (const auto& p : pix) {
                 if (p.x != x) {
                     if (count > 0) {
-                        pixels.emplace_back(cv::Point(x, static_cast<int>(cvRound(y_sum / static_cast<double>(count)))));
-                        auto gradient = static_cast<unsigned char>(cvRound(gradient_sum / count));
+                        pixels.emplace_back(cv::Point(x, static_cast<int>(round(y_sum / static_cast<double>(count)))));
+                        auto gradient = static_cast<unsigned char>(round(gradient_sum / count));
                         output.at<unsigned char>(pixels.back()) = gradient;
                         gradient_pixels[x].y = gradient;
                         count = 0;
@@ -151,48 +193,6 @@ namespace calc {
         DESCENDING,
         ASCENDING
     };
-
-    /**
-    * Round to the nearest integer (stolen from opencv)
-    * @param value The value to round
-    * @return Nearest integer as double
-    */
-    template <typename T>
-    inline
-    int round(T value) {
-        static_assert(std::is_same<T, double>::value || std::is_same<T, float>::value, "round is only possible for floating points.");
-#if ((defined _MSC_VER && defined _M_X64) || (defined __GNUC__ && defined __x86_64__ \
-    && defined __SSE2__ && !defined __APPLE__) || CV_SSE2) && !defined(__CUDACC__)
-		__m128d t = _mm_set_sd(value);
-		return _mm_cvtsd_si32(t);
-#elif defined _MSC_VER && defined _M_IX86
-        int t;
-        __asm
-        {
-            fld value;
-            fistp t;
-        }
-        return t;
-#elif ((defined _MSC_VER && defined _M_ARM) || defined CV_ICC || \
-        defined __GNUC__) && defined HAVE_TEGRA_OPTIMIZATION
-		TEGRA_ROUND_DBL(value);
-#elif defined CV_ICC || defined __GNUC__
-# if defined ARM_ROUND_DBL
-		ARM_ROUND_DBL(value);
-# else
-		return static_cast<int>(lrint(value));
-# endif
-#else
-        /* it's ok if round does not comply with IEEE754 standard;
-        the tests should allow +/-1 difference when the tested functions use round */
-#ifdef CV_VERSION
-		return static_cast<int>(cv::floor(d + 0.5));
-#else
-		return static_cast<int>(floor(d + 0.5));
-#endif
-
-#endif
-    }
 
     /** Brief Calculates the manhattan distance
     * Manhattan distance between two points
@@ -420,6 +420,7 @@ namespace calc {
     }
 
 #ifdef CV_VERSION
+
     template <typename T1, typename T2>
     inline
     double dist_manhattan(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
@@ -655,15 +656,15 @@ namespace calc {
         return cv::Vec2d(sum);
     }
 
-   /**
-    * \brief Computes the intensity centroid for each X in the Y direction.
-    * This gives the weighted Y position based off the intensity levels across that single X column
-    * \param image The image to perform the computation on
-    * \param output The output vector of points
-    * \param upper_limit The upper limit of the rectangular cut out
-    * \param lower_limit The lower limit of the rectangular cut out
-    * \return The avg of the computed Y value across the entirety of the image matrix with regards to cut offs
-    */
+    /**
+     * \brief Computes the intensity centroid for each X in the Y direction.
+     * This gives the weighted Y position based off the intensity levels across that single X column
+     * \param image The image to perform the computation on
+     * \param output The output vector of points
+     * \param upper_limit The upper limit of the rectangular cut out
+     * \param lower_limit The lower limit of the rectangular cut out
+     * \return The avg of the computed Y value across the entirety of the image matrix with regards to cut offs
+     */
     template <typename T>
     double real_intensity_line(cv::Mat& image, std::vector<cv::Point_<T>>& output, int upper_limit, int lower_limit) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");

@@ -24,7 +24,7 @@ namespace stl {
     template <typename T>
     inline
     void sort_contours(std::vector<std::vector<cv::Point_<T>>>& contours) {
-        std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) { return contourArea(a) > contourArea(b); });
+        std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) { return cv::contourArea(a) > cv::contourArea(b); });
     }
 
 #ifdef CV_VERSION

@@ -133,7 +133,7 @@ namespace cvr {
         elements.emplace_back(cv::Point_<T>(0, target.rows));
         elements.emplace_back(cv::Point_<T>(target.cols, target.rows));
 
-        sort::sort_pixels_x_ascending(elements);
+        sorter::sort_pixels_x_ascending(elements);
 
         auto size = elements.size();
 
