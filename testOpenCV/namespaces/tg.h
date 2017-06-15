@@ -169,7 +169,7 @@ namespace tg {
     T align_min_value(T value_to_align, T min_val = 0) {
         static_assert(std::is_fundamental<T>::value, "alignment is only possible for fundamental types.");
         if (value_to_align < min_val)
-            value_to_align = 0;
+            value_to_align = min_val;
         return value_to_align;
     }
 
