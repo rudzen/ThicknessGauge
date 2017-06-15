@@ -3,6 +3,24 @@
 
 namespace cvr {
 
+    void split_frames(std::vector<cv::Mat>& frames, std::vector<cv::Mat>& left_out, std::vector<cv::Mat>& right_out) {
+
+        cv::Point top_left(0, 0);
+        cv::Point buttom_left(frames.front().cols / 2, frames.front().rows);
+
+        cv::Point top_right(frames.front().cols / 2, 0);
+        cv::Point buttom_right(frames.front().cols, frames.front().rows);
+
+        cv::Rect left_rect(top_left, buttom_left);
+        cv::Rect right_rect(top_right, buttom_right);
+
+        for (auto& frame : frames) {
+            left_out.emplace_back(frame(left_rect));
+            right_out.emplace_back(frame(right_rect));
+        }
+
+    }
+
     std::string type2str(int type) {
         std::string r;
 

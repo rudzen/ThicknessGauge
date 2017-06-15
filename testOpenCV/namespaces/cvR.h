@@ -273,6 +273,15 @@ namespace cvr {
         return !target.empty();
     }
 
+   /**
+    * \brief Split the original frames into two vectors based on the center of the matrix size in X.
+    * Note that the resulting vectors only contains references to the original frames.
+    * \param frames The frames to be split in half (verticaly)
+    * \param left_out The output left side of the frames
+    * \param right_out The output right side of the frames
+    */
+    void split_frames(std::vector<cv::Mat>& frames, std::vector<cv::Mat>& left_out, std::vector<cv::Mat>& right_out);
+
     /**
     * \brief Sums the intensity for a specific coloumn in a matrix
     * \param image The image matrix to sum from

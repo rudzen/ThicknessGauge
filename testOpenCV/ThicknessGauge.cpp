@@ -878,32 +878,6 @@ double ThicknessGauge::computeHoughPMinLine(double min_len, cv::Rect2d& rect) {
 }
 
 /**
- * \brief Split the original frames into two vectors based on the center of the matrix size in X.
- * Note that the resulting vectors only contains references to the original frames.
- * \param left The output left side of the frames
- * \param right The output right side of the frames
- */
-void ThicknessGauge::splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right, unsigned int frame_index) {
-
-    auto frames = frameset[frame_index].get();
-
-    cv::Point top_left(0, 0);
-    cv::Point buttom_left(frames->frames.front().cols / 2, frames->frames.front().rows);
-
-    cv::Point top_right(frames->frames.front().cols / 2, 0);
-    cv::Point buttom_right(frames->frames.front().cols, frames->frames.front().rows);
-
-    cv::Rect left_rect(top_left, buttom_left);
-    cv::Rect right_rect(top_right, buttom_right);
-
-    for (auto& frame : frames->frames) {
-        left.emplace_back(frame(left_rect));
-        right.emplace_back(frame(right_rect));
-    }
-
-}
-
-/**
  * \brief Adds the existing null images to the null_ vector for later substraction
  */
 void ThicknessGauge::addNulls() {

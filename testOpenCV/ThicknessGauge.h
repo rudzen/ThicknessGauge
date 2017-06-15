@@ -141,8 +141,6 @@ private: /* helper functions */
 
     static double computeHoughPMinLine(double minLen, cv::Rect2d& rect);
 
-    void splitFrames(vector<cv::Mat>& left, vector<cv::Mat>& right, unsigned int frame_index);
-
     void loadGlob(std::string& globName);
 
     void captureFrames(unsigned int frame_index, unsigned int capture_count, unsigned long long int exposure);
