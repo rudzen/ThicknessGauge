@@ -42,11 +42,13 @@ public:
         return showWindows_ && get_key(delay) == 27;
     }
 
-    void drawLine(cv::Mat& image, cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour) const {
+    template <typename T>
+    void drawLine(cv::Mat& image, cv::Point_<T>& p1, cv::Point_<T>& p2, cv::Scalar colour) const {
         drawLine(image, p1, p2, colour, 1);
     }
 
-    static void drawLine(cv::Mat& image, cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour, int thickness) {
+    template <typename T>
+    static void drawLine(cv::Mat& image, cv::Point_<T>& p1, cv::Point_<T>& p2, cv::Scalar colour, int thickness) {
         cv::line(image, p1, p2, colour, thickness, CV_AA);
     }
 
@@ -85,15 +87,8 @@ public:
 
     void drawText(cv::Mat* image, const std::string text, tg::TextDrawPosition position, cv::Scalar colour) const;
 
-    void drawRectangle(cv::Mat& image, cv::Rect& rectangle, cv::Scalar colour) const {
-        cv::rectangle(image, rectangle, colour, 1, CV_AA);
-    }
-
-    void drawRectangle(cv::Mat& image, cv::Rect2f& rectangle, cv::Scalar colour) const {
-        cv::rectangle(image, rectangle, colour, 1, CV_AA);
-    }
-
-    void drawRectangle(cv::Mat& image, cv::Rect2d& rectangle, cv::Scalar colour) const {
+    template <typename T>
+    void drawRectangle(cv::Mat& image, cv::Rect_<T>& rectangle, cv::Scalar colour) const {
         cv::rectangle(image, rectangle, colour, 1, CV_AA);
     }
 

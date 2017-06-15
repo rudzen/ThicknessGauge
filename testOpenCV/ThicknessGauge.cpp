@@ -1068,8 +1068,8 @@ bool ThicknessGauge::saveData(string filename) {
 
     const auto cut_buffer = 40;
 
-    cv::Point2f base_left_p1(data->pointsStart[1] - data->leftPoints.size() - cut_buffer, data->baseLines[1]);
-    cv::Point2f base_left_p2(data->pointsStart[1] - cut_buffer, base_left_p1.y);
+    cv::Point2d base_left_p1(data->pointsStart[1] - data->leftPoints.size() - cut_buffer, data->baseLines[1]);
+    cv::Point2d base_left_p2(data->pointsStart[1] - cut_buffer, base_left_p1.y);
     draw->drawLine(overlay, base_left_p1, base_left_p2, cv::Scalar(255, 0.0, 0.0));
     draw->drawLine(overview, base_left_p1, base_left_p2, cv::Scalar(255, 0.0, 0.0));
     //paintY(overlay, data->leftPoints, data->pointsStart[1] - data->leftPoints.size(), 0.0, default_col);
@@ -1077,8 +1077,8 @@ bool ThicknessGauge::saveData(string filename) {
 
     // CENTER
 
-    cv::Point2f marking_p1(base_left_p2.x + cut_buffer * 2, base_left_p1.y - data->difference);
-    cv::Point2f marking_p2(marking_p1.x + data->centerPoints.size() - cut_buffer * 2, marking_p1.y);
+    cv::Point2d marking_p1(base_left_p2.x + cut_buffer * 2, base_left_p1.y - data->difference);
+    cv::Point2d marking_p2(marking_p1.x + data->centerPoints.size() - cut_buffer * 2, marking_p1.y);
     draw->drawLine(overlay, marking_p1, marking_p2, cv::Scalar(255.0, 0.0, 0.0));
     //draw->drawLine(overview, marking_p1, marking_p2, cv::Scalar(255.0, 0.0, 0.0));
     paintY(overlay, data->centerPoints, marking_p1.x - cut_buffer, -data->difference, default_col);
@@ -1086,8 +1086,8 @@ bool ThicknessGauge::saveData(string filename) {
 
     // RIGHT
 
-    cv::Point2f base_right_p1(marking_p2.x + cut_buffer * 2, data->baseLines[3]);
-    cv::Point2f base_right_p2(base_right_p1.x + data->rightPoints.size(), base_right_p1.y);
+    cv::Point2d base_right_p1(marking_p2.x + cut_buffer * 2, data->baseLines[3]);
+    cv::Point2d base_right_p2(base_right_p1.x + data->rightPoints.size(), base_right_p1.y);
     draw->drawLine(overlay, base_right_p1, base_right_p2, cv::Scalar(255.0, 0.0, 0.0));
     draw->drawLine(overview, base_right_p1, base_right_p2, cv::Scalar(255.0, 0.0, 0.0));
     //paintY(overlay, data->rightPoints, base_right_p1.x, -data->difference, default_col);

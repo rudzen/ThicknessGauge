@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <opencv2/core.hpp>
+#include "../namespaces/tg.h"
 
 /**
  * \brief Simple OpenCV glob generator.
