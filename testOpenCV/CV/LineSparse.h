@@ -330,7 +330,7 @@ inline void Line::mergeIntensity() {
             allComplete_.emplace_back(incent);
     }
 
-    sort::sort_pixels_x_ascending(allComplete_);
+    sorter::sort_pixels_x_ascending(allComplete_);
 }
 
 inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sort) const {
@@ -338,9 +338,9 @@ inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::P
     target.insert(target.begin(), sourceOne.begin(), sourceOne.end());
     target.insert(target.end(), sourceTwo.begin(), sourceTwo.end());
     if (sort == SortMethod::x)
-        sort::sort_pixels_x_ascending(target);
+        sorter::sort_pixels_x_ascending(target);
     else if (sort == SortMethod::y)
-        sort::sort_pixels_y_ascending(target);
+        sorter::sort_pixels_y_ascending(target);
 }
 
 inline unsigned char Line::getPixelIntensity(cv::Point2d& location) {
@@ -378,7 +378,7 @@ inline bool Line::generateSparse() {
         return false;
 
     // sort the list in X
-    sort::sort_pixels_x_ascending(allTotal_);
+    sorter::sort_pixels_x_ascending(allTotal_);
 
     auto y = 0;
     auto count = 0;
