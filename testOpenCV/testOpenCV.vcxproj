@@ -173,7 +173,6 @@
     <ClCompile Include="namespaces\filters.h" />
     <ClCompile Include="namespaces\pixel.cpp" />
     <ClCompile Include="namespaces\tg.cpp" />
-    <ClCompile Include="UI\DrawHelper.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
     <ClCompile Include="IO\ImageSave.cpp" />
@@ -221,7 +220,6 @@
     <ClInclude Include="namespaces\sort.h" />
     <ClInclude Include="namespaces\stl.h" />
     <ClInclude Include="namespaces\validate.h" />
-    <ClInclude Include="UI\DrawHelper.h" />
     <ClInclude Include="UI\ProgressBar.h" />
     <ClInclude Include="Testing\TestConfig.h" />
     <ClInclude Include="Exceptions\TestException.h" />

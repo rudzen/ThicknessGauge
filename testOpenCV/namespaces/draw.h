@@ -3,7 +3,6 @@
 #include <opencv2/imgproc/imgproc_c.h>
 #include <opencv2/videostab/ring_buffer.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "UI/DrawHelper.h"
 
 namespace draw {
 

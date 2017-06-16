@@ -18,8 +18,7 @@
 #include "CV/HoughLinesPR.h"
 #include "CV/SparseR.h"
 
-#include "UI/DrawHelper.h"
-
+#include "Exceptions/ThrowAssert.h"
 #include "Exceptions/CaptureFailException.h"
 
 #include <VimbaC/Include/VmbCommonTypes.h>
@@ -34,7 +33,6 @@
 #include "namespaces/filters.h"
 #include "namespaces/sort.h"
 #include "namespaces/validate.h"
-#include "Exceptions/ThrowAssert.h"
 #include "namespaces/cvR.h"
 #include "namespaces/draw.h"
 

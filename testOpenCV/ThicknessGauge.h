@@ -8,9 +8,8 @@
 
 #include "Calibrate/CalibrationSettings.h"
 
-#include "UI/DrawHelper.h"
-
 #include "IO/GlobGenerator.h"
+
 #include "CV/CannyR.h"
 #include "CV/FilterR.h"
 #include "CV/HoughLinesR.h"

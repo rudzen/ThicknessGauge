@@ -123,9 +123,6 @@
     <ClCompile Include="Calc\GaugeMath.cpp">
       <Filter>Source Files\Calc</Filter>
     </ClCompile>
-    <ClCompile Include="UI\DrawHelper.cpp">
-      <Filter>Source Files\CV</Filter>
-    </ClCompile>
     <ClCompile Include="Vimba\CaptureAVTCamera.cpp">
       <Filter>Source Files\Camera</Filter>
     </ClCompile>
@@ -301,9 +298,6 @@
     </ClInclude>
     <ClInclude Include="namespaces\calc.h">
       <Filter>Header Files\Namespaces</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\DrawHelper.h">
-      <Filter>Header Files\CV</Filter>
     </ClInclude>
     <ClInclude Include="Calc\GaugeMath.h">
       <Filter>Header Files\Calc</Filter>

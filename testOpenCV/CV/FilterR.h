@@ -3,7 +3,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 #include "BaseR.h"
-#include "UI/DrawHelper.h"
 
 /*
 	|  __
