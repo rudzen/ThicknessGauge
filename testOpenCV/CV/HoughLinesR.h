@@ -394,7 +394,7 @@ inline tg::linePair HoughLinesR::computePointPair2(cv::Vec2f& line) const {
     }
 
     // convert
-    theta = static_cast<float>(theta * (1.0f / 180.0f) * CV_PI);
+    theta = static_cast<float>(theta * calc::DEGREES);
 
     auto imgCenterX = static_cast<unsigned int>(image_.cols) * 0.5f;
     auto imgCenterY = static_cast<unsigned int>(image_.rows) * 0.5f;

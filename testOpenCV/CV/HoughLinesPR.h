@@ -134,7 +134,7 @@ public:
           showWindow_(showWindow) {
         angle_ = calc::DEGREES * theta;
         minTheta_ = 0.0;
-        maxTheta_ = CV_PI;
+        maxTheta_ = calc::PI;
         angleLimit_ = 0;
         windowName = "HoughLinesP";
         maxLineGab_ = 10;
@@ -287,7 +287,7 @@ inline void HoughLinesPR::doHorizontalHough() {
     // splitting things up in smaller function would help!
     lines.reserve(image_.cols * image_.rows);
 
-    HoughLinesP(image_, lines, rho_, CV_PI / 4.0, threshold_, static_cast<double>(minLineLen_), static_cast<double>(maxLineGab_));
+    HoughLinesP(image_, lines, rho_, calc::PI / 4.0, threshold_, static_cast<double>(minLineLen_), static_cast<double>(maxLineGab_));
 
     auto count = lines.size();
 
