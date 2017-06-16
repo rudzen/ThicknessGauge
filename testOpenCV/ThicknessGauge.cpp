@@ -274,7 +274,7 @@ void ThicknessGauge::computeMarkingHeight() {
         filter_baseline->setShowWindows(showWindows_);
 
         // houghlines to determin where the actual marking is in the frame
-        auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(CV_PI / 180), 40, showWindows_);
+        auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, showWindows_);
 
         // configure the diffrent functionalities
         hough_vertical->setAngleLimit(30);
@@ -292,7 +292,7 @@ void ThicknessGauge::computeMarkingHeight() {
         auto min_line_len = computeHoughPMinLine(10.0, data->markingRect);
 
         // horizontal houghline extension class
-        auto hough_horizontal = make_shared<HoughLinesPR>(1, cvRound(CV_PI / 180), 40, cvRound(min_line_len), showWindows_);
+        auto hough_horizontal = make_shared<HoughLinesPR>(1, cvRound(calc::DEGREES), 40, cvRound(min_line_len), showWindows_);
 
         hough_horizontal->setMaxLineGab(12);
         hough_horizontal->setMarkingRect(data->markingRect);

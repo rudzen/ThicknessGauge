@@ -748,7 +748,7 @@ namespace calc {
 	inline
 	double angle_between_lines(v2<T>& p1, v2<T>& p2) {
 		static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
-		return atan((p1.y - p2.y) / (p2.x - p1.x) * 180 / CV_PI);
+		return atan((p1.y - p2.y) / (p2.x - p1.x) * calc::DEGREES);
 	}
 
 	template <typename T>

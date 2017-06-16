@@ -136,11 +136,11 @@ public:
         : rho_(rho),
           theta_(theta),
           threshold(threshold) {
-        angle_ = CV_PI / 180 * theta;
+        angle_ = calc::DEGREES * theta;
         srn_ = 0;
         stn_ = 0;
         minTheta_ = 0.0;
-        maxTheta_ = CV_PI;
+        maxTheta_ = calc::PI;
         angleLimit_ = 0;
         windowName = "HoughLines";
         showWindows_ = showWindow;
