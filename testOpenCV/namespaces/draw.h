@@ -59,6 +59,16 @@ namespace draw {
         drawLine(image, p1, p2, colour, 1);
     }
 
+    template <typename T>
+    void drawLine(cv::Mat& image, cv::Vec<T, 4>& p, cv::Scalar colour) {
+        drawLine(image, cv::Point_<T>(p[0], p[1]), cv::Point_<T>(p[2], p[3]), colour);
+    }
+
+    template <typename T>
+    void drawLine(cv::Mat& image, T x1, T y1, T x2, T y2, cv::Scalar colour) {
+        drawLine(image, cv::Point_<T>(x1, y1), cv::Point_<T>(x2, y2), colour);
+    }
+
     inline void drawHorizontalLine(cv::Mat* image, uint pos, cv::Scalar colour) {
         line(*image, cv::Point(0, image->rows - pos), cv::Point(image->cols, image->rows - pos), colour, 1, cv::LINE_AA);
     }

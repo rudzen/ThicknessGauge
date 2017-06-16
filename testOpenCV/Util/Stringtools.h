@@ -56,7 +56,7 @@ namespace utils {
     /**
     * A collection of useful string functions based on std::string
     */
-    class StringTools {
+    class StringTools : public std::string {
     private:
 
         // singleton stuff	
@@ -132,7 +132,7 @@ namespace utils {
         template <typename T>
         static T parse(const string& str) {
             T result;
-            istringstream(str) >> result;
+            std::istringstream(str) >> result;
             return result;
         }
 
@@ -152,7 +152,7 @@ namespace utils {
         inline
         static vector<T> parseArray(const string& str) {
             vector<T> elems;
-            istringstream f(str);
+            std::istringstream f(str);
             string s;
             while (getline(f, s, ':'))
                 elems.emplace_back(parse<T>(s));
@@ -207,7 +207,7 @@ namespace utils {
         *
         * Taken from http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
         */
-        static string& rtrim(string& s) {
+        static string& rtrim(std::string& s) {
             s.erase(find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(isspace))).base(), s.end());
             return s;
         }
@@ -228,7 +228,7 @@ namespace utils {
         */
         template <typename T>
         static string join(const vector<T>& v, const string& token) {
-            ostringstream result;
+            std::ostringstream result;
             for (typename vector<T>::const_iterator i = v.begin(); i != v.end(); ++i) {
                 if (i != v.begin())
                     result << token;

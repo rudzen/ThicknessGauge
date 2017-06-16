@@ -344,6 +344,9 @@
     <ClInclude Include="namespaces\draw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Ztring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

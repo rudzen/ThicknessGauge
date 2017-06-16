@@ -17,7 +17,7 @@ class LaserR : public BaseR {
     typedef struct xLine {
 
         // intensity vector
-        vector<unsigned char> i;
+        std::vector<unsigned char> i;
 
         // the x pos
         int x;

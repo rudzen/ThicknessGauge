@@ -232,6 +232,7 @@
     <ClInclude Include="Exceptions\ImageDimensionException.h" />
     <ClInclude Include="IO\ImageSave.h" />
     <ClInclude Include="Exceptions\InvalidMeanException.h" />
+    <ClInclude Include="Util\Ztring.h" />
     <ClInclude Include="Util\Stringtools.h" />
     <ClInclude Include="ThicknessGaugeData.h" />
     <ClInclude Include="Util\Vec.h" />
