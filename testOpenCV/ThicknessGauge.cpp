@@ -83,7 +83,7 @@ void ThicknessGauge::initialize(std::string& glob_name) {
                 log_time << "data->cameraPtr->GetInterfaceType fail.\n";
             }
 
-            VimbaData *vimb = data->vimbaData.get();
+            auto vimb = data->vimbaData.get();
 
             // copy over data from the camera which info is already known
             vimb->pCameraID = data->cameraData->getId();
@@ -95,23 +95,23 @@ void ThicknessGauge::initialize(std::string& glob_name) {
             // attempt to retrieve the interface information
             AVT::VmbAPI::InterfacePtr pInterface;
             error = system.GetInterfaceByID(vimb->pInterfaceID, pInterface);
-            std::string spasseren;
             if (error == VmbErrorSuccess) {
                 log_time << "system.GetInterfaceByID ok.\n";
-                error = pInterface->GetSerialNumber(spasseren);
+                std::string output_string;
+                error = pInterface->GetSerialNumber(output_string);
                 if (error == VmbErrorSuccess) {
-                    vimb->pInterfaceSerialNumber = spasseren.c_str();
-                    log_time << cv::format("pInterface->GetSerialNumber ok : %s\n", spasseren);
-                    spasseren.clear();
+                    vimb->pInterfaceSerialNumber = output_string.c_str();
+                    log_time << cv::format("pInterface->GetSerialNumber ok : %s\n", output_string);
+                    output_string.clear();
                 } else {
                     log_time << "pInterface->GetSerialNumber fail.\n";
                     cam_ok = false;
                 }
-                error == pInterface->GetName(spasseren);
+                error = pInterface->GetName(output_string);
                 if (error == VmbErrorSuccess) {
-                    vimb->pInterfaceName = spasseren.c_str();
-                    log_time << cv::format("pInterface->GetName ok : %s\n", spasseren);
-                    spasseren.clear();
+                    vimb->pInterfaceName = output_string.c_str();
+                    log_time << cv::format("pInterface->GetName ok : %s\n", output_string);
+                    output_string.clear();
                 } else {
                     log_time << "pInterface->GetName fail.\n";
                     cam_ok = false;
@@ -121,25 +121,23 @@ void ThicknessGauge::initialize(std::string& glob_name) {
                 cam_ok = false;
             }
 
-
             if (cam_ok) {
-                    GC2450MCamera(
-        const char* ,
-        const char* pCameraSerialNumber,
-        const char* pInterfaceID,
-        VmbInterfaceType interfaceType,
-        const char* pInterfaceName,
-        const char* pInterfaceSerialNumber,
-        VmbAccessModeType interfacePermittedAccess);
-                    GC2450MCamera c(vimb->pCameraID, vimb->pCameraName, vimb->pCameraModel, vimb->pCameraSerialNumber, vimb->pInterfaceID, vimb->interfaceType, vimb->pInterfaceName, vimb->pInterfaceSerialNumber);
+                // create the camera object
+                data->camera = std::make_unique<GC2450MCamera>(vimb->pCameraID,
+                                                               vimb->pCameraName,
+                                                               vimb->pCameraModel,
+                                                               vimb->pCameraSerialNumber,
+                                                               vimb->pInterfaceID,
+                                                               vimb->interfaceType,
+                                                               vimb->pInterfaceName,
+                                                               vimb->pInterfaceSerialNumber,
+                                                               vimb->interfacePermittedAccess);
 
             } else {
                 log_time << "Camera data reading failed..\n";
             }
 
-
         }
-
 
         ////VmbInterfaceType interfaceType,
         ////VmbAccessModeType interfacePermittedAccess
@@ -373,7 +371,6 @@ void ThicknessGauge::computeMarkingHeight() {
 
         if (draw::is_escape_pressed(30))
             return;
-
 
     } catch (cv::Exception& e) {
         cerr << cv::format("Exception caught in computeMarkingHeight().\n%s\n", e.msg.c_str());
@@ -768,7 +765,6 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
 
         stl::reset_point_y(results);
 
-
         for (auto i = frameCount_; i--;) {
 
             try {
@@ -904,16 +900,14 @@ void ThicknessGauge::computerInBetween(shared_ptr<FilterR>& filter, shared_ptr<H
     log_time << "in between: left_laser_roi -> " << left_laser_roi << endl;
 
     // grab the left left baseline
-    for (auto& f : frame->frames) {
+    for (auto& f : frame->frames)
         base.emplace_back(f(left_base_roi));
-    }
 
     // switch to lower exposure and grab left right side
     frame_index = 0;
     frame = frameset[frame_index].get();
-    for (auto& f : frame->frames) {
+    for (auto& f : frame->frames)
         mark.emplace_back(f(left_laser_roi));
-    }
 
     cv::imwrite("__left_.png", base.front());
     cv::imwrite("__right_.png", mark.front());
@@ -1086,7 +1080,9 @@ bool ThicknessGauge::saveData(string filename) {
 
     std::ofstream file_output(filename + ".1.left.intensitet.txt");
 
-    auto writeY = [&](auto p) { file_output << p.y - data->difference << '\n'; };
+    auto writeY = [&](auto p) {
+        file_output << p.y - data->difference << '\n';
+    };
 
     // left
     std::for_each(data->leftPoints.begin(), data->leftPoints.end(), writeY);
@@ -1259,7 +1255,7 @@ int ThicknessGauge::getFrameCount() const {
 }
 
 void ThicknessGauge::setFrameCount(int frameCount) {
-    if (frameCount < 1 || frameCount > 999)
+    if (!calc::in_between(frameCount, 1, 999))
         frameCount = 25;
 
     frameCount_ = frameCount;

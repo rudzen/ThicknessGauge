@@ -274,7 +274,6 @@ public:
         const char* pInterfaceSerialNumber,
         VmbAccessModeType interfacePermittedAccess);
 
-
     // Category /Acquisition
     VmbErrorType AcquisitionAbort();
     VmbErrorType GetAcquisitionAbortFeature(AVT::VmbAPI::FeaturePtr& feature);

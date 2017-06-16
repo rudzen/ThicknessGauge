@@ -42,12 +42,6 @@ public:
         canny = std::make_unique<CannyR>(200, 250, 3, true, showWindows, false);
     }
 
-    //ThicknessGauge(): data(new Data()), frameCount_(0), showWindows_(false), saveVideo_(false), binaryThreshold_(100), lineThreshold_(100) {
-    //	baseColour_ = cv::Scalar(255, 255, 255);
-    //	canny = make_shared<CannyR>(200, 250, 3, true, showWindows_, false);
-    //}
-
-
     std::shared_ptr<Data<double>> data; // there can be only one!
 
 public: // data return point
@@ -61,8 +55,6 @@ public: // data return point
     //}
 
 private:
-
-    //std::unique_ptr<DrawHelper> draw = std::make_unique<DrawHelper>(cv::Scalar(255, 255, 255));
 
     std::unique_ptr<Capture> capture; // initialized in initVideoCapture()
 

@@ -15,12 +15,13 @@ protected:
      * easily by pointing.. like..
      * auto frames = frameset[frameset_index].get();
      */
+    template <typename T>
     struct Frames {
         std::vector<cv::Mat> frames;
-        std::vector<double> means;
-        std::vector<double> stddevs;
+        std::vector<T> means;
+        std::vector<T> stddevs;
         std::string exp_ext;
-        double exp_ms;
+        T exp_ms;
 
         Frames() = delete;
 
@@ -62,7 +63,7 @@ protected:
 
     std::array<double, 3> exposures = {5000.0, 20000.0, 40000.0};
     std::array<std::string, 3> expusures_short = {"_5k", "_20k", "_40k"};
-    std::vector<std::unique_ptr<Frames>> frameset;
+    std::vector<std::unique_ptr<Frames<double>>> frameset;
 
     std::vector<cv::Mat> nulls_;
 
@@ -72,13 +73,14 @@ protected:
         frameset.clear();
         frameset.reserve(3);
         for (auto i = 0; i < exposures.size(); i++) {
-            auto fra = std::make_unique<Frames>(expusures_short[i], exposures[i]);
+            auto fra = std::make_unique<Frames<double>>(expusures_short[i], exposures[i]);
             frameset.emplace_back(std::move(fra));
         }
         frameset.shrink_to_fit();
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const std::unique_ptr<Frames> const& obj) {
+    template <typename T>
+    friend std::ostream& operator<<(std::ostream& os, const std::unique_ptr<Frames<T>> const& obj) {
         os << "[Frame Structure]\n{\n";
         if (obj->frames.empty()) {
             return os << "\t\"frameCount\": null,\n}";

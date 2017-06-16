@@ -97,7 +97,7 @@ namespace calc {
          */
         template <typename T1, typename T2>
         inline
-        void adjust_base_lines(cv::Vec<T1, 4>& base_lines, cv::Vec<T1, 4>& intersection_points, T2 buffer) {
+        void adjust_base_lines_x(cv::Vec<T1, 4>& base_lines, cv::Vec<T1, 4>& intersection_points, T2 buffer) {
             static_assert(std::is_same<T1, T2>::value, "requires identical types.");
             static_assert(std::is_same<T2, double>::value, "buffer must be double floating point.");
 
