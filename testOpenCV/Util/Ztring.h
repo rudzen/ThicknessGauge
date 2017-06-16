@@ -41,15 +41,17 @@ typedef __int128_t i128;
     typedef unsigned long long i128;
 #endif
 
+enum class HexType {
+    NONE,
+    HEX32,
+    HEX64
+};
+
 class Ztring : public std::string {
 public:
-    explicit Ztring(const std::string& s)
-        : std::string(s) {
-    }
+    explicit Ztring(const std::string& s) : std::string(s) { }
 
-    explicit Ztring(const char* s)
-        : std::string(s) {
-    }
+    explicit Ztring(const char* s) : std::string(s) { }
 
     Ztring() { }
 
@@ -99,24 +101,29 @@ public:
     }
 
     template <class T>
-    explicit Ztring(T d, const std::string tohex = "") {
+    explicit Ztring(T d, const HexType hex_type = HexType::NONE) {
+        static_assert(std::is_integral<T>::value, "Only integral types allowed.");
         std::stringstream ss;
-        if (tohex == "int64tohex") {
-            std::stringstream ss2;
-            ss2 << std::hex << d;
-            ss << "0x";
-            for (size_t i = 0; i < 16 - ss2.str().length(); i++)
-                ss << "0";
-            ss << std::hex << d << "ULL";
-        } else if (tohex == "int32tohex") {
-            std::stringstream ss2;
-            ss2 << std::hex << d;
-            ss << "0x";
-            for (size_t i = 0; i < 8 - ss2.str().length(); i++)
-                ss << "0";
-            ss << std::hex << d;
-        } else {
-            ss << d;
+        std::stringstream ss2;
+        switch (hex_type) {
+            case HexType::NONE:
+                ss << d;
+                break;
+            case HexType::HEX32:
+                ss2 << std::hex << d;
+                ss << "0x";
+                for (size_t i = 0; i < 8 - ss2.str().length(); i++)
+                    ss << "0";
+                ss << std::hex << d;
+                break;
+            case HexType::HEX64:
+                ss2 << std::hex << d;
+                ss << "0x";
+                for (size_t i = 0; i < 16 - ss2.str().length(); i++)
+                    ss << "0";
+                ss << std::hex << d << "ULL";
+                break;
+            default: ;
         }
         assign(ss.str());
     }
@@ -126,6 +133,36 @@ public:
             return 0;
         return std::stoi(s);
     }
+
+    template <typename T>
+    Ztring& to_hex(T d, const HexType hex_type = HexType::HEX64) {
+        static_assert(std::is_integral<T>::value, "Only integral types allowed.");
+        std::stringstream ss;
+        std::stringstream ss2;
+        switch (hex_type) {
+            case HexType::NONE:
+                ss << d;
+                break;
+            case HexType::HEX32:
+                ss2 << std::hex << d;
+                ss << "0x";
+                for (size_t i = 0; i < 8 - ss2.str().length(); i++)
+                    ss << "0";
+                ss << std::hex << d;
+                break;
+            case HexType::HEX64:
+                ss2 << std::hex << d;
+                ss << "0x";
+                for (size_t i = 0; i < 16 - ss2.str().length(); i++)
+                    ss << "0";
+                ss << std::hex << d << "ULL";
+                break;
+            default: ;
+        }
+        assign(ss.str());
+        return *this;
+    }
+
 
     /**
  * Creates a string containing spaces
