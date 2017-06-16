@@ -48,37 +48,106 @@ void ThicknessGauge::initialize(std::string& glob_name) {
 
     // determin where to get the frames from.
     if (glob_name == "camera") {
+
+        // just to check if everything was fine :-)
+        auto cam_ok = false;
+
         AVT::VmbAPI::CameraPtrVector cameras;
         auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
         if (VmbErrorSuccess == system.Startup()) {
-        	if (VmbErrorSuccess == system.GetCameras(cameras)) {
-        		data->cameraData->parse(cameras);
-        	}
-        	if (cameras.empty())
-                log_time << "Error, no cameras currently available.";
-        	data->cameraPtr = cameras.front();
+            if (VmbErrorSuccess == system.GetCameras(cameras)) {
+                data->cameraData->parse(cameras);
+            }
+            if (cameras.empty())
+            log_time << "Error, no cameras currently available.";
+            data->cameraPtr = cameras.front();
         }
 
-        ////		const char* pCameraID,
-        ////const char* pCameraName,
-        ////const char* pCameraModel,
-        ////const char* pCameraSerialNumber,
-        ////const char* pInterfaceID,
+        // gather information if the camera is found
+        if (data->cameraPtr != nullptr) {
+
+            //interface permissions
+            VmbErrorType error = data->cameraPtr->GetPermittedAccess(data->vimbaData->interfacePermittedAccess);
+            if (error == VmbErrorSuccess) {
+                log_time << "data->cameraPtr->GetPermittedAccess ok.\n";
+            } else {
+                log_time << "data->cameraPtr->GetPermittedAccess fail.\n";
+            }
+
+            // interface type
+            error = data->cameraPtr->GetInterfaceType(data->vimbaData->interfaceType);
+
+            if (error == VmbErrorSuccess) {
+                log_time << "data->cameraPtr->GetInterfaceType ok.\n";
+            } else {
+                log_time << "data->cameraPtr->GetInterfaceType fail.\n";
+            }
+
+            VimbaData *vimb = data->vimbaData.get();
+
+            // copy over data from the camera which info is already known
+            vimb->pCameraID = data->cameraData->getId();
+            vimb->pCameraName = data->cameraData->getName();
+            vimb->pCameraModel = data->cameraData->getModel();
+            vimb->pCameraSerialNumber = data->cameraData->getSn();
+            vimb->pInterfaceID = data->cameraData->getInterfaceId();
+
+            // attempt to retrieve the interface information
+            AVT::VmbAPI::InterfacePtr pInterface;
+            error = system.GetInterfaceByID(vimb->pInterfaceID, pInterface);
+            std::string spasseren;
+            if (error == VmbErrorSuccess) {
+                log_time << "system.GetInterfaceByID ok.\n";
+                error = pInterface->GetSerialNumber(spasseren);
+                if (error == VmbErrorSuccess) {
+                    vimb->pInterfaceSerialNumber = spasseren.c_str();
+                    log_time << cv::format("pInterface->GetSerialNumber ok : %s\n", spasseren);
+                    spasseren.clear();
+                } else {
+                    log_time << "pInterface->GetSerialNumber fail.\n";
+                    cam_ok = false;
+                }
+                error == pInterface->GetName(spasseren);
+                if (error == VmbErrorSuccess) {
+                    vimb->pInterfaceName = spasseren.c_str();
+                    log_time << cv::format("pInterface->GetName ok : %s\n", spasseren);
+                    spasseren.clear();
+                } else {
+                    log_time << "pInterface->GetName fail.\n";
+                    cam_ok = false;
+                }
+            } else {
+                log_time << "system.GetInterfaceByID fail.\n";
+                cam_ok = false;
+            }
+
+
+            if (cam_ok) {
+                    GC2450MCamera(
+        const char* ,
+        const char* pCameraSerialNumber,
+        const char* pInterfaceID,
+        VmbInterfaceType interfaceType,
+        const char* pInterfaceName,
+        const char* pInterfaceSerialNumber,
+        VmbAccessModeType interfacePermittedAccess);
+                    GC2450MCamera c(vimb->pCameraID, vimb->pCameraName, vimb->pCameraModel, vimb->pCameraSerialNumber, vimb->pInterfaceID, vimb->interfaceType, vimb->pInterfaceName, vimb->pInterfaceSerialNumber);
+
+            } else {
+                log_time << "Camera data reading failed..\n";
+            }
+
+
+        }
+
+
         ////VmbInterfaceType interfaceType,
-        ////const char* pInterfaceName,
-        ////const char* pInterfaceSerialNumber,
         ////VmbAccessModeType interfacePermittedAccess
 
         //VmbInterfaceType cam_interface_type;
         //auto error = data->cameraPtr->GetInterfaceType(cam_interface_type);
         //if (error == VmbErrorSuccess) {
         //	log_time << "cam_interface_type ok.\n";
-        //}
-
-        //VmbAccessModeType cam_interface_permissions;
-        //error = data->cameraPtr->GetPermittedAccess(cam_interface_permissions);
-        //if (error == VmbErrorSuccess) {
-        //	log_time << "cam_interface_permissions ok.\n";
         //}
 
         ////error = data->cameraPtr->Open(VmbAccessModeFull);

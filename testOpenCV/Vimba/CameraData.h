@@ -2,6 +2,7 @@
 #include <string>
 #include <VimbaCPP/Include/Camera.h>
 #include <ostream>
+#include "../namespaces/tg.h"
 
 // contains all meta information from the current camera
 // reason : this is generic, the original vimba is not !
@@ -14,6 +15,27 @@ class CameraData {
     std::vector<std::string> interfaceId;
 
 public:
+
+    const char* getId() {
+        return Id.front().c_str();
+    }
+
+    const char* getName() {
+        return name.front().c_str();
+    }
+
+    const char* getModel() {
+        return model.front().c_str();
+    }
+
+    const char* getSn() {
+        return sn.front().c_str();
+    }
+
+    const char *getInterfaceId() {
+        return interfaceId.front().c_str();
+    }
+
 
     bool empty() const {
         return Id.empty();
