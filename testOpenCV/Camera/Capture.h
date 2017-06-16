@@ -59,6 +59,103 @@ public:
         setGain(gain);
     }
 
+    template <typename T>
+    void initialize_vimba(Data<T>* data) {
+
+        // MESSY FOR NOW
+
+        // just to check if everything was fine :-)
+        auto cam_ok = false;
+
+        AVT::VmbAPI::CameraPtrVector cameras;
+        auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
+        if (VmbErrorSuccess == system.Startup()) {
+            if (VmbErrorSuccess == system.GetCameras(cameras)) {
+                data->cameraData->parse(cameras);
+            }
+            if (cameras.empty())
+            log_time << "Error, no cameras currently available.";
+            data->cameraPtr = cameras.front();
+        }
+
+        // gather information if the camera is found
+        if (data->cameraPtr != nullptr) {
+
+            //interface permissions
+            VmbErrorType error = data->cameraPtr->GetPermittedAccess(data->vimbaData->interfacePermittedAccess);
+            if (error == VmbErrorSuccess) {
+                log_time << "data->cameraPtr->GetPermittedAccess ok.\n";
+            } else {
+                log_time << "data->cameraPtr->GetPermittedAccess fail.\n";
+            }
+
+            // interface type
+            error = data->cameraPtr->GetInterfaceType(data->vimbaData->interfaceType);
+
+            if (error == VmbErrorSuccess) {
+                log_time << "data->cameraPtr->GetInterfaceType ok.\n";
+            } else {
+                log_time << "data->cameraPtr->GetInterfaceType fail.\n";
+            }
+
+            auto vimb = data->vimbaData.get();
+
+            // copy over data from the camera which info is already known
+            vimb->pCameraID = data->cameraData->getId();
+            vimb->pCameraName = data->cameraData->getName();
+            vimb->pCameraModel = data->cameraData->getModel();
+            vimb->pCameraSerialNumber = data->cameraData->getSn();
+            vimb->pInterfaceID = data->cameraData->getInterfaceId();
+
+            // attempt to retrieve the interface information
+            AVT::VmbAPI::InterfacePtr pInterface;
+            error = system.GetInterfaceByID(vimb->pInterfaceID, pInterface);
+            if (error == VmbErrorSuccess) {
+                log_time << "system.GetInterfaceByID ok.\n";
+                std::string output_string;
+                error = pInterface->GetSerialNumber(output_string);
+                if (error == VmbErrorSuccess) {
+                    vimb->pInterfaceSerialNumber = output_string.c_str();
+                    log_time << cv::format("pInterface->GetSerialNumber ok : %s\n", output_string);
+                    output_string.clear();
+                } else {
+                    log_time << "pInterface->GetSerialNumber fail.\n";
+                    cam_ok = false;
+                }
+                error = pInterface->GetName(output_string);
+                if (error == VmbErrorSuccess) {
+                    vimb->pInterfaceName = output_string.c_str();
+                    log_time << cv::format("pInterface->GetName ok : %s\n", output_string);
+                    output_string.clear();
+                } else {
+                    log_time << "pInterface->GetName fail.\n";
+                    cam_ok = false;
+                }
+            } else {
+                log_time << "system.GetInterfaceByID fail.\n";
+                cam_ok = false;
+            }
+
+            if (cam_ok) {
+                // create the camera object
+                data->camera = std::make_unique<GC2450MCamera>(vimb->pCameraID,
+                                                               vimb->pCameraName,
+                                                               vimb->pCameraModel,
+                                                               vimb->pCameraSerialNumber,
+                                                               vimb->pInterfaceID,
+                                                               vimb->interfaceType,
+                                                               vimb->pInterfaceName,
+                                                               vimb->pInterfaceSerialNumber,
+                                                               vimb->interfacePermittedAccess);
+
+            } else {
+                log_time << "Camera data reading failed..\n";
+            }
+
+        }
+
+    }
+
     bool isOpen() const {
         return cap.isOpened();
     }
