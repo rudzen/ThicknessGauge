@@ -33,19 +33,18 @@
 #include "VimbaCPP/Include/VimbaCPP.h"
 
 namespace AVT {
-namespace VmbAPI {
+    namespace VmbAPI {
 
-template<typename STREAM>
-STREAM& operator<<( STREAM& os, AVT::VmbAPI::VimbaSystem &sys )
-{
-    VmbVersionInfo_t info;
-    if (VmbErrorSuccess != sys.QueryVersion( info ))
-    {
-        throw std::exception();
+        template <typename STREAM>
+        STREAM& operator<<(STREAM& os, AVT::VmbAPI::VimbaSystem& sys) {
+            VmbVersionInfo_t info;
+            if (VmbErrorSuccess != sys.QueryVersion(info)) {
+                throw std::exception();
+            }
+            os << info.major << "." << info.minor << "." << info.patch;
+            return os;
+        }
+
     }
-    os << info.major << "." << info.minor << "." << info.patch;
-    return os;
-}
-
-}} // Namespace AVT::VmbAPI::Examples
+} // Namespace AVT::VmbAPI::Examples
 #endif

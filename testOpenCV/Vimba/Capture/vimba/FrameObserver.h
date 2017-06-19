@@ -38,41 +38,42 @@
 #include <VimbaCPP/Include/VimbaCPP.h>
 
 namespace AVT {
-namespace VmbAPI {
+    namespace VmbAPI {
 
-class FrameObserver : virtual public IFrameObserver
-{
-//    Q_OBJECT
+        class FrameObserver : virtual public IFrameObserver {
+            //    Q_OBJECT
 
-  public:
-    // We pass the camera that will deliver the frames to the constructor
-    FrameObserver( CameraPtr pCamera ) : IFrameObserver( pCamera ) {;}
+        public:
+            // We pass the camera that will deliver the frames to the constructor
+            FrameObserver(CameraPtr pCamera)
+                : IFrameObserver(pCamera) { ; }
 
-    // This is our callback routine that will be executed on every received frame
-    virtual void FrameReceived( const FramePtr pFrame );
+            // This is our callback routine that will be executed on every received frame
+            virtual void FrameReceived(const FramePtr pFrame);
 
-    // After the view has been notified about a new frame it can pick it up
-    FramePtr GetFrame();
+            // After the view has been notified about a new frame it can pick it up
+            FramePtr GetFrame();
 
-    bool FrameAvailable();
-    unsigned int GetQueueFrameSize();
+            bool FrameAvailable();
+            unsigned int GetQueueFrameSize();
 
-    // Clears the double buffer frame queue
-    void ClearFrameQueue();
+            // Clears the double buffer frame queue
+            void ClearFrameQueue();
 
-  private:
-    // Since a Qt signal cannot contain a whole frame
-    // the frame observer stores all FramePtr
-    std::queue<FramePtr> m_Frames;
-    std::mutex m_FramesMutex;
-//    QMutex m_FramesMutex;
+        private:
+            // Since a Qt signal cannot contain a whole frame
+            // the frame observer stores all FramePtr
+            std::queue<FramePtr> m_Frames;
+            std::mutex m_FramesMutex;
+            //    QMutex m_FramesMutex;
 
-//  signals:
-    // The frame received event that passes the frame directly
-    void FrameReceivedSignal( int status );
+            //  signals:
+            // The frame received event that passes the frame directly
+            void FrameReceivedSignal(int status);
 
-};
+        };
 
-}} // namespace AVT::VmbAPI::Examples
+    }
+} // namespace AVT::VmbAPI::Examples
 
 #endif

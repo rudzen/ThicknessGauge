@@ -20,8 +20,7 @@
 #pragma once
 
 #include "Capture.h"
-
-//#include "vimba/ApiController.h"
+#include "vimba/ApiController.h"
 
 class AVT::VmbAPI::ApiController;
 

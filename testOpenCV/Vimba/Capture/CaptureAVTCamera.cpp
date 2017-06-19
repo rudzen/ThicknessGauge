@@ -31,127 +31,114 @@ using namespace std;
 using namespace cv;
 
 
-CaptureAVTCamera::CaptureAVTCamera(int device) : Capture()
-{
+CaptureAVTCamera::CaptureAVTCamera(int device)
+    : Capture() {
     if (Open(device))
-	type = AVT_CAMERA;
+        type = AVT_CAMERA;
 }
 
-CaptureAVTCamera::CaptureAVTCamera(FileNode& fn) : Capture()
-{
+CaptureAVTCamera::CaptureAVTCamera(FileNode& fn)
+    : Capture() {
     LoadXML(fn);
     if (Open(device))
-	type = AVT_CAMERA;
+        type = AVT_CAMERA;
 }
 
-CaptureAVTCamera::~CaptureAVTCamera()
-{
+CaptureAVTCamera::~CaptureAVTCamera() {
 
 }
 
-string CaptureAVTCamera::GetName()
-{
+string CaptureAVTCamera::GetName() {
     string str = "AVT Camera device ";
     return str + std::to_string(device);
 }
 
-bool CaptureAVTCamera::Open (int device)
-{
+bool CaptureAVTCamera::Open(int device) {
     this->device = device;
     std::string cameraID;
     VmbErrorType err = VmbErrorSuccess;
 
     err = vimbaApiController.StartUp();
-    if (err == VmbErrorSuccess)
-    {
-	AVT::VmbAPI::CameraPtrVector cameras = vimbaApiController.GetCameraList();
-	if (cameras.empty())
-	{
-	    err = VmbErrorNotFound;
-	}
-	else
-	{
-	    err = cameras[device]->GetID(cameraID);
-	}
+    if (err == VmbErrorSuccess) {
+        AVT::VmbAPI::CameraPtrVector cameras = vimbaApiController.GetCameraList();
+        if (cameras.empty()) {
+            err = VmbErrorNotFound;
+        } else {
+            err = cameras[device]->GetID(cameraID);
+        }
     }
-    if (err == VmbErrorSuccess)
-    {
-	std::cout<<"Opening camera with ID: "<< cameraID <<"\n";
-	err = vimbaApiController.StartContinuousImageAcquisition(cameraID);
+    if (err == VmbErrorSuccess) {
+        std::cout << "Opening camera with ID: " << cameraID << "\n";
+        err = vimbaApiController.StartContinuousImageAcquisition(cameraID);
     }
 
-    if (err != VmbErrorSuccess)
-    {
-    	std::string strError = vimbaApiController.ErrorCodeToMessage( err );
-    	std::cout<<"\nAn error occured:"<<strError<<"\n";
-	return false;
+    if (err != VmbErrorSuccess) {
+        std::string strError = vimbaApiController.ErrorCodeToMessage(err);
+        std::cout << "\nAn error occured:" << strError << "\n";
+        return false;
     }
 
-// Get the properties from the camera
+    // Get the properties from the camera
     width = vimbaApiController.GetWidth();
     height = vimbaApiController.GetHeight();
 
-// estimate FPS by retrieving xx frames and measuring time
+    // estimate FPS by retrieving xx frames and measuring time
     unsigned long long t1 = wxGetUTCTimeUSec();
     int frameCount = 0;
-    while (1)
-    {
-	if (vimbaApiController.FrameAvailable())
-	{
-	    unsigned char* buffer;
-	    AVT::VmbAPI::FramePtr pFrame = vimbaApiController.GetFrame();
-	    VmbErrorType err = SP_ACCESS( pFrame )->GetImage( buffer );
-            if( err == VmbErrorSuccess ) frameCount++;
-	    vimbaApiController.QueueFrame(pFrame);
+    while (1) {
+        if (vimbaApiController.FrameAvailable()) {
+            unsigned char* buffer;
+            AVT::VmbAPI::FramePtr pFrame = vimbaApiController.GetFrame();
+            VmbErrorType err = SP_ACCESS( pFrame )->GetImage(buffer);
+            if (err == VmbErrorSuccess)
+                frameCount++;
+            vimbaApiController.QueueFrame(pFrame);
 
-	    if (frameCount == 20) break;
-	}
-	wxMicroSleep (10);
+            if (frameCount == 20)
+                break;
+        }
+        wxMicroSleep(10);
     }
     unsigned long long t2 = wxGetUTCTimeUSec();
-    double delay = (t2 - t1).ToDouble() / 1000000.0;
+    double delay = (t2 - t1) / 1000000.0;
     fps = 20.0 / delay;
 
     std::cout << "Camera properties\n";
-    std::cout << "width = " << width << std::endl <<" height = "<< height << " fps = " << fps << std::endl;
+    std::cout << "width = " << width << std::endl << " height = " << height << " fps = " << fps << std::endl;
 
-    playTimestep.Assign(1000000.0 / fps);
+    playTimestep = (1000000.0 / fps);
     startTime = wxGetUTCTimeUSec();
     pauseTime = startTime;
     isPaused = true;
 
-    frame = Mat (height, width, CV_8UC3);
+    frame = Mat(height, width, CV_8UC3);
 
     return (!frame.empty());
 }
 
-void CaptureAVTCamera::Close ()
-{
+void CaptureAVTCamera::Close() {
 
 }
 
-bool CaptureAVTCamera::GetNextFrame ()
-{
+bool CaptureAVTCamera::GetNextFrame() {
     bool gotFrame = false;
     unsigned long long startTime = wxGetUTCTimeUSec();
 
-// try to get a frame during x useconds
-    while (1)
-    {
-	if (vimbaApiController.FrameAvailable())
-	{
-	    gotFrame = vimbaApiController.GetFrame(frame);
-	}
+    // try to get a frame during x useconds
+    while (1) {
+        if (vimbaApiController.FrameAvailable()) {
+            gotFrame = vimbaApiController.GetFrame(frame);
+        }
 
-	if (gotFrame) break;
-	else if (wxGetUTCTimeUSec() - startTime > 1000000)
-	{
-	    return false;
-	}
+        if (gotFrame)
+            break;
+        else if (wxGetUTCTimeUSec() - startTime > 1000000) {
+            return false;
+        }
 
-// did not get a frame, wait a bit before retrying
-	wxMicroSleep (100);
-//	std::cout << "Waiting for a frame... " << startTime << "\t" << wxGetUTCTimeUSec() << std::endl;
+        // did not get a frame, wait a bit before retrying
+        wxMicroSleep(100);
+        //	std::cout << "Waiting for a frame... " << startTime << "\t" << wxGetUTCTimeUSec() << std::endl;
     }
 
     frameNumber++;
@@ -161,52 +148,47 @@ bool CaptureAVTCamera::GetNextFrame ()
     return !frame.empty();
 }
 
-unsigned long long CaptureAVTCamera::GetNextFrameSystemTime()
-{
+unsigned long long CaptureAVTCamera::GetNextFrameSystemTime() {
     return nextFrameTime;
 }
 
-void CaptureAVTCamera::Stop()
-{
+void CaptureAVTCamera::Stop() {
     isPaused = false;
     isStopped = true;
     statusChanged = true;
     frameNumber = 0;
 }
 
-void CaptureAVTCamera::Pause()
-{
+void CaptureAVTCamera::Pause() {
     isPaused = true;
     statusChanged = true;
     pauseTime = wxGetUTCTimeUSec();
 }
 
-void CaptureAVTCamera::Play()
-{
-    if (isPaused)
-    {
-	startTime += wxGetUTCTimeUSec() - pauseTime;
-	nextFrameTime = wxGetUTCTimeUSec() + playTimestep;
-	statusChanged = true;
-	isPaused = false;
+void CaptureAVTCamera::Play() {
+    if (isPaused) {
+        startTime += wxGetUTCTimeUSec() - pauseTime;
+        nextFrameTime = wxGetUTCTimeUSec() + playTimestep;
+        statusChanged = true;
+        isPaused = false;
     }
-    if (isStopped)
-    {
-	startTime = wxGetUTCTimeUSec();
-	nextFrameTime = startTime + playTimestep;
-	statusChanged = true;
-	isStopped =false;
+    if (isStopped) {
+        startTime = wxGetUTCTimeUSec();
+        nextFrameTime = startTime + playTimestep;
+        statusChanged = true;
+        isStopped = false;
     }
 }
 
-bool CaptureAVTCamera::GetFrame (double time)
-{
+bool CaptureAVTCamera::GetFrame(double time) {
     time *= 1000000.0;
-    while (InternalGetTime() < time) this_thread::sleep_for(chrono::milliseconds(10));
+    while (InternalGetTime() < time)
+        this_thread::sleep_for(chrono::milliseconds(10));
 
     if (vimbaApiController.FrameAvailable())
-	vimbaApiController.GetFrame(frame);
-    else return false;
+        vimbaApiController.GetFrame(frame);
+    else
+        return false;
 
     frameNumber++;
     lastFrameTime = InternalGetTime();
@@ -215,56 +197,51 @@ bool CaptureAVTCamera::GetFrame (double time)
     return !frame.empty();
 }
 
-long CaptureAVTCamera::GetFrameNumber ()
-{
+long CaptureAVTCamera::GetFrameNumber() {
     return frameNumber; // source.get(CV_CAP_PROP_POS_FRAMES);
 }
 
-long CaptureAVTCamera::GetFrameCount ()
-{
+long CaptureAVTCamera::GetFrameCount() {
     return 1;
 }
 
-double CaptureAVTCamera::GetTime()
-{
-    if (isStopped) return 0;
-    else return lastFrameTime.ToDouble() / 1000000.0;
+double CaptureAVTCamera::GetTime() {
+    if (isStopped)
+        return 0;
+    else
+        return lastFrameTime / 1000000.0;
 }
 
-unsigned long long CaptureAVTCamera::InternalGetTime()
-{
-    if (isPaused) return (pauseTime - startTime);
-    else if (isStopped) return 0;
-    else return (wxGetUTCTimeUSec() - startTime);
+unsigned long long CaptureAVTCamera::InternalGetTime() {
+    if (isPaused)
+        return (pauseTime - startTime);
+    else if (isStopped)
+        return 0;
+    else
+        return (wxGetUTCTimeUSec() - startTime);
 }
 
 
-void CaptureAVTCamera::SaveXML(FileStorage& fs)
-{
+void CaptureAVTCamera::SaveXML(FileStorage& fs) {
     fs << "Type" << "AVTcamera";
     fs << "Device" << device;
 
-    if (calibration.calibrated)
-    {
-	fs << "Calibration" << "{";
+    if (calibration.calibrated) {
+        fs << "Calibration" << "{";
 
-	calibration.SaveXML(fs);
+        calibration.SaveXML(fs);
 
-	fs << "}";
+        fs << "}";
     }
 }
 
-void CaptureAVTCamera::LoadXML(FileNode& fn)
-{
-    if (!fn.empty())
-    {
-	device = (int)fn["Device"];
+void CaptureAVTCamera::LoadXML(FileNode& fn) {
+    if (!fn.empty()) {
+        device = (int)fn["Device"];
 
-	FileNode calibNode = fn ["Calibration"];
-	if (!calibNode.empty())
-	{
-	    calibration.LoadXML (calibNode);
-	}
+        FileNode calibNode = fn["Calibration"];
+        if (!calibNode.empty()) {
+            calibration.LoadXML(calibNode);
+        }
     }
 }
-

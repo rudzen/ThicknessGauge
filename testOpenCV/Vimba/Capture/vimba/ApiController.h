@@ -40,54 +40,54 @@
 #include<opencv2/highgui/highgui.hpp>
 
 namespace AVT {
-namespace VmbAPI {
+    namespace VmbAPI {
 
-class ApiController
-{
-  public:
-    ApiController();
-    ~ApiController();
+        class ApiController {
+        public:
+            ApiController();
+            ~ApiController();
 
-    VmbErrorType        StartUp();
-    void                ShutDown();
+            VmbErrorType StartUp();
+            void ShutDown();
 
-    VmbErrorType        StartContinuousImageAcquisition( const std::string &rStrCameraID );
-    VmbErrorType        StopContinuousImageAcquisition();
+            VmbErrorType StartContinuousImageAcquisition(const std::string& rStrCameraID);
+            VmbErrorType StopContinuousImageAcquisition();
 
-    int                 GetWidth();
-    int                 GetHeight();
-    VmbPixelFormatType  GetPixelFormat();
-    CameraPtrVector     GetCameraList();
-    FramePtr            GetFrame();
-    bool GetFrame(cv::Mat& m);
-    bool FrameAvailable();
-    unsigned int GetQueueFrameSize();
-    VmbErrorType        QueueFrame( FramePtr pFrame );
-    void                ClearFrameQueue();
+            int GetWidth();
+            int GetHeight();
+            VmbPixelFormatType GetPixelFormat();
+            CameraPtrVector GetCameraList();
+            FramePtr GetFrame();
+            bool GetFrame(cv::Mat& m);
+            bool FrameAvailable();
+            unsigned int GetQueueFrameSize();
+            VmbErrorType QueueFrame(FramePtr pFrame);
+            void ClearFrameQueue();
 
-    CameraObserver*            GetCameraObserver();
-    FrameObserver*            GetFrameObserver();
+            CameraObserver* GetCameraObserver();
+            FrameObserver* GetFrameObserver();
 
-    std::string         ErrorCodeToMessage( VmbErrorType eErr ) const;
-    std::string         GetVersion() const;
+            std::string ErrorCodeToMessage(VmbErrorType eErr) const;
+            std::string GetVersion() const;
 
-  private:
-    // A reference to our Vimba singleton
-    VimbaSystem&                m_system;
-    // The currently streaming camera
-    CameraPtr                   m_pCamera;
-    // Every camera has its own frame observer
-    IFrameObserverPtr           m_pFrameObserver;
-    // Our camera observer
-    ICameraListObserverPtr      m_pCameraObserver;
-    // The current pixel format
-    VmbInt64_t                  m_nPixelFormat;
-    // The current width
-    VmbInt64_t                  m_nWidth;
-    // The current height
-    VmbInt64_t                  m_nHeight;
-};
+        private:
+            // A reference to our Vimba singleton
+            VimbaSystem& m_system;
+            // The currently streaming camera
+            CameraPtr m_pCamera;
+            // Every camera has its own frame observer
+            IFrameObserverPtr m_pFrameObserver;
+            // Our camera observer
+            ICameraListObserverPtr m_pCameraObserver;
+            // The current pixel format
+            VmbInt64_t m_nPixelFormat;
+            // The current width
+            VmbInt64_t m_nWidth;
+            // The current height
+            VmbInt64_t m_nHeight;
+        };
 
-}} // namespace AVT::VmbAPI::Examples
+    }
+} // namespace AVT::VmbAPI::Examples
 
 #endif
