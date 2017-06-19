@@ -83,7 +83,7 @@ bool CaptureAVTCamera::Open(int device) {
     height = vimbaApiController.GetHeight();
 
     // estimate FPS by retrieving xx frames and measuring time
-    unsigned long long t1 = wxGetUTCTimeUSec();
+    unsigned long long t1 = get_now_us();
     int frameCount = 0;
     while (1) {
         if (vimbaApiController.FrameAvailable()) {
@@ -97,9 +97,9 @@ bool CaptureAVTCamera::Open(int device) {
             if (frameCount == 20)
                 break;
         }
-        wxMicroSleep(10);
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
-    unsigned long long t2 = wxGetUTCTimeUSec();
+    unsigned long long t2 = get_now_us();
     double delay = (t2 - t1) / 1000000.0;
     fps = 20.0 / delay;
 
@@ -107,7 +107,7 @@ bool CaptureAVTCamera::Open(int device) {
     std::cout << "width = " << width << std::endl << " height = " << height << " fps = " << fps << std::endl;
 
     playTimestep = (1000000.0 / fps);
-    startTime = wxGetUTCTimeUSec();
+    startTime = get_now_us();
     pauseTime = startTime;
     isPaused = true;
 
@@ -122,7 +122,7 @@ void CaptureAVTCamera::Close() {
 
 bool CaptureAVTCamera::GetNextFrame() {
     bool gotFrame = false;
-    unsigned long long startTime = wxGetUTCTimeUSec();
+    unsigned long long startTime = get_now_us();
 
     // try to get a frame during x useconds
     while (1) {
@@ -132,12 +132,12 @@ bool CaptureAVTCamera::GetNextFrame() {
 
         if (gotFrame)
             break;
-        else if (wxGetUTCTimeUSec() - startTime > 1000000) {
+        else if (get_now_us() - startTime > 1000000) {
             return false;
         }
 
         // did not get a frame, wait a bit before retrying
-        wxMicroSleep(100);
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
         //	std::cout << "Waiting for a frame... " << startTime << "\t" << wxGetUTCTimeUSec() << std::endl;
     }
 
@@ -162,18 +162,18 @@ void CaptureAVTCamera::Stop() {
 void CaptureAVTCamera::Pause() {
     isPaused = true;
     statusChanged = true;
-    pauseTime = wxGetUTCTimeUSec();
+    pauseTime = get_now_us();
 }
 
 void CaptureAVTCamera::Play() {
     if (isPaused) {
-        startTime += wxGetUTCTimeUSec() - pauseTime;
-        nextFrameTime = wxGetUTCTimeUSec() + playTimestep;
+        startTime += get_now_us() - pauseTime;
+        nextFrameTime = startTime + playTimestep;
         statusChanged = true;
         isPaused = false;
     }
     if (isStopped) {
-        startTime = wxGetUTCTimeUSec();
+        startTime = get_now_us();
         nextFrameTime = startTime + playTimestep;
         statusChanged = true;
         isStopped = false;
@@ -192,7 +192,7 @@ bool CaptureAVTCamera::GetFrame(double time) {
 
     frameNumber++;
     lastFrameTime = InternalGetTime();
-    nextFrameTime = wxGetUTCTimeUSec() + playTimestep;
+    nextFrameTime = get_now_us() + playTimestep;
 
     return !frame.empty();
 }
@@ -218,7 +218,7 @@ unsigned long long CaptureAVTCamera::InternalGetTime() {
     else if (isStopped)
         return 0;
     else
-        return (wxGetUTCTimeUSec() - startTime);
+        return (get_now_us() - startTime);
 }
 
 
@@ -237,7 +237,7 @@ void CaptureAVTCamera::SaveXML(FileStorage& fs) {
 
 void CaptureAVTCamera::LoadXML(FileNode& fn) {
     if (!fn.empty()) {
-        device = (int)fn["Device"];
+        device = static_cast<int>(fn["Device"]);
 
         FileNode calibNode = fn["Calibration"];
         if (!calibNode.empty()) {

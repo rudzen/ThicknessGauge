@@ -24,8 +24,7 @@
 
 class AVT::VmbAPI::ApiController;
 
-struct CaptureAVTCamera : Capture
-{
+struct CaptureAVTCamera : Capture {
     int device;
     AVT::VmbAPI::ApiController vimbaApiController;
 
@@ -40,6 +39,10 @@ struct CaptureAVTCamera : Capture
     CaptureAVTCamera(cv::FileNode& fn);
     ~CaptureAVTCamera();
 
+    static inline long long int get_now_us() {
+        return std::chrono::high_resolution_clock::now().time_since_epoch() / std::chrono::microseconds(1);
+    }
+
     bool Open(int device);
     void Close();
 
@@ -47,8 +50,8 @@ struct CaptureAVTCamera : Capture
     void Play();
     void Stop();
 
-    bool GetNextFrame ();
-    bool GetFrame (double time);
+    bool GetNextFrame();
+    bool GetFrame(double time);
     unsigned long long GetNextFrameSystemTime();
     unsigned long long InternalGetTime();
     double GetTime();
@@ -56,8 +59,8 @@ struct CaptureAVTCamera : Capture
     long GetFrameNumber();
     long GetFrameCount();
 
-    void LoadXML (cv::FileNode& fn);
-    void SaveXML (cv::FileStorage& fs);
+    void LoadXML(cv::FileNode& fn);
+    void SaveXML(cv::FileStorage& fs);
 
     std::string GetName();
 };
