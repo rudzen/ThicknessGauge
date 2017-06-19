@@ -13,19 +13,6 @@ std::string CapturePvApi::version() const {
     return cv::format("%i.%i", major, minor);
 }
 
-std::string CapturePvApi::error() {
-
-    //*               ePvErrBadHandle,       the handle of the camera is invalid
-    //*               ePvErrUnplugged,       the camera has been unplugged 
-    //*               ePvErrNotFound,        the requested attribute doesn't exist
-    //*               ePvErrWrongType,       the requested attribute is not of the correct type
-    //*               ePvErrForbidden,       the requested attribute forbid this operation
-    //*               ePvErrOutOfRange,      the supplied value is out of range
-    //*               ePvErrInternalFault,   an internal fault occurred
-    //*               ePvErrBadSequence,     API isn't initialized
-
-}
-
 void CapturePvApi::region(cv::Rect_<unsigned long>& new_region) {
 
     Errcode = PvAttrUint32Set(myCamera.Handle, "RegionX", new_region.x);
@@ -89,23 +76,14 @@ void CapturePvApi::capture(int frame_count, std::vector<cv::Mat>& target_vector)
 
     for (auto i = frame_count; i--;) {
         if (!PvCaptureQueueFrame(myCamera.Handle, &(myCamera.Frame), nullptr)) {
-            //double time = static_cast<double>(cv::getTickCount());
 
             while (PvCaptureWaitForFrameDone(myCamera.Handle, &(myCamera.Frame), 100) == ePvErrTimeout) {
             }
 
-            ////////////////////////////////////////////////////////
-            // Here comes the OpenCV functionality for each frame //
-            ////////////////////////////////////////////////////////
-
             // Create an image header (mono image)
-            // Push ImageBuffer data into the image matrix
-            //auto m = cv::Mat(roi.height, roi.width, CV_8UC1);
+            // Push ImageBuffer data into the image matrix and clone it into target vector
             m.data = static_cast<uchar *>(myCamera.Frame.ImageBuffer);
             target_vector.emplace_back(m.clone());
-
-            //if (i)
-            //    exposure(exposure() + 500);
         }
     }
 

@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 
     std::vector<cv::Mat> temp;
 
-    capture_.capture(25, temp);
+    capture_.capture(25, temp, 60000);
 
     capture_.close();
 

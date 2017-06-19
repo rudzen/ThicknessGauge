@@ -2,7 +2,6 @@
 
 #include "CaptureInterface.h"
 #include <PvApi.h>
-#include "../namespaces/tg.h"
 
 class CapturePvApi : public CaptureInterface {
 
@@ -32,8 +31,6 @@ public:
 public:
 
     std::string version() const;
-
-    std::string error();
 
     void region(cv::Rect_<unsigned long>& new_region);
 
