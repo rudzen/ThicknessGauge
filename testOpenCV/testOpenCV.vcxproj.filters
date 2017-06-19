@@ -129,9 +129,6 @@
     <ClCompile Include="CV\HoughLinesR.cpp">
       <Filter>Source Files\CV</Filter>
     </ClCompile>
-    <ClCompile Include="Camera\Capture.cpp">
-      <Filter>Source Files\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="CV\LaserR.cpp">
       <Filter>Source Files\CV</Filter>
     </ClCompile>
@@ -164,6 +161,9 @@
     </ClCompile>
     <ClCompile Include="Vimba\testing\program.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\OpenCVCap.cpp">
+      <Filter>Source Files\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -287,9 +287,6 @@
     <ClInclude Include="Vimba\CameraFrame.h">
       <Filter>Header Files\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Camera\Capture.h">
-      <Filter>Header Files\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="Vimba\CaptureAVTCamera.h">
       <Filter>Header Files\Camera</Filter>
     </ClInclude>
@@ -350,9 +347,6 @@
     <ClInclude Include="Util\Ztring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera\CaptureVimba.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Vimba\testing\ApiController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -364,6 +358,9 @@
     </ClInclude>
     <ClInclude Include="Vimba\testing\ErrorCodeToMessage.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\OpenCVCap.h">
+      <Filter>Header Files\Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

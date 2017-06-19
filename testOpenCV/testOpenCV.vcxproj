@@ -164,7 +164,7 @@
     <ClCompile Include="Calc\GaugeMath.cpp" />
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
-    <ClCompile Include="Camera\Capture.cpp" />
+    <ClCompile Include="Camera\OpenCVCap.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
     <ClCompile Include="namespaces\calc.cpp" />
@@ -186,12 +186,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
-    <ClInclude Include="Camera\CaptureVimba.h" />
     <ClInclude Include="CV\HarrisDetector.h" />
     <ClInclude Include="Exceptions\ThrowAssert.h" />
     <ClInclude Include="namespaces\calc.h" />
     <ClInclude Include="Calc\GaugeMath.h" />
-    <ClInclude Include="Camera\Capture.h" />
+    <ClInclude Include="Camera\OpenCVCap.h" />
     <ClInclude Include="Camera\CaptureInterface.h" />
     <ClInclude Include="CV\BaseR.h" />
     <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />

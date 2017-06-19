@@ -23,7 +23,7 @@ using namespace tg;
     CV_CAP_PROP_PVAPI_BINNINGY              = 305, // Vertical binning factor
     CV_CAP_PROP_PVAPI_PIXELFORMAT           = 306, // Pixel format
  */
-class Capture : public CaptureInterface {
+class OpenCVCap : public CaptureInterface {
 
 private:
 
@@ -38,12 +38,12 @@ public:
 
     cv::VideoCapture cap;
 
-    Capture() {
+    OpenCVCap() {
         targetStdDev_ = NAN;
         delta_ = NAN;
     }
 
-    ~Capture() = default;
+    ~OpenCVCap() = default;
 
     void initialize() {
         cap.set(CV_CAP_PROP_SETTINGS, 1);
@@ -219,7 +219,7 @@ public:
 
     double detectExposure();
 
-    friend std::ostream& operator<<(std::ostream& os, const Capture& obj) {
+    friend std::ostream& operator<<(std::ostream& os, const OpenCVCap& obj) {
         os << "Capture device settings :\n";
         os << cv::format("brightness: %f\n", obj.settings->brightness);
         os << cv::format("contrast: %f\n", obj.settings->contrast);

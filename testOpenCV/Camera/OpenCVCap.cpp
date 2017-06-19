@@ -1,6 +1,6 @@
-﻿#include "Capture.h"
+﻿#include "OpenCVCap.h"
 
-void Capture::retrieveAllInfo() {
+void OpenCVCap::retrieveAllInfo() {
     settings->brightness = cap.get(CV_CAP_PROP_BRIGHTNESS);
     settings->contrast = cap.get(CV_CAP_PROP_CONTRAST);
     settings->saturation = cap.get(CV_CAP_PROP_SATURATION);
@@ -15,7 +15,7 @@ void Capture::retrieveAllInfo() {
     settings->buffersize = cap.get(CV_CAP_PROP_BUFFERSIZE);
 }
 
-double Capture::detectExposure() {
+double OpenCVCap::detectExposure() {
     cv::Mat t;
     cv::Scalar mean;
     cv::Scalar stddev(0.0, 0.0, 0.0);
