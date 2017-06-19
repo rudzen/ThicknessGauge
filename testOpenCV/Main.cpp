@@ -46,7 +46,7 @@ using namespace tg;
 #define _USE_MATH_DEFINES
 
 
-#define RUDZ_DEBUG
+#define VIMBA
 
 const string default_camera_calibration_file = "C2450.json";
 
