@@ -106,7 +106,7 @@ bool CaptureAVTCamera::Open(int device) {
     std::cout << "Camera properties\n";
     std::cout << "width = " << width << std::endl << " height = " << height << " fps = " << fps << std::endl;
 
-    playTimestep = (1000000.0 / fps);
+    playTimestep = (1000000 / fps);
     startTime = get_now_us();
     pauseTime = startTime;
     isPaused = true;

@@ -178,17 +178,7 @@
     <ClCompile Include="IO\ImageSave.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="IO\VideoInfo.cpp" />
-    <ClCompile Include="Vimba\CaptureAVTCamera.cpp" />
-    <ClCompile Include="Vimba\Capture\Capture.cpp" />
-    <ClCompile Include="Vimba\Capture\CaptureAVTCamera.cpp" />
-    <ClCompile Include="Vimba\Capture\CaptureCalibration.cpp" />
-    <ClCompile Include="Vimba\Capture\vimba\ApiController.cpp" />
-    <ClCompile Include="Vimba\Capture\vimba\CameraObserver.cpp" />
-    <ClCompile Include="Vimba\Capture\vimba\FrameObserver.cpp" />
     <ClCompile Include="Vimba\GC2450MCamera.cpp" />
-    <ClCompile Include="Vimba\testing\ApiController.cpp" />
-    <ClCompile Include="Vimba\testing\Bitmap.cpp" />
-    <ClCompile Include="Vimba\testing\program.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
@@ -247,22 +237,8 @@
     <ClInclude Include="namespaces\tg.h" />
     <ClInclude Include="Vimba\CameraData.h" />
     <ClInclude Include="Vimba\CameraFrame.h" />
-    <ClInclude Include="Vimba\CaptureAVTCamera.h" />
-    <ClInclude Include="Vimba\Capture\Capture.h" />
-    <ClInclude Include="Vimba\Capture\CaptureAVTCamera.h" />
-    <ClInclude Include="Vimba\Capture\CaptureCalibration.h" />
-    <ClInclude Include="Vimba\Capture\vimba\ApiController.h" />
-    <ClInclude Include="Vimba\Capture\vimba\CameraObserver.h" />
-    <ClInclude Include="Vimba\Capture\vimba\ErrorCodeToMessage.h" />
-    <ClInclude Include="Vimba\Capture\vimba\FrameObserver.h" />
-    <ClInclude Include="Vimba\Capture\vimba\StreamSystemInfo.h" />
-    <ClInclude Include="Vimba\Capture\vimba\TransformImage.h" />
     <ClInclude Include="Vimba\GC2450MCamera.h" />
     <ClInclude Include="Vimba\OpenCVVideoRecorder.h" />
-    <ClInclude Include="Vimba\testing\ApiController.h" />
-    <ClInclude Include="Vimba\testing\Bitmap.h" />
-    <ClInclude Include="Vimba\testing\ErrorCodeToMessage.h" />
-    <ClInclude Include="Vimba\testing\StreamSystemInfo.h" />
     <ClInclude Include="_unused_crap\temp_mains.txt" />
     <ClInclude Include="_unused_crap\temp_unused.txt" />
   </ItemGroup>

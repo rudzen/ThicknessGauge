@@ -123,9 +123,6 @@
     <ClCompile Include="Calc\GaugeMath.cpp">
       <Filter>Source Files\Calc</Filter>
     </ClCompile>
-    <ClCompile Include="Vimba\CaptureAVTCamera.cpp">
-      <Filter>Source Files\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="CV\HoughLinesR.cpp">
       <Filter>Source Files\CV</Filter>
     </ClCompile>
@@ -153,35 +150,8 @@
     <ClCompile Include="namespaces\pixel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Vimba\testing\ApiController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vimba\testing\Bitmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vimba\testing\program.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Camera\OpenCVCap.cpp">
       <Filter>Source Files\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Vimba\Capture\Capture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vimba\Capture\CaptureCalibration.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vimba\Capture\CaptureAVTCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vimba\Capture\vimba\ApiController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vimba\Capture\vimba\CameraObserver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vimba\Capture\vimba\FrameObserver.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -305,9 +275,6 @@
     <ClInclude Include="Vimba\CameraFrame.h">
       <Filter>Header Files\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Vimba\CaptureAVTCamera.h">
-      <Filter>Header Files\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="Camera\CaptureInterface.h">
       <Filter>Header Files\Camera</Filter>
     </ClInclude>
@@ -365,47 +332,8 @@
     <ClInclude Include="Util\Ztring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vimba\testing\ApiController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\testing\Bitmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\testing\StreamSystemInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\testing\ErrorCodeToMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera\OpenCVCap.h">
       <Filter>Header Files\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\Capture\Capture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\Capture\CaptureCalibration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\Capture\CaptureAVTCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\Capture\vimba\ApiController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\Capture\vimba\CameraObserver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\Capture\vimba\ErrorCodeToMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\Capture\vimba\FrameObserver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\Capture\vimba\StreamSystemInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\Capture\vimba\TransformImage.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

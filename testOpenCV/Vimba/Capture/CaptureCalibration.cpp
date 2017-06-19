@@ -10,6 +10,7 @@
 // TODO DEBUG
 //#include "Utils.h"
 #include <ctime>
+#include "namespaces/calc.h"
 
 using namespace std;
 using namespace cv;
@@ -231,11 +232,11 @@ void CaptureCalibration::Calibrate() {
     if (view.cols >= 1000 || view.rows >= 1000) {
         Mat tmp;
         if (view.cols > view.rows)
-            coeff = view.cols / 1000.0;
+            coeff = view.cols / 1000.0f;
         else
-            coeff = view.rows / 1000.0;
+            coeff = view.rows / 1000.0f;
 
-        Size sz(view.cols / coeff, view.rows / coeff);
+        Size sz(calc::round(view.cols / coeff), calc::round(view.rows / coeff));
         resize(view, tmp, sz);
         viewScaled = tmp;
     }

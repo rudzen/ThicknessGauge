@@ -9,6 +9,7 @@
 
 #include "CaptureInterface.h"
 #include "../namespaces/tg.h"
+#include <VimbaImageTransform/Include/VmbTransform.h>
 
 using namespace tg;
 
@@ -34,6 +35,95 @@ private:
 
     double delta_;
 
+    //
+    // frame data temporary storage
+    //
+    struct frame_store
+    {
+    private:
+        typedef std::vector<VmbUchar_t> data_vector;
+        data_vector                 m_Data;             // Frame data
+        VmbUint32_t                 m_Width;            // frame width
+        VmbUint32_t                 m_Height;           // frame height
+        VmbPixelFormat_t            m_PixelFormat;      // frame pixel format
+    public:
+        //
+        // Method: frame_store()
+        //
+        // Purpose: default constructing frame store from data pointer and dimensions
+        //
+        frame_store(const VmbUchar_t *pBuffer, VmbUint32_t BufferByteSize, VmbUint32_t Width, VmbUint32_t Height, VmbPixelFormatType PixelFormat)
+            : m_Data ( pBuffer, pBuffer + BufferByteSize )
+            , m_Width( Width )
+            , m_Height( Height )
+            , m_PixelFormat( PixelFormat )
+        {
+        }
+        //
+        // Method: equal
+        //
+        // Purpose: compare frame store to frame dimensions
+        //
+        bool equal( VmbUint32_t Width, VmbUint32_t Height, VmbPixelFormat_t PixelFormat) const
+        {
+            return      m_Width       == Width
+                    &&  m_Height      == Height
+                    &&  m_PixelFormat == PixelFormat;
+        }
+        //
+        // Method: setData
+        //
+        // Purpose: copy data into frame store from matching source
+        //
+        // Returns: false if data size not equal to internal buffer size
+        //
+        bool setData( const VmbUchar_t *Buffer, VmbUint32_t BufferSize)
+        {
+            if( BufferSize == dataSize() )
+            {
+                std::copy( Buffer, Buffer+BufferSize, m_Data.begin() );
+                return true;
+            }
+            return false;
+        }
+        //
+        // Methode: PixelFormat()
+        //
+        // Purpose: get pixel format of internal buffer.
+        //
+        VmbPixelFormat_t    pixelFormat()   const   { return m_PixelFormat; }
+        //
+        // Methode: Width()
+        //
+        // Purpose: get image width.
+        //
+        VmbUint32_t         width()         const   { return m_Width; }
+        //
+        // Methode: Height()
+        //
+        // Purpose: get image height
+        //
+        VmbUint32_t         height()        const   { return m_Height; }
+        //
+        // Methode: dataSize()
+        //
+        // Purpose: get buffer size of internal data.
+        //
+        VmbUint32_t         dataSize()      const   { return static_cast<VmbUint32_t>( m_Data.size() ); }
+        //
+        // Methode: data()
+        //
+        // Purpose: get constant internal data pointer.
+        //
+        const VmbUchar_t*   data()          const   { return &*m_Data.begin();}
+        //
+        // Methode: data()
+        //
+        // Purpose: get internal data pointer.
+        //
+        VmbUchar_t*         data()                  { return &*m_Data.begin();}
+    };
+
 public:
 
     cv::VideoCapture cap;
@@ -44,6 +134,8 @@ public:
     }
 
     ~OpenCVCap() = default;
+
+    cv::Mat m_ConvertImage;
 
     void initialize() {
         cap.set(CV_CAP_PROP_SETTINGS, 1);
@@ -57,6 +149,30 @@ public:
         gain = align_min_value(gain);
         setExposure(exposure);
         setGain(gain);
+    }
+
+    //
+    // Method:      convertImage()
+    //
+    // Purpose:     converts frame_store data to internal openCV image for video encoding.
+    //
+    // Parameters:
+    //
+    //  [in]    frame   internal frame_store struct from queue to convert into m_ConvertImage
+    //
+    // Note:        access to m_Convert image will race the function is not thread safe and meant to be used as single writer to data.
+    //
+    bool convertImage(frame_store& frame) {
+        VmbImage srcImage;
+        VmbImage dstImage;
+        srcImage.Size = sizeof(srcImage);
+        dstImage.Size = sizeof(dstImage);
+        VmbSetImageInfoFromPixelFormat(frame.pixelFormat(), frame.width(), frame.height(), & srcImage);
+        VmbSetImageInfoFromPixelFormat(VmbPixelFormatRgb8, m_ConvertImage.cols, m_ConvertImage.rows, & dstImage);
+        srcImage.Data = frame.data();
+        dstImage.Data = m_ConvertImage.data;
+        return VmbErrorSuccess == VmbImageTransform(&srcImage, &dstImage, NULL, 0);
+
     }
 
     template <typename T>

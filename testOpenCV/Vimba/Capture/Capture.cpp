@@ -75,7 +75,7 @@ void Capture::CalibrationSetBoardHeight(int h) {
 }
 
 void Capture::CalibrationSetSquareSize(int size) {
-    calibration.squareSize = ((float)size / 1000.0);
+    calibration.squareSize = (static_cast<float>(size) / 1000.0f);
 }
 
 void Capture::CalibrationSetFramesCount(int framesCount) {
@@ -138,7 +138,7 @@ int Capture::CalibrationGetAspectDen() {
 }
 
 float Capture::CalibrationGetFrameDelay() {
-    return calibration.delay;
+    return static_cast<float>(calibration.delay);
 }
 
 bool Capture::CalibrationGetZeroTangentDist() {

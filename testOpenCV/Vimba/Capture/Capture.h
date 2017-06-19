@@ -6,7 +6,8 @@
 
 #include "CaptureCalibration.h"
 
-struct Capture {
+class Capture {
+public:
     // members
     // ------------------------------------
 
