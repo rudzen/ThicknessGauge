@@ -45,7 +45,7 @@ public:
 
     virtual void retrieveAllInfo() = 0;
 
-    virtual void capture(int frame_count, double exposure) = 0;
+    virtual void capture(int frame_count, std::vector<cv::Mat>& target_vector, unsigned long exposure) = 0;
 
     virtual void initialize() = 0;
 

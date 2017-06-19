@@ -41,7 +41,7 @@ public:
 
     void retrieveAllInfo() override;
 
-    void capture(int frame_count, double exposure) override;
+    void capture(int frame_count, std::vector<cv::Mat>& target_vector, unsigned long exposure) override;
 
     void capture(int frame_count, std::vector<cv::Mat>& target_vector);
 

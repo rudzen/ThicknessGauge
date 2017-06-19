@@ -54,7 +54,11 @@ cv::Rect_<unsigned long> CapturePvApi::region() {
 void CapturePvApi::retrieveAllInfo() {
 }
 
-void CapturePvApi::capture(int frame_count, double exposure) {
+void CapturePvApi::capture(int frame_count, std::vector<cv::Mat>& target_vector, unsigned long exposure_to_use) {
+
+    exposure(exposure_to_use);
+    capture(frame_count, target_vector);
+
 }
 
 void CapturePvApi::capture(int frame_count, std::vector<cv::Mat>& target_vector) {
