@@ -18,7 +18,7 @@
 #include "CV/MorphR.h"
 
 #include "Vimba/GC2450MCamera.h"
-#include "Camera/Capture.h"
+#include "Camera/OpenCVCap.h"
 
 #include "namespaces/tg.h"
 
@@ -56,7 +56,7 @@ public: // data return point
 
 private:
 
-    std::unique_ptr<Capture> capture; // initialized in initVideoCapture()
+    std::unique_ptr<OpenCVCap> capture; // initialized in initVideoCapture()
 
     // common canny with default settings for detecting marking borders
     std::shared_ptr<CannyR> canny;

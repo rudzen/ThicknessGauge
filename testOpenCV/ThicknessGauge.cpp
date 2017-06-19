@@ -22,7 +22,7 @@
 #include "Exceptions/CaptureFailException.h"
 
 
-#include "Camera/Capture.h"
+#include "Camera/OpenCVCap.h"
 
 #include "namespaces/tg.h"
 #include "namespaces/filesystem.h"
@@ -108,7 +108,7 @@ void ThicknessGauge::initialize(std::string& glob_name) {
  * (requires that OpenCV is compiled with the location of the PvAPI, deprecated version)
  */
 void ThicknessGauge::initVideoCapture() {
-    capture = std::make_unique<Cap>();
+    capture = std::make_unique<OpenCVCap>();
     if (!capture->cap.open(CV_CAP_PVAPI)) {
         sync_cout << "Failed to open using PV_API, attempting defatult";
         if (!capture->cap.open(CV_CAP_ANY)) {
