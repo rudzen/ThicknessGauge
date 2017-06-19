@@ -9,6 +9,7 @@
 #include <opencv2/opencv.hpp>
 #include "Vimba/CameraData.h"
 #include "../Vimba/GC2450MCamera.h"
+#include <PvApi.h>
 
 /**
  * \brief Contains utilitary functionality for the entire program
@@ -59,9 +60,9 @@ namespace tg {
         Difference
     };
 
-
     typedef std::tuple<DataMemberIndex, bool, ValidationStatus, std::string> ValidationResult;
 
+    // used for camera
     using VimbaData = struct vim {
         const char* pCameraID;
         const char* pCameraName;
@@ -73,6 +74,13 @@ namespace tg {
         const char* pInterfaceSerialNumber;
         VmbAccessModeType interfacePermittedAccess;
     };
+
+    // camera's data type definition
+    typedef struct {
+        unsigned long UID;
+        tPvHandle Handle;
+        tPvFrame Frame;
+    } tCamera;
 
     template <class T>
     class Data {
@@ -93,11 +101,13 @@ namespace tg {
         // the camera meta data
         std::unique_ptr<CameraData> cameraData = std::make_unique<CameraData>();
 
-        // the main camera
+        // the main camera pointer through the system
         AVT::VmbAPI::CameraPtr cameraPtr;
 
+        // holding data to construct the actual camera
         std::unique_ptr<VimbaData> vimbaData = std::make_unique<VimbaData>();
 
+        // the actual camera used
         std::shared_ptr<GC2450MCamera> camera;
 
         // the name of the glob loaded (or "camera" for live feed)

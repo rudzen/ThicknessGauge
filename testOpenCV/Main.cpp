@@ -27,6 +27,9 @@
 #include "ThicknessGauge.h"
 
 #include "namespaces/tg.h"
+#include <PvApi.h>
+#include <thread>
+#include "Camera/CapturePvApi.h"
 
 using namespace std;
 using namespace TCLAP;
@@ -50,9 +53,8 @@ const string default_camera_calibration_file = "C2450.json";
 
 bool parseArgs(int argc, char** argv, CommandLineOptions& options);
 
-//vimba testing declarations
-unsigned char StartsWith(const char* pString, const char* pStart);
-int test_vimba(int argc, char* argv[]);
+//pvapi testing declarations
+int testCPP(int argc, char* argv[]);
 
 void saveNull(std::string filename) {
 
@@ -71,8 +73,36 @@ void saveNull(std::string filename) {
 
 int main(int argc, char** argv) {
 
+    CapturePvApi capture_;
+
+    capture_.initialize();
+
+    capture_.open();
+
+    std::vector<cv::Mat> temp;
+
+    capture_.capture(25, temp);
+
+    capture_.close();
+
+    log_time << "frames captured : " << temp.size() << std::endl;
+
+    while (true) {
+        int key = 0;
+        for (const auto& i : temp) {
+            cv::imshow("View window", i);
+            key = cv::waitKey(5);
+        }
+        if (key == 27) {
+            std::cout << "Closed down the application by pressing ESC." << std::endl;
+            break;
+        }
+    }
+
+    return 0;
+
     // jump directly into vimba testing for now!
-    //return test_vimba(argc, argv);
+    //return testCPP(argc, argv);
 
     auto return_value = false;
     CommandLineOptions options;
@@ -266,203 +296,143 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 }
 
 
-//unsigned char StartsWith(const char* pString, const char* pStart) {
-//    if (NULL == pString) {
+//using namespace std;
+//using namespace cv;
+//
+//// camera's data type definition
+//typedef struct {
+//    unsigned long UID;
+//    tPvHandle Handle;
+//    tPvFrame Frame;
+//
+//} tCamera;
+//
+//#define CH_MONO 1   // Single channel for mono images
+//
+//int testCPP(int argc, char* argv[]) {
+//    tg::tCamera myCamera;
+//    tPvCameraInfo cameraInfo;
+//    unsigned long frameSize;
+//    tPvErr Errcode;
+//
+//    int counter = 0;
+//
+//    if (argc == 1) {
+//        cout << "This script will stream data from an AVT MANTA GigE camera using OpenCV C++ style interface." << endl;
+//        cout << "capture_manta.exe <resolution width> <resolution heigth>" << endl;
 //        return 0;
 //    }
-//    if (NULL == pStart) {
-//        return 0;
-//    }
 //
-//    if (std::strlen(pString) < std::strlen(pStart)) {
-//        return 0;
-//    }
-//
-//    if (std::memcmp(pString, pStart, std::strlen(pStart)) != 0) {
-//        return 0;
-//    }
-//
-//    return 1;
-//}
-//
-//int test_vimba(int argc, char* argv[]) {
-//    VmbErrorType err = VmbErrorSuccess;
-//
-//    char* pCameraID = NULL; // The ID of the camera to use
-//    const char* pFileName = NULL; // The filename for the bitmap to save
-//    bool bPrintHelp = false; // Output help?
-//    int i; // Counter for some iteration
-//    char* pParameter; // The command line parameter
-//
-//    std::cout << "//////////////////////////////////////////\n";
-//    std::cout << "/// Vimba API Synchronous Grab Example ///\n";
-//    std::cout << "//////////////////////////////////////////\n\n";
-//
-//    //////////////////////
-//    //Parse command line//
-//    //////////////////////
-//
-//    for (i = 1; i < argc; ++i) {
-//        pParameter = argv[i];
-//        if (0 > std::strlen(pParameter)) {
-//            err = VmbErrorBadParameter;
-//            break;
+//    // Initialize the API
+//    if (!PvInitialize()) {
+//        // Wait for the response from a camera after the initialization of the driver
+//        // This is done by checking if camera's are found yet
+//        ////////////////////////////////////////////////////////////
+//        while (PvCameraCount() == 0) {
+//            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
 //        }
 //
-//        if ('/' == pParameter[0]) {
-//            if (StartsWith(pParameter, "/f:")) {
-//                if (NULL != pFileName) {
-//                    err = VmbErrorBadParameter;
-//                    break;
-//                }
+//        //debug
+//        cout << "Camera count successfully finished." << endl;
 //
-//                pFileName = pParameter + 3;
-//                if (0 >= std::strlen(pFileName)) {
-//                    err = VmbErrorBadParameter;
-//                    break;
-//                }
-//            } else if (0 == std::strcmp(pParameter, "/h")) {
-//                if ((NULL != pCameraID)
-//                    || (NULL != pFileName)
-//                    || (bPrintHelp)) {
-//                    err = VmbErrorBadParameter;
-//                    break;
-//                }
+//        /////////////////////////////////////////////////////////////
+//        if (PvCameraList(&cameraInfo, 1, NULL) == 1) {
+//            // Get the camera ID
+//            myCamera.UID = cameraInfo.UniqueId;
 //
-//                bPrintHelp = true;
-//            } else {
-//                err = VmbErrorBadParameter;
-//                break;
-//            }
-//        } else {
-//            if (NULL != pCameraID) {
-//                err = VmbErrorBadParameter;
-//                break;
-//            }
+//            // Open the camera
+//            if (!PvCameraOpen(myCamera.UID, ePvAccessMaster, &(myCamera.Handle))) {
+//                //debug
+//                cout << "Camera opened succesfully." << endl;
 //
-//            pCameraID = pParameter;
-//        }
-//    }
+//                // Get the image size of every capture
+//                PvAttrUint32Get(myCamera.Handle, "TotalBytesPerFrame", &frameSize);
 //
-//    //Write out an error if we could not parse the command line
-//    if (VmbErrorBadParameter == err) {
-//        std::cout << "Invalid parameters!\n\n";
-//        bPrintHelp = true;
-//    }
+//                // Allocate a buffer to store the image
+//                memset(&myCamera.Frame, 0, sizeof(tPvFrame));
+//                myCamera.Frame.ImageBufferSize = frameSize;
+//                myCamera.Frame.ImageBuffer = new char[frameSize];
 //
-//    //Print out help and end program
-//    if (bPrintHelp) {
-//        std::cout << "Usage: SynchronousGrab [CameraID] [/h] [/f:FileName]\n";
-//        std::cout << "Parameters:   CameraID    ID of the camera to use (using first camera if not specified)\n";
-//        std::cout << "              /h          Print out help\n";
-//        std::cout << "              /f:FileName File name for operation\n";
-//        std::cout << "                          (default \"SynchronousGrab.bmp\" if not specified)\n";
-//    } else {
-//        if (NULL == pFileName) {
-//            pFileName = "SynchronousGrab.bmp";
-//        }
+//                // Set maximum camera parameters - camera specific
+//                int max_width = 1624;
+//                int max_heigth = 1234;
 //
-//        AVT::VmbAPI::Examples::ApiController apiController;
+//                int center_x = max_width / 2;
+//                int center_y = max_heigth / 2;
 //
-//        std::cout << "Vimba Version V" << apiController.GetVersion() << "\n";
+//                int frame_width = atoi(argv[1]);
+//                int frame_heigth = atoi(argv[2]);
 //
-//        VmbFrameStatusType status = VmbFrameStatusIncomplete;
-//        err = apiController.StartUp();
-//        if (VmbErrorSuccess == err) {
-//            std::string strCameraID;
-//            if (NULL == pCameraID) {
-//                AVT::VmbAPI::CameraPtrVector cameras = apiController.GetCameraList();
-//                if (cameras.size() <= 0) {
-//                    err = VmbErrorNotFound;
-//                } else {
-//                    err = cameras[0]->GetID(strCameraID);
-//                }
-//            } else {
-//                strCameraID = pCameraID;
-//            }
+//                // Set the manta camera parameters to get wanted frame size retrieved
+//                PvAttrUint32Set(myCamera.Handle, "RegionX", center_x - (frame_width / 2));
+//                PvAttrUint32Set(myCamera.Handle, "RegionY", center_y - (frame_heigth / 2));
+//                PvAttrUint32Set(myCamera.Handle, "Width", frame_width);
+//                PvAttrUint32Set(myCamera.Handle, "Height", frame_heigth);
 //
-//            if (VmbErrorSuccess == err) {
-//                std::cout << "Camera ID:" << strCameraID.c_str() << "\n\n";
+//                // Start the camera
+//                PvCaptureStart(myCamera.Handle);
 //
-//                AVT::VmbAPI::FramePtr pFrame;
-//                err = apiController.AcquireSingleImage(strCameraID, pFrame);
-//                if (VmbErrorSuccess == err) {
-//                    err = pFrame->GetReceiveStatus(status);
-//                    if (VmbErrorSuccess == err
-//                        && VmbFrameStatusComplete == status) {
-//                        VmbPixelFormatType ePixelFormat = VmbPixelFormatMono8;
-//                        err = pFrame->GetPixelFormat(ePixelFormat);
-//                        if (VmbErrorSuccess == err) {
-//                            if ((VmbPixelFormatMono8 != ePixelFormat)
-//                                && (VmbPixelFormatRgb8 != ePixelFormat)) {
-//                                err = VmbErrorInvalidValue;
-//                            } else {
-//                                VmbUint32_t nImageSize = 0;
-//                                err = pFrame->GetImageSize(nImageSize);
-//                                if (VmbErrorSuccess == err) {
-//                                    VmbUint32_t nWidth = 0;
-//                                    err = pFrame->GetWidth(nWidth);
-//                                    if (VmbErrorSuccess == err) {
-//                                        VmbUint32_t nHeight = 0;
-//                                        err = pFrame->GetHeight(nHeight);
-//                                        if (VmbErrorSuccess == err) {
-//                                            VmbUchar_t* pImage = nullptr;
-//                                            err = pFrame->GetImage(pImage);
-//                                            if (VmbErrorSuccess == err) {
-//                                                AVTBitmap bitmap;
+//                // Set the camera to capture continuously
+//                PvAttrEnumSet(myCamera.Handle, "AcquisitionMode", "Continuous");
+//                PvCommandRun(myCamera.Handle, "AcquisitionStart");
+//                PvAttrEnumSet(myCamera.Handle, "FrameStartTriggerMode", "Freerun");
 //
-//                                                if (VmbPixelFormatRgb8 == ePixelFormat) {
-//                                                    bitmap.colorCode = ColorCodeRGB24;
-//                                                } else {
-//                                                    bitmap.colorCode = ColorCodeMono8;
-//                                                }
+//                // Create infinite loop - break out when condition is met
+//                for (;;) {
+//                    if (!PvCaptureQueueFrame(myCamera.Handle, &(myCamera.Frame), NULL)) {
+//                        double time = (double)getTickCount();
 //
-//                                                bitmap.bufferSize = nImageSize;
-//                                                bitmap.width = nWidth;
-//                                                bitmap.height = nHeight;
-//
-//                                                // test convert to opencv structure
-//
-//
-//                                                // Create the bitmap
-//                                                if (0 == AVTCreateBitmap(&bitmap, pImage)) {
-//                                                    std::cout << "Could not create bitmap.\n";
-//                                                    err = VmbErrorResources;
-//                                                } else {
-//                                                    // Save the bitmap
-//                                                    if (0 == AVTWriteBitmapToFile(&bitmap, pFileName)) {
-//                                                        std::cout << "Could not write bitmap to file.\n";
-//                                                        err = VmbErrorOther;
-//                                                    } else {
-//                                                        std::cout << "Bitmap successfully written to file \"" << pFileName << "\"\n";
-//                                                        // Release the bitmap's buffer
-//                                                        if (0 == AVTReleaseBitmap(&bitmap)) {
-//                                                            std::cout << "Could not release the bitmap.\n";
-//                                                            err = VmbErrorInternalFault;
-//                                                        }
-//                                                    }
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
+//                        while (PvCaptureWaitForFrameDone(myCamera.Handle, &(myCamera.Frame), 100) == ePvErrTimeout) {
 //                        }
+//
+//                        ////////////////////////////////////////////////////////
+//                        // Here comes the OpenCV functionality for each frame //
+//                        ////////////////////////////////////////////////////////
+//
+//                        // Create an image header (mono image)
+//                        // Push ImageBuffer data into the image matrix
+//                        Mat image = Mat(frame_heigth, frame_width, CV_8UC1);
+//                        image.data = (uchar *)myCamera.Frame.ImageBuffer;
+//
+//                        // Show the actual frame
+//                        imshow("View window", image);
+//
+//                        // Now wait for a keystroke and respond to it
+//                        int key = waitKey(5);
+//                        if (key == 27) {
+//                            cout << "Closed down the application by pressing ESC." << endl;
+//                            break;
+//                        }
+//                        if (key == 115) {
+//                            cout << "Save key pressed, storing current frame." << endl;
+//                            stringstream location;
+//                            location << "FILL_IN_A_LOCATION_HERE" << counter << ".png";
+//
+//                            imwrite(location.str(), image);
+//
+//                            counter++;
+//                        }
+//
+//                        // Release the image data
+//                        image.release();
 //                    }
 //                }
-//            }
 //
-//            apiController.ShutDown();
-//        }
+//                // Stop the acquisition & free the camera
+//                Errcode = PvCommandRun(myCamera.Handle, "AcquisitionStop");
+//                if (Errcode != ePvErrSuccess)
+//                    throw Errcode;
 //
-//        if (VmbErrorSuccess != err) {
-//            std::string strError = apiController.ErrorCodeToMessage(err);
-//            std::cout << "\nAn error occurred: " << strError.c_str() << "\n";
-//        }
-//        if (VmbFrameStatusIncomplete == status) {
-//            std::cout << "received frame was not complete\n";
-//        }
-//    }
+//                PvCaptureEnd(myCamera.Handle);
+//                PvCameraClose(myCamera.Handle);
 //
-//    return err;
+//                cout << endl << "finished" << endl;
+//            } else
+//                cout << "open camera error" << endl;
+//        } else
+//            cout << "camera not found" << endl;
+//    } else
+//        cout << "failed to initialise the API" << endl;
+//
+//    return 0;
 //}

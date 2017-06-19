@@ -108,17 +108,17 @@ void ThicknessGauge::initialize(std::string& glob_name) {
  * (requires that OpenCV is compiled with the location of the PvAPI, deprecated version)
  */
 void ThicknessGauge::initVideoCapture() {
-    capture = std::make_unique<OpenCVCap>();
-    if (!capture->cap.open(CV_CAP_PVAPI)) {
-        sync_cout << "Failed to open using PV_API, attempting defatult";
-        if (!capture->cap.open(CV_CAP_ANY)) {
-            CV_Error(cv::Error::StsError, "Error while attempting to open capture device.");
-        }
-    }
+    //capture = std::make_unique<OpenCVCap>();
+    //if (!capture->cap.open(CV_CAP_PVAPI)) {
+    //    sync_cout << "Failed to open using PV_API, attempting defatult";
+    //    if (!capture->cap.open(CV_CAP_ANY)) {
+    //        CV_Error(cv::Error::StsError, "Error while attempting to open capture device.");
+    //    }
+    //}
 
-    capture->targetStdDev(63.0);
-    capture->deltaValue(2.0);
-    log_time << "whoop: " << capture->detectExposure() << endl;
+    //capture->targetStdDev(63.0);
+    //capture->deltaValue(2.0);
+    //log_time << "whoop: " << capture->detectExposure() << endl;
 
 }
 

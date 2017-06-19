@@ -9,12 +9,6 @@
 #include <vector>
 #include "tg.h"
 
-#if defined(_MSC_VER) && !defined(inline)
-#define inline __forceinline
-#elif defined(__GNUC__) && !defined(inline)
-#define inline __always_inline
-#endif
-
 namespace validate {
 
 #ifdef CV_VERSION

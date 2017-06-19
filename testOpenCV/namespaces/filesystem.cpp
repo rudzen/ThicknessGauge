@@ -11,9 +11,6 @@
 
 namespace file {
 
-#if defined(_MSC_VER) && !defined(inline)
-#define inline __forceinline
-#endif
 
     constexpr char path_seperator =
 #ifdef _WIN32

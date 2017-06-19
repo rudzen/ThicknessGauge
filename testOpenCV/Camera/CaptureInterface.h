@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 using CaptureSettings = struct CaptureSettings {
 
     double brightness;
@@ -33,8 +35,18 @@ class CaptureInterface {
 protected:
     ~CaptureInterface() = default;
 
+    bool auto_exposure = false;
+
+    std::string status(std::string pre, bool s) {
+        return pre + (s ? " ok" : " fail") + ".\n";
+    }
+
 public:
 
     virtual void retrieveAllInfo() = 0;
+
+    virtual void capture(int frame_count, double exposure) = 0;
+
+    virtual void initialize() = 0;
 
 };

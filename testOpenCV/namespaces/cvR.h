@@ -11,10 +11,6 @@
 #include "sort.h"
 #include "calc.h"
 
-#if defined(_MSC_VER) && !defined(inline)
-#define inline __forceinline
-#endif
-
 // helper functions for open cv related stuff.
 namespace cvr {
 

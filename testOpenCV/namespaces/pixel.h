@@ -11,10 +11,6 @@
 
 namespace pixel {
     
-#if defined(_MSC_VER) && !defined(inline)
-#define inline __forceinline
-#endif
-
     /**
      * \brief Get the intensity of a specific point on a specific image
      * \param image The image to get the intensity from

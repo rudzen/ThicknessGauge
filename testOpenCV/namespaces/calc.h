@@ -18,10 +18,6 @@
 #include "Util/Vec.h"
 #endif
 
-#if defined(_MSC_VER) && !defined(inline)
-#define inline __forceinline
-#endif
-
 /**
  * \brief Calculation utility functionality
  * Contains optional OpenCV overloads for quick access

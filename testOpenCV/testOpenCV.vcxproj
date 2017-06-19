@@ -164,6 +164,7 @@
     <ClCompile Include="Calc\GaugeMath.cpp" />
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
+    <ClCompile Include="Camera\CapturePvApi.cpp" />
     <ClCompile Include="Camera\OpenCVCap.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
@@ -182,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
+    <ClInclude Include="Camera\CapturePvApi.h" />
     <ClInclude Include="CV\HarrisDetector.h" />
     <ClInclude Include="Exceptions\ThrowAssert.h" />
     <ClInclude Include="namespaces\calc.h" />

@@ -8,10 +8,6 @@
 
 #include <opencv2/core/core.hpp>
 
-#if defined(_MSC_VER) && !defined(inline)
-#define inline __forceinline
-#endif
-
 namespace stl {
 
     template <typename T1, typename T2>

@@ -26,8 +26,6 @@ using namespace tg;
  */
 class OpenCVCap : public CaptureInterface {
 
-private:
-
     std::unique_ptr<CaptureSettings> settings = std::make_unique<CaptureSettings>();
 
     // The target stddev to set configuration for.
@@ -38,38 +36,37 @@ private:
     //
     // frame data temporary storage
     //
-    struct frame_store
-    {
+    struct frame_store {
     private:
         typedef std::vector<VmbUchar_t> data_vector;
-        data_vector                 m_Data;             // Frame data
-        VmbUint32_t                 m_Width;            // frame width
-        VmbUint32_t                 m_Height;           // frame height
-        VmbPixelFormat_t            m_PixelFormat;      // frame pixel format
+        data_vector m_Data; // Frame data
+        VmbUint32_t m_Width; // frame width
+        VmbUint32_t m_Height; // frame height
+        VmbPixelFormat_t m_PixelFormat; // frame pixel format
     public:
         //
         // Method: frame_store()
         //
         // Purpose: default constructing frame store from data pointer and dimensions
         //
-        frame_store(const VmbUchar_t *pBuffer, VmbUint32_t BufferByteSize, VmbUint32_t Width, VmbUint32_t Height, VmbPixelFormatType PixelFormat)
-            : m_Data ( pBuffer, pBuffer + BufferByteSize )
-            , m_Width( Width )
-            , m_Height( Height )
-            , m_PixelFormat( PixelFormat )
-        {
+        frame_store(const VmbUchar_t* pBuffer, VmbUint32_t BufferByteSize, VmbUint32_t Width, VmbUint32_t Height, VmbPixelFormatType PixelFormat)
+            : m_Data(pBuffer, pBuffer + BufferByteSize)
+              , m_Width(Width)
+              , m_Height(Height)
+              , m_PixelFormat(PixelFormat) {
         }
+
         //
         // Method: equal
         //
         // Purpose: compare frame store to frame dimensions
         //
-        bool equal( VmbUint32_t Width, VmbUint32_t Height, VmbPixelFormat_t PixelFormat) const
-        {
-            return      m_Width       == Width
-                    &&  m_Height      == Height
-                    &&  m_PixelFormat == PixelFormat;
+        bool equal(VmbUint32_t Width, VmbUint32_t Height, VmbPixelFormat_t PixelFormat) const {
+            return m_Width == Width
+                && m_Height == Height
+                && m_PixelFormat == PixelFormat;
         }
+
         //
         // Method: setData
         //
@@ -77,51 +74,50 @@ private:
         //
         // Returns: false if data size not equal to internal buffer size
         //
-        bool setData( const VmbUchar_t *Buffer, VmbUint32_t BufferSize)
-        {
-            if( BufferSize == dataSize() )
-            {
-                std::copy( Buffer, Buffer+BufferSize, m_Data.begin() );
+        bool setData(const VmbUchar_t* Buffer, VmbUint32_t BufferSize) {
+            if (BufferSize == dataSize()) {
+                std::copy(Buffer, Buffer + BufferSize, m_Data.begin());
                 return true;
             }
             return false;
         }
+
         //
         // Methode: PixelFormat()
         //
         // Purpose: get pixel format of internal buffer.
         //
-        VmbPixelFormat_t    pixelFormat()   const   { return m_PixelFormat; }
+        VmbPixelFormat_t pixelFormat() const { return m_PixelFormat; }
         //
         // Methode: Width()
         //
         // Purpose: get image width.
         //
-        VmbUint32_t         width()         const   { return m_Width; }
+        VmbUint32_t width() const { return m_Width; }
         //
         // Methode: Height()
         //
         // Purpose: get image height
         //
-        VmbUint32_t         height()        const   { return m_Height; }
+        VmbUint32_t height() const { return m_Height; }
         //
         // Methode: dataSize()
         //
         // Purpose: get buffer size of internal data.
         //
-        VmbUint32_t         dataSize()      const   { return static_cast<VmbUint32_t>( m_Data.size() ); }
+        VmbUint32_t dataSize() const { return static_cast<VmbUint32_t>(m_Data.size()); }
         //
         // Methode: data()
         //
         // Purpose: get constant internal data pointer.
         //
-        const VmbUchar_t*   data()          const   { return &*m_Data.begin();}
+        const VmbUchar_t* data() const { return &*m_Data.begin(); }
         //
         // Methode: data()
         //
         // Purpose: get internal data pointer.
         //
-        VmbUchar_t*         data()                  { return &*m_Data.begin();}
+        VmbUchar_t* data() { return &*m_Data.begin(); }
     };
 
 public:
@@ -180,38 +176,53 @@ public:
 
         // MESSY FOR NOW
 
+        log_time << "Camera initialization in progress.\n";
+
         // just to check if everything was fine :-)
-        auto cam_ok = false;
+        auto cam_ok = true;
 
         AVT::VmbAPI::CameraPtrVector cameras;
         auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
         if (VmbErrorSuccess == system.Startup()) {
             if (VmbErrorSuccess == system.GetCameras(cameras))
                 data->cameraData->parse(cameras);
-            if (cameras.empty())
-            log_time << "Error, no cameras currently available.";
+            if (cameras.empty()) {
+                log_time << "Error, no cameras currently available.";
+                return;
+            }
             data->cameraPtr = cameras.front();
         }
 
         // gather information if the camera is found
         if (data->cameraPtr != nullptr) {
 
+            bool success;
+
             //interface permissions
             VmbErrorType error = data->cameraPtr->GetPermittedAccess(data->vimbaData->interfacePermittedAccess);
-            if (error == VmbErrorSuccess) {
-                log_time << "data->cameraPtr->GetPermittedAccess ok.\n";
-            } else {
-                log_time << "data->cameraPtr->GetPermittedAccess fail.\n";
-            }
+            success = error == VmbErrorSuccess;
+            log_time << status("data->cameraPtr->GetPermittedAccess", success);
+            if (!success)
+                cam_ok = false;
+
+            //if (success) {
+            //    log_time << "data->cameraPtr->GetPermittedAccess ok.\n";
+            //} else {
+            //    log_time << "data->cameraPtr->GetPermittedAccess fail.\n";
+            //    cam_ok = false;
+            //}
 
             // interface type
             error = data->cameraPtr->GetInterfaceType(data->vimbaData->interfaceType);
 
             if (error == VmbErrorSuccess) {
-                log_time << "data->cameraPtr->GetInterfaceType ok.\n";
+                log_time << "data->data->cameraPtr->GetInterfaceType ok.\n";
             } else {
-                log_time << "data->cameraPtr->GetInterfaceType fail.\n";
+                log_time << "data->data->cameraPtr->GetInterfaceType fail.\n";
+                cam_ok = false;
             }
+
+            std::string output_string;
 
             auto vimb = data->vimbaData.get();
 
@@ -227,25 +238,28 @@ public:
             error = system.GetInterfaceByID(vimb->pInterfaceID, pInterface);
             if (error == VmbErrorSuccess) {
                 log_time << "system.GetInterfaceByID ok.\n";
-                std::string output_string;
                 error = pInterface->GetSerialNumber(output_string);
                 if (error == VmbErrorSuccess) {
                     vimb->pInterfaceSerialNumber = output_string.c_str();
-                    log_time << cv::format("pInterface->GetSerialNumber ok : %s\n", output_string);
-                    output_string.clear();
+                    log_time << cv::format("pInterface->GetSerialNumber ok : %s\n", output_string.c_str());
                 } else {
                     log_time << "pInterface->GetSerialNumber fail.\n";
                     cam_ok = false;
                 }
+
+                output_string.clear();
+
                 error = pInterface->GetName(output_string);
                 if (error == VmbErrorSuccess) {
                     vimb->pInterfaceName = output_string.c_str();
-                    log_time << cv::format("pInterface->GetName ok : %s\n", output_string);
-                    output_string.clear();
+                    log_time << cv::format("pInterface->GetName ok : %s\n", output_string.c_str());
                 } else {
                     log_time << "pInterface->GetName fail.\n";
                     cam_ok = false;
                 }
+
+                output_string.clear();
+
             } else {
                 log_time << "system.GetInterfaceByID fail.\n";
                 cam_ok = false;
@@ -263,8 +277,43 @@ public:
                                                                vimb->pInterfaceSerialNumber,
                                                                vimb->interfacePermittedAccess);
 
+                if (data->camera == nullptr) {
+                    log_time << "Failed to initialize camera.\n";
+                } else {
+                    log_time << "Camera initialized. Getting information.\n";
+                }
+
+                // test it
+
+                log_time << "Checking for auto exposure. ";
+
+                AVT::VmbAPI::FeaturePtr feature;
+                double exposure_time = 0.0;
+                error = data->camera->SetExposureTimeAbs(200.0);
+                if (error != VmbErrorSuccess) {
+                    log_time << "failed to set exposure....\n";
+                }
+
+
+
+                error = data->camera->GetExposureTimeAbs(exposure_time);
+                log_time << exposure_time << std::endl;
+                //error = data->camera->GetExposureAutoFeature(feature);
+                if (error == VmbErrorSuccess) {
+                    std::cout << "supported. ";
+                    error = feature->GetName(output_string);
+                    if (error == VmbErrorSuccess) {
+                        std::cout << "activated.\n";
+                        auto_exposure = true;
+                    } else {
+                        std::cout << "deactivated.\n";
+                    }
+                } else {
+                    std::cout << "not supported.\n";
+                }
+
             } else {
-                log_time << "Camera data reading failed..\n";
+                log_time << "Generic fail while initializing camera.\n";
             }
 
         }
@@ -349,9 +398,7 @@ public:
         os << cv::format("rectification: %f\n", obj.settings->rectification);
         os << cv::format("iso_speed: %f\n", obj.settings->iso_speed);
         os << cv::format("buffersize: %f\n", obj.settings->buffersize);
-        os << cv::format("Brightness: %f\n", obj.settings->brightness);
-        os << cv::format("Brightness: %f\n", obj.settings->brightness);
-        os << cv::format("Brightness: %f\n", obj.settings->brightness);
         return os;
     }
+
 };
