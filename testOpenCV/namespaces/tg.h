@@ -98,7 +98,7 @@ namespace tg {
 
         std::unique_ptr<VimbaData> vimbaData = std::make_unique<VimbaData>();
 
-        std::unique_ptr<GC2450MCamera> camera;
+        std::shared_ptr<GC2450MCamera> camera;
 
         // the name of the glob loaded (or "camera" for live feed)
         std::string globName;

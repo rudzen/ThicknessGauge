@@ -70,9 +70,8 @@ public:
         AVT::VmbAPI::CameraPtrVector cameras;
         auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
         if (VmbErrorSuccess == system.Startup()) {
-            if (VmbErrorSuccess == system.GetCameras(cameras)) {
+            if (VmbErrorSuccess == system.GetCameras(cameras))
                 data->cameraData->parse(cameras);
-            }
             if (cameras.empty())
             log_time << "Error, no cameras currently available.";
             data->cameraPtr = cameras.front();
@@ -137,8 +136,8 @@ public:
             }
 
             if (cam_ok) {
-                // create the camera object
-                data->camera = std::make_unique<GC2450MCamera>(vimb->pCameraID,
+                // create the camera object pointer, with shareable properties
+                data->camera = std::make_shared<GC2450MCamera>(vimb->pCameraID,
                                                                vimb->pCameraName,
                                                                vimb->pCameraModel,
                                                                vimb->pCameraSerialNumber,

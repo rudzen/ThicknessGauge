@@ -180,9 +180,13 @@
     <ClCompile Include="IO\VideoInfo.cpp" />
     <ClCompile Include="Vimba\CaptureAVTCamera.cpp" />
     <ClCompile Include="Vimba\GC2450MCamera.cpp" />
+    <ClCompile Include="Vimba\testing\ApiController.cpp" />
+    <ClCompile Include="Vimba\testing\Bitmap.cpp" />
+    <ClCompile Include="Vimba\testing\program.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
+    <ClInclude Include="Camera\CaptureVimba.h" />
     <ClInclude Include="CV\HarrisDetector.h" />
     <ClInclude Include="Exceptions\ThrowAssert.h" />
     <ClInclude Include="namespaces\calc.h" />
@@ -241,6 +245,10 @@
     <ClInclude Include="Vimba\CaptureAVTCamera.h" />
     <ClInclude Include="Vimba\GC2450MCamera.h" />
     <ClInclude Include="Vimba\OpenCVVideoRecorder.h" />
+    <ClInclude Include="Vimba\testing\ApiController.h" />
+    <ClInclude Include="Vimba\testing\Bitmap.h" />
+    <ClInclude Include="Vimba\testing\ErrorCodeToMessage.h" />
+    <ClInclude Include="Vimba\testing\StreamSystemInfo.h" />
     <ClInclude Include="_unused_crap\temp_mains.txt" />
     <ClInclude Include="_unused_crap\temp_unused.txt" />
   </ItemGroup>

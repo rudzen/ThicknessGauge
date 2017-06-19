@@ -16,6 +16,8 @@
 ///*    You should have received a copy of the GNU General Public License       */
 ///*    along with USE Tracker.  If not, see <http://www.gnu.org/licenses/>.    */
 ///*----------------------------------------------------------------------------*/
+
+
 //
 //#include "CaptureAVTCamera.h"
 //
@@ -24,8 +26,8 @@
 //#include <iostream>
 ////#include <chrono>
 //
-//#include <VimbaCPP/Include/VimbaCPP.h>
-//#include <opencv2/core/persistence.hpp>
+#include <VimbaCPP/Include/VimbaCPP.h>
+#include <opencv2/core/persistence.hpp>
 //
 //using namespace std;
 //
