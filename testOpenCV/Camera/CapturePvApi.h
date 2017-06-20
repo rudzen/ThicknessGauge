@@ -81,6 +81,8 @@ public:
 
     void uninitialize();
 
+    static unsigned long countCameras();
+
     bool open();
 
     void close();

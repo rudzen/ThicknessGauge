@@ -255,23 +255,23 @@ bool CapturePvApi::initialize() {
 
     if (retry_count) {
         while (retry_count--) {
-            camera_count = PvCameraCount();
+            camera_count = countCameras();
             if (camera_count)
                 break;
             log_time << cv::format("Retrying... %i..\n", retry_count);
             tg::sleep(150);
         }
     } else
-        camera_count = PvCameraCount();
+        camera_count = countCameras();
 
     std::cout << '\n';
 
     if (camera_count && retryCount_) {
         log_time << cv::format("Found %i cameras.\n", camera_count);
     } else {
-        log_time << cv::format("Failed to locate any cameras, please try increasing retry amount. Current retry amount is %i\n", retryCount());
-        isOpen_ = false;
+        log_time << cv::format("Failed to locate any cameras, try increasing retry amount. Current retry amount is %i\n", retryCount());
         close();
+        return false;
     }
 
     unsigned int cam_list_count = PvCameraList(&cameraInfo, 1, nullptr);
@@ -290,6 +290,10 @@ bool CapturePvApi::initialize() {
 void CapturePvApi::uninitialize() {
     PvUnInitialize();
     initialized_ = false;
+}
+
+unsigned long CapturePvApi::countCameras() {
+    return PvCameraCount();
 }
 
 bool CapturePvApi::open() {
