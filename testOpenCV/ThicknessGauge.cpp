@@ -32,6 +32,7 @@
 #include "namespaces/validate.h"
 #include "namespaces/cvR.h"
 #include "namespaces/draw.h"
+#include <future>
 
 using namespace tg;
 
@@ -54,8 +55,6 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
             if (capture->isOpen()) {
                 capture->close();
             }
-
-            //capture->initialized(false);
         }
 
         // always perform complete re-init.
@@ -275,7 +274,7 @@ void ThicknessGauge::computeMarkingHeight() {
 
         log_time << "Total compute time (seconds) : " << frameTime_ << endl;
 
-        if (draw::is_escape_pressed(30))
+        if (showWindows_ && draw::is_escape_pressed(30))
             return;
 
     } catch (cv::Exception& e) {
@@ -393,7 +392,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
                 }
             }
 
-            if (draw::is_escape_pressed(30))
+            if (showWindows_ && draw::is_escape_pressed(30))
                 running = false;
 
         }
@@ -435,7 +434,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
                     stl::copyVector(h.elements, right_elements);
             }
 
-            if (draw::is_escape_pressed(30))
+            if (showWindows_ && draw::is_escape_pressed(30))
                 running = false;
 
         }
@@ -516,7 +515,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
     if (showWindows_)
         draw::makeWindow(window_name);
 
-    filter_marking->setKernel(filters::kernel_line_left_to_right);
+    filter_marking->setKernel(filters::kernel_horizontal_line);
 
     vector<cv::Rect2d> markings(frameCount_);
     vector<cv::Vec4d> left_borders(frameCount_);
@@ -536,12 +535,12 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
 
     log_time << cv::format("computerMarkingRectangle using exposure set %i : %s (%i)\n", frame_index, frames->exp_ext, frames->exp_ms);
 
-    auto accuRects = [image_height](vector<cv::Rect2d>& rects, cv::Rect2d& out) {
+    auto accuRects = [image_height](const vector<cv::Rect2d>& rects, cv::Rect2d& out) {
         out.x = 0.0;
         out.y = 0.0;
         out.width = 0.0;
         out.height = image_height;
-        for (auto& r : rects) {
+        for (const auto& r : rects) {
             out.x += r.x;
             out.width += r.width;
         }
@@ -549,12 +548,12 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
         out.width /= rects.size();
     };
 
-    auto accuVecs = [image_height](vector<cv::Vec4d>& vecs, cv::Vec4d& out) {
+    auto accuVecs = [](const vector<cv::Vec4d>& vecs, cv::Vec4d& out) {
         out[0] = 0.0;
-        out[1] = image_height;
+        out[1] = 0.0; // image_height;
         out[2] = 0.0;
         out[3] = 0.0;
-        for (auto& v : vecs) {
+        for (const auto& v : vecs) {
             out[0] += v[0];
             out[1] += v[1];
             out[2] += v[2];
@@ -567,46 +566,60 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
     };
 
     while (running) {
+        try {
 
-        markings.clear();
-        left_borders.clear();
-        right_borders.clear();
+            markings.clear();
+            left_borders.clear();
+            right_borders.clear();
 
-        cv::Mat sparse;
-        for (auto i = 0; i < frames->frames.size(); i++) {
-            filter_marking->setImage(frames->frames[i].clone());
-            filter_marking->doFilter();
-            canny->setImage(filter_marking->getResult());
-            canny->doCanny();
 
-            auto t = canny->getResult();
+            cv::Mat sparse;
+            for (auto i = 0; i < frames->frames.size(); i++) {
 
-            auto tmp = t.clone();
-            hough->setOriginal(tmp);
-            hough->setImage(t);
+                //canny->setImage(frames->frames[i].clone());
+                //canny->doCanny();
 
-            hough->doVerticalHough();
-            hough->computeBorders();
-            markings.emplace_back(hough->getMarkingRect());
-            left_borders.emplace_back(hough->getLeftBorder());
-            right_borders.emplace_back(hough->getRightBorder());
-            if (draw::is_escape_pressed(30))
+                filter_marking->setImage(frames->frames[i].clone());
+                filter_marking->doFilter();
+                canny->setImage(filter_marking->getResult());
+                canny->doCanny();
+
+                auto t = canny->getResult();
+
+                auto tmp = t.clone();
+                hough->setOriginal(tmp);
+                hough->setImage(t);
+
+                if (hough->doVerticalHough() < 0) {
+                    log_time << "No lines detected from houghR\n";
+                    continue;
+                }
+                hough->computeBorders();
+                markings.emplace_back(hough->getMarkingRect());
+                left_borders.emplace_back(hough->getLeftBorder());
+                right_borders.emplace_back(hough->getRightBorder());
+                if (showWindows_ && draw::is_escape_pressed(30))
+                    running = false;
+
+            }
+
+            accuRects(markings, output);
+            accuVecs(left_borders, left_border_result);
+            accuVecs(right_borders, right_border_result);
+
+            if (!showWindows_)
                 running = false;
+            else {
+                auto marking_test = frames->frames.front().clone();
+                draw::drawRectangle(marking_test, output, cv::Scalar(128, 128, 128));
+                draw::showImage(window_name, marking_test);
+                if (draw::is_escape_pressed(30))
+                    running = false;
+            }
+        } catch (cv::Exception& e) {
+            log_time << "Caught exception in computeMarkingRect main loop\n";
         }
 
-        accuRects(markings, output);
-        accuVecs(left_borders, left_border_result);
-        accuVecs(right_borders, right_border_result);
-
-        if (!showWindows_)
-            running = false;
-        else {
-            auto marking_test = frames->frames.front().clone();
-            draw::drawRectangle(marking_test, output, cv::Scalar(128, 128, 128));
-            draw::showImage(window_name, marking_test);
-            if (draw::is_escape_pressed(30))
-                running = false;
-        }
     }
 
     if (showWindows_)
@@ -694,7 +707,7 @@ void ThicknessGauge::computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr
                 for (auto& centerpoint : data->centerPoints)
                     results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
 
-                if (draw::is_escape_pressed(30))
+                if (showWindows_ && draw::is_escape_pressed(30))
                     running = false;
 
                 if (showWindows_ && !i && running) {
@@ -908,7 +921,6 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 
     const std::string window_name = "cap";
     if (showWindows_) {
-        draw::showWindows = true;
         draw::makeWindow(window_name);
     }
 
@@ -946,7 +958,7 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 
     pb.Progressed(100);
 
-    cout << endl;
+    std::cout << endl;
 
     log_time << "Capture done.\n";
 
@@ -1032,7 +1044,6 @@ bool ThicknessGauge::saveData(string filename) {
 
     // testing height stuff drawing HERE
 
-    draw::showWindows = true;
     const std::string diff_text = cv::format("diff (px): %f", data->difference);
     draw::drawText(&overlay, diff_text, tg::TextDrawPosition::UpperRight, default_col);
     draw::drawText(&overview, diff_text, tg::TextDrawPosition::UpperRight, default_bw);
@@ -1188,5 +1199,4 @@ bool ThicknessGauge::isShowWindows() const {
 
 void ThicknessGauge::setShowWindows(bool showWindows) {
     showWindows_ = showWindows;
-    draw::showWindows = showWindows;
 }

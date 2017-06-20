@@ -32,6 +32,7 @@
 
 
 using namespace std;
+using namespace tg;
 
 class HoughLinesR : public BaseR {
 
@@ -279,9 +280,9 @@ inline void HoughLinesR::computeBorders() {
     cv::Rect2d rightRoi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
 
     computeRectFromLines(leftLines_, leftRoi);
-    throw_assert(validate::validate_rect(leftRoi), "Left ROI rect failed validation!!!");
+    //throw_assert(validate::validate_rect(leftRoi), "Left ROI rect failed validation!!!");
     computeRectFromLines(rightLines_, rightRoi);
-    throw_assert(validate::validate_rect(rightRoi), "Right ROI rect failed validation!!!");
+    //throw_assert(validate::validate_rect(rightRoi), "Right ROI rect failed validation!!!");
 
     auto imgHeight = static_cast<double>(image_.rows);
 
@@ -341,8 +342,6 @@ inline int HoughLinesR::doVerticalHough() {
     //cv::HoughLines(image, lines, rho, angle, threshold, srn, stn, minTheta, maxTheta);
     HoughLines(image_, lines_, 1, calc::DEGREES, threshold, 0, 0);
 
-    //std::cout << "doVerticalHough # lines : " << lines.size();
-
     if (lines_.empty())
         return -1;
 
@@ -364,7 +363,6 @@ inline int HoughLinesR::doVerticalHough() {
         return -2;
     //cerr << "FATAL ERROR, NO VERTICAL LINES DETECTED!";
 
-    //drawLines(allLines, cv::Scalar(255, 0, 255));
     computeMeta();
 
     return 0;

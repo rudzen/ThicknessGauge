@@ -166,6 +166,7 @@
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
     <ClCompile Include="Camera\CapturePvApi.cpp" />
     <ClCompile Include="Camera\OpenCVCap.cpp" />
+    <ClCompile Include="CV\CannyR.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
     <ClCompile Include="namespaces\calc.cpp" />

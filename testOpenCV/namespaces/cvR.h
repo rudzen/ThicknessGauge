@@ -54,6 +54,28 @@ namespace cvr {
         marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
     }
 
+
+    template <typename T>
+    inline
+    void avg_vector_vec(const std::vector<cv::Vec<T ,4>>& vecvec, cv::Vec<T, 4>& out) {
+        out[0] = 0.0;
+        out[1] = 0.0;
+        out[2] = 0.0;
+        out[3] = 0.0;
+        for (auto& v : vecvec) {
+            out[0] += v[0];
+            out[1] += v[1];
+            out[2] += v[2];
+            out[3] += v[3];
+        }
+        out[0] /= vecvec.size();
+        out[1] /= vecvec.size();
+        out[2] /= vecvec.size();
+        out[3] /= vecvec.size();
+    }
+
+
+
     /**
      * \brief Computes the average (mean) intensity of the entire image
      * \param image The image to calculate meaned intensity of

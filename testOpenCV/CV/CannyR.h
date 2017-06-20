@@ -96,9 +96,7 @@ public:
 
     void doCanny();
 
-    cv::Mat& getResult() {
-        return edges_;
-    }
+    cv::Mat& getResult();
 
 };
 
@@ -131,13 +129,4 @@ inline void CannyR::gradientcb(int value, void* user_data) {
     log_time << cv::format("Canny gradient : %s\n", boltab[static_cast<bool>(value)]);
 }
 
-inline void CannyR::doCanny() {
 
-    Canny(image_, edges_, threshold1_, threshold2_, apertureSize_, gradient_ > 0);
-
-    if (removePepperNoise_)
-        pixel::remove_pepper_noise(image_);
-
-    if (showWindow_)
-        imshow(windowName, edges_);
-}

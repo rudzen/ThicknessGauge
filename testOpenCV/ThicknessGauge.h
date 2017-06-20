@@ -21,6 +21,7 @@
 
 #include "namespaces/tg.h"
 #include "Camera/CapturePvApi.h"
+#include "namespaces/draw.h"
 
 using namespace tg;
 
@@ -40,6 +41,7 @@ public:
           lineThreshold_(lineThreshold) {
         baseColour_ = cv::Scalar(255, 255, 255);
         canny = std::make_unique<CannyR>(200, 250, 3, true, showWindows, false);
+        //draw::showWindows = showWindows;
     }
 
     std::shared_ptr<Data<double>> data; // there can be only one!

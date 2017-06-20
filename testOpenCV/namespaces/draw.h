@@ -4,47 +4,39 @@
 #include <opencv2/videostab/ring_buffer.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "tg.h"
+
 namespace draw {
 
     constexpr int ESC = 27;
 
     const cv::Scalar colour = cv::Scalar(255, 255, 255);
 
-    bool showWindows = false;
-
     inline char get_key(const int delay) {
         return static_cast<char>(cv::waitKey(delay));
     }
 
     inline bool is_escape_pressed(const int delay) {
-        return showWindows && get_key(delay) == ESC;
+        return get_key(delay) == ESC;
     }
 
     template <typename T>
     void makeWindow(T name) {
-        if (!showWindows)
-            return;
         cv::namedWindow(name, cv::WINDOW_FREERATIO | cv::WINDOW_GUI_EXPANDED);
     }
 
     template <typename T>
     void removeWindow(T name) {
-        if (!showWindows)
-            return;
         cv::destroyWindow(name);
         cv::waitKey(1);
     }
 
     inline void removeAllWindows() {
-        if (!showWindows)
-            return;
         cv::destroyAllWindows();
     }
 
     template <typename T>
     void showImage(T windowName, cv::Mat& image) {
-        if (!showWindows)
-            return;
         cv::imshow(windowName, image);
     }
 
@@ -94,8 +86,6 @@ namespace draw {
     }
 
     inline void drawText(cv::Mat* image, const std::string text, tg::TextDrawPosition position, cv::Scalar colour) {
-        if (!showWindows)
-            return;
         cv::Point pos;
         switch (position) {
         case tg::TextDrawPosition::UpperLeft: pos.x = image->cols / 3;
