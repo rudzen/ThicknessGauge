@@ -8,6 +8,11 @@
 
 namespace sorter {
 
+    /**
+     * \brief Sorts vector of vector of points (contour structure), in descending order
+     * \tparam T The type of point
+     * \param contours The contours
+     */
     template <typename T>
     inline
     void sort_contours(std::vector<std::vector<cv::Point_<T>>>& contours) {
@@ -15,6 +20,11 @@ namespace sorter {
         std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>>& a, std::vector<cv::Point_<T>>& b) { return contourArea(a) > contourArea(b); });
     }
 
+    /**
+     * \brief Sorts a vector of points with respect to X in ascending order
+     * \tparam T The type of point
+     * \param vector The vector of points to sort
+     */
     template <typename T>
     inline
     void sort_pixels_x_ascending(std::vector<cv::Point_<T>>& vector) {
@@ -22,6 +32,11 @@ namespace sorter {
         std::sort(vector.begin(), vector.end(), [](cv::Point_<T>& p1, cv::Point_<T>& p2) { return p1.x < p2.x; });
     }
 
+    /**
+     * \brief Sorts a vector of points with respect to X in descending order
+     * \tparam T The type of point
+     * \param vector The vector of points to sort
+     */
     template <typename T>
     inline
     void sort_pixels_x_descending(std::vector<cv::Point_<T>>& vector) {
@@ -29,6 +44,11 @@ namespace sorter {
         std::sort(vector.begin(), vector.end(), [](cv::Point_<T>& p1, cv::Point_<T>& p2) { return p1.x > p2.x; });
     }
 
+    /**
+     * \brief Sorts a vector of points with respect to Y in ascending order
+     * \tparam T The type of point
+     * \param vector The vector of points to sort
+     */
     template <typename T>
     inline
     void sort_pixels_y_ascending(std::vector<cv::Point_<T>>& vector) {
@@ -36,6 +56,11 @@ namespace sorter {
         std::sort(vector.begin(), vector.end(), [](cv::Point_<T>& p1, cv::Point_<T>& p2) { return p1.y < p2.y; });
     }
 
+    /**
+     * \brief Sorts a vector of point with respect to Y in descending order
+     * \tparam T The type of point
+     * \param vector The vector of points to sort
+     */
     template <typename T>
     inline
     void sort_pixels_y_descending(std::vector<cv::Point_<T>>& vector) {

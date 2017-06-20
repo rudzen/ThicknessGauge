@@ -906,6 +906,9 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
         f->frames.clear();
         f->frames.reserve(capture_count);
         capture->capture(capture_count, f->frames, static_cast<unsigned long>(f->exp_ms));
+        //log_time << f << '\n';
+
+
         //capture->cap.set(CV_CAP_PROP_EXPOSURE, static_cast<double>(f->exp_ms));
         //cout << "capturing with exposure : " << cap.get(CV_CAP_PROP_EXPOSURE) << endl;
         //for (unsigned int i = 0; i++ < capture_count;) {
