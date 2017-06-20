@@ -290,19 +290,19 @@ inline void HoughLinesR::computeBorders() {
     markingRect.y = leftRoi.y;
     markingRect.width = rightRoi.x - leftRoi.x + rightRoi.width;
     markingRect.height = imgHeight;
-    throw_assert(validate::validate_rect(markingRect), "Marking rect failed validation!!!");
+    //throw_assert(validate::validate_rect(markingRect), "Marking rect failed validation!!!");
 
     leftBorder_[0] = leftRoi.x;
     leftBorder_[1] = imgHeight;
     leftBorder_[2] = leftRoi.x + leftRoi.width;
     leftBorder_[3] = 0.0f;
-    throw_assert((validate::valid_vec<float, 4>(leftBorder_)), "Left border failed validation!!!");
+    //throw_assert((validate::valid_vec<float, 4>(leftBorder_)), "Left border failed validation!!!");
 
     rightBorder_[0] = rightRoi.x;
     rightBorder_[1] = 0.0f;
     rightBorder_[2] = rightRoi.x + rightRoi.width;
     rightBorder_[3] = imgHeight;
-    throw_assert((validate::valid_vec<float, 4>(rightBorder_)), "Right border failed validation!!!");
+    //throw_assert((validate::valid_vec<float, 4>(rightBorder_)), "Right border failed validation!!!");
 
     if (showWindows_) {
         drawLine(leftBorder_);

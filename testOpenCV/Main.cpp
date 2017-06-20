@@ -169,6 +169,8 @@ int main(int argc, char** argv) {
         string what = te.what();
         log_timedate << "Exception suddenly happend (but what?)\n" + what << std::endl;
         return -4;
+    } catch (cv::Exception& e) {
+        cerr << cv::format("cv::Exception caught in main\n", e.msg.c_str());
     }
     log_time << cv::format("Smooth operator >> %i\n", return_value);
 

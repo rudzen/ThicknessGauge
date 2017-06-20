@@ -226,9 +226,9 @@ void ThicknessGauge::computeMarkingHeight() {
         data->middlePieces[0] = data->intersectionCuts[0];
         data->middlePieces[1] = data->intersectionCuts[3] - data->intersectionCuts[0];
 
-        if (!validate::validate_rect(data->markingRect)) {
-            CV_Error(cv::Error::BadROISize, "Marking rectangle dimensions are fatal.");
-        }
+        //if (!validate::validate_rect(data->markingRect)) {
+        //    CV_Error(cv::Error::BadROISize, "Marking rectangle dimensions are fatal.");
+        //}
 
         // adjust the baselines according to the intersection points. (could perhaps be useful in the future)
         cvr::adjust_marking_rect(data->markingRect, data->intersections, intersect_cutoff[0]);
@@ -386,11 +386,9 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
             processMatForLine(org, hough, morph);
 
             const auto& lines = hough->getRightLines(); // inner most side
-            for (auto& line : lines) {
-                if (line.entry[0] > left_cutoff) {
+            for (auto& line : lines)
+                if (line.entry[0] > left_cutoff)
                     stl::copyVector(line.elements, left_elements);
-                }
-            }
 
             if (showWindows_ && draw::is_escape_pressed(30))
                 running = false;
@@ -515,7 +513,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
     if (showWindows_)
         draw::makeWindow(window_name);
 
-    filter_marking->setKernel(filters::kernel_horizontal_line);
+    filter_marking->setKernel(filters::kernel_line_right_to_left);
 
     vector<cv::Rect2d> markings(frameCount_);
     vector<cv::Vec4d> left_borders(frameCount_);
@@ -529,7 +527,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
 
     auto image_height = static_cast<double>(imageSize_.height);
 
-    unsigned int frame_index = 2;
+    unsigned int frame_index = 1;
 
     auto frames = frameset[frame_index].get();
 
@@ -592,7 +590,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
 
                 if (hough->doVerticalHough() < 0) {
                     log_time << "No lines detected from houghR\n";
-                    continue;
+                    //continue;
                 }
                 hough->computeBorders();
                 markings.emplace_back(hough->getMarkingRect());
