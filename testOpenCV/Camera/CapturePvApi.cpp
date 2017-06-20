@@ -104,6 +104,7 @@ void CapturePvApi::capture(int frame_count, std::vector<cv::Mat>& target_vector)
 
 void CapturePvApi::initialize() {
 
+    // avoid initialization if already done
     if (initialized)
         return;
 
@@ -114,31 +115,47 @@ void CapturePvApi::initialize() {
     if (!initialized) { // something went to shiets...
         switch (Errcode) {
         case ePvErrResources:
-            log_time << "Error while initializing PvApi, ePvErrResources\n";
+            log_time << "Error.. resources requested from the OS were not available\n";
             return;
         case ePvErrInternalFault:
-            log_time << "Error while initializing PvApi, ePvErrInternalFault\n";
+            log_time << "Error.. an internal fault occurred\n";
             return;
         default: ;
-            log_time << "Error while initializing PvApi, Unknown\n";
+            log_time << "Error.. Unknown error while attempting to initialize PvApi\n";
             return;
         }
     }
 
-    while (retryCount_--) {
+    log_time << cv::format("Waiting for interface.. %i..", retryCount_);
+    if (retryCount_) {
+        while (retryCount_--) {
+            camera_count = PvCameraCount();
+            if (camera_count)
+                break;
+            log_time << cv::format("%i..", retryCount_);
+            tg::sleep(150);
+        }
+    } else {
         camera_count = PvCameraCount();
-        if (camera_count)
-            break;
-        log_time << cv::format("Waiting for interface.. %i\n", retryCount_);
-        tg::sleep(150);
     }
 
-    log_time << "Found " << camera_count << " cameras.\n";
+    std::cout << '\n';
+
+    if (camera_count && retryCount_) {
+        log_time << cv::format("Found %i cameras.\n", camera_count);
+    } else {
+        log_time << cv::format("Failed to locate any cameras, please try increasing retry amount. Current retry amount is %i\n", retryCount());
+        close();
+        initialized = false;
+        return;
+    }
 
     unsigned int cam_list_count = PvCameraList(&cameraInfo, 1, nullptr);
 
     if (!cam_list_count) {
         log_time << "Error while getting camera info.\n";
+        close();
+        initialized = false;
         return;
     }
 
