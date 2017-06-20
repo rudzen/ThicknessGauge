@@ -250,6 +250,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="Doxyfile" />
     <None Include="_run_test.bat" />
   </ItemGroup>
   <ItemGroup>

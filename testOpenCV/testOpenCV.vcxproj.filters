@@ -353,6 +353,7 @@
     <None Include="ClassDiagram.cd">
       <Filter>Diagrams</Filter>
     </None>
+    <None Include="Doxyfile" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Intersection bug.txt">
