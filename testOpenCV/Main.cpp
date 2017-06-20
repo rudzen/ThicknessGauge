@@ -118,12 +118,22 @@ int main(int argc, char** argv) {
 
             auto glob_name = options.getGlobFolder();
 
-            auto initialized_ok = thicknessGauge->initialize(glob_name);
+            thicknessGauge->addNulls();
 
-            if (!initialized_ok) {
-                log_time << "Catastrofic failure.. exiting..\n";
-                return -20;
+            while (true) {
+                auto initialized_ok = thicknessGauge->initialize(glob_name);
+                if (initialized_ok)
+                    break;
+
+                log_time << "Unable to initialize....\n";
+                log_time << "Retrying in a moment [press ctrl-c to abort].\n";
+                tg::sleep(500);
             }
+
+
+            //    log_time << "Catastrofic failure.. exiting..\n";
+            //    return -20;
+            //}
 
             thicknessGauge->computeMarkingHeight();
 

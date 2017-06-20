@@ -12,11 +12,11 @@ class CapturePvApi : public CaptureInterface {
 
     const int mono = 1;
 
-    const cv::Rect_<unsigned long> default_roi = cv::Rect_<unsigned long>(0, 1006, 256, 2448);
+    const cv::Rect_<unsigned long> default_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
 
-    bool initialized;
+    bool initialized_;
 
-    bool isOpen;
+    bool isOpen_;
 
     unsigned int camera_count = 0;
 
@@ -24,22 +24,31 @@ class CapturePvApi : public CaptureInterface {
 
 public:
 
-    CapturePvApi() : initialized(false), isOpen(false), retryCount_(10) { }
+    CapturePvApi() : initialized_(false), isOpen_(false), retryCount_(10) { }
 
     CapturePvApi(tg::tCamera myCamera, tPvCameraInfo cameraInfo, unsigned long frameSize)
         : myCamera(myCamera),
           cameraInfo(cameraInfo),
-          frameSize(frameSize), initialized(true), isOpen(false), retryCount_(10) {
+          frameSize(frameSize), initialized_(true), isOpen_(false), retryCount_(10) {
     }
 
-public:
+    void reset();
 
+    bool isOpen() const;
+
+    void isOpen(bool new_value);
+
+    bool initialized() const;
+
+    void initialized(bool new_value);
 
     unsigned retryCount() const;
-    void retryCount(unsigned retryCount);
+
+    void retryCount(unsigned new_value);
+
     std::string version() const;
 
-    void region(cv::Rect_<unsigned long>& new_region);
+    bool region(cv::Rect_<unsigned long> new_region);
 
     cv::Rect_<unsigned long> region();
 

@@ -41,12 +41,24 @@ using namespace tg;
  */
 bool ThicknessGauge::initialize(std::string& glob_name) {
     data->globName = glob_name;
-    addNulls();
+    //addNulls();
 
     // determin where to get the frames from.
     if (glob_name == "camera") {
 
-        capture = std::make_unique<CapturePvApi>();
+        if (capture == nullptr) {
+            // run the basic process for the capture object
+            capture = std::make_unique<CapturePvApi>();
+        } else {
+            // double check for weirdness
+            if (capture->isOpen()) {
+                capture->close();
+            }
+
+            capture->initialized(false);
+        }
+
+        // always perform complete re-init.
 
         auto capture_device_ok = capture->initialize();
 
@@ -61,10 +73,13 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
 
         if (!capture_device_ok) {
             log_time << "Capture device could not be openened, aborting.\n";
+            capture->initialized(false);
             return false;
         }
 
-        for (auto &fs : frameset)
+        capture->reset();
+
+        for (auto& fs : frameset)
             capture->capture(25, fs->frames, fs->exp_ms);
 
         capture->close();
@@ -73,7 +88,8 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
     } else
         loadGlob(glob_name);
 
-    return true;
+    return
+        true;
 }
 
 /**
@@ -81,7 +97,6 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
  * (requires that OpenCV is compiled with the location of the PvAPI, deprecated version)
  */
 void ThicknessGauge::initVideoCapture() {
-
 
 
     //capture = std::make_unique<OpenCVCap>();
@@ -913,13 +928,13 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
         //cout << "capturing with exposure : " << cap.get(CV_CAP_PROP_EXPOSURE) << endl;
         //for (unsigned int i = 0; i++ < capture_count;) {
         //    pb.Progressed(pb_pos++);
-            //capture->cap >> t;
-            //f->frames.emplace_back(t);
-            //pb.Progressed(pb_pos++);
-            //draw::showImage(window_name, t);
-            //if (draw::is_escape_pressed(30)) {
-            //    // nothing :P
-            //}
+        //capture->cap >> t;
+        //f->frames.emplace_back(t);
+        //pb.Progressed(pb_pos++);
+        //draw::showImage(window_name, t);
+        //if (draw::is_escape_pressed(30)) {
+        //    // nothing :P
+        //}
         //}
     }
 
