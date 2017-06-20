@@ -229,30 +229,25 @@ void CapturePvApi::capture(int frame_count, std::vector<cv::Mat>& target_vector)
 
 bool CapturePvApi::initialize() {
 
-    // avoid initialization if already done
-    if (initialized_)
-        return true;
-
-    Errcode = PvInitialize();
-
-    initialized_ = Errcode == ePvErrSuccess;
-
-    if (!initialized_) { // something went to shiets...
-        switch (Errcode) {
-        case ePvErrResources:
-            log_time << "Error.. resources requested from the OS were not available\n";
-            break;
-        case ePvErrInternalFault:
-            log_time << "Error.. an internal fault occurred\n";
-            break;
-        default: ;
-            log_time << "Error.. Unknown error while attempting to initialize PvApi\n";
-            break;
+    if (!initialized_) {
+        Errcode = PvInitialize();
+        initialized_ = Errcode == ePvErrSuccess;
+        isOpen_ = false;
+        if (!initialized_) { // something went to shiets...
+            switch (Errcode) {
+            case ePvErrResources:
+                log_time << "Error.. resources requested from the OS were not available\n";
+                break;
+            case ePvErrInternalFault:
+                log_time << "Error.. an internal fault occurred\n";
+                break;
+            default: ;
+                log_time << "Error.. Unknown error while attempting to initialize PvApi\n";
+                break;
+            }
+            return false;
         }
     }
-
-    if (!initialized_)
-        return false;
 
     auto retry_count = retryCount();
 
@@ -275,28 +270,26 @@ bool CapturePvApi::initialize() {
         log_time << cv::format("Found %i cameras.\n", camera_count);
     } else {
         log_time << cv::format("Failed to locate any cameras, please try increasing retry amount. Current retry amount is %i\n", retryCount());
+        isOpen_ = false;
         close();
-        initialized_ = false;
     }
-
-    if (!initialized_)
-        return false;
 
     unsigned int cam_list_count = PvCameraList(&cameraInfo, 1, nullptr);
 
-    if (!cam_list_count) {
+    isOpen_ = cam_list_count;
+
+    if (!isOpen_) {
         log_time << "Error while getting camera info.\n";
-        close();
-        initialized_ = false;
+        return false;
     }
 
-    if (!initialized_)
-        return false;
-
     myCamera.UID = cameraInfo.UniqueId;
-
     return true;
+}
 
+void CapturePvApi::uninitialize() {
+    PvUnInitialize();
+    initialized_ = false;
 }
 
 bool CapturePvApi::open() {
@@ -307,7 +300,6 @@ bool CapturePvApi::open() {
     }
 
     Errcode = PvCameraOpen(myCamera.UID, ePvAccessMaster, &(myCamera.Handle));
-
     isOpen_ = Errcode == ePvErrSuccess;
 
     if (!isOpen_) { // something went to shiets...
@@ -340,15 +332,12 @@ bool CapturePvApi::open() {
     }
 
     log_time << "Camera opened ok.\n";
-
     return true;
-
 }
 
 void CapturePvApi::close() {
 
     Errcode = PvCameraClose(myCamera.Handle);
-
     isOpen_ = Errcode != ePvErrSuccess;
 
     if (isOpen_) {
@@ -364,9 +353,7 @@ void CapturePvApi::close() {
             return;
         }
     }
-
     log_time << "Camera closed.\n";
-
 }
 
 void CapturePvApi::exposure(unsigned long new_value) {

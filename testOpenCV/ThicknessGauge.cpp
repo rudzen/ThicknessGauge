@@ -55,7 +55,7 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
                 capture->close();
             }
 
-            capture->initialized(false);
+            //capture->initialized(false);
         }
 
         // always perform complete re-init.
@@ -83,6 +83,8 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
             capture->capture(25, fs->frames, fs->exp_ms);
 
         capture->close();
+
+        capture->uninitialize();
 
         //captureFrames(0, frameCount_, 5000);
     } else

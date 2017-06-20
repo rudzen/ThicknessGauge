@@ -79,6 +79,8 @@ public:
 
     bool initialize();
 
+    void uninitialize();
+
     bool open();
 
     void close();
