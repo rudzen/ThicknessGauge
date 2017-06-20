@@ -88,7 +88,7 @@ public:
     // the following pointers are public on purpose!
     std::unique_ptr<CalibrationSettings> cs = std::make_unique<CalibrationSettings>();
 
-    void initialize(std::string& glob_name);
+    bool initialize(std::string& glob_name);
 
     void initVideoCapture();
 

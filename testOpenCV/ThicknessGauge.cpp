@@ -39,74 +39,41 @@ using namespace tg;
  * \brief Initializes the class and loads any aditional information
  * \param glob_name if "camera", use camera, otherwise load from glob folder
  */
-void ThicknessGauge::initialize(std::string& glob_name) {
+bool ThicknessGauge::initialize(std::string& glob_name) {
     data->globName = glob_name;
     addNulls();
 
     // determin where to get the frames from.
     if (glob_name == "camera") {
 
-        //capture->initialize_vimba(data.get());
-
-        ////VmbInterfaceType interfaceType,
-        ////VmbAccessModeType interfacePermittedAccess
-
-        //VmbInterfaceType cam_interface_type;
-        //auto error = data->cameraPtr->GetInterfaceType(cam_interface_type);
-        //if (error == VmbErrorSuccess) {
-        //	log_time << "cam_interface_type ok.\n";
-        //}
-
-        ////error = data->cameraPtr->Open(VmbAccessModeFull);
-        ////if (error == VmbErrorSuccess) {
-        ////	log_time << "Open ok.\n";
-        ////}
-
-        //AVT::VmbAPI::FeaturePtr featPtr;
-        //error = data->cameraPtr->GetFeatureByName("ExposureTimeAbs", featPtr);
-        //if (error == VmbErrorSuccess) {
-        //	log_time << "ExposureTimeAbs ok.\n";
-        //}
-        //else {
-        //	log_time << "ExposureTimeAbs fail.\n";
-        //}
-
-        //std::string value;
-        //error = featPtr->GetValue(value);
-        //if (error == VmbErrorSuccess) {
-        //	log_time << "GetValue ok. " << value << "\n";
-        //	error = featPtr->SetValue(1);
-        //	if (error == VmbErrorSuccess) {
-        //		log_time << "SetValue ok.\n";
-        //	}
-        //}
-
-        //error = data->cameraPtr->Close();
-        //if (error == VmbErrorSuccess) {
-        //	log_time << "Close ok.\n";
-        //}
-
-        //auto res = data->camera.GetExposureTimeAbsFeature(featPtr);
-        //if (VmbErrorSuccess == res) {
-        //	log_time << "Camera feature retrieved.." << endl;
-        //	VmbInt32_t exposure_low = 40000;
-        //	featPtr->SetValue(exposure_low);
-        //} else {
-        //	log_time << "Camera feature retrieval failed !.." << endl;
-        //}
-
-        //system.Shutdown();
         capture = std::make_unique<CapturePvApi>();
-        capture->initialize();
-        //initVideoCapture();
-        capture->open();
-        for (auto &fs : frameset) {
-            capture->capture(25, fs->frames, fs->exp_ms);
+
+        auto capture_device_ok = capture->initialize();
+
+        if (!capture_device_ok) {
+            log_time << "Capture device could not be initialized, aborting.\n";
+            return false;
         }
+
+        //initVideoCapture(); // for opencv capture object
+
+        capture_device_ok = capture->open();
+
+        if (!capture_device_ok) {
+            log_time << "Capture device could not be openened, aborting.\n";
+            return false;
+        }
+
+        for (auto &fs : frameset)
+            capture->capture(25, fs->frames, fs->exp_ms);
+
         capture->close();
+
         //captureFrames(0, frameCount_, 5000);
     } else
         loadGlob(glob_name);
+
+    return true;
 }
 
 /**

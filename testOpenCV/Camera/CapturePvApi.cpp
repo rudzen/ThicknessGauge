@@ -1,6 +1,7 @@
-#include "CapturePvApi.h"
-
+#include <thread>
+#include <chrono>
 #include "../namespaces/tg.h"
+#include "CapturePvApi.h"
 
 using namespace tg;
 
@@ -102,11 +103,11 @@ void CapturePvApi::capture(int frame_count, std::vector<cv::Mat>& target_vector)
 
 }
 
-void CapturePvApi::initialize() {
+bool CapturePvApi::initialize() {
 
     // avoid initialization if already done
     if (initialized)
-        return;
+        return true;
 
     Errcode = PvInitialize();
 
@@ -116,28 +117,33 @@ void CapturePvApi::initialize() {
         switch (Errcode) {
         case ePvErrResources:
             log_time << "Error.. resources requested from the OS were not available\n";
-            return;
+            break;
         case ePvErrInternalFault:
             log_time << "Error.. an internal fault occurred\n";
-            return;
+            break;
         default: ;
             log_time << "Error.. Unknown error while attempting to initialize PvApi\n";
-            return;
+            break;
         }
     }
 
-    log_time << cv::format("Waiting for interface.. %i..", retryCount_);
-    if (retryCount_) {
-        while (retryCount_--) {
+    if (!initialized)
+        return false;
+
+    auto retry_count = retryCount();
+
+    log_time << cv::format("Getting camera count\n");
+
+    if (retry_count) {
+        while (retry_count--) {
             camera_count = PvCameraCount();
             if (camera_count)
                 break;
-            log_time << cv::format("%i..", retryCount_);
+            log_time << cv::format("Retrying... %i..\n", retry_count);
             tg::sleep(150);
         }
-    } else {
+    } else
         camera_count = PvCameraCount();
-    }
 
     std::cout << '\n';
 
@@ -147,8 +153,10 @@ void CapturePvApi::initialize() {
         log_time << cv::format("Failed to locate any cameras, please try increasing retry amount. Current retry amount is %i\n", retryCount());
         close();
         initialized = false;
-        return;
     }
+
+    if (!initialized)
+        return false;
 
     unsigned int cam_list_count = PvCameraList(&cameraInfo, 1, nullptr);
 
@@ -156,18 +164,22 @@ void CapturePvApi::initialize() {
         log_time << "Error while getting camera info.\n";
         close();
         initialized = false;
-        return;
     }
+
+    if (!initialized)
+        return false;
 
     myCamera.UID = cameraInfo.UniqueId;
 
+    return true;
+
 }
 
-void CapturePvApi::open() {
+bool CapturePvApi::open() {
 
     if (!initialized) {
         log_time << "PvApi not initialized.\n";
-        return;
+        return false;
     }
 
     Errcode = PvCameraOpen(myCamera.UID, ePvAccessMaster, &(myCamera.Handle));
@@ -178,33 +190,34 @@ void CapturePvApi::open() {
         switch (Errcode) {
         case ePvErrAccessDenied:
             log_time << "Error.. the camera couldn't be open in the requested mode\n";
-            return;
+            return false;
         case ePvErrNotFound:
             log_time << "Error.. the camera was not found (unplugged)\n";
-            return;
+            return false;
         case ePvErrUnplugged:
             log_time << "Error.. the camera was found but unplugged during the function call\n";
-            return;
+            return false;
         case ePvErrBadParameter:
             log_time << "Error.. a valid pointer for pCamera was not supplied\n";
-            return;
+            return false;
         case ePvErrResources:
             log_time << "Error.. resources requested from the OS were not available\n";
-            return;
+            return false;
         case ePvErrInternalFault:
             log_time << "Error.. an internal fault occurred\n";
-            return;
+            return false;
         case ePvErrBadSequence:
             log_time << "Error.. API isn't initialized or camera is alreay open\n";
-            return;
+            return false;
         default:
             log_time << "Error.. some mysterious error happend.. but what?\n";
-            return;
-
+            return false;
         }
     }
 
     log_time << "Camera opened ok.\n";
+
+    return true;
 
 }
 

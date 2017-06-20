@@ -49,9 +49,9 @@ public:
 
     void capture(int frame_count, std::vector<cv::Mat>& target_vector);
 
-    void initialize();
+    bool initialize();
 
-    void open();
+    bool open();
 
     void close();
 

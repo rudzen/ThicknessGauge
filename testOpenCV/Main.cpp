@@ -118,7 +118,12 @@ int main(int argc, char** argv) {
 
             auto glob_name = options.getGlobFolder();
 
-            thicknessGauge->initialize(glob_name);
+            auto initialized_ok = thicknessGauge->initialize(glob_name);
+
+            if (!initialized_ok) {
+                log_time << "Catastrofic failure.. exiting..\n";
+                return -20;
+            }
 
             thicknessGauge->computeMarkingHeight();
 
