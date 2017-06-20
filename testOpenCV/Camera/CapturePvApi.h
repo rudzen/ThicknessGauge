@@ -22,6 +22,8 @@ class CapturePvApi : public CaptureInterface {
 
     unsigned int retryCount_;
 
+    static std::string error_attr(tPvErr error);
+
 public:
 
     CapturePvApi() : initialized_(false), isOpen_(false), retryCount_(10) { }
@@ -51,6 +53,23 @@ public:
     bool region(cv::Rect_<unsigned long> new_region);
 
     cv::Rect_<unsigned long> region();
+
+    bool region_x(unsigned new_x);
+
+    unsigned long region_x();
+
+    bool region_y(unsigned new_y);
+
+    unsigned long region_y();
+
+    bool region_height(unsigned new_height);
+
+    unsigned long region_height();
+
+    bool region_width(unsigned new_width);
+
+    unsigned long region_width();
+
 
     void retrieveAllInfo() override;
 

@@ -5,6 +5,21 @@
 
 using namespace tg;
 
+std::string CapturePvApi::error_attr(tPvErr error) {
+
+    switch (error) {
+    case ePvErrInternalFault: return std::string("an internal fault occurred");
+    case ePvErrBadHandle: return std::string("the handle of the camera is invalid");
+    case ePvErrBadSequence: return std::string("API isn't initialized");
+    case ePvErrNotFound: return std::string("the requested attribute doesn't exist");
+    case ePvErrUnplugged: return std::string("the camera has been unplugged");
+    case ePvErrOutOfRange: return std::string("the supplied value is out of range");
+    case ePvErrWrongType: return std::string("the requested attribute is not of the correct type");
+    case ePvErrForbidden: return std::string("the requested attribute forbid this operation");
+    default: return std::string("unknown error");
+    }
+}
+
 void CapturePvApi::reset() {
 
     // reset stuff like binning etc
@@ -61,56 +76,95 @@ bool CapturePvApi::region(cv::Rect_<unsigned long> new_region) {
 
     auto failures = 0;
 
-    Errcode = PvAttrUint32Set(myCamera.Handle, "RegionX", new_region.x);
-    if (Errcode != ePvErrSuccess) {
-        log_time << "Failed to change RegionX\n";
+    if (!region_x(new_region.x))
         failures++;
-    }
-    Errcode = PvAttrUint32Set(myCamera.Handle, "RegionY", new_region.y);
-    if (Errcode != ePvErrSuccess) {
-        log_time << "Failed to change RegionY\n";
+
+    if (!region_y(new_region.y))
         failures++;
-    }
-    Errcode = PvAttrUint32Set(myCamera.Handle, "Width", new_region.width);
-    if (Errcode != ePvErrSuccess) {
-        log_time << "Failed to change Width\n";
+
+    if (!region_width(new_region.width))
         failures++;
-    }
-    Errcode = PvAttrUint32Set(myCamera.Handle, "Height", new_region.height);
-    if (Errcode != ePvErrSuccess) {
-        log_time << "Failed to change Height\n";
+
+    if (!region_height(new_region.height))
         failures++;
-    }
 
     return failures == 0;
 }
 
 cv::Rect_<unsigned long> CapturePvApi::region() {
+    auto x = region_x();
+    auto y = region_y();
+    auto width = region_width();
+    auto height = region_height();
+    return cv::Rect_<unsigned long>(x, y, width, height);
+}
 
-    unsigned long x;
-    unsigned long y;
-    unsigned long width;
-    unsigned long height;
+bool CapturePvApi::region_x(unsigned new_x) {
+    Errcode = PvAttrUint32Set(myCamera.Handle, "RegionX", new_x);
+    if (Errcode == ePvErrSuccess)
+        return true;
+    log_time << cv::format("Error setting roi x.. %s\n", error_attr(Errcode));
+    return false;
+}
 
+unsigned long CapturePvApi::region_x() {
+    unsigned long x = 0;
     Errcode = PvAttrUint32Get(myCamera.Handle, "RegionX", &x);
     if (Errcode != ePvErrSuccess) {
-        log_time << "Failed to get RegionX\n";
+        log_time << cv::format("Error getting roi x.. %s\n", error_attr(Errcode));
     }
+    return x;
+}
+
+bool CapturePvApi::region_y(unsigned new_y) {
+    Errcode = PvAttrUint32Set(myCamera.Handle, "RegionY", new_y);
+    if (Errcode == ePvErrSuccess)
+        return true;
+    log_time << cv::format("Error setting roi y.. %s\n", error_attr(Errcode));
+    return false;
+}
+
+unsigned long CapturePvApi::region_y() {
+    unsigned long y = 0;
     Errcode = PvAttrUint32Get(myCamera.Handle, "RegionY", &y);
     if (Errcode != ePvErrSuccess) {
-        log_time << "Failed to get RegionY\n";
+        log_time << cv::format("Error getting roi y.. %s\n", error_attr(Errcode));
     }
-    Errcode = PvAttrUint32Get(myCamera.Handle, "Width", &width);
-    if (Errcode != ePvErrSuccess) {
-        log_time << "Failed to get Width\n";
-    }
+    return y;
+}
+
+bool CapturePvApi::region_height(unsigned new_height) {
+    Errcode = PvAttrUint32Set(myCamera.Handle, "Height", new_height);
+    if (Errcode == ePvErrSuccess)
+        return true;
+    log_time << cv::format("Error setting roi height.. %s\n", error_attr(Errcode));
+    return false;
+}
+
+unsigned long CapturePvApi::region_height() {
+    unsigned long height = 0;
     Errcode = PvAttrUint32Get(myCamera.Handle, "Height", &height);
     if (Errcode != ePvErrSuccess) {
-        log_time << "Failed to get Height\n";
+        log_time << cv::format("Error getting roi height.. %s\n", error_attr(Errcode));
     }
+    return height;
+}
 
-    return cv::Rect_<unsigned long>(x, y, width, height);
+bool CapturePvApi::region_width(unsigned new_width) {
+    Errcode = PvAttrUint32Set(myCamera.Handle, "Width", new_width);
+    if (Errcode == ePvErrSuccess)
+        return true;
+    log_time << cv::format("Error setting roi width.. %s\n", error_attr(Errcode));
+    return false;
+}
 
+unsigned long CapturePvApi::region_width() {
+    unsigned long width = 0;
+    Errcode = PvAttrUint32Get(myCamera.Handle, "Width", &width);
+    if (Errcode != ePvErrSuccess) {
+        log_time << cv::format("Error getting roi width.. %s\n", error_attr(Errcode));
+    }
+    return width;
 }
 
 void CapturePvApi::retrieveAllInfo() {
