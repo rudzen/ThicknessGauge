@@ -20,18 +20,23 @@ class CapturePvApi : public CaptureInterface {
 
     unsigned int camera_count = 0;
 
+    unsigned int retryCount_;
+
 public:
 
-    CapturePvApi() : initialized(false), isOpen(false) { }
+    CapturePvApi() : initialized(false), isOpen(false), retryCount_(10) { }
 
     CapturePvApi(tg::tCamera myCamera, tPvCameraInfo cameraInfo, unsigned long frameSize)
         : myCamera(myCamera),
           cameraInfo(cameraInfo),
-          frameSize(frameSize), initialized(true), isOpen(false) {
+          frameSize(frameSize), initialized(true), isOpen(false), retryCount_(10) {
     }
 
 public:
 
+
+    unsigned retryCount() const;
+    void retryCount(unsigned retryCount);
     std::string version() const;
 
     void region(cv::Rect_<unsigned long>& new_region);

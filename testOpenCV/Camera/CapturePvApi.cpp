@@ -1,10 +1,16 @@
 #include "CapturePvApi.h"
 
 #include "../namespaces/tg.h"
-#include <chrono>
-#include <thread>
 
 using namespace tg;
+
+unsigned CapturePvApi::retryCount() const {
+    return retryCount_;
+}
+
+void CapturePvApi::retryCount(unsigned retryCount) {
+    retryCount_ = retryCount;
+}
 
 std::string CapturePvApi::version() const {
     unsigned long major = 0;
@@ -119,13 +125,11 @@ void CapturePvApi::initialize() {
         }
     }
 
-    unsigned int retry_count = 10;
-
-    while (retry_count--) {
+    while (retryCount_--) {
         camera_count = PvCameraCount();
         if (camera_count)
             break;
-        log_time << cv::format("Waiting for interface.. %i\n", retry_count);
+        log_time << cv::format("Waiting for interface.. %i\n", retryCount_);
         tg::sleep(150);
     }
 
