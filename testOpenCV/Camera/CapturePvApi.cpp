@@ -125,8 +125,8 @@ void CapturePvApi::initialize() {
         camera_count = PvCameraCount();
         if (camera_count)
             break;
-        log_time << "Waiting for interface..\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        log_time << cv::format("Waiting for interface.. %i\n", retry_count);
+        tg::sleep(150);
     }
 
     log_time << "Found " << camera_count << " cameras.\n";
@@ -184,7 +184,6 @@ void CapturePvApi::open() {
     }
 
     log_time << "Camera opened ok.\n";
-
 
 }
 

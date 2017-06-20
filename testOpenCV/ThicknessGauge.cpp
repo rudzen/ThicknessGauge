@@ -46,7 +46,7 @@ void ThicknessGauge::initialize(std::string& glob_name) {
     // determin where to get the frames from.
     if (glob_name == "camera") {
 
-        capture->initialize_vimba(data.get());
+        //capture->initialize_vimba(data.get());
 
         ////VmbInterfaceType interfaceType,
         ////VmbAccessModeType interfacePermittedAccess
@@ -96,9 +96,15 @@ void ThicknessGauge::initialize(std::string& glob_name) {
         //}
 
         //system.Shutdown();
-
-        initVideoCapture();
-        captureFrames(0, frameCount_, 5000);
+        capture = std::make_unique<CapturePvApi>();
+        capture->initialize();
+        //initVideoCapture();
+        capture->open();
+        for (auto &fs : frameset) {
+            capture->capture(25, fs->frames, fs->exp_ms);
+        }
+        capture->close();
+        //captureFrames(0, frameCount_, 5000);
     } else
         loadGlob(glob_name);
 }
@@ -108,6 +114,9 @@ void ThicknessGauge::initialize(std::string& glob_name) {
  * (requires that OpenCV is compiled with the location of the PvAPI, deprecated version)
  */
 void ThicknessGauge::initVideoCapture() {
+
+
+
     //capture = std::make_unique<OpenCVCap>();
     //if (!capture->cap.open(CV_CAP_PVAPI)) {
     //    sync_cout << "Failed to open using PV_API, attempting defatult";
@@ -146,12 +155,16 @@ void ThicknessGauge::generateGlob(std::string& name) {
 
     cv::Mat t;
 
+    cv::VideoCapture cap;
+    cap.open(CV_CAP_PVAPI);
+
     unsigned long progress = 0;
     for (auto i = 0; i < frameCount_; ++i) {
         pb.Progressed(++progress);
-        capture->cap >> t;
+        cap >> t;
         cv::imwrite(name + "/img" + to_string(i) + ".png", t);
     }
+    cap.release();
     pb.Progressed(frameCount_);
 }
 
@@ -907,6 +920,8 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
 
     cv::Mat t;
 
+    capture->open();
+
     const std::string window_name = "cap";
     if (showWindows_) {
         draw::showWindows = true;
@@ -923,23 +938,24 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
     for (auto& f : frameset) {
         f->frames.clear();
         f->frames.reserve(capture_count);
-        capture->cap.set(CV_CAP_PROP_EXPOSURE, static_cast<double>(f->exp_ms));
+        capture->capture(capture_count, f->frames, static_cast<unsigned long>(f->exp_ms));
+        //capture->cap.set(CV_CAP_PROP_EXPOSURE, static_cast<double>(f->exp_ms));
         //cout << "capturing with exposure : " << cap.get(CV_CAP_PROP_EXPOSURE) << endl;
-        for (unsigned int i = 0; i++ < capture_count;) {
-            pb.Progressed(pb_pos++);
-            capture->cap >> t;
-            f->frames.emplace_back(t);
-            pb.Progressed(pb_pos++);
-            draw::showImage(window_name, t);
-            if (draw::is_escape_pressed(30)) {
-                // nothing :P
-            }
-        }
+        //for (unsigned int i = 0; i++ < capture_count;) {
+        //    pb.Progressed(pb_pos++);
+            //capture->cap >> t;
+            //f->frames.emplace_back(t);
+            //pb.Progressed(pb_pos++);
+            //draw::showImage(window_name, t);
+            //if (draw::is_escape_pressed(30)) {
+            //    // nothing :P
+            //}
+        //}
     }
 
-    throw_assert(t.rows == 256, "shiet, husk nu at indstille kameraets roi!");
+    //throw_assert(t.rows == 256, "shiet, husk nu at indstille kameraets roi!");
 
-    setImageSize(t.size());
+    //setImageSize(t.size());
 
     pb.Progressed(100);
 

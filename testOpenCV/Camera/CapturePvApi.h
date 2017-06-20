@@ -12,6 +12,8 @@ class CapturePvApi : public CaptureInterface {
 
     const int mono = 1;
 
+    const cv::Rect_<unsigned long> default_roi = cv::Rect_<unsigned long>(0, 1006, 256, 2448);
+
     bool initialized;
 
     bool isOpen;
@@ -42,7 +44,7 @@ public:
 
     void capture(int frame_count, std::vector<cv::Mat>& target_vector);
 
-    void initialize() override;
+    void initialize();
 
     void open();
 
@@ -57,5 +59,7 @@ public:
     void exposure_sub(unsigned long value_to_sub);
 
     void exposure_mul(unsigned long value_to_mul);
+
+
 
 };

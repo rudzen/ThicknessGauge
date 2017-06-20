@@ -39,7 +39,7 @@ protected:
 
     bool auto_exposure = false;
 
-    std::string status(std::string pre, bool s) {
+    static std::string status(std::string pre, bool s) {
         return pre + (s ? " ok" : " fail") + ".\n";
     }
 

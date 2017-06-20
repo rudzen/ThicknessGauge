@@ -7,9 +7,11 @@
 #include <memory>
 #include <vector>
 #include <opencv2/opencv.hpp>
-#include "Vimba/CameraData.h"
-#include "../Vimba/GC2450MCamera.h"
 #include <PvApi.h>
+#include <thread>
+#include <chrono>
+#include "../Vimba/GC2450MCamera.h"
+#include "Vimba/CameraData.h"
 
 /**
  * \brief Contains utilitary functionality for the entire program
@@ -62,7 +64,10 @@ namespace tg {
 
     typedef std::tuple<DataMemberIndex, bool, ValidationStatus, std::string> ValidationResult;
 
-    // used for camera
+    
+    /**
+     * \brief Vimba camera structure
+     */
     using VimbaData = struct vim {
         const char* pCameraID;
         const char* pCameraName;
@@ -75,7 +80,10 @@ namespace tg {
         VmbAccessModeType interfacePermittedAccess;
     };
 
-    // camera's data type definition
+
+    /**
+     * \brief PvApi camera structure
+     */
     typedef struct {
         unsigned long UID;
         tPvHandle Handle;
@@ -131,8 +139,10 @@ namespace tg {
         // enclusure of the laser line
         cv::Vec<T, 4> centerLine;
 
-        // the points where the intersections are cut.
-        // adjusted so potential unwanted information is not included in further calculations
+        /**
+         * \brief the points where the intersections are cut.
+         * adjusted so potential unwanted information is not included in further calculations
+         */
         cv::Vec<T, 2> intersectionCuts;
 
         // the x coordinates for the pieces that are cut out.
@@ -228,7 +238,10 @@ namespace tg {
      */
     std::string get_date();
 
-    // ----------- output stuff ---------------
+    // ----------------------------------------------
+    // -------------- output stuff ------------------
+    // ----------------------------------------------
+
     enum class SyncCout { IO_LOCK, IO_UNLOCK };
 
     std::ostream& operator<<(std::ostream&, SyncCout);
@@ -249,6 +262,16 @@ namespace tg {
 #define log_date std::cout << LogTime::LOG_DATE
 
     // ----------------------------------------------
+
+    // ----------------------------------------------
+    // -------------- thread related ----------------
+    // ----------------------------------------------
+    
+    template <typename T>
+    void sleep(T ms) {
+        static_assert(std::is_integral<T>::value, "Wrong type, must be integral.");
+        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+    }
 
 
 }

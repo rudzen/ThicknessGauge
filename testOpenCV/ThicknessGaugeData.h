@@ -21,11 +21,11 @@ protected:
         std::vector<T> means;
         std::vector<T> stddevs;
         std::string exp_ext;
-        T exp_ms;
+        unsigned long exp_ms;
 
         Frames() = delete;
 
-        Frames(const std::string& expExt, double expMs)
+        Frames(const std::string& expExt, unsigned long expMs)
             : exp_ext(expExt),
               exp_ms(expMs) {
         }
@@ -61,7 +61,7 @@ protected:
         }
     };
 
-    std::array<double, 3> exposures = {5000.0, 20000.0, 40000.0};
+    std::array<unsigned long, 3> exposures = {5000, 20000, 40000};
     std::array<std::string, 3> expusures_short = {"_5k", "_20k", "_40k"};
     std::vector<std::unique_ptr<Frames<double>>> frameset;
 
