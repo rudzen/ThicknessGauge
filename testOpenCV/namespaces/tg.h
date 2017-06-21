@@ -242,6 +242,8 @@ namespace tg {
     // -------------- output stuff ------------------
     // ----------------------------------------------
 
+#ifndef _SYNC_OUT
+#define _SYNC_OUT
     enum class SyncCout { IO_LOCK, IO_UNLOCK };
 
     std::ostream& operator<<(std::ostream&, SyncCout);
@@ -249,8 +251,13 @@ namespace tg {
 #define sync_cout std::cout << SyncCout::IO_LOCK
 #define sync_endl std::endl << SyncCout::IO_UNLOCK
 
+    #endif
+
+
     enum class LogTime { LOG_TIME, LOG_DATE, LOG_TIME_DATE };
 
+#ifndef _TIME_DATE_OUT
+#define _TIME_DATE_OUT
     /**
      * \brief Overload of ostream to insert time and/or date beforehand
      * \return The processed ostream
@@ -260,6 +267,8 @@ namespace tg {
 #define log_timedate std::cout << LogTime::LOG_TIME_DATE
 #define log_time std::cout << LogTime::LOG_TIME
 #define log_date std::cout << LogTime::LOG_DATE
+
+#endif
 
     // ----------------------------------------------
 

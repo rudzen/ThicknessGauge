@@ -76,7 +76,7 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
             return false;
         }
 
-        capture->reset();
+        capture->reset_binning();
 
         for (auto& fs : frameset)
             capture->cap(25, fs->frames, fs->exp_ms);

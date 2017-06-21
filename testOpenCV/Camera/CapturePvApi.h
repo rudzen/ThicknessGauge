@@ -3,36 +3,45 @@
 #include "CaptureInterface.h"
 #include <PvApi.h>
 
+/**
+ * \brief Allows capture through PvAPI -> OpenCV data structure
+ */
 class CapturePvApi {
-
-    tg::tCamera camera_;
-    tPvCameraInfo camera_info_;
-    unsigned long frameSize;
-    tPvErr Errcode;
 
     const int mono = 1;
 
+    const unsigned long def_packet_size = 8228;
+
     const cv::Rect_<unsigned long> default_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
+
+    tg::tCamera camera_;
+
+    tPvCameraInfo camera_info_;
+
+    unsigned long frame_size_;
+
+    unsigned int retry_count_;
 
     bool initialized_;
 
     bool is_open_;
 
-    unsigned int retry_count_;
-
-    std::string error_last() const;
+    static char const* error_last(tPvErr error);
 
 public:
 
-    CapturePvApi() : initialized_(false), is_open_(false), retry_count_(10) { }
+    CapturePvApi() : retry_count_(10), initialized_(false), is_open_(false) { }
 
     CapturePvApi(tg::tCamera myCamera, tPvCameraInfo cameraInfo, unsigned long frameSize)
         : camera_(myCamera),
           camera_info_(cameraInfo),
-          frameSize(frameSize), initialized_(true), is_open_(false), retry_count_(10) {
+          frame_size_(frameSize), retry_count_(10), initialized_(true), is_open_(false) {
     }
 
-    void reset();
+    /**
+     * \brief Resets binning
+     */
+    void reset_binning() const;
 
     bool is_open() const;
 
@@ -46,28 +55,45 @@ public:
 
     void retry_count(unsigned new_value);
 
+    unsigned long frame_size() const;
+
     std::string version() const;
 
-    bool region(cv::Rect_<unsigned long> new_region);
+    /**
+     * \brief Apply a specific ROI to the camera
+     * \param new_region The region as opencv rect of unsigned long
+     * \return true if all 4 regions were set without errors
+     */
+    bool region(cv::Rect_<unsigned long> new_region) const;
 
-    cv::Rect_<unsigned long> region();
+    /**
+     * \brief Retrieves the camera ROI
+     * \return The roi as opencv rect type unsigned long
+     */
+    cv::Rect_<unsigned long> region() const;
 
-    bool region_x(unsigned new_x);
+    bool region_x(unsigned new_x) const;
 
-    unsigned long region_x();
+    unsigned long region_x() const;
 
-    bool region_y(unsigned new_y);
+    bool region_y(unsigned new_y) const;
 
-    unsigned long region_y();
+    unsigned long region_y() const;
 
-    bool region_height(unsigned new_height);
+    bool region_height(unsigned new_height) const;
 
-    unsigned long region_height();
+    unsigned long region_height() const;
 
-    bool region_width(unsigned new_width);
+    bool region_width(unsigned new_width) const;
 
-    unsigned long region_width();
+    unsigned long region_width() const;
 
+    /**
+     * \brief Captures frames synchron into a vector of opencv matricies using specified exposure
+     * \param frame_count Amount of frames to capture
+     * \param target_vector The target vector for the captured images
+     * \param exposure The exposure to use (us)
+     */
     void cap(int frame_count, std::vector<cv::Mat>& target_vector, unsigned long exposure);
 
     bool initialize();
@@ -80,16 +106,14 @@ public:
 
     void close();
 
-    void exposure(unsigned long new_value);
+    void exposure(unsigned long new_value) const;
 
-    unsigned long exposure();
+    unsigned long exposure() const;
 
-    void exposure_add(unsigned long value_to_add);
+    void exposure_add(unsigned long value_to_add) const;
 
-    void exposure_sub(unsigned long value_to_sub);
+    void exposure_sub(unsigned long value_to_sub) const;
 
-    void exposure_mul(unsigned long value_to_mul);
-
-
+    void exposure_mul(unsigned long value_to_mul) const;
 
 };

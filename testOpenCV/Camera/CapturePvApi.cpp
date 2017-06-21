@@ -5,27 +5,46 @@
 
 using namespace tg;
 
-std::string CapturePvApi::error_last() const {
+char const* CapturePvApi::error_last(tPvErr error) {
 
-    switch (Errcode) {
-    case ePvErrInternalFault: return std::string("an internal fault occurred");
-    case ePvErrBadHandle: return std::string("the handle of the camera is invalid");
-    case ePvErrBadSequence: return std::string("API isn't initialized");
-    case ePvErrNotFound: return std::string("the requested attribute doesn't exist");
-    case ePvErrUnplugged: return std::string("the camera has been unplugged");
-    case ePvErrOutOfRange: return std::string("the supplied value is out of range");
-    case ePvErrWrongType: return std::string("the requested attribute is not of the correct type");
-    case ePvErrForbidden: return std::string("the requested attribute forbid this operation");
-    default: return std::string("unknown error");
+    std::string return_string;
+
+    switch (error) {
+    case ePvErrInternalFault: return_string += "an internal fault occurred";
+        break;
+    case ePvErrBadHandle: return_string += "the handle of the camera is invalid";
+        break;
+    case ePvErrBadSequence: return_string += "API isn't initialized or capture already started/camera already open";
+        break;
+    case ePvErrNotFound: return_string += "the requested attribute doesn't exist or the camera was not found";
+        break;
+    case ePvErrUnplugged: return_string += "the camera was found but unplugged during the function call";
+        break;
+    case ePvErrOutOfRange: return_string += "the supplied value is out of range";
+        break;
+    case ePvErrWrongType: return_string += "the requested attribute is not of the correct type";
+        break;
+    case ePvErrForbidden: return_string += "the requested attribute forbid this operation";
+        break;
+    case ePvErrResources: return_string += "resources requested from the OS were not available";
+        break;
+    case ePvErrAccessDenied: return_string += "the camera couldn't be open in the requested mode";
+        break;
+    case ePvErrBadParameter: return_string += "a valid pointer for pCamera was not supplied";
+        break;
+    default: return_string += "unknown error";
     }
+
+    return return_string.c_str();
+
 }
 
-void CapturePvApi::reset() {
+void CapturePvApi::reset_binning() const {
 
     // reset stuff like binning etc
     const auto def_binning = 1;
-    Errcode = PvAttrUint32Set(camera_.Handle, "BinningX", def_binning);
-    Errcode = PvAttrUint32Set(camera_.Handle, "BinningY", def_binning);
+    auto err_code = PvAttrUint32Set(camera_.Handle, "BinningX", def_binning);
+    err_code = PvAttrUint32Set(camera_.Handle, "BinningY", def_binning);
 
 }
 
@@ -65,6 +84,10 @@ void CapturePvApi::retry_count(unsigned new_value) {
 
 }
 
+unsigned long CapturePvApi::frame_size() const {
+    return frame_size_;
+}
+
 std::string CapturePvApi::version() const {
     unsigned long major = 0;
     unsigned long minor = 0;
@@ -72,7 +95,7 @@ std::string CapturePvApi::version() const {
     return cv::format("%i.%i", major, minor);
 }
 
-bool CapturePvApi::region(cv::Rect_<unsigned long> new_region) {
+bool CapturePvApi::region(cv::Rect_<unsigned long> new_region) const {
 
     auto failures = 0;
 
@@ -91,7 +114,7 @@ bool CapturePvApi::region(cv::Rect_<unsigned long> new_region) {
     return failures == 0;
 }
 
-cv::Rect_<unsigned long> CapturePvApi::region() {
+cv::Rect_<unsigned long> CapturePvApi::region() const {
     auto x = region_x();
     auto y = region_y();
     auto width = region_width();
@@ -99,70 +122,70 @@ cv::Rect_<unsigned long> CapturePvApi::region() {
     return cv::Rect_<unsigned long>(x, y, width, height);
 }
 
-bool CapturePvApi::region_x(unsigned new_x) {
-    Errcode = PvAttrUint32Set(camera_.Handle, "RegionX", new_x);
-    if (Errcode == ePvErrSuccess)
+bool CapturePvApi::region_x(unsigned new_x) const {
+    auto err_code = PvAttrUint32Set(camera_.Handle, "RegionX", new_x);
+    if (err_code == ePvErrSuccess)
         return true;
-    log_time << cv::format("Error setting roi x.. %s\n", error_last());
+    log_time << cv::format("Error setting roi x.. %s\n", error_last(err_code));
     return false;
 }
 
-unsigned long CapturePvApi::region_x() {
+unsigned long CapturePvApi::region_x() const {
     unsigned long x = 0;
-    Errcode = PvAttrUint32Get(camera_.Handle, "RegionX", &x);
-    if (Errcode != ePvErrSuccess) {
-        log_time << cv::format("Error getting roi x.. %s\n", error_last());
+    auto err_code = PvAttrUint32Get(camera_.Handle, "RegionX", &x);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error getting roi x.. %s\n", error_last(err_code));
     }
     return x;
 }
 
-bool CapturePvApi::region_y(unsigned new_y) {
-    Errcode = PvAttrUint32Set(camera_.Handle, "RegionY", new_y);
-    if (Errcode == ePvErrSuccess)
+bool CapturePvApi::region_y(unsigned new_y) const {
+    auto err_code = PvAttrUint32Set(camera_.Handle, "RegionY", new_y);
+    if (err_code == ePvErrSuccess)
         return true;
-    log_time << cv::format("Error setting roi y.. %s\n", error_last());
+    log_time << cv::format("Error setting roi y.. %s\n", error_last(err_code));
     return false;
 }
 
-unsigned long CapturePvApi::region_y() {
+unsigned long CapturePvApi::region_y() const {
     unsigned long y = 0;
-    Errcode = PvAttrUint32Get(camera_.Handle, "RegionY", &y);
-    if (Errcode != ePvErrSuccess) {
-        log_time << cv::format("Error getting roi y.. %s\n", error_last());
+    auto err_code = PvAttrUint32Get(camera_.Handle, "RegionY", &y);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error getting roi y.. %s\n", error_last(err_code));
     }
     return y;
 }
 
-bool CapturePvApi::region_height(unsigned new_height) {
-    Errcode = PvAttrUint32Set(camera_.Handle, "Height", new_height);
-    if (Errcode == ePvErrSuccess)
+bool CapturePvApi::region_height(unsigned new_height) const {
+    auto err_code = PvAttrUint32Set(camera_.Handle, "Height", new_height);
+    if (err_code == ePvErrSuccess)
         return true;
-    log_time << cv::format("Error setting roi height.. %s\n", error_last());
+    log_time << cv::format("Error setting roi height.. %s\n", error_last(err_code));
     return false;
 }
 
-unsigned long CapturePvApi::region_height() {
+unsigned long CapturePvApi::region_height() const {
     unsigned long height = 0;
-    Errcode = PvAttrUint32Get(camera_.Handle, "Height", &height);
-    if (Errcode != ePvErrSuccess) {
-        log_time << cv::format("Error getting roi height.. %s\n", error_last());
+    auto err_code = PvAttrUint32Get(camera_.Handle, "Height", &height);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error getting roi height.. %s\n", error_last(err_code));
     }
     return height;
 }
 
-bool CapturePvApi::region_width(unsigned new_width) {
-    Errcode = PvAttrUint32Set(camera_.Handle, "Width", new_width);
-    if (Errcode == ePvErrSuccess)
+bool CapturePvApi::region_width(unsigned new_width) const {
+    auto err_code = PvAttrUint32Set(camera_.Handle, "Width", new_width);
+    if (err_code == ePvErrSuccess)
         return true;
-    log_time << cv::format("Error setting roi width.. %s\n", error_last());
+    log_time << cv::format("Error setting roi width.. %s\n", error_last(err_code));
     return false;
 }
 
-unsigned long CapturePvApi::region_width() {
+unsigned long CapturePvApi::region_width() const {
     unsigned long width = 0;
-    Errcode = PvAttrUint32Get(camera_.Handle, "Width", &width);
-    if (Errcode != ePvErrSuccess) {
-        log_time << cv::format("Error getting roi width.. %s\n", error_last());
+    auto err_code = PvAttrUint32Get(camera_.Handle, "Width", &width);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error getting roi width.. %s\n", error_last(err_code));
     }
     return width;
 }
@@ -170,12 +193,17 @@ unsigned long CapturePvApi::region_width() {
 void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector, unsigned long exposure_to_use) {
 
     // Get the image size of every capture
-    PvAttrUint32Get(camera_.Handle, "TotalBytesPerFrame", &frameSize);
+    PvAttrUint32Get(camera_.Handle, "TotalBytesPerFrame", &frame_size_);
+
+    auto err_code = PvCaptureAdjustPacketSize(camera_.Handle, def_packet_size);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error.. adjusting packet size.. %s\n", error_last(err_code));
+    }
 
     // Allocate a buffer to store the image
     memset(&camera_.Frame, 0, sizeof(tPvFrame));
-    camera_.Frame.ImageBufferSize = frameSize;
-    camera_.Frame.ImageBuffer = new char[frameSize];
+    camera_.Frame.ImageBufferSize = frame_size_;
+    camera_.Frame.ImageBuffer = new char[frame_size_];
 
     // Set maximum camera parameters - camera specific
     //int max_width = 2448;
@@ -212,9 +240,11 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector, uns
     }
 
     // Stop the acquisition
-    Errcode = PvCommandRun(camera_.Handle, "AcquisitionStop");
-    if (Errcode != ePvErrSuccess)
-        throw Errcode;
+    err_code = PvCommandRun(camera_.Handle, "AcquisitionStop");
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error..AcquisitionStop.. %s\n", error_last(err_code));
+        throw err_code;
+    }
 
     PvCaptureEnd(camera_.Handle);
 
@@ -222,22 +252,13 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector, uns
 
 bool CapturePvApi::initialize() {
 
+    tPvErr err_code;
     if (!initialized_) {
-        Errcode = PvInitialize();
-        initialized_ = Errcode == ePvErrSuccess;
+        err_code = PvInitialize();
+        initialized_ = err_code == ePvErrSuccess;
         is_open_ = false;
         if (!initialized_) { // something went to shiets...
-            switch (Errcode) {
-            case ePvErrResources:
-                log_time << "Error.. resources requested from the OS were not available\n";
-                break;
-            case ePvErrInternalFault:
-                log_time << "Error.. an internal fault occurred\n";
-                break;
-            default: ;
-                log_time << "Error.. Unknown error while attempting to initialize PvApi\n";
-                break;
-            }
+            log_time << cv::format("Error. initialize(). %s\n", error_last(err_code));
             return false;
         }
     }
@@ -264,7 +285,7 @@ bool CapturePvApi::initialize() {
     if (cameras && retry_count_) {
         log_time << cv::format("Found %i camera(s).\n", cameras);
     } else {
-        log_time << cv::format("Failed to locate camera, try increasing retry amount. Current retry amount is %i\n", retry_count());
+        log_time << cv::format("Failed to locate camera, try increasing retry amount. Current is %i\n", retry_count());
         close();
         return false;
     }
@@ -279,6 +300,7 @@ bool CapturePvApi::initialize() {
     }
 
     camera_.UID = camera_info_.UniqueId;
+
     return true;
 }
 
@@ -298,36 +320,11 @@ bool CapturePvApi::open() {
         return false;
     }
 
-    Errcode = PvCameraOpen(camera_.UID, ePvAccessMaster, &(camera_.Handle));
-    is_open_ = Errcode == ePvErrSuccess;
+    auto err_code = PvCameraOpen(camera_.UID, ePvAccessMaster, &(camera_.Handle));
+    is_open_ = err_code == ePvErrSuccess;
 
     if (!is_open_) { // something went to shiets...
-        switch (Errcode) {
-        case ePvErrAccessDenied:
-            log_time << "Error.. the camera couldn't be open in the requested mode\n";
-            return false;
-        case ePvErrNotFound:
-            log_time << "Error.. the camera was not found (unplugged)\n";
-            return false;
-        case ePvErrUnplugged:
-            log_time << "Error.. the camera was found but unplugged during the function call\n";
-            return false;
-        case ePvErrBadParameter:
-            log_time << "Error.. a valid pointer for pCamera was not supplied\n";
-            return false;
-        case ePvErrResources:
-            log_time << "Error.. resources requested from the OS were not available\n";
-            return false;
-        case ePvErrInternalFault:
-            log_time << "Error.. an internal fault occurred\n";
-            return false;
-        case ePvErrBadSequence:
-            log_time << "Error.. API isn't initialized or camera is alreay open\n";
-            return false;
-        default:
-            log_time << "Error.. some mysterious error happend.. but what?\n";
-            return false;
-        }
+        log_time << cv::format("Error. camera not open.. %s\n", error_last(err_code));
     }
 
     log_time << "Camera opened ok.\n";
@@ -336,53 +333,44 @@ bool CapturePvApi::open() {
 
 void CapturePvApi::close() {
 
-    Errcode = PvCameraClose(camera_.Handle);
-    is_open_ = Errcode != ePvErrSuccess;
+    auto err_code = PvCameraClose(camera_.Handle);
+    is_open_ = err_code != ePvErrSuccess;
 
     if (is_open_) {
-        switch (Errcode) {
-        case ePvErrBadHandle:
-            log_time << "Error.. the handle of the camera is invalid\n";
-            return;
-        case ePvErrBadSequence:
-            log_time << "Error.. API isn't initialized\n";
-            return;
-        default:
-            log_time << "Error.. unknown error while closing camera.\n";
-            return;
-        }
+        log_time << cv::format("Error. close(), %s\n", error_last(err_code));
+        return;
     }
     log_time << "Camera closed.\n";
 }
 
-void CapturePvApi::exposure(unsigned long new_value) {
-    Errcode = PvAttrUint32Set(camera_.Handle, "ExposureValue", new_value);
-    if (Errcode != ePvErrSuccess) {
+void CapturePvApi::exposure(unsigned long new_value) const {
+    auto err_code = PvAttrUint32Set(camera_.Handle, "ExposureValue", new_value);
+    if (err_code != ePvErrSuccess) {
         log_time << "Exposure changed failed.\n";
         return;
     }
     log_time << "Exposure changed to " << new_value << std::endl;
 }
 
-unsigned long CapturePvApi::exposure() {
+unsigned long CapturePvApi::exposure() const {
     unsigned long val = 0;
-    Errcode = PvAttrUint32Get(camera_.Handle, "ExposureValue", &val);
-    if (Errcode != ePvErrSuccess) {
-        log_time << "Exposure reading failed.\n";
+    auto err_code = PvAttrUint32Get(camera_.Handle, "ExposureValue", &val);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error. exposure(). %s\n", error_last(err_code));
         return 0;
     }
     log_time << "Exposure fetched " << val << std::endl;
     return val;
 }
 
-void CapturePvApi::exposure_add(unsigned long value) {
+void CapturePvApi::exposure_add(unsigned long value) const {
     exposure(exposure() + value);
 }
 
-void CapturePvApi::exposure_sub(unsigned long value) {
+void CapturePvApi::exposure_sub(unsigned long value) const {
     exposure(exposure() - value);
 }
 
-void CapturePvApi::exposure_mul(unsigned long value) {
+void CapturePvApi::exposure_mul(unsigned long value) const {
     exposure(exposure() * value);
 }
