@@ -76,12 +76,30 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
             return false;
         }
 
-        capture->reset_binning();
-
         //capture->print_attr();
 
-        for (auto& fs : frameset)
-            capture->cap(25, fs->frames, fs->exp_ms);
+        capture->reset_binning();
+
+        capture->packet_size(8228);
+
+        auto def_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
+
+        capture->region(def_roi);
+
+        capture->frame_init();
+
+        capture->cap_init();
+
+        capture->aquisition_init();
+
+        for (auto& fs : frameset) {
+            capture->exposure(fs->exp_ms);
+            capture->cap(25, fs->frames);
+        }
+
+        capture->aquisition_end();
+
+        capture->cap_end();
 
         capture->close();
 
@@ -937,7 +955,7 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
     for (auto& f : frameset) {
         f->frames.clear();
         f->frames.reserve(capture_count);
-        capture->cap(capture_count, f->frames, static_cast<unsigned long>(f->exp_ms));
+        //capture->cap(capture_count, f->frames, static_cast<unsigned long>(f->exp_ms));
         //log_time << f << '\n';
 
 

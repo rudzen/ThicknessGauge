@@ -151,8 +151,87 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
     }
 }
 
-void CapturePvApi::reset_binning() const {
+bool CapturePvApi::frame_init() {
 
+    // Get the image size of every capture
+    auto err_code = PvAttrUint32Get(camera_.Handle, "TotalBytesPerFrame", &frame_size_);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error while initializing frame! %s\n", error_last(err_code));
+        return false;
+    }
+
+    // Allocate a buffer to store the image
+    memset(&camera_.Frame, 0, sizeof(tPvFrame));
+    camera_.Frame.ImageBufferSize = frame_size_;
+    camera_.Frame.ImageBuffer = new char[frame_size_];
+
+    return true;
+
+}
+
+int CapturePvApi::cap_init() const {
+    // Start the camera
+    auto err_code = PvCaptureStart(camera_.Handle);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error starting capture.. %s\n", error_last(err_code));
+        return -1;
+    }
+
+    unsigned long ready = 0;
+    err_code = PvCaptureQuery(camera_.Handle, &ready);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error. Capture query failed. %s\n", error_last(err_code));
+        return -2;
+    }
+    if (ready == 0) {
+        log_time << cv::format("Error. Unit is not ready to capture.\n");
+        return -3;
+    }
+
+    return 0;
+}
+
+bool CapturePvApi::cap_end() const {
+    auto err_code = PvCaptureEnd(camera_.Handle);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error. Failed to end capture. %s\n", error_last(err_code));
+        return false;
+    }
+    return true;
+}
+
+bool CapturePvApi::aquisition_init() const {
+    // Set the camera to capture continuously
+    auto err_code = PvAttrEnumSet(camera_.Handle, "AcquisitionMode", "Continuous");
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error setting acquisition mode.. %s\n", error_last(err_code));
+        return false;
+    }
+    err_code = PvCommandRun(camera_.Handle, "AcquisitionStart");
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error setting acquisition start.. %s\n", error_last(err_code));
+        return false;
+    }
+    err_code = PvAttrEnumSet(camera_.Handle, "FrameStartTriggerMode", "Freerun");
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error setting frame start trigger mode.. %s\n", error_last(err_code));
+        return false;
+    }
+    return true;
+}
+
+bool CapturePvApi::aquisition_end() const {
+    // Stop the acquisition
+    auto err_code = PvCommandRun(camera_.Handle, "AcquisitionStop");
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error..AcquisitionStop.. %s\n", error_last(err_code));
+        return false;
+    }
+
+    return true;
+}
+
+void CapturePvApi::reset_binning() const {
     // reset stuff like binning etc
     const auto def_binning = 1;
     auto err_code = PvAttrUint32Set(camera_.Handle, "BinningX", def_binning);
@@ -163,7 +242,6 @@ void CapturePvApi::reset_binning() const {
     if (err_code != ePvErrSuccess) {
         log_time << cv::format("Error setting BinningY.. %s\n", error_last(err_code));
     }
-
 }
 
 bool CapturePvApi::is_open() const {
@@ -308,65 +386,10 @@ unsigned long CapturePvApi::region_width() const {
     return width;
 }
 
-void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector, unsigned long exposure_to_use) {
+void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
 
-    // Get the image size of every capture
-    PvAttrUint32Get(camera_.Handle, "TotalBytesPerFrame", &frame_size_);
-
-    auto err_code = PvCaptureAdjustPacketSize(camera_.Handle, packet_size_);
-    if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error.. adjusting packet size.. %s\n", error_last(err_code));
-    }
-
-    // Allocate a buffer to store the image
-    memset(&camera_.Frame, 0, sizeof(tPvFrame));
-    camera_.Frame.ImageBufferSize = frame_size_;
-    camera_.Frame.ImageBuffer = new char[frame_size_];
-
-    // Set maximum camera parameters - camera specific
-    //int max_width = 2448;
-    //int max_heigth = 2050;
-
-    exposure(exposure_to_use);
-
-    region(default_roi);
-
+    // retrieve the roi to use
     auto roi = region();
-
-    // Start the camera
-    err_code = PvCaptureStart(camera_.Handle);
-    if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error starting capture.. %s\n", error_last(err_code));
-        return;
-    }
-
-    unsigned long ready = 0;
-    err_code = PvCaptureQuery(camera_.Handle, &ready);
-    if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error. Capture query failed. %s\n", error_last(err_code));
-        return;
-    }
-    if (ready == 0) {
-        log_time << cv::format("Error. Unit is not ready to capture.\n");
-        return;
-    }
-
-    // Set the camera to capture continuously
-    err_code = PvAttrEnumSet(camera_.Handle, "AcquisitionMode", "Continuous");
-    if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error setting acquisition mode.. %s\n", error_last(err_code));
-        return;
-    }
-    err_code = PvCommandRun(camera_.Handle, "AcquisitionStart");
-    if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error setting acquisition start.. %s\n", error_last(err_code));
-        return;
-    }
-    err_code = PvAttrEnumSet(camera_.Handle, "FrameStartTriggerMode", "Freerun");
-    if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error setting frame start trigger mode.. %s\n", error_last(err_code));
-        return;
-    }
 
     auto m = cv::Mat(roi.height, roi.width, CV_8UC1);
 
@@ -374,7 +397,7 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector, uns
         if (!PvCaptureQueueFrame(camera_.Handle, &(camera_.Frame), nullptr)) {
 
             while (true) {
-                err_code = PvCaptureWaitForFrameDone(camera_.Handle, &(camera_.Frame), 100);
+                auto err_code = PvCaptureWaitForFrameDone(camera_.Handle, &(camera_.Frame), 100);
                 if (err_code == ePvErrTimeout)
                     continue;
                 if (err_code == ePvErrSuccess)
@@ -389,16 +412,6 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector, uns
             //cv::imwrite("ostefars.png", target_vector.back());
         }
     }
-
-    // Stop the acquisition
-    err_code = PvCommandRun(camera_.Handle, "AcquisitionStop");
-    if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error..AcquisitionStop.. %s\n", error_last(err_code));
-        throw err_code;
-    }
-
-    PvCaptureEnd(camera_.Handle);
-
 }
 
 bool CapturePvApi::initialize() {
@@ -493,12 +506,11 @@ void CapturePvApi::close() {
     log_time << "Camera closed.\n";
 }
 
-void CapturePvApi::packet_size(const unsigned long new_value) {
-    packet_size_ = new_value;
-}
-
-unsigned long CapturePvApi::packet_size() const {
-    return packet_size_;
+void CapturePvApi::packet_size(const unsigned long new_value) const {
+    auto err_code = PvCaptureAdjustPacketSize(camera_.Handle, new_value);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error.. adjusting packet size.. %s\n", error_last(err_code));
+    }
 }
 
 void CapturePvApi::gain(unsigned long new_value) const {
@@ -561,6 +573,6 @@ void CapturePvApi::print_attr() const {
         log_time << "Unable to read attributes..\n";
     }
 
-    for (auto i = 0; i < count; i++)
+    for (unsigned long i = 0; i < count; i++)
         query_attribute(pListPtr[i]);
 }

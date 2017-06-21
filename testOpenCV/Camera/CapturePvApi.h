@@ -12,15 +12,11 @@ class CapturePvApi {
 
     const unsigned long def_packet_size = 8228;
 
-    const cv::Rect_<unsigned long> default_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
-
     tg::tCamera camera_;
 
     tPvCameraInfo camera_info_;
 
     unsigned long frame_size_;
-
-    unsigned long packet_size_;
 
     unsigned int retry_count_;
 
@@ -36,13 +32,34 @@ class CapturePvApi {
 
 public:
 
+    const cv::Rect_<unsigned long> default_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
+
     CapturePvApi()
-        : frame_size_(0), packet_size_(def_packet_size), retry_count_(10), initialized_(false), is_open_(false) { }
+        : frame_size_(0), retry_count_(10), initialized_(false), is_open_(false) { }
 
     CapturePvApi(tg::tCamera myCamera, tPvCameraInfo cameraInfo, unsigned long frameSize)
         : camera_(myCamera),
           camera_info_(cameraInfo),
-          frame_size_(frameSize), packet_size_(def_packet_size), retry_count_(10), initialized_(true), is_open_(false) { }
+          frame_size_(frameSize), retry_count_(10), initialized_(true), is_open_(false) { }
+
+    ~CapturePvApi() {
+        //delete camera_.Frame.ImageBuffer;
+    }
+
+    bool frame_init();
+
+    int cap_init() const;
+
+    bool cap_end() const;
+
+    bool aquisition_init() const;
+
+    bool aquisition_end() const;
+
+
+
+
+
 
     /**
      * \brief Resets binning
@@ -98,9 +115,8 @@ public:
      * \brief Captures frames synchron into a vector of opencv matricies using specified exposure
      * \param frame_count Amount of frames to capture
      * \param target_vector The target vector for the captured images
-     * \param exposure The exposure to use (us)
      */
-    void cap(int frame_count, std::vector<cv::Mat>& target_vector, unsigned long exposure);
+    void cap(int frame_count, std::vector<cv::Mat>& target_vector);
 
     bool initialize();
 
@@ -112,9 +128,7 @@ public:
 
     void close();
 
-    void packet_size(const unsigned long new_value);
-
-    unsigned long packet_size() const;
+    void packet_size(const unsigned long new_value) const;
 
     void gain(unsigned long new_value) const;
 
