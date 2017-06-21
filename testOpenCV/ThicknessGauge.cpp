@@ -78,6 +78,8 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
 
         capture->reset_binning();
 
+        //capture->print_attr();
+
         for (auto& fs : frameset)
             capture->cap(25, fs->frames, fs->exp_ms);
 
@@ -89,8 +91,7 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
     } else
         loadGlob(glob_name);
 
-    return
-        true;
+    return true;
 }
 
 /**

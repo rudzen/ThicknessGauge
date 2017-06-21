@@ -39,6 +39,118 @@ char const* CapturePvApi::error_last(tPvErr error) {
 
 }
 
+const char* CapturePvApi::data_type_to_string(tPvDatatype aType) {
+    switch (aType) {
+    case ePvDatatypeUnknown: return "unknown";
+    case ePvDatatypeCommand: return "command";
+    case ePvDatatypeRaw: return "raw";
+    case ePvDatatypeString: return "string";
+    case ePvDatatypeEnum: return "enum";
+    case ePvDatatypeUint32: return "uint32";
+    case ePvDatatypeFloat32: return "float32";
+    case ePvDatatypeInt64: return "int64";
+    case ePvDatatypeBoolean: return "boolean";
+    default: return "";
+    }
+}
+
+void CapturePvApi::query_attribute(const char* aLabel) const {
+    tPvAttributeInfo lInfo;
+
+    if (PvAttrInfo(camera_.Handle, aLabel, &lInfo) != ePvErrSuccess)
+        return;
+
+    char lFlags[5];
+
+    memset(lFlags, ' ', sizeof(char) * 4);
+
+    if (lInfo.Flags & ePvFlagRead)
+        lFlags[0] = 'r';
+    if (lInfo.Flags & ePvFlagWrite)
+        lFlags[1] = 'w';
+    if (lInfo.Flags & ePvFlagVolatile)
+        lFlags[2] = 'v';
+    if (lInfo.Flags & ePvFlagConst)
+        lFlags[3] = 'c';
+    lFlags[4] = '\0';
+
+    //	printf("%30s (%30s) [%7s]{%s}",aLabel,lInfo.Category,DatatypeToString(lInfo.Datatype),lFlags); 
+    //    printf("%s/%s = %s [%s]{%s}\n",lInfo.Category,aLabel,lValue,DatatypeToString(lInfo.Datatype),lFlags); 
+
+    switch (lInfo.Datatype) {
+    case ePvDatatypeString:
+        {
+            char lValue[128];
+
+            // we assume here that any string value will be less than 128 characters
+            // long, which we may not be the case
+
+            if (PvAttrStringGet(camera_.Handle, aLabel, lValue, 128, nullptr) == ePvErrSuccess)
+                printf("%s/%s = %s [%s,%s]\n", lInfo.Category, aLabel, lValue, data_type_to_string(lInfo.Datatype), lFlags);
+            else
+                printf("ERROR!\n");
+
+            break;
+        }
+    case ePvDatatypeEnum:
+        {
+            char lValue[128];
+
+            // we assume here that any string value will be less than 128 characters
+            // long, which we may not be the case
+
+            if (PvAttrEnumGet(camera_.Handle, aLabel, lValue, 128, nullptr) == ePvErrSuccess)
+                printf("%s/%s = %s [%s,%s]\n", lInfo.Category, aLabel, lValue, data_type_to_string(lInfo.Datatype), lFlags);
+            else
+                printf("ERROR!\n");
+            break;
+        }
+    case ePvDatatypeUint32:
+        {
+            tPvUint32 lValue;
+
+            if (PvAttrUint32Get(camera_.Handle, aLabel, &lValue) == ePvErrSuccess)
+                printf("%s/%s = %lu [%s,%s]\n", lInfo.Category, aLabel, lValue, data_type_to_string(lInfo.Datatype), lFlags);
+            else
+                printf("ERROR!\n");
+            break;
+        }
+    case ePvDatatypeInt64:
+        {
+            tPvInt64 lValue;
+
+            if (PvAttrInt64Get(camera_.Handle, aLabel, &lValue) == ePvErrSuccess)
+                printf("%s/%s = %lld [%s,%s]\n", lInfo.Category, aLabel, lValue, data_type_to_string(lInfo.Datatype), lFlags);
+            else
+                printf("ERROR!\n");
+            break;
+        }
+    case ePvDatatypeFloat32:
+        {
+            tPvFloat32 lValue;
+
+            if (PvAttrFloat32Get(camera_.Handle, aLabel, &lValue) == ePvErrSuccess)
+                printf("%s/%s = %f [%s,%s]\n", lInfo.Category, aLabel, lValue, data_type_to_string(lInfo.Datatype), lFlags);
+            else
+                printf("ERROR!\n");
+            break;
+        }
+    case ePvDatatypeBoolean:
+        {
+            tPvBoolean lValue;
+
+            if (PvAttrBooleanGet(camera_.Handle, aLabel, &lValue) == ePvErrSuccess)
+                printf("%s/%s = %s [%s,%s]\n", lInfo.Category, aLabel, lValue ? "true" : "false", data_type_to_string(lInfo.Datatype), lFlags);
+            else
+                printf("ERROR!\n");
+            break;
+        }
+    default:
+        //command
+        printf("%s/%s [%s,%s]\n", lInfo.Category, aLabel, data_type_to_string(lInfo.Datatype), lFlags);
+    }
+}
+
 void CapturePvApi::reset_binning() const {
 
     // reset stuff like binning etc
@@ -201,7 +313,7 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector, uns
     // Get the image size of every capture
     PvAttrUint32Get(camera_.Handle, "TotalBytesPerFrame", &frame_size_);
 
-    auto err_code = PvCaptureAdjustPacketSize(camera_.Handle, def_packet_size);
+    auto err_code = PvCaptureAdjustPacketSize(camera_.Handle, packet_size_);
     if (err_code != ePvErrSuccess) {
         log_time << cv::format("Error.. adjusting packet size.. %s\n", error_last(err_code));
     }
@@ -225,6 +337,17 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector, uns
     err_code = PvCaptureStart(camera_.Handle);
     if (err_code != ePvErrSuccess) {
         log_time << cv::format("Error starting capture.. %s\n", error_last(err_code));
+        return;
+    }
+
+    unsigned long ready = 0;
+    err_code = PvCaptureQuery(camera_.Handle, &ready);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error. Capture query failed. %s\n", error_last(err_code));
+        return;
+    }
+    if (ready == 0) {
+        log_time << cv::format("Error. Unit is not ready to capture.\n");
         return;
     }
 
@@ -370,6 +493,34 @@ void CapturePvApi::close() {
     log_time << "Camera closed.\n";
 }
 
+void CapturePvApi::packet_size(const unsigned long new_value) {
+    packet_size_ = new_value;
+}
+
+unsigned long CapturePvApi::packet_size() const {
+    return packet_size_;
+}
+
+void CapturePvApi::gain(unsigned long new_value) const {
+    auto err_code = PvAttrUint32Set(camera_.Handle, "GainValue", new_value);
+    if (err_code != ePvErrSuccess) {
+        log_time << "Gain changed failed.\n";
+        return;
+    }
+    log_time << "Gain changed to " << new_value << std::endl;
+}
+
+unsigned long CapturePvApi::gain() const {
+    unsigned long val = 0;
+    auto err_code = PvAttrUint32Get(camera_.Handle, "GainValue", &val);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error. gain(). %s\n", error_last(err_code));
+        return 0;
+    }
+    log_time << "Gain fetched " << val << std::endl;
+    return val;
+}
+
 void CapturePvApi::exposure(unsigned long new_value) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "ExposureValue", new_value);
     if (err_code != ePvErrSuccess) {
@@ -400,4 +551,16 @@ void CapturePvApi::exposure_sub(unsigned long value) const {
 
 void CapturePvApi::exposure_mul(unsigned long value) const {
     exposure(exposure() * value);
+}
+
+void CapturePvApi::print_attr() const {
+    unsigned long count = 0;
+    tPvAttrListPtr pListPtr;
+    auto err_code = PvAttrList(camera_.Handle, &pListPtr, &count);
+    if (err_code != ePvErrSuccess) {
+        log_time << "Unable to read attributes..\n";
+    }
+
+    for (auto i = 0; i < count; i++)
+        query_attribute(pListPtr[i]);
 }

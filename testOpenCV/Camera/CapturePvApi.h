@@ -20,6 +20,8 @@ class CapturePvApi {
 
     unsigned long frame_size_;
 
+    unsigned long packet_size_;
+
     unsigned int retry_count_;
 
     bool initialized_;
@@ -28,15 +30,19 @@ class CapturePvApi {
 
     static char const* error_last(tPvErr error);
 
+    static const char* data_type_to_string(tPvDatatype aType);
+
+    void query_attribute(const char* aLabel) const;
+
 public:
 
-    CapturePvApi() : retry_count_(10), initialized_(false), is_open_(false) { }
+    CapturePvApi()
+        : frame_size_(0), packet_size_(def_packet_size), retry_count_(10), initialized_(false), is_open_(false) { }
 
     CapturePvApi(tg::tCamera myCamera, tPvCameraInfo cameraInfo, unsigned long frameSize)
         : camera_(myCamera),
           camera_info_(cameraInfo),
-          frame_size_(frameSize), retry_count_(10), initialized_(true), is_open_(false) {
-    }
+          frame_size_(frameSize), packet_size_(def_packet_size), retry_count_(10), initialized_(true), is_open_(false) { }
 
     /**
      * \brief Resets binning
@@ -106,6 +112,14 @@ public:
 
     void close();
 
+    void packet_size(const unsigned long new_value);
+
+    unsigned long packet_size() const;
+
+    void gain(unsigned long new_value) const;
+
+    unsigned long gain() const;
+
     void exposure(unsigned long new_value) const;
 
     unsigned long exposure() const;
@@ -115,5 +129,7 @@ public:
     void exposure_sub(unsigned long value_to_sub) const;
 
     void exposure_mul(unsigned long value_to_mul) const;
+
+    void print_attr() const;
 
 };
