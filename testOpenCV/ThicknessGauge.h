@@ -111,6 +111,8 @@ public: // basic stuff to extract information
 
 private:
 
+    void testEdge();
+
     void computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph);
 
     void processMatForLine(cv::Mat& org, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) const;

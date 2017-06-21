@@ -3,10 +3,10 @@
 #include "CaptureInterface.h"
 #include <PvApi.h>
 
-class CapturePvApi : public CaptureInterface {
+class CapturePvApi {
 
-    tg::tCamera myCamera;
-    tPvCameraInfo cameraInfo;
+    tg::tCamera camera_;
+    tPvCameraInfo camera_info_;
     unsigned long frameSize;
     tPvErr Errcode;
 
@@ -16,37 +16,35 @@ class CapturePvApi : public CaptureInterface {
 
     bool initialized_;
 
-    bool isOpen_;
+    bool is_open_;
 
-    unsigned int camera_count = 0;
+    unsigned int retry_count_;
 
-    unsigned int retryCount_;
-
-    static std::string error_attr(tPvErr error);
+    std::string error_last() const;
 
 public:
 
-    CapturePvApi() : initialized_(false), isOpen_(false), retryCount_(10) { }
+    CapturePvApi() : initialized_(false), is_open_(false), retry_count_(10) { }
 
     CapturePvApi(tg::tCamera myCamera, tPvCameraInfo cameraInfo, unsigned long frameSize)
-        : myCamera(myCamera),
-          cameraInfo(cameraInfo),
-          frameSize(frameSize), initialized_(true), isOpen_(false), retryCount_(10) {
+        : camera_(myCamera),
+          camera_info_(cameraInfo),
+          frameSize(frameSize), initialized_(true), is_open_(false), retry_count_(10) {
     }
 
     void reset();
 
-    bool isOpen() const;
+    bool is_open() const;
 
-    void isOpen(bool new_value);
+    void is_open(bool new_value);
 
     bool initialized() const;
 
     void initialized(bool new_value);
 
-    unsigned retryCount() const;
+    unsigned retry_count() const;
 
-    void retryCount(unsigned new_value);
+    void retry_count(unsigned new_value);
 
     std::string version() const;
 
@@ -70,18 +68,13 @@ public:
 
     unsigned long region_width();
 
-
-    void retrieveAllInfo() override;
-
-    void capture(int frame_count, std::vector<cv::Mat>& target_vector, unsigned long exposure) override;
-
-    void capture(int frame_count, std::vector<cv::Mat>& target_vector);
+    void cap(int frame_count, std::vector<cv::Mat>& target_vector, unsigned long exposure);
 
     bool initialize();
 
     void uninitialize();
 
-    static unsigned long countCameras();
+    static unsigned long camera_count();
 
     bool open();
 

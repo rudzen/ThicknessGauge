@@ -52,7 +52,7 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
             capture = std::make_unique<CapturePvApi>();
         } else {
             // double check for weirdness
-            if (capture->isOpen()) {
+            if (capture->is_open()) {
                 capture->close();
             }
         }
@@ -79,7 +79,7 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
         capture->reset();
 
         for (auto& fs : frameset)
-            capture->capture(25, fs->frames, fs->exp_ms);
+            capture->cap(25, fs->frames, fs->exp_ms);
 
         capture->close();
 
@@ -156,6 +156,10 @@ void ThicknessGauge::generateGlob(std::string& name) {
  * \return 2 Float vector with the points marking the boundries as pair, where first = left, second = right
  */
 void ThicknessGauge::computeMarkingHeight() {
+
+    testEdge();
+
+    return;
 
     try {
 
@@ -932,7 +936,7 @@ void ThicknessGauge::captureFrames(unsigned int frame_index, unsigned int captur
     for (auto& f : frameset) {
         f->frames.clear();
         f->frames.reserve(capture_count);
-        capture->capture(capture_count, f->frames, static_cast<unsigned long>(f->exp_ms));
+        capture->cap(capture_count, f->frames, static_cast<unsigned long>(f->exp_ms));
         //log_time << f << '\n';
 
 
@@ -1084,6 +1088,25 @@ bool ThicknessGauge::saveData(string filename) {
     cv::imwrite("_overview.png", overview);
 
     return true;
+}
+
+void ThicknessGauge::testEdge() {
+
+    cv::VideoCapture cap(CV_CAP_PVAPI); // open the default camera
+    if (!cap.isOpened()) // check if we succeeded
+        return;
+
+    cv::namedWindow("Video", 1);
+    while (true) {
+        cv::Mat frame;
+        cap >> frame; // get a new frame from camera
+        imshow("Video", frame);
+
+        // Press 'c' to escape
+        if (cv::waitKey(30) == 'c')
+            break;
+    }
+    return;
 }
 
 void ThicknessGauge::computerGaugeLine(cv::Mat& output) {
