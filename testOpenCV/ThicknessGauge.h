@@ -64,7 +64,7 @@ private:
     std::shared_ptr<CannyR> pcanny;
 
     // filter used for marking detection
-    std::unique_ptr<FilterR> p_filter_marking = std::make_unique<FilterR>("Marking filter");
+    std::unique_ptr<FilterR> pfilter_marking = std::make_unique<FilterR>("Marking filter");
 
     // filter used for base line detection
     std::unique_ptr<FilterR> pfilter_baseline = std::make_unique<FilterR>("Baseline filter");

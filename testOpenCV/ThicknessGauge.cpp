@@ -198,7 +198,7 @@ void ThicknessGauge::compute_marking_height() {
             //splitFrames(leftFrames, rightFrames);
 
             // configure filters for show window
-            p_filter_marking->show_windows(show_windows_);
+            pfilter_marking->show_windows(show_windows_);
             pfilter_baseline->show_windows(show_windows_);
 
             // houghlines to determin where the actual marking is in the frame
@@ -545,7 +545,7 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
     if (show_windows_)
         draw::makeWindow(window_name);
 
-    p_filter_marking->setKernel(filters::kernel_line_right_to_left);
+    pfilter_marking->setKernel(filters::kernel_line_right_to_left);
 
     vector<cv::Rect2d> markings(frame_count_);
     vector<cv::Vec4d> left_borders(frame_count_);
@@ -615,9 +615,9 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
                 //canny->setImage(frames->frames[i].clone());
                 //canny->doCanny();
 
-                p_filter_marking->image(frames->frames_[i].clone());
-                p_filter_marking->doFilter();
-                pcanny->image(p_filter_marking->getResult());
+                pfilter_marking->image(frames->frames_[i].clone());
+                pfilter_marking->doFilter();
+                pcanny->image(pfilter_marking->getResult());
                 pcanny->do_canny();
 
                 auto t = pcanny->result();
