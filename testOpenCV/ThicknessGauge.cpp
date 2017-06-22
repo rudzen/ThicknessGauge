@@ -78,6 +78,8 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
 
         //capture->print_attr();
 
+        capture->pixel_format();
+
         capture->reset_binning();
 
         capture->packet_size(8228);

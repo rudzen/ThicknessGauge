@@ -2,11 +2,21 @@
 
 #include "CaptureInterface.h"
 #include <PvApi.h>
+#include "UI/ProgressBar.h"
 
 /**
  * \brief Allows capture through PvAPI -> OpenCV data structure
  */
 class CapturePvApi {
+
+public:
+
+    enum class PixelFormat {
+        MONO8, MONO12, MONO12_PACKED, UNKNOWN
+    };
+
+
+private:
 
     const int mono = 1;
 
@@ -43,7 +53,7 @@ public:
           frame_size_(frameSize), retry_count_(10), initialized_(true), is_open_(false) { }
 
     ~CapturePvApi() {
-        //delete camera_.Frame.ImageBuffer;
+        delete[] static_cast<char*>(camera_.Frame.ImageBuffer);
     }
 
     bool frame_init();
@@ -58,8 +68,15 @@ public:
 
 
 
-
-
+    /*
+/Controls/Exposure/Auto/ExposureAutoAdjustTol = 5 [uint32,rw  ]
+/Controls/Exposure/Auto/ExposureAutoAlg = Mean [enum,rw  ]
+/Controls/Exposure/Auto/ExposureAutoMax = 500000 [uint32,rw  ]
+/Controls/Exposure/Auto/ExposureAutoMin = 25 [uint32,rw  ]
+/Controls/Exposure/Auto/ExposureAutoOutliers = 0 [uint32,rw  ]
+/Controls/Exposure/Auto/ExposureAutoRate = 100 [uint32,rw  ]
+/Controls/Exposure/Auto/ExposureAutoTarget = 50 [uint32,rw  ]
+     */
 
     /**
      * \brief Resets binning
@@ -143,6 +160,10 @@ public:
     void exposure_sub(unsigned long value_to_sub) const;
 
     void exposure_mul(unsigned long value_to_mul) const;
+
+    void pixel_format(const PixelFormat format) const;
+
+    PixelFormat pixel_format() const;
 
     void print_attr() const;
 

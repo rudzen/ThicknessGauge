@@ -5,7 +5,7 @@ ProgressBar::ProgressBar() {
 
 ProgressBar::ProgressBar(unsigned long n_, const char* description_, std::ostream& out_) {
 
-    n = n_;
+    n_ = n_;
     frequency_update = n_;
     description = description_;
     out = &out_;
@@ -18,7 +18,7 @@ ProgressBar::ProgressBar(unsigned long n_, const char* description_, std::ostrea
 
 void ProgressBar::SetFrequencyUpdate(unsigned long frequency_update_) {
 
-    frequency_update = frequency_update_ > n ? n : frequency_update_;
+    frequency_update = frequency_update_ > n_ ? n_ : frequency_update_;
 }
 
 void ProgressBar::SetStyle(const char* unit_bar_, const char* unit_space_) {
@@ -60,24 +60,24 @@ void ProgressBar::ClearBarField() const {
 
 void ProgressBar::Progressed(unsigned long idx_) {
     try {
-        if (idx_ > n)
+        if (idx_ > n_)
             throw idx_;
 
         // determines whether to update the progress bar from frequency_update
-        if ((idx_ != n) && (idx_ % (n / frequency_update) != 0))
+        if ((idx_ != n_) && (idx_ % (n_ / frequency_update) != 0))
             return;
 
         // calculate the size of the progress bar
         auto bar_size = GetBarLength();
 
         // calculate percentage of progress
-        auto progress_percent = idx_ * TOTAL_PERCENTAGE / n;
+        auto progress_percent = idx_ * TOTAL_PERCENTAGE / n_;
 
         // calculate the percentage value of a unit bar 
         auto percent_per_unit_bar = TOTAL_PERCENTAGE / bar_size;
 
         // display progress bar
-        *out << " " << description << " [";
+        *out << ' ' << description << " [";
 
         for (auto bar_length = 0; bar_length <= bar_size - 1; ++bar_length) {
             *out << (bar_length * percent_per_unit_bar < progress_percent ? unit_bar : unit_space);
@@ -86,7 +86,15 @@ void ProgressBar::Progressed(unsigned long idx_) {
         *out << ']' << std::setw(CHARACTER_WIDTH_PERCENTAGE + 1) << std::setprecision(1) << std::fixed << progress_percent << "%\r" << std::flush;
     } catch (unsigned long e) {
         ClearBarField();
-        std::cerr << "PROGRESS_BAR_EXCEPTION: _idx (" << e << ") went out of bounds, greater than n (" << n << ")." << std::endl << std::flush;
+        std::cerr << "PROGRESS_BAR_EXCEPTION: _idx (" << e << ") went out of bounds, greater than n (" << n_ << ")." << std::endl << std::flush;
     }
 
+}
+
+unsigned long ProgressBar::n() const {
+    return n_;
+}
+
+void ProgressBar::n(unsigned long new_n) {
+    n_ = new_n;
 }

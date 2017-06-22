@@ -363,5 +363,11 @@
       <Filter>Bugs</Filter>
     </Text>
     <Text Include="LICENSE_1_0.txt" />
+    <Text Include="GC2450M_attributes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Vimba_Exposure_Control.PNG">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

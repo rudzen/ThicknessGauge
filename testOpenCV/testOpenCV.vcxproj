@@ -262,8 +262,12 @@
     <None Include="_run_test.bat" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="GC2450M_attributes.txt" />
     <Text Include="Intersection bug.txt" />
     <Text Include="LICENSE_1_0.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Vimba_Exposure_Control.PNG" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

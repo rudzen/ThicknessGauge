@@ -28,9 +28,12 @@ public:
 
     void Progressed(unsigned long idx_);
 
-private:
+public:
 
-    unsigned long n;
+    unsigned long n() const;
+    void n(unsigned long n);
+private:
+    unsigned long n_;
     unsigned int desc_width;
     unsigned long frequency_update;
     std::ostream* out;
