@@ -97,7 +97,7 @@ public:
                 ss >> cameraID;
                 inputType = InputType::CAMERA;
             } else {
-                if (isListOfImages(input) && readStringList(input, imageList)) {
+                if (is_list_of_images(input) && read_string_list(input, imageList)) {
                     inputType = InputType::IMAGE_LIST;
                     nrFrames = (nrFrames < static_cast<int>(imageList.size())) ? nrFrames : static_cast<int>(imageList.size());
                 } else
@@ -154,7 +154,7 @@ public:
         return result;
     }
 
-    static bool readStringList(const string& filename, vector<string>& l) {
+    static bool read_string_list(const string& filename, vector<string>& l) {
         l.clear();
         cv::FileStorage fs(filename, cv::FileStorage::READ);
         if (!fs.isOpened())
@@ -168,7 +168,7 @@ public:
         return true;
     }
 
-    static bool isListOfImages(const string& filename) {
+    static bool is_list_of_images(const string& filename) {
 
         return StringTools::endsWith(filename, ".xml") ||
             StringTools::endsWith(filename, ".yaml") ||

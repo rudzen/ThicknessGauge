@@ -60,10 +60,10 @@ namespace utils {
     private:
 
         // singleton stuff	
-        StringTools() {
-        }
+        StringTools() { }
 
         StringTools(const StringTools&) = delete;
+
         StringTools& operator=(const StringTools&) = delete;
 
     public: // singleton stuff
@@ -74,7 +74,6 @@ namespace utils {
         }
 
         // end of singleton stuff
-
 
         /**
         * Replaces first occurrence of from in str with to

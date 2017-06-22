@@ -1,4 +1,3 @@
-
 //          Copyright Rudy Alex Kohn 2017.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -11,7 +10,7 @@
 namespace stl {
 
     template <typename T1, typename T2>
-    void copyVector(T1& source, T2& destination) {
+    void copy_vector(T1& source, T2& destination) {
         static_assert(std::is_convertible<T1, T2>::value, "Types are not convertible.");
         destination.reserve(source.size() + destination.size());
         destination.insert(destination.begin(), source.begin(), source.end());
@@ -19,7 +18,9 @@ namespace stl {
 
     template <typename T>
     void sort_contours(std::vector<std::vector<cv::Point_<T>>>& contours) {
-        std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) { return cv::contourArea(a) > cv::contourArea(b); });
+        std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) {
+              return cv::contourArea(a) > cv::contourArea(b);
+          });
     }
 
 #ifdef CV_VERSION
@@ -50,11 +51,11 @@ namespace stl {
     void reset_point_y(std::vector<cv::Point_<T>>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         T zero = static_cast<T>(0);
-        std::for_each(vec.begin(), vec.end(), [zero](cv::Point_<T>& p) { p.y = zero; });
+        std::for_each(vec.begin(), vec.end(), [zero](cv::Point_<T>& p) {
+                  p.y = zero;
+              });
     }
 
-
 #endif
-
 
 }

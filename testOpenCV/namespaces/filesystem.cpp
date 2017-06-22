@@ -1,4 +1,3 @@
-
 //          Copyright Rudy Alex Kohn 2017.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -11,17 +10,18 @@
 
 namespace file {
 
-
     constexpr char path_seperator =
 #ifdef _WIN32
-                            '\\';
+            '\\';
 #else
                             '/';
 #endif
 
     using path_legal = struct path {
         std::vector<std::string> legal_part;
+
         std::vector<std::string> complete_path;
+
         bool any_legal;
     };
 
@@ -81,7 +81,7 @@ namespace file {
 
         token.reserve(full_path.size());
 
-        while(getline(ss, token, path_seperator))
+        while (getline(ss, token, path_seperator))
             current.complete_path.emplace_back(token);
 
         token.clear();
@@ -97,7 +97,6 @@ namespace file {
 
         return current;
     }
-    
 
     inline
     bool is_name_legal(const std::string& name) {

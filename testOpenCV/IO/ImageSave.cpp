@@ -5,15 +5,15 @@
 
 #include "../namespaces/filesystem.h"
 
-void ImageSave::SaveImage(cv::Mat* image) const {
-    SaveImage(image, fileName_);
+void ImageSave::save_image(cv::Mat* image) const {
+    save_image(image, file_name_);
 }
 
-void ImageSave::SaveImage(cv::Mat* image, string filename) const {
+void ImageSave::save_image(cv::Mat* image, string filename) const {
 
     replace(filename.begin(), filename.end(), ' ', '_');
 
-    auto outFile = "./images/_" + to_string(timeStamp_) + '-' + filename + '.' + (!utils::StringTools::endsWith(filename, m_FileExtensions.at(saveType_)) ? m_FileExtensions.at(saveType_) : "");
+    auto outFile = "./images/_" + to_string(time_stamp_) + '-' + filename + '.' + (!utils::StringTools::endsWith(filename, file_extensions_.at(save_type_)) ? file_extensions_.at(save_type_) : "");
 
     if (!file::is_name_legal(outFile)) {
         throw InvalidFileException("Invalid filename for " + outFile);
@@ -37,39 +37,39 @@ void ImageSave::SaveImage(cv::Mat* image, string filename) const {
     imwrite(outFile, *image);
 }
 
-void ImageSave::OpenVideo() {
-    videoWriter_.open("./images/" + fileName_ + '.' + m_FileExtensions.at(saveType_), GetCodec(), GetFPS(), GetSize(), IsColour());
+void ImageSave::open_video() {
+    video_writer_.open("./images/" + file_name_ + '.' + file_extensions_.at(save_type_), codec(), fps(), size(), colour());
 }
 
-void ImageSave::CloseVideo() {
-    log_time << m_FileExtensions.at(saveType_) << GetCodec() << GetFPS() << GetSize() << IsColour();
-    videoWriter_.release();
+void ImageSave::close_video() {
+    log_time << file_extensions_.at(save_type_) << codec() << fps() << size() << colour();
+    video_writer_.release();
 }
 
-void ImageSave::SaveVideoFrame(cv::Mat& image) {
-    videoWriter_.write(image);
+void ImageSave::save_video_frame(cv::Mat& image) {
+    video_writer_.write(image);
 }
 
-void ImageSave::SetSaveType(const SaveType new_type) {
-    saveType_ = new_type;
+void ImageSave::set_save_type(const SaveType new_type) {
+    save_type_ = new_type;
 }
 
-SaveType ImageSave::GetSaveMode() const {
-    return saveType_;
+SaveType ImageSave::save_mode() const {
+    return save_type_;
 }
 
-void ImageSave::SetInformation(const Information information) {
+void ImageSave::information(const Information information) {
     information_ = information;
 }
 
-Information ImageSave::GetInformation() const {
+Information ImageSave::information() const {
     return information_;
 }
 
-void ImageSave::UpdateTimeStamp() {
-    timeStamp_ = cvGetTickCount();
+void ImageSave::update_time_stamp() {
+    time_stamp_ = cvGetTickCount();
 }
 
-void ImageSave::SetFileName(string FileName) {
-    fileName_ = FileName;
+void ImageSave::file_name(string FileName) {
+    file_name_ = FileName;
 }

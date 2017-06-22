@@ -38,11 +38,11 @@ namespace calc {
 
     constexpr double LOG2 = 0.69314718055994530941723212145818;
 
-   /**
-    * Round to the nearest integer (stolen from opencv)
-    * @param value The value to round
-    * @return Nearest integer as double
-    */
+    /**
+     * Round to the nearest integer (stolen from opencv)
+     * @param value The value to round
+     * @return Nearest integer as double
+     */
     template <typename T>
     int round(T value) {
         static_assert(std::is_same<T, double>::value || std::is_same<T, float>::value, "round is only possible for floating points.");
@@ -79,7 +79,6 @@ namespace calc {
 #endif
     }
 
-
     namespace line {
 
         /**
@@ -108,7 +107,7 @@ namespace calc {
         template <typename T>
         bool compute_line_fitting(std::vector<cv::Point_<T>>& pixels, cv::Vec4f& result, LineConfig& config) {
             cv::Vec4f results;
-            cv::fitLine(pixels, results, config.getDistType(), config.getParams(), config.getReps(), config.getAepa());
+            cv::fitLine(pixels, results, config.dist_type(), config.params(), config.reps(), config.aepa());
             if (!validate::valid_vec<float, 4>(results))
                 return false;
             result = results;
@@ -116,7 +115,6 @@ namespace calc {
         }
 
     }
-
 
     namespace pixels {
 
@@ -436,7 +434,6 @@ namespace calc {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "angle_between_lines is only possible for arithmetic types.");
         return atan((p1.y - p2.y) / (p2.x - p1.x));
     }
-
 
     /**
      * \brief Calculates the angle of a 2D vector in degrees.
@@ -799,6 +796,5 @@ namespace calc {
         static_assert(std::is_convertible<T1, T2>::value, "s and mean must be convertible.");
         return s / mean * 100.0;
     }
-
 
 }

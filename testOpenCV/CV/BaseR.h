@@ -33,35 +33,42 @@ protected:
     */
     cv::Mat image_;
 
-    cv::Rect2d markingRect;
+    cv::Rect2d marking_rect_;
 
-    int imageOffset = 0;
+    int image_offset_ = 0;
 
-    std::string windowName;
+    std::string window_name_;
 
-    bool showWindows_ = false;
+    bool show_windows_ = false;
+
+protected:
+
+    BaseR(std::string windowName, bool showWindows) : window_name_(windowName)
+                                                    , show_windows_(showWindows) {}
 
 public:
 
-    void setOriginal(const cv::Mat& original) { original_ = original; }
+    BaseR() { }
 
-    cv::Mat& getImage() { return image_; }
+    void original(const cv::Mat& original) { original_ = original; }
 
-    void setImage(const cv::Mat& image) { image_ = image; }
+    cv::Mat& image() { return image_; }
 
-    const cv::Rect2d& getMarkingRect() const {
-        return markingRect;
+    void image(const cv::Mat& image) { image_ = image; }
+
+    const cv::Rect2d& marking_rect() const {
+        return marking_rect_;
     }
 
-    void setMarkingRect(const cv::Rect2d& markingRect) {
-        this->markingRect = markingRect;
+    void marking_rect(const cv::Rect2d& markingRect) {
+        this->marking_rect_ = markingRect;
     }
 
-    bool isShowWindows() const {
-        return showWindows_;
+    bool show_windows() const {
+        return show_windows_;
     }
 
-    void setShowWindows(bool showWindows) {
-        showWindows_ = showWindows;
+    void show_windows(bool showWindows) {
+        show_windows_ = showWindows;
     }
 };

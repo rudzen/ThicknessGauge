@@ -88,21 +88,25 @@ namespace draw {
     inline void drawText(cv::Mat* image, const std::string text, tg::TextDrawPosition position, cv::Scalar colour) {
         cv::Point pos;
         switch (position) {
-        case tg::TextDrawPosition::UpperLeft: pos.x = image->cols / 3;
-            pos.y = image->rows >> 2;
-            break;
-        case tg::TextDrawPosition::UpperRight: pos.x = image->cols - image->cols / 3;
-            pos.y = image->rows >> 2;
-            break;
-        case tg::TextDrawPosition::LowerLeft: pos.x = image->cols / 3;
-            pos.y = image->rows - 3 * (image->rows >> 2);
-            break;
-        case tg::TextDrawPosition::LowerRight: pos.x = image->cols - image->cols / 3;
-            pos.y = image->rows - (image->rows >> 2);
-            break;
-        default:
-            // oh noes..
-            break;
+            case tg::TextDrawPosition::UpperLeft:
+                pos.x = image->cols / 3;
+                pos.y = image->rows >> 2;
+                break;
+            case tg::TextDrawPosition::UpperRight:
+                pos.x = image->cols - image->cols / 3;
+                pos.y = image->rows >> 2;
+                break;
+            case tg::TextDrawPosition::LowerLeft:
+                pos.x = image->cols / 3;
+                pos.y = image->rows - 3 * (image->rows >> 2);
+                break;
+            case tg::TextDrawPosition::LowerRight:
+                pos.x = image->cols - image->cols / 3;
+                pos.y = image->rows - (image->rows >> 2);
+                break;
+            default:
+                // oh noes..
+                break;
         }
         putText(*image, text, pos, 1, 1.0, colour, 2);
     }
@@ -115,6 +119,5 @@ namespace draw {
     void drawRectangle(cv::Mat& image, cv::Rect_<T>& rectangle, cv::Scalar colour) {
         cv::rectangle(image, rectangle, colour, 1, CV_AA);
     }
-
 
 }

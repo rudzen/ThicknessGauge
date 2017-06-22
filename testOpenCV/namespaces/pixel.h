@@ -1,4 +1,3 @@
-
 //          Copyright Rudy Alex Kohn 2017.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -10,7 +9,7 @@
 #include "calc.h"
 
 namespace pixel {
-    
+
     /**
      * \brief Get the intensity of a specific point on a specific image
      * \param image The image to get the intensity from

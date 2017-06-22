@@ -163,7 +163,6 @@ public:
         return *this;
     }
 
-
     /**
  * Creates a string containing spaces
  *

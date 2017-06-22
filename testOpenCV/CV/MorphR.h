@@ -8,71 +8,69 @@ class MorphR : public BaseR {
 
     cv::Mat output_;
 
-    cv::Mat structureElement_;
+    cv::Mat structure_element_;
 
     cv::MorphTypes method_;
 
-    cv::MorphShapes elementShape_;
+    cv::MorphShapes element_shape_;
 
     int iterations_;
 
-    bool showWindow_;
-
 public:
 
-    explicit MorphR(cv::MorphTypes method, const int iterations, const bool showWindow)
-        : method_(method), iterations_(iterations), showWindow_(showWindow) {
-        structureElement_ = cv::Mat();
-        windowName = "MorphR";
-        elementShape_ = cv::MORPH_RECT;
+    explicit MorphR(cv::MorphTypes method, const int iterations, const bool show_window) : BaseR("MorphR", show_window)
+                                                                                        , method_(method)
+                                                                                        , iterations_(iterations) {
+        structure_element_ = cv::Mat();
+        element_shape_ = cv::MORPH_RECT;
     }
 
-    const cv::Mat& getResult() const {
+    const cv::Mat& result() const {
         return output_;
     }
 
-    cv::MorphTypes getMethod() const {
+    cv::MorphTypes method() const {
         return method_;
     }
 
-    cv::MorphShapes getElementShape() const {
-        return elementShape_;
+    cv::MorphShapes element_shape() const {
+        return element_shape_;
     }
 
-    void setElementShape(cv::MorphShapes elementShape) {
-        elementShape_ = elementShape;
+    void element_shape(cv::MorphShapes elementShape) {
+        element_shape_ = elementShape;
     }
 
-    void setMethod(cv::MorphTypes method) {
+    void method(cv::MorphTypes method) {
         method_ = method;
     }
 
-    int getIterations() const {
+    int iterations() const {
         return iterations_;
     }
 
-    void setIterations(int iterations) {
+    void iterations(int iterations) {
         iterations_ = iterations;
     }
 
-    void generateStructureElement(int size) {
-        structureElement_ = getStructuringElement(elementShape_, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
+    void generate_structure_element(int size) {
+        structure_element_ = getStructuringElement(element_shape_, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
     }
 
     void resetStructureElement() {
-        structureElement_ = cv::Mat();
+        structure_element_ = cv::Mat();
     }
 
-    void doMorph() {
-        cv::morphologyEx(image_, output_, method_, structureElement_, cv::Point(-1, -1), iterations_);
-        if (showWindow_)
+    void morph() {
+        cv::morphologyEx(image_, output_, method_, structure_element_, cv::Point(-1, -1), iterations_);
+        if (show_windows_)
             show();
     }
 
 private:
 
     void show() const {
-        cv::imshow(windowName, output_);
+        cv::imshow(window_name_, output_);
     }
 
 

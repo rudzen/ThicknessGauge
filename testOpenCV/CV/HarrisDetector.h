@@ -21,124 +21,128 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/features2d/features2d.hpp>
 
 template <class T>
 class HarrisDetector {
 
     // 32-bit float image of corner strength
-    cv::Mat cornerStrength;
+    cv::Mat corner_strength_;
+
     // 32-bit float image of thresholded corners
-    cv::Mat cornerTh;
+    cv::Mat corner_threshold;
+
     // image of local maxima (internal)
-    cv::Mat localMax;
+    cv::Mat local_max_;
+
     // size of neighbourhood for derivatives smoothing
     int neighbourhood;
+
     // aperture for gradient computation
     int aperture;
+
     // Harris parameter
     T k;
+
     // maximum strength for threshold computation
-    T maxStrength;
+    T max_strength;
+
     // calculated threshold (internal)
     T threshold;
+
     // size of neighbourhood for non-max suppression
-    int nonMaxSize;
+    int non_max_size;
+
     // kernel for non-max suppression
     cv::Mat kernel;
 
 public:
 
-    HarrisDetector()
-        : neighbourhood(3), aperture(3), k(0.1), maxStrength(0.0), threshold(0.01), nonMaxSize(3) {
+    HarrisDetector() : neighbourhood(3)
+                     , aperture(3)
+                     , k(0.1)
+                     , max_strength(0.0)
+                     , threshold(0.01)
+                     , non_max_size(3) {
 
-        setLocalMaxWindowSize(nonMaxSize);
+        local_max_window_size(non_max_size);
     }
 
     // Create kernel used in non-maxima suppression
-    void setLocalMaxWindowSize(int size) {
+    void local_max_window_size(int size) {
 
-        nonMaxSize = size;
-        kernel.create(nonMaxSize, nonMaxSize,CV_8U);
+        non_max_size = size;
+        kernel.create(non_max_size, non_max_size,CV_8U);
     }
 
     // Compute Harris corners
     void detect(const cv::Mat& image) {
 
         // Harris computation
-        cv::cornerHarris(image, cornerStrength,
+        cv::cornerHarris(image, corner_strength_,
                          neighbourhood,// neighborhood size
                          aperture, // aperture size
                          k); // Harris parameter
 
         // internal threshold computation
-        double minStrength; // not used
-        cv::minMaxLoc(cornerStrength, &minStrength, &maxStrength);
+        double min_strength; // not used
+        cv::minMaxLoc(corner_strength_, &min_strength, &max_strength);
 
         // local maxima detection
         cv::Mat dilated; // temporary image
-        cv::dilate(cornerStrength, dilated, cv::Mat());
-        cv::compare(cornerStrength, dilated, localMax, cv::CMP_EQ);
+        cv::dilate(corner_strength_, dilated, cv::Mat());
+        cv::compare(corner_strength_, dilated, local_max_, cv::CMP_EQ);
     }
 
     // Get the corner map from the computed Harris values
-    cv::Mat getCornerMap(double qualityLevel) {
+    cv::Mat corner_map(double quality_level) {
 
-        cv::Mat cornerMap;
+        cv::Mat cmap;
 
         // thresholding the corner strength
-        threshold = qualityLevel * maxStrength;
-        cv::threshold(cornerStrength, cornerTh, threshold, 255, cv::THRESH_BINARY);
+        threshold = quality_level * max_strength;
+        cv::threshold(corner_strength_, corner_threshold, threshold, 255, cv::THRESH_BINARY);
 
         // convert to 8-bit image
-        cornerTh.convertTo(cornerMap,CV_8U);
+        corner_threshold.convertTo(cmap,CV_8U);
 
         // non-maxima suppression
-        cv::bitwise_and(cornerMap, localMax, cornerMap);
+        cv::bitwise_and(cmap, local_max_, cmap);
 
-        return cornerMap;
+        return cmap;
     }
 
     // Get the feature points vector from the computed Harris values
-    void getCorners(std::vector<cv::Point_<T>>& points, double qualityLevel) {
+    void corners(std::vector<cv::Point_<T>>& points, double quality_level) {
 
         // Get the corner map
-        auto cornerMap = getCornerMap(qualityLevel);
+        auto cmap = corner_map(quality_level);
         // Get the corners
-        getCorners(points, cornerMap);
+        corners(points, cmap);
     }
 
     // Get the feature points vector from the computed corner map
-    static void getCorners(std::vector<cv::Point_<T>>& points, const cv::Mat& cornerMap) {
+    static void corners(std::vector<cv::Point_<T>>& points, const cv::Mat& corner_map) {
 
         // Iterate over the pixels to obtain all feature points
-        for (auto y = 0; y < cornerMap.rows; y++) {
+        for (auto y = 0; y < corner_map.rows; y++) {
 
-            auto rowPtr = cornerMap.ptr<uchar>(y);
+            auto rowPtr = corner_map.ptr<uchar>(y);
 
-            for (auto x = 0; x < cornerMap.cols; x++) {
+            for (auto x = 0; x < corner_map.cols; x++) {
 
                 // if it is a feature point
-                if (rowPtr[x]) {
+                if (rowPtr[x])
                     points.emplace_back(cv::Point(x, y));
-                }
             }
         }
     }
 
     // Draw circles at feature point locations on an image
-    static void drawOnImage(cv::Mat& image, const std::vector<cv::Point_<T>>& points, cv::Scalar color = cv::Scalar(255, 255, 255), int radius = 3, int thickness = 2) {
+    static void draw_on_image(cv::Mat& image, const std::vector<cv::Point_<T>>& points, cv::Scalar color = cv::Scalar(255, 255, 255), int radius = 3, int thickness = 2) {
 
-        auto it = points.begin();
+        for (const auto& p : points)
+            cv::circle(image, p, radius, color, thickness);
 
-        // for all corners
-        while (it != points.end()) {
-
-            // draw a circle at each corner location
-            cv::circle(image, *it, radius, color, thickness);
-            ++it;
-        }
     }
 };
 

@@ -153,6 +153,9 @@
     <ClCompile Include="CV\CannyR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Histogram\Histogram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">

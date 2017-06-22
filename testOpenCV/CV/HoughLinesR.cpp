@@ -1,18 +1,18 @@
 #include <opencv2/core.hpp>
 #include "HoughLinesR.h"
 
-void HoughLinesR::computeMeta() {
+void HoughLinesR::compute_meta() {
 
-    if (allLines_.empty())
+    if (all_lines_.empty())
         return;
 
-    auto size = allLines_.size();
+    auto size = all_lines_.size();
 
-    rightLines_.clear();
-    rightLines_.reserve(size);
+    right_lines_.clear();
+    right_lines_.reserve(size);
 
-    leftLines_.clear();
-    leftLines_.reserve(size);
+    left_lines_.clear();
+    left_lines_.reserve(size);
 
     auto center = image_.cols / 2;
 
@@ -20,21 +20,21 @@ void HoughLinesR::computeMeta() {
 
     log_time << __FUNCTION__ << " center: " << center << std::endl;
 
-    for (auto& a : allLines_) {
-        a.slobe = calc::slope(a.entry[0], a.entry[2], a.entry[1], a.entry[3]);
+    for (auto& a : all_lines_) {
+        a.slobe = calc::slope(a.entry_[0], a.entry_[2], a.entry_[1], a.entry_[3]);
         // TODO : do something in regards to the slobe
         //log_time << cv::format("slobe calc : %f\n", a.slobe);
-        if (a.points.first.x > center) {
-            log_time << __FUNCTION__ << " right point added : " << a.points.first << std::endl;
-            rightLines_.emplace_back(a);
+        if (a.points.p1.x > center) {
+            log_time << __FUNCTION__ << " right point added : " << a.points.p1 << std::endl;
+            right_lines_.emplace_back(a);
         } else {
-            log_time << __FUNCTION__ << " left point added : " << a.points.first << std::endl;
-            leftLines_.emplace_back(a);
+            log_time << __FUNCTION__ << " left point added : " << a.points.p1 << std::endl;
+            left_lines_.emplace_back(a);
         }
     }
 
-    auto lSize = leftLines_.size();
-    auto rSize = rightLines_.size();
+    auto lSize = left_lines_.size();
+    auto rSize = right_lines_.size();
 
     //// TODO : replace with throw asserts ?
     //if (lSize + rSize == 0)
@@ -46,8 +46,8 @@ void HoughLinesR::computeMeta() {
     //if (rSize == 0)
     //    throw NoLineDetectedException("No marking right line detected.");
 
-    for (auto& left : leftLines_) {
-        cv::LineIterator it(image_, left.points.first, left.points.second, 8);
+    for (auto& left : left_lines_) {
+        cv::LineIterator it(image_, left.points.p1, left.points.p2, 8);
         left.elements.reserve(it.count);
         for (auto i = 0; i < it.count; i++ , ++it)
             left.elements.emplace_back(it.pos());
@@ -56,16 +56,16 @@ void HoughLinesR::computeMeta() {
     auto line_sort = [](const LineV& l1, const LineV& l2) { return l1.elements.size() < l2.elements.size(); };
 
     if (lSize > 1)
-        std::sort(leftLines_.begin(), leftLines_.end(), line_sort);
+        std::sort(left_lines_.begin(), left_lines_.end(), line_sort);
 
-    for (auto& right : rightLines_) {
-        cv::LineIterator it(image_, right.points.first, right.points.second, 8);
+    for (auto& right : right_lines_) {
+        cv::LineIterator it(image_, right.points.p1, right.points.p2, 8);
         right.elements.reserve(it.count);
         for (auto i = 0; i < it.count; i++ , ++it)
             right.elements.emplace_back(it.pos());
     }
 
     if (rSize > 1)
-        std::sort(rightLines_.begin(), rightLines_.end(), line_sort);
+        std::sort(right_lines_.begin(), right_lines_.end(), line_sort);
 
 }

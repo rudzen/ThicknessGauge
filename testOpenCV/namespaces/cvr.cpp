@@ -1,4 +1,3 @@
-
 //          Copyright Rudy Alex Kohn 2017.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -34,22 +33,30 @@ namespace cvr {
         uchar chans = 1 + (type >> CV_CN_SHIFT);
 
         switch (depth) {
-        case CV_8U: r = "8U";
-            break;
-        case CV_8S: r = "8S";
-            break;
-        case CV_16U: r = "16U";
-            break;
-        case CV_16S: r = "16S";
-            break;
-        case CV_32S: r = "32S";
-            break;
-        case CV_32F: r = "32F";
-            break;
-        case CV_64F: r = "64F";
-            break;
-        default: r = "User";
-            break;
+            case CV_8U:
+                r = "8U";
+                break;
+            case CV_8S:
+                r = "8S";
+                break;
+            case CV_16U:
+                r = "16U";
+                break;
+            case CV_16S:
+                r = "16S";
+                break;
+            case CV_32S:
+                r = "32S";
+                break;
+            case CV_32F:
+                r = "32F";
+                break;
+            case CV_64F:
+                r = "64F";
+                break;
+            default:
+                r = "User";
+                break;
         }
 
         r += "C";
@@ -74,6 +81,5 @@ namespace cvr {
 
         return highest_y;
     }
-
 
 }

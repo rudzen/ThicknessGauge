@@ -7,7 +7,6 @@
 
 using namespace tg;
 
-
 /*! \brief Simple wrapper class for image and/or video saving
 *
 * Wraps OpenCV image/video save functionality in a simple typesafe structure.
@@ -16,65 +15,58 @@ class ImageSave : public VideoInfo {
 
 public:
 
-    ImageSave()
-        : ImageSave("", SaveType::Image_Png, Information::Basic) {
-    }
+    ImageSave() : ImageSave("", SaveType::Image_Png, Information::Basic) { }
 
-    explicit ImageSave(std::string FileName)
-        : ImageSave(FileName, SaveType::Image_Png, Information::Basic) {
-    }
+    explicit ImageSave(std::string FileName) : ImageSave(FileName, SaveType::Image_Png, Information::Basic) { }
 
-    ImageSave(std::string FileName, SaveType SaveType)
-        : ImageSave(FileName, SaveType, Information::Basic) {
-    }
+    ImageSave(std::string FileName, SaveType SaveType) : ImageSave(FileName, SaveType, Information::Basic) { }
 
-    ImageSave(ImageSave& imageSave)
-        : ImageSave(imageSave.fileName_, imageSave.saveType_, imageSave.information_) {
-    }
+    ImageSave(ImageSave& imageSave) : ImageSave(imageSave.file_name_, imageSave.save_type_, imageSave.information_) { }
 
-    ImageSave(std::string FileName, SaveType save_type, Information information)
-        : saveType_(save_type), information_(information), fileName_(FileName) {
-        UpdateTimeStamp();
+    ImageSave(std::string FileName, SaveType save_type, Information information) : save_type_(save_type)
+                                                                                 , information_(information)
+                                                                                 , file_name_(FileName) {
+        update_time_stamp();
     }
 
     ~ImageSave() {
-        videoWriter_.~VideoWriter();
+        video_writer_.~VideoWriter();
     }
 
-    void SaveImage(cv::Mat* image) const;
+    void save_image(cv::Mat* image) const;
 
-    void SaveImage(cv::Mat* image, std::string filename) const;
+    void save_image(cv::Mat* image, std::string filename) const;
 
-    void OpenVideo();
+    void open_video();
 
-    void CloseVideo();
+    void close_video();
 
-    void SaveVideoFrame(cv::Mat& image);
+    void save_video_frame(cv::Mat& image);
 
-    void SetSaveType(const SaveType type);
+    void set_save_type(const SaveType type);
 
-    SaveType GetSaveMode() const;
+    SaveType save_mode() const;
 
-    void SetInformation(const Information information);
+    void information(const Information information);
 
-    Information GetInformation() const;
+    Information information() const;
 
-    void UpdateTimeStamp();
+    void update_time_stamp();
 
-    void SetFileName(std::string FileName);
+    void file_name(std::string FileName);
 
 private:
 
-    cv::VideoWriter videoWriter_;
+    cv::VideoWriter video_writer_;
 
-    const std::map<SaveType, std::string> m_FileExtensions = {{SaveType::Image_Jpeg, "jpg"},{SaveType::Image_Png, "png"},{SaveType::Video, "avi"}};
+    const std::map<SaveType, std::string> file_extensions_ = {{SaveType::Image_Jpeg, "jpg"},{SaveType::Image_Png, "png"},{SaveType::Video, "avi"}};
 
-    SaveType saveType_;
+    SaveType save_type_;
 
     Information information_;
 
-    std::string fileName_;
+    std::string file_name_;
 
-    int64 timeStamp_;
+    int64 time_stamp_;
 
 };

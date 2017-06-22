@@ -63,8 +63,8 @@ class FilterR : public BaseR {
     int deltaI_ = 0;
 
     void createWindow() {
-        cv::namedWindow(windowName, cv::WINDOW_FREERATIO | cv::WINDOW_GUI_EXPANDED);
-        cv::createTrackbar("delta", windowName, &deltaI_, 100, delta_cb, this);
+        cv::namedWindow(window_name_, cv::WINDOW_FREERATIO | cv::WINDOW_GUI_EXPANDED);
+        cv::createTrackbar("delta", window_name_, &deltaI_, 100, delta_cb, this);
     }
 
     static void delta_cb(int value, void* userData) {
@@ -72,7 +72,7 @@ class FilterR : public BaseR {
         auto oldVal = that->getDelta();
         that->setDelta(static_cast<double>(value));
         using namespace tg;
-        log_time << cv::format("%s delta : %i -> %i\n", that->windowName, oldVal, value);
+        log_time << cv::format("%s delta : %i -> %i\n", that->window_name_, oldVal, value);
     }
 
 public: // constructors
@@ -83,8 +83,8 @@ public: // constructors
           , border_(cv::BORDER_DEFAULT) {
         generateKernel(3, 3, 1.0f);
         anchor_ = cv::Point(-1, -1);
-        showWindows_ = showWindows;
-        this->windowName = windowName;
+        show_windows_ = showWindows;
+        this->window_name_ = windowName;
         if (showWindows)
             createWindow();
     }
@@ -93,8 +93,8 @@ public: // constructors
         : delta_(0.0), ddepth_(-1), border_(cv::BORDER_DEFAULT) {
         generateKernel(3, 3, 1.0f);
         anchor_ = cv::Point(-1, -1);
-        showWindows_ = false;
-        this->windowName = windowName;
+        show_windows_ = false;
+        this->window_name_ = windowName;
     }
 
     FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows, std::string windowName)
@@ -103,8 +103,8 @@ public: // constructors
           , delta_(delta)
           , ddepth_(ddepth)
           , border_(border) {
-        showWindows_ = showWindows;
-        this->windowName = windowName;
+        show_windows_ = showWindows;
+        this->window_name_ = windowName;
         if (showWindows)
             createWindow();
     }
@@ -176,6 +176,6 @@ inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, dou
 
 inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border) {
     filter2D(image_, result_, depth, kernel, anchor, delta, border);
-    if (showWindows_)
-        imshow(windowName, result_);
+    if (show_windows_)
+        imshow(window_name_, result_);
 }

@@ -1,33 +1,32 @@
 ﻿#include "ProgressBar.h"
 
-ProgressBar::ProgressBar() {
+ProgressBar::ProgressBar() {}
+
+ProgressBar::ProgressBar(unsigned long n, const char* description, std::ostream& out) {
+
+    n_ = n;
+    frequency_update_ = n;
+    description_ = description;
+    out_ = &out;
+
+    unit_bar_ = "=";
+    unit_space_ = " ";
+    desc_width_ = static_cast<unsigned int>(std::strlen(description)); // character width of description field
+
 }
 
-ProgressBar::ProgressBar(unsigned long n_, const char* description_, std::ostream& out_) {
+void ProgressBar::set_frequency_update(unsigned long frequency_update) {
 
-    n_ = n_;
-    frequency_update = n_;
-    description = description_;
-    out = &out_;
-
-    unit_bar = "=";
-    unit_space = " ";
-    desc_width = static_cast<unsigned int>(std::strlen(description)); // character width of description field
-
+    frequency_update_ = frequency_update > n_ ? n_ : frequency_update;
 }
 
-void ProgressBar::SetFrequencyUpdate(unsigned long frequency_update_) {
+void ProgressBar::set_style(const char* unit_bar, const char* unit_space) {
 
-    frequency_update = frequency_update_ > n_ ? n_ : frequency_update_;
+    unit_bar_ = unit_bar;
+    unit_space_ = unit_space;
 }
 
-void ProgressBar::SetStyle(const char* unit_bar_, const char* unit_space_) {
-
-    unit_bar = unit_bar_;
-    unit_space = unit_space_;
-}
-
-int ProgressBar::GetConsoleWidth() {
+int ProgressBar::get_console_width() {
 
     //#ifdef _WINDOWS
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -42,50 +41,50 @@ int ProgressBar::GetConsoleWidth() {
     return width;
 }
 
-int ProgressBar::GetBarLength() const {
+int ProgressBar::bar_length() const {
 
     // get console width and according adjust the length of the progress bar
 
-    auto bar_length = static_cast<int>((GetConsoleWidth() - desc_width - CHARACTER_WIDTH_PERCENTAGE) / 2.);
+    auto bar_length = static_cast<int>((get_console_width() - desc_width_ - CHARACTER_WIDTH_PERCENTAGE) / 2.);
 
     return bar_length;
 }
 
-void ProgressBar::ClearBarField() const {
+void ProgressBar::clear_bar_field() const {
 
-    for (auto i = 0; i < GetConsoleWidth(); ++i)
-        *out << ' ';
-    *out << '\r' << std::flush;
+    for (auto i = 0; i < get_console_width(); ++i)
+        *out_ << ' ';
+    *out_ << '\r' << std::flush;
 }
 
-void ProgressBar::Progressed(unsigned long idx_) {
+void ProgressBar::progressed(unsigned long idx) {
     try {
-        if (idx_ > n_)
-            throw idx_;
+        if (idx > n_)
+            throw idx;
 
         // determines whether to update the progress bar from frequency_update
-        if ((idx_ != n_) && (idx_ % (n_ / frequency_update) != 0))
+        if ((idx != n_) && (idx % (n_ / frequency_update_) != 0))
             return;
 
         // calculate the size of the progress bar
-        auto bar_size = GetBarLength();
+        auto bar_size = bar_length();
 
         // calculate percentage of progress
-        auto progress_percent = idx_ * TOTAL_PERCENTAGE / n_;
+        auto progress_percent = idx * TOTAL_PERCENTAGE / n_;
 
         // calculate the percentage value of a unit bar 
         auto percent_per_unit_bar = TOTAL_PERCENTAGE / bar_size;
 
         // display progress bar
-        *out << ' ' << description << " [";
+        *out_ << ' ' << description_ << " [";
 
         for (auto bar_length = 0; bar_length <= bar_size - 1; ++bar_length) {
-            *out << (bar_length * percent_per_unit_bar < progress_percent ? unit_bar : unit_space);
+            *out_ << (bar_length * percent_per_unit_bar < progress_percent ? unit_bar_ : unit_space_);
         }
 
-        *out << ']' << std::setw(CHARACTER_WIDTH_PERCENTAGE + 1) << std::setprecision(1) << std::fixed << progress_percent << "%\r" << std::flush;
+        *out_ << ']' << std::setw(CHARACTER_WIDTH_PERCENTAGE + 1) << std::setprecision(1) << std::fixed << progress_percent << "%\r" << std::flush;
     } catch (unsigned long e) {
-        ClearBarField();
+        clear_bar_field();
         std::cerr << "PROGRESS_BAR_EXCEPTION: _idx (" << e << ") went out of bounds, greater than n (" << n_ << ")." << std::endl << std::flush;
     }
 

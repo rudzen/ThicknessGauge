@@ -4,22 +4,21 @@
 
 using namespace tg;
 
-void CannyR::doCanny() {
+void CannyR::do_canny() {
+        try {
+        Canny(image_, edges_, threshold_1_, threshold_2_, aperture_size_, gradient_ > 0);
 
-    try {
-        Canny(image_, edges_, threshold1_, threshold2_, apertureSize_, gradient_ > 0);
-
-        if (removePepperNoise_)
+        if (remove_pepper_noise_)
             pixel::remove_pepper_noise(image_);
 
-        if (showWindow_)
-            imshow(windowName, edges_);
+        if (show_windows_)
+            imshow(window_name_, edges_);
     } catch (cv::Exception& e) {
-        log_time << "Caught exception in CannyR.\n";
+        log_time << "Caught exception in CannyR.\n" << e.what();
     }
 
 }
 
-cv::Mat& CannyR::getResult() {
+cv::Mat& CannyR::result() {
     return edges_;
 }

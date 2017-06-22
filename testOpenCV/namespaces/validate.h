@@ -1,4 +1,3 @@
-
 //          Copyright Rudy Alex Kohn 2017.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -23,7 +22,7 @@ namespace validate {
     bool validate_rect(const cv::Rect_<T>& rect) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
-        auto valid_rectangle = [rect]()-> bool {
+        auto valid_rectangle = [rect]()->bool {
             return rect.width > 0.0 && rect.height > 0.0 && rect.x >= 0.0 && rect.y >= 0.0;
         };
 
@@ -50,7 +49,7 @@ namespace validate {
     bool validate_rect(const cv::Rect_<T>& rect, const cv::Mat& boundry) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
-        auto valid_rectangle = [rect](cv::Rect_<T>& boundry)-> bool {
+        auto valid_rectangle = [rect](cv::Rect_<T>& boundry)->bool {
 
             if (!validate_rect(rect) || !validate_rect(boundry))
                 return false;
@@ -79,7 +78,9 @@ namespace validate {
         if (vec.empty())
             return false;
 
-        auto it = find_if(vec.begin(), vec.end(), [](cv::Point_<T>& p) { return p.x >= 0 && p.y >= 0; });
+        auto it = find_if(vec.begin(), vec.end(), [](cv::Point_<T>& p) {
+                      return p.x >= 0 && p.y >= 0;
+                  });
 
         return it != vec.end();
 
@@ -93,7 +94,6 @@ namespace validate {
 
         return true;
     }
-
 
     /**
      * \brief Validates the entirety of the data structure
@@ -111,52 +111,52 @@ namespace validate {
 
         size_t failures = 0;
 
-        if (data->globName.empty()) {
-            log_time << cv::format("Val: globName failed [%i], name = %s\n", ++failures, data->globName);
+        if (data->glob_name.empty()) {
+            log_time << cv::format("Val: globName failed [%i], name = %s\n", ++failures, data->glob_name);
         }
 
-        if (data->cameraPtr == nullptr && data->globName == "camera") {
-            log_time << cv::format("Val: cameraPtr failed [%i], == nullptr\n", ++failures);
+        //if (data->cameraPtr == nullptr && data->glob_name == "camera") {
+        //    log_time << cv::format("Val: cameraPtr failed [%i], == nullptr\n", ++failures);
+        //}
+
+        if (!valid_pix_vec(data->center_points)) {
+            log_time << cv::format("Val: centerPoints failed [%i], size == %i\n", ++failures, data->center_points.size());
         }
 
-        if (!valid_pix_vec(data->centerPoints)) {
-            log_time << cv::format("Val: centerPoints failed [%i], size == %i\n", ++failures, data->centerPoints.size());
+        if (!valid_pix_vec(data->left_points)) {
+            log_time << cv::format("Val: leftPoints failed [%i], size = %i\n", ++failures, data->left_points.size());
         }
 
-        if (!valid_pix_vec(data->leftPoints)) {
-            log_time << cv::format("Val: leftPoints failed [%i], size = %i\n", ++failures, data->leftPoints.size());
+        if (!valid_pix_vec(data->right_points)) {
+            log_time << cv::format("rightPoints failed, size = %i\n", data->right_points.size());
         }
 
-        if (!valid_pix_vec(data->rightPoints)) {
-            log_time << cv::format("rightPoints failed, size = %i\n", data->rightPoints.size());
+        if (!valid_vec(data->points_start)) {
+            log_time << cv::format("pointsStart failed, data = %d,%d,%d\n", data->points_start[0], data->points_start[1], data->points_start[2]);
         }
 
-        if (!valid_vec(data->pointsStart)) {
-            log_time << cv::format("pointsStart failed, data = %d,%d,%d\n", data->pointsStart[0], data->pointsStart[1], data->pointsStart[2]);
+        if (!valid_vec(data->left_border)) {
+            log_time << cv::format("leftBorder failed, data = %d,%d,%d,%d\n", data->left_border[0], data->left_border[1], data->left_border[2], data->left_border[3]);
         }
 
-        if (!valid_vec(data->leftBorder)) {
-            log_time << cv::format("leftBorder failed, data = %d,%d,%d,%d\n", data->leftBorder[0], data->leftBorder[1], data->leftBorder[2], data->leftBorder[3]);
+        if (!valid_vec(data->right_border)) {
+            log_time << cv::format("rightBorder failed, data = %d,%d,%d,%d\n", data->right_border[0], data->right_border[1], data->right_border[2], data->right_border[3]);
         }
 
-        if (!valid_vec(data->rightBorder)) {
-            log_time << cv::format("rightBorder failed, data = %d,%d,%d,%d\n", data->rightBorder[0], data->rightBorder[1], data->rightBorder[2], data->rightBorder[3]);
+        if (!valid_vec(data->center_line)) {
+            log_time << cv::format("centerLine failed, data = %d,%d,%d,%d\n", data->center_line[0], data->center_line[1], data->center_line[2], data->center_line[3]);
         }
 
-        if (!valid_vec(data->centerLine)) {
-            log_time << cv::format("centerLine failed, data = %d,%d,%d,%d\n", data->centerLine[0], data->centerLine[1], data->centerLine[2], data->centerLine[3]);
+        if (data->left_avg < 0.0) {
+            log_time << cv::format("leftAvg failed, data = %f\n", data->left_avg);
         }
 
-        if (data->leftAvg < 0.0) {
-            log_time << cv::format("leftAvg failed, data = %f\n", data->leftAvg);
+        if (data->center_avg < 0.0) {
+            log_time << cv::format("centerAvg failed, data = %f\n", data->center_avg);
         }
 
-        if (data->centerAvg < 0.0) {
-            log_time << cv::format("centerAvg failed, data = %f\n", data->centerAvg);
-        }
-
-        if (data->rightAvg < 0.0) {
-            log_time << cv::format("rightAvg failed, data = %f\n", data->rightAvg);
+        if (data->right_avg < 0.0) {
+            log_time << cv::format("rightAvg failed, data = %f\n", data->right_avg);
         }
 
         if (data->difference < 0.0) {
@@ -169,6 +169,5 @@ namespace validate {
     }
 
 #endif
-
 
 }

@@ -33,12 +33,12 @@ class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
 
-    ThicknessGauge(int frameCount, bool showWindows, bool saveVideo, int binaryThreshold, int lineThreshold)
-        : data(std::make_shared<Data<double>>()), frameCount_(frameCount),
-          showWindows_(showWindows),
-          saveVideo_(saveVideo),
-          binaryThreshold_(binaryThreshold),
-          lineThreshold_(lineThreshold) {
+    ThicknessGauge(int frameCount, bool showWindows, bool saveVideo, int binaryThreshold, int lineThreshold) : data(std::make_shared<Data<double>>())
+                                                                                                             , frameCount_(frameCount)
+                                                                                                             , showWindows_(showWindows)
+                                                                                                             , saveVideo_(saveVideo)
+                                                                                                             , binaryThreshold_(binaryThreshold)
+                                                                                                             , lineThreshold_(lineThreshold) {
         baseColour_ = cv::Scalar(255, 255, 255);
         canny = std::make_unique<CannyR>(130, 200, 3, true, showWindows, false);
         //draw::showWindows = showWindows;

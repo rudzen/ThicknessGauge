@@ -175,6 +175,7 @@
     <ClCompile Include="CV\CannyR.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
+    <ClCompile Include="Histogram\Histogram.cpp" />
     <ClCompile Include="namespaces\calc.cpp" />
     <ClCompile Include="namespaces\cvr.cpp" />
     <ClCompile Include="namespaces\filesystem.cpp" />

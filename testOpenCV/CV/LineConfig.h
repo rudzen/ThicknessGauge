@@ -21,7 +21,7 @@ class LineConfig {
      * DIST_WELSCH	= distance = c^2/2(1-exp(-(x/c)^2)), c = 2.9846
      * DIST_HUBER	= distance = |x|<c ? x^2/2 : c(|x|-c/2), c=1.345 
      */
-    cv::DistanceTypes distType_;
+    cv::DistanceTypes dist_type_;
 
     /**
      * \brief Numerical parameter ( C ) for some types of distances. If it is 0, an optimal value is chosen.
@@ -40,7 +40,7 @@ class LineConfig {
 
 public:
     LineConfig(const cv::DistanceTypes distType, const double params, const double reps, const double aepa)
-        : distType_(distType),
+        : dist_type_(distType),
           params_(params),
           reps_(reps),
           aepa_(aepa) {
@@ -50,38 +50,38 @@ public:
      * \brief Default configuration
      */
     LineConfig()
-        : distType_(cv::DIST_L12), params_(0.0), reps_(0.01), aepa_(0.01) {
+        : dist_type_(cv::DIST_L12), params_(0.0), reps_(0.01), aepa_(0.01) {
     }
 
-    cv::DistanceTypes getDistType() const {
-        return distType_;
+    cv::DistanceTypes dist_type() const {
+        return dist_type_;
     }
 
-    void setDistType(cv::DistanceTypes distType) {
-        distType_ = distType;
+    void dist_type(cv::DistanceTypes distType) {
+        dist_type_ = distType;
     }
 
-    double getParams() const {
+    double params() const {
         return params_;
     }
 
-    void setParams(double params) {
+    void params(double params) {
         params_ = params;
     }
 
-    double getReps() const {
+    double reps() const {
         return reps_;
     }
 
-    void setReps(double reps) {
+    void reps(double reps) {
         reps_ = reps;
     }
 
-    double getAepa() const {
+    double aepa() const {
         return aepa_;
     }
 
-    void setAepa(double aepa) {
+    void aepa(double aepa) {
         aepa_ = aepa;
     }
 };

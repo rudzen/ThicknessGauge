@@ -18,7 +18,33 @@
  */
 namespace tg {
 
-    typedef std::pair<cv::Point2f, cv::Point2f> linePair;
+    template <typename T>
+    struct line_pair {
+        cv::Point_<T> p1;
+
+        cv::Point_<T> p2;
+
+        line_pair(T x1, T x2, T y1, T y2) {
+            p1.x = x1;
+            p1.y = y1;
+            p2.x = x2;
+            p2.y = y2;
+        }
+
+        line_pair(cv::Point_<T> p1, cv::Point_<T> p2) : p1(p1)
+                                                      , p2(p2) {}
+
+        friend bool operator==(const line_pair& lhs, const line_pair& rhs) {
+            return lhs.p1 == rhs.p1
+                    && lhs.p2 == rhs.p2;
+        }
+
+        friend bool operator!=(const line_pair& lhs, const line_pair& rhs) {
+            return !(lhs == rhs);
+        }
+    };
+
+    //    typedef std::pair<cv::Point2f, cv::Point2f> linePair;
 
     enum Side { Left = 0, Right = 1, Center = 2 };
 
@@ -64,29 +90,37 @@ namespace tg {
 
     typedef std::tuple<DataMemberIndex, bool, ValidationStatus, std::string> ValidationResult;
 
-    
     /**
      * \brief Vimba camera structure
      */
     using VimbaData = struct vim {
         const char* pCameraID;
+
         const char* pCameraName;
+
         const char* pCameraModel;
+
         const char* pCameraSerialNumber;
+
         const char* pInterfaceID;
+
         VmbInterfaceType interfaceType;
+
         const char* pInterfaceName;
+
         const char* pInterfaceSerialNumber;
+
         VmbAccessModeType interfacePermittedAccess;
     };
-
 
     /**
      * \brief PvApi camera structure
      */
     typedef struct {
         unsigned long UID;
+
         tPvHandle Handle;
+
         tPvFrame Frame;
     } tCamera;
 
@@ -95,101 +129,124 @@ namespace tg {
     public:
 
         // the points of the laser on the marking
-        std::vector<cv::Point_<T>> centerPoints;
+        std::vector<cv::Point_<T>> center_points;
 
         // the points thwere the laser hits ground zero on the LEFT side of the marking
-        std::vector<cv::Point_<T>> leftPoints;
+        std::vector<cv::Point_<T>> left_points;
 
         // the points thwere the laser hits ground zero on the RIGHT side of the marking
-        std::vector<cv::Point_<T>> rightPoints;
+        std::vector<cv::Point_<T>> right_points;
 
         // start location for the 3 point vectors
-        cv::Vec<T, 3> pointsStart;
+        cv::Vec<T, 3> points_start;
 
         // the camera meta data
-        std::unique_ptr<CameraData> cameraData = std::make_unique<CameraData>();
+        std::unique_ptr<CameraData> camera_data = std::make_unique<CameraData>();
 
-        // the main camera pointer through the system
-        AVT::VmbAPI::CameraPtr cameraPtr;
+        //// the main camera pointer through the system
+        //AVT::VmbAPI::CameraPtr cameraPtr;
 
-        // holding data to construct the actual camera
-        std::unique_ptr<VimbaData> vimbaData = std::make_unique<VimbaData>();
+        //// holding data to construct the actual camera
+        //std::unique_ptr<VimbaData> vimbaData = std::make_unique<VimbaData>();
 
-        // the actual camera used
-        std::shared_ptr<GC2450MCamera> camera;
+        //// the actual camera used
+        //std::shared_ptr<GC2450MCamera> camera;
 
         // the name of the glob loaded (or "camera" for live feed)
-        std::string globName;
+        std::string glob_name;
 
         // the rectangle which includes the entire marking
-        cv::Rect_<T> markingRect;
+        cv::Rect_<T> marking_rect;
 
         // left border vector
-        cv::Vec<T, 4> leftBorder;
+        cv::Vec<T, 4> left_border;
 
         // right border vector
-        cv::Vec<T, 4> rightBorder;
+        cv::Vec<T, 4> right_border;
 
         // the base lines where the laser hits the actual ground-zero
-        cv::Vec<T, 4> baseLines;
+        cv::Vec<T, 4> base_lines;
 
         // the locations for where the base lines intersect with the marking border
         cv::Vec<T, 4> intersections;
 
         // enclusure of the laser line
-        cv::Vec<T, 4> centerLine;
+        cv::Vec<T, 4> center_line;
 
         /**
          * \brief the points where the intersections are cut.
          * adjusted so potential unwanted information is not included in further calculations
          */
-        cv::Vec<T, 2> intersectionCuts;
+        cv::Vec<T, 2> intersection_cuts;
 
         // the x coordinates for the pieces that are cut out.
-        cv::Vec<T, 4> middlePieces;
+        cv::Vec<T, 4> middle_pieces;
 
         // validation results for the individual members of this structure
-        std::vector<ValidationResult> validationResults;
+        std::vector<ValidationResult> validation_results;
 
         // overall validation status for this structure
         ValidationStatus status;
 
         // the avg
-        T leftAvg;
-        T leftMiddleAvg;
-        T centerAvg;
-        T rightMiddleAvg;
-        T rightAvg;
+        T left_avg;
+
+        T left_mid_avg;
+
+        T center_avg;
+
+        T right_mid_avg;
+
+        T right_avg;
 
         // the difference between the baseline(s) and the laser line on the marking in sub-pixels
         T difference;
 
         static std::string DataMemberName(DataMemberIndex index) {
             switch (index) {
-            case DataMemberIndex::CenterPoints: return "CenterPoints";
-            case DataMemberIndex::LeftPoints: return "LeftPoints";
-            case DataMemberIndex::RightPoints: return "RightPoints";
-            case DataMemberIndex::PointsStart: return "PointsStart";
-            case DataMemberIndex::CameraData: return "CameraData";
-            case DataMemberIndex::CameraPtr: return "CameraPtr";
-            case DataMemberIndex::GlobName: return "GlobName";
-            case DataMemberIndex::MarkingRect: return "MarkingRect";
-            case DataMemberIndex::LeftBorder: return "LeftBorder";
-            case DataMemberIndex::RightBorder: return "RightBorder";
-            case DataMemberIndex::BaseLines: return "BaseLines";
-            case DataMemberIndex::Intersections: return "Intersections";
-            case DataMemberIndex::IntersectionCuts: return "IntersectionCuts";
-            case DataMemberIndex::MiddlePieces: return "MiddlePieces";
-            case DataMemberIndex::LeftAvg: return "LeftAvg";
-            case DataMemberIndex::CenterAvg: return "CenterAvg";
-            case DataMemberIndex::RightAvg: return "RightAvg";
-            case DataMemberIndex::Difference: return "Difference";
-            default: return "feeeeek";
+                case DataMemberIndex::CenterPoints:
+                    return "CenterPoints";
+                case DataMemberIndex::LeftPoints:
+                    return "LeftPoints";
+                case DataMemberIndex::RightPoints:
+                    return "RightPoints";
+                case DataMemberIndex::PointsStart:
+                    return "PointsStart";
+                case DataMemberIndex::CameraData:
+                    return "CameraData";
+                case DataMemberIndex::CameraPtr:
+                    return "CameraPtr";
+                case DataMemberIndex::GlobName:
+                    return "GlobName";
+                case DataMemberIndex::MarkingRect:
+                    return "MarkingRect";
+                case DataMemberIndex::LeftBorder:
+                    return "LeftBorder";
+                case DataMemberIndex::RightBorder:
+                    return "RightBorder";
+                case DataMemberIndex::BaseLines:
+                    return "BaseLines";
+                case DataMemberIndex::Intersections:
+                    return "Intersections";
+                case DataMemberIndex::IntersectionCuts:
+                    return "IntersectionCuts";
+                case DataMemberIndex::MiddlePieces:
+                    return "MiddlePieces";
+                case DataMemberIndex::LeftAvg:
+                    return "LeftAvg";
+                case DataMemberIndex::CenterAvg:
+                    return "CenterAvg";
+                case DataMemberIndex::RightAvg:
+                    return "RightAvg";
+                case DataMemberIndex::Difference:
+                    return "Difference";
+                default:
+                    return "feeeeek";
             }
         }
 
         void addValidationResult(DataMemberIndex index, bool ok, ValidationStatus validation, std::string information) {
-            validationResults.emplace_back(ValidationResult(index, ok, validation, information));
+            validation_results.emplace_back(ValidationResult(index, ok, validation, information));
         }
 
     };
@@ -244,6 +301,7 @@ namespace tg {
 
 #ifndef _SYNC_OUT
 #define _SYNC_OUT
+
     enum class SyncCout { IO_LOCK, IO_UNLOCK };
 
     std::ostream& operator<<(std::ostream&, SyncCout);
@@ -251,13 +309,13 @@ namespace tg {
 #define sync_cout std::cout << SyncCout::IO_LOCK
 #define sync_endl std::endl << SyncCout::IO_UNLOCK
 
-    #endif
-
+#endif
 
     enum class LogTime { LOG_TIME, LOG_DATE, LOG_TIME_DATE };
 
 #ifndef _TIME_DATE_OUT
 #define _TIME_DATE_OUT
+
     /**
      * \brief Overload of ostream to insert time and/or date beforehand
      * \return The processed ostream
@@ -275,12 +333,11 @@ namespace tg {
     // ----------------------------------------------
     // -------------- thread related ----------------
     // ----------------------------------------------
-    
+
     template <typename T>
     void sleep(T ms) {
         static_assert(std::is_integral<T>::value, "Wrong type, must be integral.");
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
     }
-
 
 }

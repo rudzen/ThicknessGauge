@@ -15,36 +15,36 @@ class VideoInfo {
 public:
 
     VideoInfo()
-        : Fps_(25.0), codec_(0), colour_(false) {
+        : fps_(25.0), codec_(0), colour_(false) {
     }
 
-    int GetCodec() const;
+    int codec() const;
 
-    void SetCodec(VideoCodec codec);
+    void codec(VideoCodec codec);
 
-    double GetFPS() const;
+    double fps() const;
 
-    void SetFPS(float FPS);
+    void fps(float FPS);
 
-    cv::Size GetSize() const;
+    cv::Size size() const;
 
-    void SetSize(int x, int y);
+    void size(int x, int y);
 
-    void SetSize(cv::Size size);
+    void size(cv::Size size);
 
-    bool IsColour() const;
+    bool colour() const;
 
-    void SetColour(VideoColour colour);
+    void colour(VideoColour colour);
 
 private:
 
-    const std::map<VideoCodec, int> m_VideoCodecs = {{VideoCodec::Mjpeg, CV_FOURCC('M', 'J', 'P', 'G')}};
+    const std::map<VideoCodec, int> video_codecs_ = {{VideoCodec::Mjpeg, CV_FOURCC('M', 'J', 'P', 'G')}};
 
-    const std::map<VideoColour, bool> m_VideoColour = {{VideoColour::Colour, true},{VideoColour::Grey, false}};
+    const std::map<VideoColour, bool> video_colour_ = {{VideoColour::Colour, true},{VideoColour::Grey, false}};
 
-    cv::Size videoSize_;
+    cv::Size video_size_;
 
-    double Fps_;
+    double fps_;
 
     int codec_;
 

@@ -1,4 +1,3 @@
-
 //          Copyright Rudy Alex Kohn 2017.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -16,9 +15,9 @@ namespace cvr {
 
     // helper functions to clear opencv structures without creating new objects
     namespace clear {
-        
+
         template <typename T, int cn>
-        void vec(cv::Vec<T ,cn>& vec) {
+        void vec(cv::Vec<T, cn>& vec) {
             auto pos = cn;
             while (pos)
                 vec[pos--] = static_cast<T>(0);
@@ -50,9 +49,8 @@ namespace cvr {
         marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
     }
 
-
     template <typename T>
-    void avg_vector_vec(const std::vector<cv::Vec<T ,4>>& vecvec, cv::Vec<T, 4>& out) {
+    void avg_vector_vec(const std::vector<cv::Vec<T, 4>>& vecvec, cv::Vec<T, 4>& out) {
         out[0] = 0.0;
         out[1] = 0.0;
         out[2] = 0.0;
@@ -68,8 +66,6 @@ namespace cvr {
         out[2] /= vecvec.size();
         out[3] /= vecvec.size();
     }
-
-
 
     /**
      * \brief Computes the average (mean) intensity of the entire image
@@ -304,13 +300,13 @@ namespace cvr {
         return !target.empty();
     }
 
-   /**
-    * \brief Split the original frames into two vectors based on the center of the matrix size in X.
-    * Note that the resulting vectors only contains references to the original frames.
-    * \param frames The frames to be split in half (verticaly)
-    * \param left_out The output left side of the frames
-    * \param right_out The output right side of the frames
-    */
+    /**
+     * \brief Split the original frames into two vectors based on the center of the matrix size in X.
+     * Note that the resulting vectors only contains references to the original frames.
+     * \param frames The frames to be split in half (verticaly)
+     * \param left_out The output left side of the frames
+     * \param right_out The output right side of the frames
+     */
     void split_frames(std::vector<cv::Mat>& frames, std::vector<cv::Mat>& left_out, std::vector<cv::Mat>& right_out);
 
     /**

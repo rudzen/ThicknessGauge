@@ -39,27 +39,23 @@ class HoughLinesR : public BaseR {
 public:
 
     typedef struct LineV {
-        cv::Vec2f entry;
-        tg::linePair points;
+        cv::Vec2f entry_;
+        tg::line_pair<float> points;
         std::vector<cv::Point_<float>> elements;
 
         double slobe;
         calc::SlobeDirection slobe_direction = calc::SlobeDirection::HORIZONTAL;
 
-        LineV() {
-            slobe = 0.0f;
-        }
-
-        LineV(cv::Vec2f entry, tg::linePair points)
-            : entry(entry),
+        LineV(cv::Vec2f entry, tg::line_pair<float> points)
+            : entry_(entry),
               points(points) {
-            elements.reserve(cvRound(calc::dist_manhattan(points.first.x, points.second.x, points.first.y, points.second.y)));
+            elements.reserve(cvRound(calc::dist_manhattan(points.p1.x, points.p2.x, points.p1.y, points.p2.y)));
             slobe = 0.0f;
         }
 
         friend bool operator==(const LineV& lhs, const LineV& rhs) {
             return lhs.slobe == rhs.slobe
-                && lhs.entry == rhs.entry
+                && lhs.entry_ == rhs.entry_
                 && lhs.points == rhs.points
                 && lhs.elements == rhs.elements;
         }
@@ -70,9 +66,9 @@ public:
 
         friend std::ostream& operator<<(std::ostream& os, const LineV& obj) {
             return os
-                << "entry: " << obj.entry
+                << "entry: " << obj.entry_
                 << "slobe: " << obj.slobe
-                << " points(1/2): " << obj.points.first << '/' << obj.points.second
+                << " points(1/2): " << obj.points.p1 << '/' << obj.points.p2
                 << " elements: " << obj.elements;
         }
     } LineV;
@@ -92,21 +88,21 @@ private:
     vector<cv::Vec2f> lines_;
 
     // the lines with all information
-    vector<LineV> allLines_;
+    vector<LineV> all_lines_;
 
     // the lines located on the right side of the image
-    vector<LineV> rightLines_;
+    vector<LineV> right_lines_;
 
     // the lines location on the left side of the image
-    vector<LineV> leftLines_;
+    vector<LineV> left_lines_;
 
     // the x coordinates of the left "border" of the marking
-    cv::Vec4d leftBorder_;
+    cv::Vec4d left_border_;
 
     // the x coordinates of the right "border" of the marking
-    cv::Vec4d rightBorder_;
+    cv::Vec4d right_border_;
 
-    double leftY_ = 0.0;
+    double left_y_ = 0.0;
 
     /* only used for UI display through open cv*/
 
@@ -116,7 +112,7 @@ private:
 
     double angle_;
 
-    int threshold;
+    int threshold_;
 
     const int APERTURE_MIN = 3;
     const int APERTURE_MAX = 7;
@@ -125,55 +121,51 @@ private:
 
     double stn_;
 
-    double minTheta_;
+    double min_theta_;
 
-    double maxTheta_;
+    double max_theta_;
 
-    int iAngleLimit_;
+    int i_angle_limit_;
 
-    double angleLimit_;
+    double angle_limit_;
 
 public:
 
-    HoughLinesR(const int rho, const int theta, const int threshold, const bool showWindow)
-        : rho_(rho),
-          theta_(theta),
-          threshold(threshold) {
+    HoughLinesR(const int rho, const int theta, const int threshold, const bool show_window) : BaseR("HoughLines", show_window)
+                                                                                            , rho_(rho)
+                                                                                            , theta_(theta)
+                                                                                            , threshold_(threshold) {
         angle_ = calc::DEGREES * theta;
         srn_ = 0;
         stn_ = 0;
-        minTheta_ = 0.0;
-        maxTheta_ = calc::PI;
-        angleLimit_ = 0;
-        windowName = "HoughLines";
-        showWindows_ = showWindow;
-        if (showWindow)
-            createWindow();
+        min_theta_ = 0.0;
+        max_theta_ = calc::PI;
+        angle_limit_ = 0;
+        if (show_window)
+            create_window();
     }
 
-    void computeBorders();
+    void compute_borders();
 
 private:
-    void createWindow() {
-        namedWindow(windowName, cv::WINDOW_KEEPRATIO);
-        cv::createTrackbar("rho", windowName, &rho_, 3, rhocb, this);
-        cv::createTrackbar("theta", windowName, &theta_, 180, thetacb, this);
-        cv::createTrackbar("threshold", windowName, &threshold, 100, thresholdcb, this);
+    void create_window() {
+        namedWindow(window_name_, cv::WINDOW_KEEPRATIO);
+        cv::createTrackbar("rho", window_name_, &rho_, 3, rhocb, this);
+        cv::createTrackbar("theta", window_name_, &theta_, 180, thetacb, this);
+        cv::createTrackbar("threshold", window_name_, &threshold_, 100, thresholdcb, this);
     }
 
-    tg::linePair computePointPair(cv::Vec2f& line) const;
+    tg::line_pair<float> compute_point_pair(cv::Vec2f& line) const;
 
-    tg::linePair computePointPair2(cv::Vec2f& line) const;
+    void draw_lines(vector<LineV>& linePairs, cv::Scalar colour);
 
-    void drawLines(vector<LineV>& linePairs, cv::Scalar colour);
+    void draw_line(cv::Vec4d& line);
 
-    void drawLine(cv::Vec4d& line);
+    void show_output() const;
 
-    void showOutput() const;
+    void compute_meta();
 
-    void computeMeta();
-
-    static void computeRectFromLines(vector<LineV>& input, cv::Rect2d& output);
+    static void compute_rect_from_lines(vector<LineV>& input, cv::Rect2d& output);
 
     // callbacks
 
@@ -185,81 +177,81 @@ private:
 
     // getters & setters
 
-    void setRho(int rho) {
+    void rho(int rho) {
         this->rho_ = rho;
     }
 
-    void setTheta(int theta) {
+    void theta(int theta) {
         if (theta == 0)
             theta++;
-        this->theta_ = theta;
+        theta_ = theta;
         angle_ = calc::DEGREES * theta;
     }
 
-    void setThreshold(int threshold) {
-        this->threshold = threshold;
+    void threshold(int threshold) {
+        threshold_ = threshold;
     }
 
 public:
 
-    int doVerticalHough();
+    int hough_vertical();
 
-    void setAngleLimit(double angleLimit) {
-        this->angleLimit_ = angleLimit;
+    void angle_limit(double angleLimit) {
+        this->angle_limit_ = angleLimit;
     }
 
-    void setOriginal(cv::Mat& original) {
+    void original(cv::Mat& original) {
         original_ = original;
-        if (showWindows_)
+        if (show_windows_)
             cvtColor(original_, output_, CV_GRAY2BGR);
     }
 
-    const vector<cv::Vec2f>& getLines() const {
+    const vector<cv::Vec2f>& lines() const {
         return lines_;
     }
 
-    const vector<LineV>& getAllLines() const {
-        return allLines_;
+    const vector<LineV>& all_lines() const {
+        return all_lines_;
     }
 
-    void setAllLines(const vector<LineV>& allLines) {
-        this->allLines_ = allLines;
+    void all_lines(const vector<LineV>& allLines) {
+        this->all_lines_ = allLines;
     }
 
-    const vector<LineV>& getRightLines() const {
-        return rightLines_;
+    const vector<LineV>& right_lines() const {
+        return right_lines_;
     }
 
-    void setRightLines(const vector<LineV>& rightLines) {
-        this->rightLines_ = rightLines;
+    void right_lines(const vector<LineV>& rightLines) {
+        this->right_lines_ = rightLines;
     }
 
-    const vector<LineV>& getLeftLines() const {
-        return leftLines_;
+    const vector<LineV>& left_lines() const {
+        return left_lines_;
     }
 
-    void setLeftLines(const vector<LineV>& leftLines) {
-        this->leftLines_ = leftLines;
+    void left_lines(const vector<LineV>& leftLines) {
+        this->left_lines_ = leftLines;
     }
 
-    const cv::Vec4d& getLeftBorder() const {
-        return leftBorder_;
+    const cv::Vec4d& left_border() const {
+        return left_border_;
     }
 
-    const cv::Vec4d& getRightBorder() const {
-        return rightBorder_;
+    const cv::Vec4d& right_border() const {
+        return right_border_;
     }
 
-    void leftBorder(cv::Vec4d leftBorder) {
-        leftBorder_ = leftBorder;
+    void left_border(cv::Vec4d leftBorder) {
+        left_border_ = leftBorder;
     }
 
-    void rightBorder(cv::Vec4d rightBorder) {
-        rightBorder_ = rightBorder;
+    void right_border(cv::Vec4d rightBorder) {
+        right_border_ = rightBorder;
     }
 };
 
-inline void HoughLinesR::computeRectFromLines(vector<LineV>& input, cv::Rect2d& output) {
+inline void HoughLinesR::compute_rect_from_lines(vector<LineV>& input, cv::Rect2d& output) {
 
     for (auto& line : input) {
         cv::Rect2f t = cv::boundingRect(line.elements);
@@ -276,15 +268,15 @@ inline void HoughLinesR::computeRectFromLines(vector<LineV>& input, cv::Rect2d& 
 
 }
 
-inline void HoughLinesR::computeBorders() {
+inline void HoughLinesR::compute_borders() {
 
     cv::Rect2d leftRoi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
     cv::Rect2d rightRoi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
 
-    computeRectFromLines(leftLines_, leftRoi);
+    compute_rect_from_lines(left_lines_, leftRoi);
     if (!validate::validate_rect(leftRoi)) {
-        for (int i = 0; i < leftLines_.size(); i++) {
-            cv::Rect2f t = cv::boundingRect(leftLines_[i].elements);
+        for (int i = 0; i < left_lines_.size(); i++) {
+            cv::Rect2f t = cv::boundingRect(left_lines_[i].elements);
             log_time << __FUNCTION__ << " bounding rect for line : " << t << std::endl;
         }
         log_time << __FUNCTION__ << " leftRoi : " << leftRoi << std::endl;
@@ -292,10 +284,10 @@ inline void HoughLinesR::computeBorders() {
     }
 
 
-    computeRectFromLines(rightLines_, rightRoi);
+    compute_rect_from_lines(right_lines_, rightRoi);
     if (!validate::validate_rect(rightRoi)) {
-        for (int i = 0; i < rightLines_.size(); i++) {
-            cv::Rect2f t = cv::boundingRect(rightLines_[i].elements);
+        for (auto i = 0; i < right_lines_.size(); i++) {
+            cv::Rect2f t = cv::boundingRect(right_lines_[i].elements);
             log_time << __FUNCTION__ << " bounding rect for right line : " << t << std::endl;
         }
         log_time << __FUNCTION__ << " rightRoi : " << leftRoi << std::endl;
@@ -304,95 +296,95 @@ inline void HoughLinesR::computeBorders() {
 
     auto imgHeight = static_cast<double>(image_.rows);
 
-    markingRect.x = leftRoi.x;
-    markingRect.y = leftRoi.y;
-    markingRect.width = rightRoi.x - leftRoi.x + rightRoi.width;
-    markingRect.height = imgHeight;
-    throw_assert(validate::validate_rect(markingRect), "Marking rect failed validation!!!");
+    marking_rect_.x = leftRoi.x;
+    marking_rect_.y = leftRoi.y;
+    marking_rect_.width = rightRoi.x - leftRoi.x + rightRoi.width;
+    marking_rect_.height = imgHeight;
+    throw_assert(validate::validate_rect(marking_rect_), "Marking rect failed validation!!!");
 
-    leftBorder_[0] = leftRoi.x;
-    leftBorder_[1] = imgHeight;
-    leftBorder_[2] = leftRoi.x + leftRoi.width;
-    leftBorder_[3] = 0.0f;
-    throw_assert((validate::valid_vec<float, 4>(leftBorder_)), "Left border failed validation!!!");
+    left_border_[0] = leftRoi.x;
+    left_border_[1] = imgHeight;
+    left_border_[2] = leftRoi.x + leftRoi.width;
+    left_border_[3] = 0.0f;
+    throw_assert((validate::valid_vec<float, 4>(left_border_)), "Left border failed validation!!!");
 
-    rightBorder_[0] = rightRoi.x;
-    rightBorder_[1] = 0.0f;
-    rightBorder_[2] = rightRoi.x + rightRoi.width;
-    rightBorder_[3] = imgHeight;
-    throw_assert((validate::valid_vec<float, 4>(rightBorder_)), "Right border failed validation!!!");
+    right_border_[0] = rightRoi.x;
+    right_border_[1] = 0.0f;
+    right_border_[2] = rightRoi.x + rightRoi.width;
+    right_border_[3] = imgHeight;
+    throw_assert((validate::valid_vec<float, 4>(right_border_)), "Right border failed validation!!!");
 
-    if (showWindows_) {
-        drawLine(leftBorder_);
-        drawLine(rightBorder_);
-        showOutput();
+    if (show_windows_) {
+        draw_line(left_border_);
+        draw_line(right_border_);
+        show_output();
     }
 
 }
 
 inline void HoughLinesR::rhocb(int value, void* user_data) {
     auto that = static_cast<HoughLinesR*>(user_data);
-    that->setTheta(value);
+    that->theta(value);
     using namespace tg;
-    log_time << cv::format("%s rho : %i\n", that->windowName, value);
+    log_time << cv::format("%s rho : %i\n", that->window_name_, value);
 }
 
 inline void HoughLinesR::thetacb(int value, void* user_data) {
     auto that = static_cast<HoughLinesR*>(user_data);
-    that->setTheta(value);
+    that->theta(value);
     using namespace tg;
-    log_time << cv::format("%s theta : %i\n", that->windowName, value);
+    log_time << cv::format("%s theta : %i\n", that->window_name_, value);
 }
 
 inline void HoughLinesR::thresholdcb(int value, void* user_data) {
     auto that = static_cast<HoughLinesR*>(user_data);
-    that->setThreshold(value);
+    that->threshold(value);
     using namespace tg;
-    log_time << cv::format("%s threshold : %i\n", that->windowName, value);
+    log_time << cv::format("%s threshold : %i\n", that->window_name_, value);
 }
 
-inline int HoughLinesR::doVerticalHough() {
+inline int HoughLinesR::hough_vertical() {
 
     if (!lines_.empty())
         lines_.clear();
 
     //cv::HoughLines(image, lines, rho, angle, threshold, srn, stn, minTheta, maxTheta);
-    HoughLines(image_, lines_, 1, calc::DEGREES, threshold, 0, 0);
+    HoughLines(image_, lines_, 1, calc::DEGREES, threshold_, 0, 0);
 
     if (lines_.empty())
         return -1;
 
-    allLines_.clear();
-    allLines_.reserve(lines_.size());
+    all_lines_.clear();
+    all_lines_.reserve(lines_.size());
 
     auto pos = 0;
 
     for (auto& line : lines_) {
         auto theta = line[1];
-        if (theta <= calc::DEGREES * (180 - angleLimit_) && theta >= calc::DEGREES * angleLimit_)
+        if (theta <= calc::DEGREES * (180 - angle_limit_) && theta >= calc::DEGREES * angle_limit_)
             continue;
 
         //log_time << "vhough1\n";
-        auto p = computePointPair(line);
-        allLines_.emplace_back(LineV(line, p));
+        auto p = compute_point_pair(line);
+        all_lines_.emplace_back(LineV(line, p));
         pos++;
     }
 
-    log_time << __FUNCTION__ << " all line count : " << allLines_.size() << std::endl;
+    log_time << __FUNCTION__ << " all line count : " << all_lines_.size() << std::endl;
 
-    if (allLines_.empty())
+    if (all_lines_.empty())
         return -2;
     //cerr << "FATAL ERROR, NO VERTICAL LINES DETECTED!";
 
     //log_time << "vhough2\n";
 
-    computeMeta();
+    compute_meta();
 
     return 0;
 
 }
 
-inline tg::linePair HoughLinesR::computePointPair(cv::Vec2f& line) const {
+inline tg::line_pair<float> HoughLinesR::compute_point_pair(cv::Vec2f& line) const {
     auto rho = line[0];
     auto theta = line[1];
     double a = cos(theta);
@@ -401,83 +393,31 @@ inline tg::linePair HoughLinesR::computePointPair(cv::Vec2f& line) const {
     auto y0 = b * rho;
     cv::Point2f pt1(static_cast<float>(x0 + 1000 * (-b)), static_cast<float>(y0 + 1000 * (a)));
     cv::Point2f pt2(static_cast<float>(x0 - 1000 * (-b)), static_cast<float>(y0 - 1000 * (a)));
-    return tg::linePair(pt1, pt2);
+    return tg::line_pair<float>(pt1, pt2);
 }
 
-inline tg::linePair HoughLinesR::computePointPair2(cv::Vec2f& line) const {
-    auto rho = line[0];
-    auto theta = line[1];
-
-    // detect lower part of image
-    if (rho < 0) {
-        theta += 180.0f;
-        rho = -rho;
-    }
-
-    // convert
-    theta = static_cast<float>(theta * calc::DEGREES);
-
-    auto imgCenterX = static_cast<unsigned int>(image_.cols) * 0.5f;
-    auto imgCenterY = static_cast<unsigned int>(image_.rows) * 0.5f;
-
-    double x0;
-    double x1;
-    double y0;
-    double y1;
-
-    if (line[1] != 0) {
-        // non-vertical line
-        x0 = -imgCenterX;
-        x1 = imgCenterX;
-
-        double cosTheta = cos(theta);
-        double sinTheta = sin(theta);
-        y0 = (-cosTheta * x0 + rho) / sinTheta;
-        y1 = (-cosTheta * x1 + rho) / sinTheta;
-
-    } else {
-        // vertical line
-
-        x0 = line[0];
-        x1 = line[0];
-
-        y0 = imgCenterY;
-        y1 = -imgCenterY;
-
-    }
-
-    auto p0x = static_cast<float>(x0);
-    auto p1x = static_cast<float>(x1);
-    auto p0y = static_cast<float>(y0);
-    auto p1y = static_cast<float>(y1);
-
-    return tg::linePair(cv::Point2f(p0x, p0y), cv::Point2f(p1x, p1y));
-
-}
-
-inline void HoughLinesR::drawLines(vector<LineV>& line_pairs, cv::Scalar colour) {
-    if (!showWindows_)
+inline void HoughLinesR::draw_lines(vector<LineV>& line_pairs, cv::Scalar colour) {
+    if (!show_windows_)
         return;
 
     if (line_pairs.empty())
         return;
 
     for (auto& lineV : line_pairs) {
-        line(output_, lineV.points.first, lineV.points.second, colour, 1, CV_AA);
+        line(output_, lineV.points.p1, lineV.points.p2, colour, 1, CV_AA);
         //line(original, r.first, r.second, colour, 1, CV_AA);
     }
 }
 
-
-inline void HoughLinesR::drawLine(cv::Vec4d& line) {
+inline void HoughLinesR::draw_line(cv::Vec4d& line) {
     cv::Point2d p1(line[0], line[1]);
     cv::Point2d p2(line[2], line[3]);
     cv::line(output_, p1, p2, cv::Scalar(120, 120, 255), 2);
 }
 
-inline void HoughLinesR::showOutput() const {
-    if (!showWindows_)
+inline void HoughLinesR::show_output() const {
+    if (!show_windows_)
         return;
 
-    imshow(windowName, output_);
+    imshow(window_name_, output_);
 }

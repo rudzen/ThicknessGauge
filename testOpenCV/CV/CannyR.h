@@ -30,27 +30,25 @@ class CannyR : public BaseR {
 
     cv::Mat edges_;
 
-    int threshold1_;
+    int threshold_1_;
 
-    int threshold2_;
+    int threshold_2_;
 
     const int APER_MIN = 3;
     const int APER_MAX = 7;
 
-    int apertureSize_;
+    int aperture_size_;
 
     int gradient_;
 
-    bool showWindow_;
-
-    bool removePepperNoise_;
+    bool remove_pepper_noise_;
 
     void createWindow() {
-        namedWindow(windowName, cv::WINDOW_KEEPRATIO);
-        cv::createTrackbar("threshold1", windowName, &threshold1_, 200, threshold1cb, this);
-        cv::createTrackbar("threshold2", windowName, &threshold2_, 200, threshold2cb, this);
-        cv::createTrackbar("apertureSize", windowName, &apertureSize_, APER_MAX, apertureSizecb, this);
-        cv::createTrackbar("gradient", windowName, &gradient_, 1, gradientcb, this);
+        namedWindow(window_name_, cv::WINDOW_KEEPRATIO);
+        cv::createTrackbar("threshold1", window_name_, &threshold_1_, 200, threshold1cb, this);
+        cv::createTrackbar("threshold2", window_name_, &threshold_2_, 200, threshold2cb, this);
+        cv::createTrackbar("apertureSize", window_name_, &aperture_size_, APER_MAX, apertureSizecb, this);
+        cv::createTrackbar("gradient", window_name_, &gradient_, 1, gradientcb, this);
     }
 
     static void threshold1cb(int value, void* userData);
@@ -58,72 +56,70 @@ class CannyR : public BaseR {
     static void apertureSizecb(int value, void* userData);
     static void gradientcb(int value, void* userData);
 
-    void setThreshold1(int threshold1) {
-        this->threshold1_ = threshold1;
+    void threshold_1(int threshold1) {
+        threshold_1_ = threshold1;
     }
 
-    void setThreshold2(int threshold2) {
-        this->threshold2_ = threshold2;
+    void threshold_2(int threshold2) {
+        threshold_2_ = threshold2;
     }
 
-    void setApertureSize(int apertureSize) {
-        auto newSize = apertureSize;
-        if (newSize < APER_MIN)
-            newSize = APER_MIN;
-        else if (newSize % 2 == 0)
-            newSize++;
+    void aperture_size(int new_aperture_size) {
+        auto new_size = new_aperture_size;
+        if (new_size < APER_MIN)
+            new_size = APER_MIN;
+        else if (new_size % 2 == 0)
+            new_size++;
 
-        this->apertureSize_ = newSize;
-        //this->apertureSize = 2 * apertureSize + 1;
+        aperture_size_ = new_size;
     }
 
-    void setGradient(int gradient) {
+    void gradient(int gradient) {
         this->gradient_ = gradient;
     }
 
 public:
-    CannyR(const int threshold1, const int threshold2, const int apertureSize, const bool gradient, const bool showWindow, const bool removePepperNoise)
-        : threshold1_(threshold1),
-          threshold2_(threshold2),
-          apertureSize_(apertureSize),
-          gradient_(gradient),
-          showWindow_(showWindow),
-          removePepperNoise_(removePepperNoise) {
-        windowName = "Canny";
-        if (showWindow)
+
+    CannyR(const int threshold_1, const int threshold_2, const int aperture_size, const bool gradient, const bool show_windows, const bool remove_pepper_noise)
+        : BaseR("Canny", show_windows),
+          threshold_1_(threshold_1),
+          threshold_2_(threshold_2),
+          aperture_size_(aperture_size),
+          gradient_(gradient), remove_pepper_noise_(remove_pepper_noise) {
+        if (show_windows)
             createWindow();
     }
 
-    void doCanny();
+    void do_canny();
 
-    cv::Mat& getResult();
+    cv::Mat& result();
 
 };
 
 inline void CannyR::threshold1cb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);
-    that->setThreshold1(value);
+    that->threshold_1(value);
     using namespace tg;
     log_time << cv::format("Canny threshold 1 : %i\n", value);
 }
 
 inline void CannyR::threshold2cb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);
-    that->setThreshold2(value);
+    that->threshold_2(value);
     using namespace tg;
     log_time << cv::format("Canny threshold 2 : %i\n", value);
 }
 
 inline void CannyR::apertureSizecb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);
-    that->setApertureSize(value);
+    that->aperture_size(value);
     using namespace tg;
-    log_time << cv::format("Canny apertureSize : %i\n", value);
+    log_time << cv::format("Canny aperture size : %i\n", value);
 }
 
 inline void CannyR::gradientcb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);
-    that->setGradient(value);
+    that->gradient(value);
     std::string boltab[2] = {"false", "true"};
     using namespace tg;
     log_time << cv::format("Canny gradient : %s\n", boltab[static_cast<bool>(value)]);

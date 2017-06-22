@@ -52,15 +52,11 @@ public:
         y = y_;
     }
 
-    v2(const v2& other)
-        : x(other.x)
-          , y(other.y) {
-    }
+    v2(const v2& other) : x(other.x)
+                        , y(other.y) { }
 
-    v2(v2&& other) noexcept
-        : x(std::move(other.x))
-          , y(std::move(other.y)) {
-    }
+    v2(v2&& other) noexcept : x(std::move(other.x))
+                            , y(std::move(other.y)) { }
 
     v2& operator=(const v2& other) {
         if (this == &other)
@@ -124,7 +120,7 @@ public:
 
     friend bool operator==(const v2& lhs, const v2& rhs) {
         return lhs.x == rhs.x
-            && lhs.y == rhs.y;
+                && lhs.y == rhs.y;
     }
 
     friend bool operator!=(const v2& lhs, const v2& rhs) {
@@ -252,30 +248,23 @@ template <class T>
 class v3 : public v2<T> {
 public:
 
-    v3(T x1, T y1, T z1, T x2, T y2, T z2)
-        : v2<T>(x1, y1, x2, y2) {
+    v3(T x1, T y1, T z1, T x2, T y2, T z2) : v2<T>(x1, y1, x2, y2) {
         z = z2 - z1;
     }
 
-    v3(T x_, T y_, T z_)
-        : v2<T>(x_, y_) {
+    v3(T x_, T y_, T z_) : v2<T>(x_, y_) {
         z = z_;
     }
 
-    v3()
-        : v2<T>(0, 0) {
+    v3() : v2<T>(0, 0) {
         z = 0;
     }
 
-    v3(const v3& other)
-        : v2<T>(other)
-          , z(other.z) {
-    }
+    v3(const v3& other) : v2<T>(other)
+                        , z(other.z) { }
 
-    v3(v3&& other) noexcept
-        : v2<T>(std::move(other))
-          , z(std::move(other.z)) {
-    }
+    v3(v3&& other) noexcept : v2<T>(std::move(other))
+                            , z(std::move(other.z)) { }
 
     v3& operator=(const v3& other) {
         if (this == &other)
@@ -297,7 +286,7 @@ public:
 
     friend bool operator==(const v3& lhs, const v3& rhs) {
         return static_cast<const v2<T>&>(lhs) == static_cast<const v2<T>&>(rhs)
-            && lhs.z == rhs.z;
+                && lhs.z == rhs.z;
     }
 
     friend bool operator!=(const v3& lhs, const v3& rhs) {
@@ -361,30 +350,23 @@ template <class T>
 class v4 : public v3<T> {
 public:
 
-    v4(T x1, T y1, T z1, T w1, T x2, T y2, T z2, T w2)
-        : v3<T>(x1, y1, z1, x2, y2, z2) {
+    v4(T x1, T y1, T z1, T w1, T x2, T y2, T z2, T w2) : v3<T>(x1, y1, z1, x2, y2, z2) {
         w = z2 - z1;
     }
 
-    v4(T x_, T y_, T z_, T w_)
-        : v3<T>(x_, y_, z_) {
+    v4(T x_, T y_, T z_, T w_) : v3<T>(x_, y_, z_) {
         w = w_;
     }
 
-    v4()
-        : v3<T>(0, 0, 0) {
+    v4() : v3<T>(0, 0, 0) {
         w = 0;
     }
 
-    v4(const v4& other)
-        : v3<T>(other)
-          , w(other.w) {
-    }
+    v4(const v4& other) : v3<T>(other)
+                        , w(other.w) { }
 
-    v4(v4&& other) noexcept
-        : v3<T>(std::move(other))
-          , w(std::move(other.w)) {
-    }
+    v4(v4&& other) noexcept : v3<T>(std::move(other))
+                            , w(std::move(other.w)) { }
 
     v4& operator=(const v4& other) {
         if (this == &other)
@@ -406,7 +388,7 @@ public:
 
     friend bool operator==(const v4& lhs, const v4& rhs) {
         return static_cast<const v3<T>&>(lhs) == static_cast<const v3<T>&>(rhs)
-            && lhs.w == rhs.w;
+                && lhs.w == rhs.w;
     }
 
     friend bool operator!=(const v4& lhs, const v4& rhs) {
