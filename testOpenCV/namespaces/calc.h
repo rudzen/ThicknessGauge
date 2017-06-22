@@ -285,6 +285,8 @@ namespace calc {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "slope is only possible for arithmetic types.");
         static_assert(std::is_convertible<T1, T2>::value, "slope argument types must be convertible.");
         double dx = x2 - x1;
+        if (dx == 0.0)
+            return 0.0;
         double dy = y2 - y1;
         return dy / dx;
     }

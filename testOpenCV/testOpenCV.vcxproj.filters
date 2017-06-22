@@ -117,9 +117,6 @@
     <ClCompile Include="IO\ImageSave.cpp">
       <Filter>Source Files\File</Filter>
     </ClCompile>
-    <ClCompile Include="Vimba\GC2450MCamera.cpp">
-      <Filter>Source Files\Vimba</Filter>
-    </ClCompile>
     <ClCompile Include="Calc\GaugeMath.cpp">
       <Filter>Source Files\Calc</Filter>
     </ClCompile>
@@ -149,9 +146,6 @@
     </ClCompile>
     <ClCompile Include="namespaces\pixel.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera\OpenCVCap.cpp">
-      <Filter>Source Files\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Camera\CapturePvApi.cpp">
       <Filter>Source Files</Filter>
@@ -269,9 +263,6 @@
     <ClInclude Include="_unused_crap\temp_mains.txt">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vimba\GC2450MCamera.h">
-      <Filter>Header Files\Camera\Vimba</Filter>
-    </ClInclude>
     <ClInclude Include="namespaces\tg.h">
       <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
@@ -286,9 +277,6 @@
     </ClInclude>
     <ClInclude Include="Exceptions\NoLineDetectedException.h">
       <Filter>Header Files\Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\OpenCVVideoRecorder.h">
-      <Filter>Header Files\CV</Filter>
     </ClInclude>
     <ClInclude Include="CV\LaserR.h">
       <Filter>Header Files\CV</Filter>
@@ -337,9 +325,6 @@
     </ClInclude>
     <ClInclude Include="Util\Ztring.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\OpenCVCap.h">
-      <Filter>Header Files\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Camera\CapturePvApi.h">
       <Filter>Header Files</Filter>

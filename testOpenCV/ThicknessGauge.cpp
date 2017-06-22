@@ -182,129 +182,138 @@ void ThicknessGauge::computeMarkingHeight() {
 
     //return;
 
-    try {
-
-        // test print for all framesets
-        for (auto& f: frameset) {
-            f->compute();
-            //log_time << f << endl;
-        }
-
-        uint64 time_start = cv::getTickCount();
-
-        // configure frames based on center vertical splitting of the original frames
-        //vector<cv::Mat> leftFrames(frameCount_);
-        //vector<cv::Mat> rightFrames(frameCount_);
-        //splitFrames(leftFrames, rightFrames);
-
-        // configure filters for show window
-        filter_marking->setShowWindows(showWindows_);
-        filter_baseline->setShowWindows(showWindows_);
-
-        // houghlines to determin where the actual marking is in the frame
-        auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, showWindows_);
-
-        // configure the diffrent functionalities
-        hough_vertical->setAngleLimit(30);
-        hough_vertical->setShowWindows(showWindows_);
-
-        data->markingRect = computerMarkingRectangle(hough_vertical);
-        hough_vertical->setMarkingRect(data->markingRect);
-
-        // check the resulting rectangle for weirdness
-        if (data->markingRect.x < 0.0 || data->markingRect.y < 0.0 || data->markingRect.width > imageSize_.width || data->markingRect.height > imageSize_.height || data->markingRect.area() >= imageSize_.area()) {
-            CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height));
-        }
-
-        // make sure the minimum is at least 10 pixels.
-        auto min_line_len = computeHoughPMinLine(10.0, data->markingRect);
-
-        // horizontal houghline extension class
-        auto hough_horizontal = make_shared<HoughLinesPR>(1, cvRound(calc::DEGREES), 40, cvRound(min_line_len), showWindows_);
-
-        hough_horizontal->setMaxLineGab(12);
-        hough_horizontal->setMarkingRect(data->markingRect);
-        hough_horizontal->setShowWindows(showWindows_);
-
-        // morph extension class
-        auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
-
-        computeBaseLineAreas(hough_horizontal, morph);
-        //std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
-        //std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
-
-        // compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
-        calc::compute_intersection_points(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
-
-        // grabs the in between parts and stores the data
-        //computerInBetween(filter_baseline, hough_horizontal, morph);
-
-        log_time << "intersection points: " << data->intersections << endl;
-
-        // pixel cut off is based on the border of the marking..
-        auto intersect_cutoff = calc::compute_intersection_cut(hough_vertical->getLeftBorder(), hough_vertical->getRightBorder());
-
-        data->intersectionCuts[0] = data->intersections[0] - intersect_cutoff[0];
-        data->intersectionCuts[3] = data->intersections[3] + intersect_cutoff[1];
-
-        // set data for in-between areas
-        data->middlePieces[0] = data->intersectionCuts[0];
-        data->middlePieces[1] = data->intersectionCuts[3] - data->intersectionCuts[0];
-
-        //if (!validate::validate_rect(data->markingRect)) {
-        //    CV_Error(cv::Error::BadROISize, "Marking rectangle dimensions are fatal.");
-        //}
-
-        // adjust the baselines according to the intersection points. (could perhaps be useful in the future)
-        cvr::adjust_marking_rect(data->markingRect, data->intersections, intersect_cutoff[0]);
-
-        // testing angles between baseline.. should be max 5 degrees
-        cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);
-        cv::Point2d line_right(line_left.x + data->markingRect.width, data->baseLines[3]);
-
-        auto angle = calc::angle_between_lines(line_left, line_right);
-        log_time << cv::format("Angle between baselines: [r/d] = [%f/%f]\n", angle, calc::rad_to_deg(angle));
-
-        //std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
-        //std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
-        //std::cout << cv::format("Adjusted base line Y [right]: %f\n", data->baseLines[3]);
-
-        // filter for laser detection
-        auto filter_laser = make_shared<FilterR>("Laser Filter", showWindows_);
-        filter_laser->setShowWindows(showWindows_);
-
-        // main laser class
-        auto laser = make_shared<LaserR>();
-
-        // computes the Y locations of the laserline inside the marking rect
-        computeLaserLocations(laser, filter_laser);
-
-        if (showWindows_)
-            draw::removeAllWindows();
-
-        // do a quick pass of validation before modifying the data
-        validate::valid_data(data);
-
-        auto adjust_points = [&](cv::Point2d& p) {
-            p.y = imageSize_.height - p.y;
-        };
-
-        std::for_each(data->leftPoints.begin(), data->leftPoints.end(), adjust_points);
-        std::for_each(data->rightPoints.begin(), data->rightPoints.end(), adjust_points);
-        std::for_each(data->centerPoints.begin(), data->centerPoints.end(), adjust_points);
-
-        uint64 time_end = cv::getTickCount();
-
-        frameTime_ = static_cast<double>((time_end - time_start) / cv::getTickFrequency());
-
-        log_time << "Total compute time (seconds) : " << frameTime_ << endl;
-
-        if (showWindows_ && draw::is_escape_pressed(30))
-            return;
-
-    } catch (cv::Exception& e) {
-        cerr << cv::format("Exception caught in computeMarkingHeight().\n%s\n", e.msg.c_str());
+    // test print for all framesets
+    for (auto& f: frameset) {
+        f->compute();
+        log_time << f << endl;
     }
+
+    while (true) {
+
+
+        try {
+
+            uint64 time_start = cv::getTickCount();
+
+            // configure frames based on center vertical splitting of the original frames
+            //vector<cv::Mat> leftFrames(frameCount_);
+            //vector<cv::Mat> rightFrames(frameCount_);
+            //splitFrames(leftFrames, rightFrames);
+
+            // configure filters for show window
+            filter_marking->setShowWindows(showWindows_);
+            filter_baseline->setShowWindows(showWindows_);
+
+            // houghlines to determin where the actual marking is in the frame
+            auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, showWindows_);
+
+            // configure the diffrent functionalities
+            hough_vertical->setAngleLimit(30);
+            hough_vertical->setShowWindows(showWindows_);
+
+            hough_vertical->setMarkingRect(computerMarkingRectangle(hough_vertical));
+            data->markingRect = hough_vertical->getMarkingRect();
+
+            // check the resulting rectangle for weirdness
+            //if (data->markingRect.x < 0.0 || data->markingRect.y < 0.0 || data->markingRect.width > imageSize_.width || data->markingRect.height > imageSize_.height || data->markingRect.area() >= imageSize_.area()) {
+            //    CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height));
+            //}
+
+            // make sure the minimum is at least 10 pixels.
+            auto min_line_len = computeHoughPMinLine(10.0, data->markingRect);
+
+            // horizontal houghline extension class
+            auto hough_horizontal = make_shared<HoughLinesPR>(1, cvRound(calc::DEGREES), 40, cvRound(min_line_len), showWindows_);
+
+            hough_horizontal->setMaxLineGab(12);
+            hough_horizontal->setMarkingRect(data->markingRect);
+            hough_horizontal->setShowWindows(showWindows_);
+
+            // morph extension class
+            auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, showWindows_);
+
+            computeBaseLineAreas(hough_horizontal, morph);
+            //std::cout << cv::format("Base line Y [left] : %f\n", data->baseLines[1]);
+            //std::cout << cv::format("Base line Y [right]: %f\n", data->baseLines[3]);
+
+            // compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
+            calc::compute_intersection_points(data->baseLines, hough_vertical->getLeftBorder(), hough_vertical->getRightBorder(), data->intersections);
+
+            // grabs the in between parts and stores the data
+            //computerInBetween(filter_baseline, hough_horizontal, morph);
+
+            log_time << "intersection points: " << data->intersections << endl;
+
+            // pixel cut off is based on the border of the marking..
+            auto intersect_cutoff = calc::compute_intersection_cut(hough_vertical->getLeftBorder(), hough_vertical->getRightBorder());
+
+            data->intersectionCuts[0] = data->intersections[0] - intersect_cutoff[0];
+            data->intersectionCuts[3] = data->intersections[3] + intersect_cutoff[1];
+
+            // set data for in-between areas
+            data->middlePieces[0] = data->intersectionCuts[0];
+            data->middlePieces[1] = data->intersectionCuts[3] - data->intersectionCuts[0];
+
+            //if (!validate::validate_rect(data->markingRect)) {
+            //    CV_Error(cv::Error::BadROISize, "Marking rectangle dimensions are fatal.");
+            //}
+
+            // adjust the baselines according to the intersection points. (could perhaps be useful in the future)
+            cvr::adjust_marking_rect(data->markingRect, data->intersections, intersect_cutoff[0]);
+
+            // testing angles between baseline.. should be max 5 degrees
+            cv::Point2d line_left(data->markingRect.x, data->baseLines[1]);
+            cv::Point2d line_right(line_left.x + data->markingRect.width, data->baseLines[3]);
+
+            auto angle = calc::angle_between_lines(line_left, line_right);
+            log_time << cv::format("Angle between baselines: [r/d] = [%f/%f]\n", angle, calc::rad_to_deg(angle));
+
+            //std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
+            //std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
+            //std::cout << cv::format("Adjusted base line Y [right]: %f\n", data->baseLines[3]);
+
+            // filter for laser detection
+            auto filter_laser = make_shared<FilterR>("Laser Filter", showWindows_);
+            filter_laser->setShowWindows(showWindows_);
+
+            // main laser class
+            auto laser = make_shared<LaserR>();
+
+            // computes the Y locations of the laserline inside the marking rect
+            computeLaserLocations(laser, filter_laser);
+
+            if (showWindows_)
+                draw::removeAllWindows();
+
+            // do a quick pass of validation before modifying the data
+            validate::valid_data(data);
+
+            auto adjust_points = [&](cv::Point2d& p) {
+                p.y = imageSize_.height - p.y;
+            };
+
+            std::for_each(data->leftPoints.begin(), data->leftPoints.end(), adjust_points);
+            std::for_each(data->rightPoints.begin(), data->rightPoints.end(), adjust_points);
+            std::for_each(data->centerPoints.begin(), data->centerPoints.end(), adjust_points);
+
+            uint64 time_end = cv::getTickCount();
+
+            frameTime_ = static_cast<double>((time_end - time_start) / cv::getTickFrequency());
+
+            log_time << "Total compute time (seconds) : " << frameTime_ << endl;
+
+            if (showWindows_ && !draw::is_escape_pressed(30))
+                continue;
+
+            break;
+        } catch (cv::Exception& e) {
+            cerr << cv::format("CV Exception caught in computeMarkingHeight().\n%s\n", e.msg.c_str());
+        } catch (std::exception& ex) {
+            cerr << cv::format("Exception caught in computeMarkingHeight().\n%s\n", ex.what());
+        }
+
+    }
+
 
 }
 
@@ -332,6 +341,8 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
     auto base_line_y = imageSize_.height - quarter;
 
     auto marking = hough->getMarkingRect();
+
+    log_time << marking << std::endl;
 
     cv::Rect2d left_baseline;
     left_baseline.x = 0.0;
@@ -496,7 +507,7 @@ void ThicknessGauge::computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, share
     data->baseLines[2] = 0.0;
     data->baseLines[3] = right_y;
 
-    if (!validate::valid_vec(data->baseLines)) {
+    if (!validate::valid_vec<double, 4>(data->baseLines)) {
         log_time << "Validation error for data->baseLines in computeBaseLineAreas()." << endl;
     }
 
@@ -564,6 +575,8 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
         out.width = 0.0;
         out.height = image_height;
         for (const auto& r : rects) {
+            if (!validate::validate_rect(r))
+                continue;
             out.x += r.x;
             out.width += r.width;
         }
@@ -571,21 +584,24 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
         out.width /= rects.size();
     };
 
-    auto accuVecs = [](const vector<cv::Vec4d>& vecs, cv::Vec4d& out) {
+    auto accuVecs = [image_height](const vector<cv::Vec4d>& vecs, cv::Vec4d& out) {
         out[0] = 0.0;
-        out[1] = 0.0; // image_height;
+        out[1] = image_height;
         out[2] = 0.0;
         out[3] = 0.0;
         for (const auto& v : vecs) {
+            if (!validate::valid_vec(v))
+                continue;
             out[0] += v[0];
-            out[1] += v[1];
+            //out[1] += v[1];
             out[2] += v[2];
             out[3] += v[3];
         }
         out[0] /= vecs.size();
-        out[1] /= vecs.size();
+        //out[1] /= vecs.size();
         out[2] /= vecs.size();
         out[3] /= vecs.size();
+        log_time << __FUNCTION__ << " accuVecs 0 : " << out << std::endl;
     };
 
     while (running) {
@@ -595,9 +611,10 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
             left_borders.clear();
             right_borders.clear();
 
-
             cv::Mat sparse;
             for (auto i = 0; i < frames->frames.size(); i++) {
+
+                //log_time << "frame : " << i << " / " << frames->frames.size() << std::endl;
 
                 //canny->setImage(frames->frames[i].clone());
                 //canny->doCanny();
@@ -609,19 +626,44 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
 
                 auto t = canny->getResult();
 
+                //log_time << "hough\n";
+
                 auto tmp = t.clone();
                 hough->setOriginal(tmp);
                 hough->setImage(t);
+
+                //log_time << "hough2\n";
 
                 if (hough->doVerticalHough() < 0) {
                     log_time << "No lines detected from houghR\n";
                     //continue;
                 }
 
+                //log_time << "hough3\n";
+
                 hough->computeBorders();
-                markings.emplace_back(hough->getMarkingRect());
-                left_borders.emplace_back(hough->getLeftBorder());
-                right_borders.emplace_back(hough->getRightBorder());
+
+                auto lb = hough->getLeftBorder();
+                auto rb = hough->getRightBorder();
+                auto mr = hough->getMarkingRect();
+
+                //markings.emplace_back(hough->getMarkingRect());
+                //left_borders.emplace_back(hough->getLeftBorder());
+                //right_borders.emplace_back(hough->getRightBorder());
+
+                if (validate::validate_rect(mr))
+                    markings.emplace_back(mr);
+
+                if (validate::valid_vec(lb))
+                    left_borders.emplace_back(lb);
+
+                if (validate::valid_vec(rb))
+                    right_borders.emplace_back(rb);
+
+                
+
+
+
                 if (showWindows_ && draw::is_escape_pressed(30))
                     running = false;
 
@@ -630,6 +672,19 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
             accuRects(markings, output);
             accuVecs(left_borders, left_border_result);
             accuVecs(right_borders, right_border_result);
+
+            for (const auto& lb : left_borders) {
+                if (!validate::valid_vec(lb)) {
+                    log_time << __FUNCTION__ << " left_borders validation fail for " << lb << std::endl;
+                }
+            }
+
+            for (const auto& lb : right_borders) {
+                if (!validate::valid_vec(lb)) {
+                    log_time << __FUNCTION__ << " right_borders validation fail for " << lb << std::endl;
+                }
+            }
+
 
             if (!showWindows_)
                 running = false;
@@ -641,7 +696,11 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
                     running = false;
             }
         } catch (cv::Exception& e) {
-            log_time << "Caught exception in computeMarkingRect main loop\n";
+            log_time << "CV Exception\n" << e.what();
+            exit(-991);
+        } catch (NoLineDetectedException& e) {
+            log_time << cv::format("NoLineDetectedException : %s\n", e.what());
+            exit(-100);
         }
 
     }
@@ -649,15 +708,16 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
     if (showWindows_)
         draw::removeWindow(window_name);
 
-    if (validate::validate_rect(output)) {
-        data->leftBorder = left_border_result;
-        data->rightBorder = right_border_result;
-        hough->leftBorder(left_border_result);
-        hough->rightBorder(right_border_result);
-        return cv::Rect2d(output);
-    }
+    log_time << __FUNCTION__ << " : " << output << std::endl;
+    //    if (validate::validate_rect(output)) {
+    data->leftBorder = left_border_result;
+    data->rightBorder = right_border_result;
+    hough->leftBorder(left_border_result);
+    hough->rightBorder(right_border_result);
+    return cv::Rect2d(output);
+    //    }
 
-    return cv::Rect2d(0.0, 0.0, 0.0, 0.0);
+    //  return cv::Rect2d(0.0, 0.0, 0.0, 0.0);
 
 }
 

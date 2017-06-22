@@ -69,10 +69,10 @@ public:
     bool aquisition_end() const;
 
     auto exposure_auto_reset() {
-    //--- /Controls/Exposure/Auto/ExposureAutoAlg = Mean [enum,rw  ]
-    //--- /Controls/Exposure/Auto/ExposureAutoMax = 500000 [uint32,rw  ]
-    //--- /Controls/Exposure/Auto/ExposureAutoMin = 25 [uint32,rw  ]
-        
+        //--- /Controls/Exposure/Auto/ExposureAutoAlg = Mean [enum,rw  ]
+        //--- /Controls/Exposure/Auto/ExposureAutoMax = 500000 [uint32,rw  ]
+        //--- /Controls/Exposure/Auto/ExposureAutoMin = 25 [uint32,rw  ]
+
         const unsigned long auto_max = 500000;
         const unsigned long auto_min = 25;
         const std::string auto_alg = "Mean";
@@ -139,21 +139,43 @@ public:
 
     }
 
-//Controls/Exposure/Auto/ExposureAutoAdjustTol = 5 [uint32,rw  ]
-//Controls/Exposure/Auto/ExposureAutoOutliers = 0 [uint32,rw  ]
-//Controls/Exposure/Auto/ExposureAutoRate = 100 [uint32,rw  ]
-//Controls/Exposure/Auto/ExposureAutoTarget = 50 [uint32,rw  ]
-//Controls/Exposure/ExposureMode = Manual [enum,rwv ]
+    //Controls/Exposure/Auto/ExposureAutoAdjustTol = 5 [uint32,rw  ]
+    //Controls/Exposure/Auto/ExposureAutoOutliers = 0 [uint32,rw  ]
+    //Controls/Exposure/Auto/ExposureAutoRate = 100 [uint32,rw  ]
+    //Controls/Exposure/Auto/ExposureAutoTarget = 50 [uint32,rw  ]
+    //Controls/Exposure/ExposureMode = Manual [enum,rwv ]
 
-    void exposure_mode() {
+    void exposure_mode() { }
+
+    bool exposure_auto_adjust_tolerance(unsigned long new_value) {
+
+        auto err_code = PvAttrUint32Set(camera_.Handle, "ExposureAutoAdjustTol", new_value);
+
+        if (err_code == ePvErrSuccess)
+            return true;
+
+        using namespace tg;
         
+        log_time << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
+        return false;
+
     }
 
+    unsigned long exposure_auto_adjust_tolerance() {
 
+        unsigned long ret_val = 0;
+        
+        auto err_code = PvAttrUint32Get(camera_.Handle, "ExposureAutoAdjustTol", &ret_val);
 
-    void exposure_auto_adjust_tolerance(unsigned long new_value);
+        if (err_code == ePvErrSuccess)
+            return ret_val;
+        
+        using namespace tg;
 
-    unsigned long exposure_auto_adjust_tolerance();
+        log_time << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
+        return ret_val;
+
+    }
 
     void exposure_auto_rate(unsigned long new_value);
 
@@ -162,7 +184,6 @@ public:
     void exposure_auto_target(unsigned long new_value);
 
     unsigned long exposure_auto_target();
-
 
 
     /**

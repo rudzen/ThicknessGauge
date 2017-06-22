@@ -148,7 +148,7 @@
       <BrowseInformation>true</BrowseInformation>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <FloatingPointModel>Strict</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
@@ -160,7 +160,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>PvAPI.lib;VimbaCPP.lib;opencv_aruco320.lib;opencv_bgsegm320.lib;opencv_bioinspired320.lib;opencv_calib3d320.lib;opencv_ccalib320.lib;opencv_core320.lib;opencv_datasets320.lib;opencv_dnn320.lib;opencv_dpm320.lib;opencv_face320.lib;opencv_features2d320.lib;opencv_flann320.lib;opencv_fuzzy320.lib;opencv_highgui320.lib;opencv_imgcodecs320.lib;opencv_imgproc320.lib;opencv_line_descriptor320.lib;opencv_ml320.lib;opencv_objdetect320.lib;opencv_optflow320.lib;opencv_phase_unwrapping320.lib;opencv_photo320.lib;opencv_plot320.lib;opencv_reg320.lib;opencv_rgbd320.lib;opencv_saliency320.lib;opencv_shape320.lib;opencv_stereo320.lib;opencv_stitching320.lib;opencv_structured_light320.lib;opencv_superres320.lib;opencv_surface_matching320.lib;opencv_text320.lib;opencv_tracking320.lib;opencv_video320.lib;opencv_videoio320.lib;opencv_videostab320.lib;opencv_xfeatures2d320.lib;opencv_ximgproc320.lib;opencv_xobjdetect320.lib;opencv_xphoto320.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PvAPI.lib;opencv_aruco320.lib;opencv_bgsegm320.lib;opencv_bioinspired320.lib;opencv_calib3d320.lib;opencv_ccalib320.lib;opencv_core320.lib;opencv_datasets320.lib;opencv_dnn320.lib;opencv_dpm320.lib;opencv_face320.lib;opencv_features2d320.lib;opencv_flann320.lib;opencv_fuzzy320.lib;opencv_highgui320.lib;opencv_imgcodecs320.lib;opencv_imgproc320.lib;opencv_line_descriptor320.lib;opencv_ml320.lib;opencv_objdetect320.lib;opencv_optflow320.lib;opencv_phase_unwrapping320.lib;opencv_photo320.lib;opencv_plot320.lib;opencv_reg320.lib;opencv_rgbd320.lib;opencv_saliency320.lib;opencv_shape320.lib;opencv_stereo320.lib;opencv_stitching320.lib;opencv_structured_light320.lib;opencv_superres320.lib;opencv_surface_matching320.lib;opencv_text320.lib;opencv_tracking320.lib;opencv_video320.lib;opencv_videoio320.lib;opencv_videostab320.lib;opencv_xfeatures2d320.lib;opencv_ximgproc320.lib;opencv_xobjdetect320.lib;opencv_xphoto320.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
     </Link>
     <Bscmake>
@@ -172,7 +172,6 @@
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
     <ClCompile Include="Camera\CapturePvApi.cpp" />
-    <ClCompile Include="Camera\OpenCVCap.cpp" />
     <ClCompile Include="CV\CannyR.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
@@ -187,7 +186,6 @@
     <ClCompile Include="IO\ImageSave.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="IO\VideoInfo.cpp" />
-    <ClCompile Include="Vimba\GC2450MCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
@@ -196,7 +194,6 @@
     <ClInclude Include="Exceptions\ThrowAssert.h" />
     <ClInclude Include="namespaces\calc.h" />
     <ClInclude Include="Calc\GaugeMath.h" />
-    <ClInclude Include="Camera\OpenCVCap.h" />
     <ClInclude Include="Camera\CaptureInterface.h" />
     <ClInclude Include="CV\BaseR.h" />
     <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />
@@ -247,8 +244,6 @@
     <ClInclude Include="namespaces\tg.h" />
     <ClInclude Include="Vimba\CameraData.h" />
     <ClInclude Include="Vimba\CameraFrame.h" />
-    <ClInclude Include="Vimba\GC2450MCamera.h" />
-    <ClInclude Include="Vimba\OpenCVVideoRecorder.h" />
     <ClInclude Include="_unused_crap\temp_mains.txt" />
     <ClInclude Include="_unused_crap\temp_unused.txt" />
   </ItemGroup>

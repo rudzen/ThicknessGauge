@@ -18,28 +18,33 @@ void HoughLinesR::computeMeta() {
 
     using namespace tg;
 
+    log_time << __FUNCTION__ << " center: " << center << std::endl;
+
     for (auto& a : allLines_) {
         a.slobe = calc::slope(a.entry[0], a.entry[2], a.entry[1], a.entry[3]);
         // TODO : do something in regards to the slobe
         //log_time << cv::format("slobe calc : %f\n", a.slobe);
-        if (a.points.first.x < center)
-            leftLines_.emplace_back(a);
-        else
+        if (a.points.first.x > center) {
+            log_time << __FUNCTION__ << " right point added : " << a.points.first << std::endl;
             rightLines_.emplace_back(a);
+        } else {
+            log_time << __FUNCTION__ << " left point added : " << a.points.first << std::endl;
+            leftLines_.emplace_back(a);
+        }
     }
 
     auto lSize = leftLines_.size();
     auto rSize = rightLines_.size();
 
-    // TODO : replace with throw asserts ?
-    if (lSize + rSize == 0)
-        throw NoLineDetectedException("No marking lines detected.");
+    //// TODO : replace with throw asserts ?
+    //if (lSize + rSize == 0)
+    //    throw NoLineDetectedException("No marking lines detected.");
 
-    if (lSize == 0)
-        throw NoLineDetectedException("No marking left line detected.");
+    //if (lSize == 0)
+    //    throw NoLineDetectedException("No marking left line detected.");
 
-    if (rSize == 0)
-        throw NoLineDetectedException("No marking right line detected.");
+    //if (rSize == 0)
+    //    throw NoLineDetectedException("No marking right line detected.");
 
     for (auto& left : leftLines_) {
         cv::LineIterator it(image_, left.points.first, left.points.second, 8);

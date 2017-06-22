@@ -78,7 +78,9 @@ public:
     } LineV;
 
     struct lineVsizeSort {
-        bool operator()(const LineV& l1, const LineV& l2) const { return l1.elements.size() < l2.elements.size(); }
+        bool operator()(const LineV& l1, const LineV& l2) const {
+            return l1.elements.size() < l2.elements.size();
+        }
     } lineVsizeSort;
 
 private:
@@ -280,9 +282,25 @@ inline void HoughLinesR::computeBorders() {
     cv::Rect2d rightRoi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
 
     computeRectFromLines(leftLines_, leftRoi);
-    //throw_assert(validate::validate_rect(leftRoi), "Left ROI rect failed validation!!!");
+    if (!validate::validate_rect(leftRoi)) {
+        for (int i = 0; i < leftLines_.size(); i++) {
+            cv::Rect2f t = cv::boundingRect(leftLines_[i].elements);
+            log_time << __FUNCTION__ << " bounding rect for line : " << t << std::endl;
+        }
+        log_time << __FUNCTION__ << " leftRoi : " << leftRoi << std::endl;
+        throw_assert(!validate::validate_rect(leftRoi), "Left ROI rect failed validation!!!");
+    }
+
+
     computeRectFromLines(rightLines_, rightRoi);
-    //throw_assert(validate::validate_rect(rightRoi), "Right ROI rect failed validation!!!");
+    if (!validate::validate_rect(rightRoi)) {
+        for (int i = 0; i < rightLines_.size(); i++) {
+            cv::Rect2f t = cv::boundingRect(rightLines_[i].elements);
+            log_time << __FUNCTION__ << " bounding rect for right line : " << t << std::endl;
+        }
+        log_time << __FUNCTION__ << " rightRoi : " << leftRoi << std::endl;
+        throw_assert(!validate::validate_rect(rightRoi), "Right ROI rect failed validation!!!");
+    }
 
     auto imgHeight = static_cast<double>(image_.rows);
 
@@ -290,19 +308,19 @@ inline void HoughLinesR::computeBorders() {
     markingRect.y = leftRoi.y;
     markingRect.width = rightRoi.x - leftRoi.x + rightRoi.width;
     markingRect.height = imgHeight;
-    //throw_assert(validate::validate_rect(markingRect), "Marking rect failed validation!!!");
+    throw_assert(validate::validate_rect(markingRect), "Marking rect failed validation!!!");
 
     leftBorder_[0] = leftRoi.x;
     leftBorder_[1] = imgHeight;
     leftBorder_[2] = leftRoi.x + leftRoi.width;
     leftBorder_[3] = 0.0f;
-    //throw_assert((validate::valid_vec<float, 4>(leftBorder_)), "Left border failed validation!!!");
+    throw_assert((validate::valid_vec<float, 4>(leftBorder_)), "Left border failed validation!!!");
 
     rightBorder_[0] = rightRoi.x;
     rightBorder_[1] = 0.0f;
     rightBorder_[2] = rightRoi.x + rightRoi.width;
     rightBorder_[3] = imgHeight;
-    //throw_assert((validate::valid_vec<float, 4>(rightBorder_)), "Right border failed validation!!!");
+    throw_assert((validate::valid_vec<float, 4>(rightBorder_)), "Right border failed validation!!!");
 
     if (showWindows_) {
         drawLine(leftBorder_);
@@ -333,7 +351,6 @@ inline void HoughLinesR::thresholdcb(int value, void* user_data) {
     log_time << cv::format("%s threshold : %i\n", that->windowName, value);
 }
 
-
 inline int HoughLinesR::doVerticalHough() {
 
     if (!lines_.empty())
@@ -354,14 +371,20 @@ inline int HoughLinesR::doVerticalHough() {
         auto theta = line[1];
         if (theta <= calc::DEGREES * (180 - angleLimit_) && theta >= calc::DEGREES * angleLimit_)
             continue;
+
+        //log_time << "vhough1\n";
         auto p = computePointPair(line);
         allLines_.emplace_back(LineV(line, p));
         pos++;
     }
 
+    log_time << __FUNCTION__ << " all line count : " << allLines_.size() << std::endl;
+
     if (allLines_.empty())
         return -2;
     //cerr << "FATAL ERROR, NO VERTICAL LINES DETECTED!";
+
+    //log_time << "vhough2\n";
 
     computeMeta();
 

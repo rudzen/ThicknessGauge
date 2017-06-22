@@ -40,7 +40,7 @@ public:
           binaryThreshold_(binaryThreshold),
           lineThreshold_(lineThreshold) {
         baseColour_ = cv::Scalar(255, 255, 255);
-        canny = std::make_unique<CannyR>(200, 250, 3, true, showWindows, false);
+        canny = std::make_unique<CannyR>(130, 200, 3, true, showWindows, false);
         //draw::showWindows = showWindows;
     }
 

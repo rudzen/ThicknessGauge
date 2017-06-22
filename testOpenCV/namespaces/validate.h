@@ -28,7 +28,16 @@ namespace validate {
             return rect.width > 0.0 && rect.height > 0.0 && rect.x >= 0.0 && rect.y >= 0.0;
         };
 
-        return valid_rectangle();
+        bool result = valid_rectangle();
+
+        if (!result) {
+            using namespace tg;
+            log_time << __FUNCTION__ << " rectangle failed validation : " << rect << std::endl;
+            return false;
+        }
+
+        return true;
+
     }
 
     /**
