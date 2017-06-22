@@ -178,9 +178,9 @@ void ThicknessGauge::generateGlob(std::string& name) {
  */
 void ThicknessGauge::computeMarkingHeight() {
 
-    testEdge();
+    //testEdge();
 
-    return;
+    //return;
 
     try {
 
@@ -617,6 +617,7 @@ cv::Rect2d ThicknessGauge::computerMarkingRectangle(shared_ptr<HoughLinesR>& hou
                     log_time << "No lines detected from houghR\n";
                     //continue;
                 }
+
                 hough->computeBorders();
                 markings.emplace_back(hough->getMarkingRect());
                 left_borders.emplace_back(hough->getLeftBorder());
