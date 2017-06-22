@@ -20,7 +20,6 @@ namespace validate {
      * \return true if its values are above 0, otherweise false
      */
     template <typename T>
-    inline
     bool validate_rect(const cv::Rect_<T>& rect) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
@@ -48,7 +47,6 @@ namespace validate {
      * \return true if the rectangle seems ok
      */
     template <typename T>
-    inline
     bool validate_rect(const cv::Rect_<T>& rect, const cv::Mat& boundry) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
@@ -75,7 +73,6 @@ namespace validate {
      * \return true if all pixels are above 0 in both x and y, otherwise false
      */
     template <typename T>
-    inline
     bool valid_pix_vec(std::vector<cv::Point_<T>>& vec) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
@@ -89,7 +86,6 @@ namespace validate {
     }
 
     template <typename T, int cn>
-    inline
     bool valid_vec(const cv::Vec<T, cn>& v) {
         for (auto i = 0; i < cn; i++)
             if (v[i] < 0)
@@ -105,7 +101,6 @@ namespace validate {
      * \return true if a-okay, otherwise false
      */
     template <typename T>
-    inline
     bool valid_data(const std::shared_ptr<tg::Data<T>>& data) {
 
         // logging is temporary !

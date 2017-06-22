@@ -149,7 +149,6 @@ namespace utils {
         }
 
         template <typename T>
-        inline
         static vector<T> parseArray(const string& str) {
             vector<T> elems;
             std::istringstream f(str);

@@ -18,7 +18,6 @@ namespace pixel {
      * \return The intensity ranging from 0 to 255 (uchar)
      */
     template <typename T>
-    inline
     uchar get_intensity(cv::Mat& image, cv::Point_<T>& point) {
         return image.at<uchar>(point);
     }
@@ -30,7 +29,6 @@ namespace pixel {
      * \return true if > 0 otherwise false
      */
     template <typename T>
-    inline
     bool is_pixel(cv::Mat& image, cv::Point_<T>& pixel) {
         if (pixel.x > image.cols)
             return false;
@@ -50,7 +48,6 @@ namespace pixel {
      * \return The average intensity for the line, ranging 0-255 (uchar)
      */
     template <typename T>
-    inline
     double getLineAvgIntensity(cv::Mat& image, cv::Vec<T, 4>& vector, int connectivity = 8, bool left_to_right = false) {
         static_assert(std::is_arithmetic<T>::value, "feck, nan.");
 

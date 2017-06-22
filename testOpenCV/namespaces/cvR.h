@@ -18,7 +18,6 @@ namespace cvr {
     namespace clear {
         
         template <typename T, int cn>
-        inline
         void vec(cv::Vec<T ,cn>& vec) {
             auto pos = cn;
             while (pos)
@@ -26,13 +25,11 @@ namespace cvr {
         }
 
         template <typename T>
-        inline
         void rect(cv::Rect_<T>& rect) {
             rect.x = rect.y = rect.height = rect.width = static_cast<T>(0);
         }
 
         template <typename T>
-        inline
         void point(cv::Point_<T>& p) {
             p.x = static_cast<T>(0);
             p.y = static_cast<T>(0);
@@ -47,7 +44,6 @@ namespace cvr {
     * \param buffer The buffer to apply
     */
     template <typename T>
-    inline
     void adjust_marking_rect(cv::Rect_<T>& marking_rect, cv::Vec<T, 4>& intersection_points, T buffer) {
         static_assert(std::is_floating_point<T>::value, "Marking rectangles should only be treated as floating points.");
         marking_rect.x = intersection_points[0] + buffer;
@@ -56,7 +52,6 @@ namespace cvr {
 
 
     template <typename T>
-    inline
     void avg_vector_vec(const std::vector<cv::Vec<T ,4>>& vecvec, cv::Vec<T, 4>& out) {
         out[0] = 0.0;
         out[1] = 0.0;
@@ -98,7 +93,6 @@ namespace cvr {
      * \return the avg as a 2d double precision float vector
      */
     template <typename T>
-    inline
     void compute_intensity_dtd_dev(cv::Mat& image, cv::Vec<T, 2>& output) {
         static_assert(std::is_floating_point<T>::value, "Only floating points makes sense");
 
@@ -119,7 +113,6 @@ namespace cvr {
      * \return 4d vector with both points, 0 + 1 = first point, 2 + 3 = second point
      */
     template <typename T1, typename T2>
-    inline
     cv::Vec<T1, 4> compute_min_max_loc(cv::Mat& image, T2 minVal, T2 maxVal) {
         static_assert(std::is_integral<T1>::value, "Only integral type is allowed.");
         static_assert(std::is_arithmetic<T2>::value, "Invalid type.");
@@ -143,7 +136,6 @@ namespace cvr {
      * \return  representing the number of elements filled in both X and Y
      */
     template <typename T>
-    inline
     cv::Vec<T, 2> fill_pixel_gabs(cv::Point_<T>& elements, std::vector<cv::Point_<T>>& target, T barrier = 0) {
         static_assert(std::is_arithmetic<T>::value, "Incompatible type");
 
@@ -207,7 +199,6 @@ namespace cvr {
      * \param x The X value to look for
      */
     template <typename T1, typename T2>
-    inline
     void gather_elemenents_x(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 x) {
         for (auto& e : input)
             if (e.x == x)
@@ -223,7 +214,6 @@ namespace cvr {
      * \param x The X value to look for
      */
     template <typename T1, typename T2>
-    inline
     void gather_elements_x(cv::Mat& image, std::vector<cv::Point_<T1>>& out, T2 x) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "Invalid type for element extration.");
         static_assert(std::is_convertible<T1, T2>::value, "Incompatible types for element extraction.");
@@ -239,7 +229,6 @@ namespace cvr {
      * \param y The Y value to look for
      */
     template <typename T1, typename T2>
-    inline
     void gather_elemenents_y(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 y) {
         for (auto& e : input)
             if (e.y == y)
@@ -255,7 +244,6 @@ namespace cvr {
      * \param y The Y value to look for
      */
     template <typename T1, typename T2>
-    inline
     void gather_elements_y(cv::Mat& image, std::vector<cv::Point_<T1>>& out, T2 y) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "Invalid type for element extration.");
         static_assert(std::is_convertible<T1, T2>::value, "Incompatible types for element extraction.");
@@ -277,7 +265,6 @@ namespace cvr {
      * \return true if something was found, otherwise false
      */
     template <typename T>
-    inline
     bool get_pix_above_y(cv::Mat& image, std::vector<cv::Point_<T>>& output, int y_limit) {
         static_assert(std::is_arithmetic<T>::value, "Incompatible types for element extraction.");
 
@@ -299,7 +286,6 @@ namespace cvr {
      * \return true if something was found, otherwise false
      */
     template <typename T>
-    inline
     bool get_pix_above_y(std::vector<cv::Point_<T>>& pixels, std::vector<cv::Point_<T>>& target, double y_limit, double image_height) {
         static_assert(std::is_arithmetic<T>::value, "Incompatible types for element extraction.");
 
@@ -334,7 +320,6 @@ namespace cvr {
     * \return The avg intensity for specified column
     */
     template <typename T1, typename T2>
-    inline
     double sum_column_intensity(cv::Mat_<T1>& image, T2 x) {
         static_assert(std::is_arithmetic<T1>::value && std::is_integral<T2>::value, "invalid type");
 

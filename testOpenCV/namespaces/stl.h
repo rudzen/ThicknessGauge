@@ -18,7 +18,6 @@ namespace stl {
     }
 
     template <typename T>
-    inline
     void sort_contours(std::vector<std::vector<cv::Point_<T>>>& contours) {
         std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) { return cv::contourArea(a) > cv::contourArea(b); });
     }
@@ -32,7 +31,6 @@ namespace stl {
      * \param limit The limit for X
      */
     template <typename T>
-    inline
     void populate_x(std::vector<cv::Point_<T>>& vec, const size_t limit) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         vec.clear();
@@ -49,7 +47,6 @@ namespace stl {
      * \param vec The vector to reset all Y values in
      */
     template <typename T>
-    inline
     void reset_point_y(std::vector<cv::Point_<T>>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         T zero = static_cast<T>(0);

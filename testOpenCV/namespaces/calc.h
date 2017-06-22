@@ -44,7 +44,6 @@ namespace calc {
     * @return Nearest integer as double
     */
     template <typename T>
-    inline
     int round(T value) {
         static_assert(std::is_same<T, double>::value || std::is_same<T, float>::value, "round is only possible for floating points.");
 #if ((defined _MSC_VER && defined _M_X64) || (defined __GNUC__ && defined __x86_64__ \
@@ -92,7 +91,6 @@ namespace calc {
          * \param buffer The buffer to add to left side and substract from right side
          */
         template <typename T1, typename T2>
-        inline
         void adjust_base_lines_x(cv::Vec<T1, 4>& base_lines, cv::Vec<T1, 4>& intersection_points, T2 buffer) {
             static_assert(std::is_same<T1, T2>::value, "requires identical types.");
             static_assert(std::is_same<T2, double>::value, "buffer must be double floating point.");
@@ -108,7 +106,6 @@ namespace calc {
          * \return true if line was created, otherwise false
          */
         template <typename T>
-        inline
         bool compute_line_fitting(std::vector<cv::Point_<T>>& pixels, cv::Vec4f& result, LineConfig& config) {
             cv::Vec4f results;
             cv::fitLine(pixels, results, config.getDistType(), config.getParams(), config.getReps(), config.getAepa());
@@ -125,7 +122,6 @@ namespace calc {
 
         /* Converts pixels from an image to a singular line vector in X, where Y is the mean of all pixels located at that given X in the image */
         template <typename T1, typename T2>
-        inline
         [[deprecated("not really used anymore, but could still prove useful in the future")]]
         bool generate_planar_pixels(cv::Mat& input, cv::Mat& output, std::vector<cv::Point_<T1>>& pixels, std::vector<cv::Point_<T2>>& gradient_pixels) {
 
@@ -199,7 +195,6 @@ namespace calc {
     * @return The manhattan distance between the two points
     */
     template <typename T>
-    inline
     T dist_manhattan(const T x1, const T x2, const T y1, const T y2) {
         static_assert(std::is_arithmetic<T>::value, "dist_manhattan is only possible for arithmetic types.");
         return abs(x2 - x1 + y2 - y1);
@@ -215,7 +210,6 @@ namespace calc {
      * \return The distance (rooted)
      */
     template <typename T>
-    inline
     double dist_real(const T x1, const T x2, const T y1, const T y2) {
         static_assert(std::is_arithmetic<T>::value, "dist_real is only possible for arithmetic types.");
         T x = pow(x2 - x1, 2);
@@ -230,7 +224,6 @@ namespace calc {
      * \return The angle in degrees
      */
     template <typename T>
-    inline
     double rad_to_deg(T radians) {
         static_assert(std::is_floating_point<T>::value, "rad_to_deg is only possible for floating point.");
         return radians * DEGREES;
@@ -243,7 +236,6 @@ namespace calc {
      * \return The degrees in radians
      */
     template <typename T>
-    inline
     double deg_to_rad(T degrees) {
         static_assert(std::is_floating_point<T>::value, "deg_to_rad is only possible for floating point.");
         return degrees * RADIANS;
@@ -259,7 +251,6 @@ namespace calc {
      * \return The angle in radians
      */
     template <typename T>
-    inline
     double angle_between_points(const T x1, const T x2, const T y1, const T y2) {
         static_assert(std::is_arithmetic<T>::value, "angle_between_points is only possible for arithmetic types.");
 #ifdef CV_VERSION
@@ -280,7 +271,6 @@ namespace calc {
      * \return The slobe
      */
     template <typename T1, typename T2>
-    inline
     double slope(const T1 x1, const T2 x2, const T1 y1, const T2 y2) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "slope is only possible for arithmetic types.");
         static_assert(std::is_convertible<T1, T2>::value, "slope argument types must be convertible.");
@@ -297,7 +287,6 @@ namespace calc {
      * \return Enum for slobe direction
      */
     template <typename T>
-    inline
     SlobeDirection slobe_direction(T slope) {
         static_assert(std::is_arithmetic<T>::value, "slobe_direction is only possible for arithmetic types.");
         if (std::isinf(slope))
@@ -319,7 +308,6 @@ namespace calc {
      * \return 
      */
     template <typename T>
-    inline
     double angle_between_lines(T x1, T x2, T y1, T y2) {
         static_assert(std::is_arithmetic<T>::value, "angle_between_lines is only possible for arithmetic types.");
         return atan(static_cast<double>(y1 - y2) / static_cast<double>(x2 - x1));
@@ -337,7 +325,6 @@ namespace calc {
      * \return The angle in radians
      */
     template <typename T>
-    inline
     double angle_inner_points(const T p1_x, const T p2_x, const T c_x, const T p1_y, const T p2_y, const T c_y) {
         static_assert(std::is_arithmetic<T>::value, "angle_inner_points is only possible for arithmetic types.");
         auto dist1 = cv::sqrt((p1_x - c_x) * (p1_x - c_x) + (p1_y - c_y) * (p1_y - c_y));
@@ -381,7 +368,6 @@ namespace calc {
      * \return Tuple in format <bool, T, T>, where bool indicates if both roots are real regardless if they are the same or not.
      */
     template <typename T>
-    inline
     std::tuple<bool, double, double> quadratic_equation(T a, T b, T c) {
         static_assert(std::is_arithmetic<T>::value, "quadratic_equation is only possible for arithmetic types.");
 
@@ -411,7 +397,6 @@ namespace calc {
      * \return The computed mu
      */
     template <typename T>
-    inline
     double mu(T current_pos, T in_between) {
         static_assert(std::is_arithmetic<T>::value, "mu is only possible for arithmetic types.");
         return current_pos / in_between;
@@ -420,7 +405,6 @@ namespace calc {
 #ifdef CV_VERSION
 
     template <typename T1, typename T2>
-    inline
     double dist_manhattan(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value, "dist_manhattan T1 is only possible for arithmetic types.");
         static_assert(std::is_arithmetic<T2>::value, "dist_manhattan T2 is only possible for arithmetic types.");
@@ -428,14 +412,12 @@ namespace calc {
     }
 
     template <typename T1, typename T2>
-    inline
     double dist_real(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "dist_real is only possible for arithmetic types.");
         return cv::norm(p2 - p1);
     }
 
     template <typename T1, typename T2>
-    inline
     double slope(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "slope is only possible for arithmetic types.");
         return slope(p1.x, p2.x, p1.y, p2.y);
@@ -450,7 +432,6 @@ namespace calc {
      * \return The angle in radians
      */
     template <typename T1, typename T2>
-    inline
     double angle_between_lines(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "angle_between_lines is only possible for arithmetic types.");
         return atan((p1.y - p2.y) / (p2.x - p1.x));
@@ -466,7 +447,6 @@ namespace calc {
      * \return The angle in radians
      */
     template <typename T>
-    inline
     double angle_from_zero(T x, T y) {
         static_assert(std::is_floating_point<T>::value, "only possible with floating points.");
         return deg_to_rad(cv::fastAtan2(x, y));
@@ -479,7 +459,6 @@ namespace calc {
      * \return The angle in degrees
      */
     template <typename T>
-    inline
     double angle_from_zero(cv::Point_<T>& point) {
         static_assert(std::is_floating_point<T>::value, "only possible with floating points");
         return angle_from_zero(point.x, point.y);
@@ -493,7 +472,6 @@ namespace calc {
     * \return The angle in degrees
     */
     template <typename T>
-    inline
     double angle_inner_points(const cv::Point_<T>& p1, const cv::Point_<T>& p2, const cv::Point_<T>& c) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return angle_inner_points(p1.x, p2.x, c.x, p1.y, p2.y, c.y);
@@ -509,7 +487,6 @@ namespace calc {
     * \return true if intersection was found, otherwise false
     */
     template <typename T>
-    inline
     bool intersection(cv::Point_<T> o1, cv::Point_<T> p1, cv::Point_<T> o2, cv::Point_<T> p2, cv::Point_<T>& result) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         auto d1 = p1 - o1;
@@ -533,7 +510,6 @@ namespace calc {
     * \return true if intersection was found, otherwise false
     */
     template <typename T>
-    inline
     bool intersection(const cv::Vec<T, 4>& border, cv::Vec<T, 4>& line, cv::Point_<T>& result) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return intersection(cv::Point_<T>(border[0], border[1]), cv::Point_<T>(line[0], line[1]), cv::Point_<T>(border[2], border[3]), cv::Point_<T>(line[2], line[3]), result);
@@ -551,7 +527,6 @@ namespace calc {
     bool compute_intersection_points(cv::Vec4d& horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output);
 
     template <typename T>
-    inline
     cv::Vec<T, 2> compute_intersection_cut(const cv::Vec<T, 4>& left_border, const cv::Vec<T, 4>& right_border) {
 
         // TODO : do something here
@@ -566,7 +541,6 @@ namespace calc {
      * \return 0.0 if vector is empty, else the avg of the Y values for all the points
      */
     template <typename T>
-    inline
     double avg_y(std::vector<cv::Point_<T>>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
 
@@ -588,7 +562,6 @@ namespace calc {
      * \return 0.0 if vector is empty, else the avg of the X values for all the points
      */
     template <typename T, int cn>
-    inline
     double avg_y(cv::Vec<T, cn>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         static_assert(cn == 4, "avg_y only supports Vec<T, 4>");
@@ -597,14 +570,12 @@ namespace calc {
     }
 
     template <typename T>
-    inline
     double avg_y(cv::Vec<T, 6>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return (vec[1] + vec[3] + vec[5]) * (1 / 3);
     }
 
     template <typename T>
-    inline
     double avg_x(std::vector<cv::Point_<T>>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
 
@@ -620,21 +591,18 @@ namespace calc {
     }
 
     template <typename T>
-    inline
     double avg_x(cv::Vec<T, 4>& vec) {
         static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
         return (vec[0] + vec[2]) / 2;
     }
 
     template <typename T>
-    inline
     double avg_x(cv::Vec<T, 6>& vec) {
         static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
         return (vec[0] + vec[2] + vec[4]) * (1 / 3);
     }
 
     template <typename T>
-    inline
     cv::Vec2d avg_xy(std::vector<cv::Point_<T>>& vec) {
         static_assert(std::is_arithmetic<T>::value, "avg_xy is only possible for arithmetic types.");
 
@@ -707,7 +675,6 @@ namespace calc {
      * \return The avg of the whole result based on the values in the target vector
      */
     template <typename T>
-    inline
     double weighted_avg(cv::Mat& image, std::vector<cv::Point_<T>>& target_vector) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         std::vector<cv::Point> non_zero_elements(image.rows * image.cols);
@@ -794,7 +761,6 @@ namespace calc {
     * @return the highest of the two operands, defaults to operand #1
     */
     template <typename T>
-    inline
     T maxval(T a, T b) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return max(a, b);
@@ -808,7 +774,6 @@ namespace calc {
     * @return the highest of the three operands
     */
     template <typename T>
-    inline
     T maxval(T a, T b, T c) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return maxval(maxval(a, b), c);
@@ -823,14 +788,12 @@ namespace calc {
      * \return true if value is in between lower and upper
      */
     template <typename T>
-    inline
     bool in_between(int value, T lower, T upper) {
         static_assert(std::is_integral<T>::value, "invalid type.");
         return (static_cast<unsigned>(value) - static_cast<unsigned>(lower) < static_cast<unsigned>(upper) - static_cast<unsigned>(lower));
     }
 
     template <typename T1, typename T2>
-    inline
     constexpr double variance_coeff(T1 s, T2 mean) {
         static_assert(std::is_same<T1, double>::value, "s must be double floating point.");
         static_assert(std::is_convertible<T1, T2>::value, "s and mean must be convertible.");
