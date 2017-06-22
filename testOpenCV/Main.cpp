@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
         //thicknessGauge->setFrameCount(options.getFrames());
         //thicknessGauge->setShowWindows(options.isShowWindows());
         //thicknessGauge->setSaveVideo(options.isRecordVideo());
-        thicknessGauge->initCalibrationSettings(options.getCameraFile());
+        thicknessGauge->init_calibration_settings(options.getCameraFile());
         cv::setNumThreads(options.getNumOpenCvThreads());
 
         log_time << cv::format("OpenCV Optimization use : %i\n", cv::useOptimized());
@@ -111,14 +111,14 @@ int main(int argc, char** argv) {
 
         if (options.isGlobMode()) {
             // TODO : use capture for file reading?!
-            thicknessGauge->initVideoCapture();
+            thicknessGauge->init_video_capture();
             auto globName = options.getGlobFolder();
-            thicknessGauge->generateGlob(globName);
+            thicknessGauge->glob_generate(globName);
         } else if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
             auto glob_name = options.getGlobFolder();
 
-            thicknessGauge->addNulls();
+            thicknessGauge->glob_add_nulls();
 
             while (true) {
                 auto initialized_ok = thicknessGauge->initialize(glob_name);
@@ -135,11 +135,11 @@ int main(int argc, char** argv) {
             //    return -20;
             //}
 
-            thicknessGauge->computeMarkingHeight();
+            thicknessGauge->compute_marking_height();
 
-            auto data = thicknessGauge->getData<double>(); // virker :-)
+            auto data = thicknessGauge->data<double>(); // virker :-)
 
-            thicknessGauge->saveData("output_mufmuf");
+            thicknessGauge->save_data("output_mufmuf");
 
             log_time << cv::format("difference: %f\n", data->difference);
 

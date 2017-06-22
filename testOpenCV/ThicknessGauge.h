@@ -33,23 +33,23 @@ class ThicknessGauge : protected ThicknessGaugeData {
 
 public:
 
-    ThicknessGauge(int frameCount, bool showWindows, bool saveVideo, int binaryThreshold, int lineThreshold) : data(std::make_shared<Data<double>>())
-                                                                                                             , frameCount_(frameCount)
-                                                                                                             , showWindows_(showWindows)
-                                                                                                             , saveVideo_(saveVideo)
-                                                                                                             , binaryThreshold_(binaryThreshold)
-                                                                                                             , lineThreshold_(lineThreshold) {
-        baseColour_ = cv::Scalar(255, 255, 255);
-        canny = std::make_unique<CannyR>(130, 200, 3, true, showWindows, false);
+    ThicknessGauge(int frameCount, bool showWindows, bool saveVideo, int binaryThreshold, int lineThreshold) : pdata(std::make_shared<Data<double>>())
+                                                                                                             , frame_count_(frameCount)
+                                                                                                             , show_windows_(showWindows)
+                                                                                                             , save_video_(saveVideo)
+                                                                                                             , binary_threshold_(binaryThreshold)
+                                                                                                             , line_threshold_(lineThreshold) {
+        base_colour_ = cv::Scalar(255, 255, 255);
+        pcanny = std::make_shared<CannyR>(130, 200, 3, true, showWindows, false);
         //draw::showWindows = showWindows;
     }
 
-    std::shared_ptr<Data<double>> data; // there can be only one!
+    std::shared_ptr<Data<double>> pdata; // there can be only one!
 
 public: // data return point
     template <typename T>
-    std::shared_ptr<Data<T>> getData() const {
-        return data;
+    std::shared_ptr<Data<T>> data() const {
+        return pdata;
     }
 
     //AVT::VmbAPI::CameraPtr* getCamera() const {
@@ -58,32 +58,30 @@ public: // data return point
 
 private:
 
-    std::unique_ptr<CapturePvApi> capture; // initialized in initVideoCapture()
+    std::unique_ptr<CapturePvApi> pcapture; // initialized in initVideoCapture()
 
     // common canny with default settings for detecting marking borders
-    std::shared_ptr<CannyR> canny;
+    std::shared_ptr<CannyR> pcanny;
 
     // filter used for marking detection
-    std::unique_ptr<FilterR> filter_marking = std::make_unique<FilterR>("Marking filter");
+    std::unique_ptr<FilterR> p_filter_marking = std::make_unique<FilterR>("Marking filter");
 
     // filter used for base line detection
-    std::unique_ptr<FilterR> filter_baseline = std::make_unique<FilterR>("Baseline filter");
+    std::unique_ptr<FilterR> pfilter_baseline = std::make_unique<FilterR>("Baseline filter");
 
-    double frameTime_ = 0.0;
+    double frame_time_ = 0.0;
 
-    int frameCount_;
+    int frame_count_;
 
-    bool showWindows_;
+    bool show_windows_;
 
-    bool saveVideo_;
+    bool save_video_;
 
-    int binaryThreshold_;
+    int binary_threshold_;
 
-    int lineThreshold_;
+    int line_threshold_;
 
-    cv::Scalar baseColour_;
-
-    GlobGenerator globGenerator;
+    cv::Scalar base_colour_;
 
 public:
 
@@ -92,69 +90,67 @@ public:
 
     bool initialize(std::string& glob_name);
 
-    void initVideoCapture();
+    void init_video_capture();
 
-    void initCalibrationSettings(string fileName) const;
+    void init_calibration_settings(string fileName) const;
 
 public: // basic stuff to extract information
 
-    void generateGlob(std::string& name);
+    void glob_generate(std::string& name);
 
-    void computeMarkingHeight();
+    void compute_marking_height();
 
     /**
     * \brief Loads all null images from "./null/" folder.
      */
-    void addNulls();
+    void glob_add_nulls();
 
-    bool saveData(string filename);
+    bool save_data(string filename);
 
 private:
 
-    void testEdge();
+    void test_edge();
 
-    void computeBaseLineAreas(shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph);
+    void compute_base_line_areas(shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph);
 
-    void processMatForLine(cv::Mat& org, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) const;
+    void process_mat_for_line(cv::Mat& org, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) const;
 
-    cv::Rect2d computerMarkingRectangle(shared_ptr<HoughLinesR>& hough);
+    cv::Rect2d compute_marking_rectangle(shared_ptr<HoughLinesR>& hough);
 
-    void computeLaserLocations(shared_ptr<LaserR>& laser, shared_ptr<FilterR>& filter);
+    void compute_laser_locations(shared_ptr<LaserR>& laser, shared_ptr<FilterR>& filter);
 
-    void computerInBetween(shared_ptr<FilterR>& filter, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph);
+    void computer_in_between(shared_ptr<FilterR>& filter, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph);
 
 private: /* helper functions */
 
-    static double computeHoughPMinLine(double minLen, cv::Rect2d& rect);
+    static double compute_houghP_min_line(double minLen, cv::Rect2d& rect);
 
-    void loadGlob(std::string& globName);
+    void glob_load(std::string& globName);
 
-    void captureFrames(unsigned int frame_index, unsigned int capture_count, unsigned long long int exposure);
+    void capture_frames(unsigned int frame_index, unsigned int capture_count, unsigned long long int exposure);
 
-private:
+    void computer_gauge_line(cv::Mat& output);
 
-    void computerGaugeLine(cv::Mat& output);
-
-    bool getSparseY(cv::Mat& image, std::vector<cv::Point>& output) const;
+    bool sparse_y(cv::Mat& image, std::vector<cv::Point>& output) const;
 
 public: // getters and setters
 
-    int getFrameCount() const;
+    int frame_count() const;
 
-    void setFrameCount(int frameCount);
+    void frame_count(int new_frame_count);
 
-    double getFrameTime() const;
+    double frame_time() const;
 
-    bool isSaveVideo() const;
+    bool save_video() const;
 
-    void setSaveVideo(bool saveVideo);
+    void save_video(bool new_save_video_val);
 
-    bool isShowWindows() const;
+    bool show_windows() const;
 
-    void setShowWindows(bool showWindows);
+    void show_windows(bool new_show_windows);
 
-    int getBinaryThreshold() const;
+    int binary_threshold() const;
 
-    void setBinaryThreshold(int binaryThreshold);
+    void binary_threshold(int binaryThreshold);
 
 };
