@@ -34,7 +34,8 @@ public:
         tg::line_pair<float> points_;
         std::vector<cv::Point2f> elements_;
 
-        LineH(): points_(cv::Point2f(0.0f, 0.0f), cv::Point2f(0.0f, 0.0f)) { }
+        LineH()
+            : points_(cv::Point2f(0.0f, 0.0f), cv::Point2f(0.0f, 0.0f)) { }
 
         LineH(cv::Vec4f entry, tg::line_pair<float> points)
             : entry_(entry),
@@ -61,11 +62,15 @@ public:
     } LineH;
 
     struct lineHsizeSort {
-        bool operator()(const LineH &l1, const LineH &l2) const { return l1.elements_.size() < l2.elements_.size(); }
+        bool operator()(const LineH& l1, const LineH& l2) const {
+            return l1.elements_.size() < l2.elements_.size();
+        }
     } lineHsizeSort;
 
     struct lineHYSort {
-        bool operator()(const cv::Point2f &p1, const cv::Point2f &p2) const { return p1.y < p2.y; }
+        bool operator()(const cv::Point2f& p1, const cv::Point2f& p2) const {
+            return p1.y < p2.y;
+        }
     } lineHYSort;
 
 private:
@@ -165,18 +170,18 @@ private:
 
     static void maxLineGabcb(int value, void* userData);
 
-    void setRho(int rho) {
+    void rho(int rho) {
         this->rho_ = rho;
     }
 
-    void setTheta(int theta) {
+    void theta(int theta) {
         if (theta == 0)
             theta++;
         this->theta_ = theta;
         angle_ = calc::DEGREES * theta;
     }
 
-    void setThreshold(int threshold) {
+    void threshold(int threshold) {
         this->threshold_ = threshold;
     }
 
@@ -195,11 +200,12 @@ public:
         line(output_, p1, p2, colour, 1, CV_AA);
     }
 
-    void draw_line(cv::Point& p1, cv::Point& p2, cv::Scalar colour);
-
-    void draw_line(int x1, int y1, int x2, int y2, cv::Scalar colour);
-
-    void draw_line(float x1, float y1, float x2, float y2, cv::Scalar colour);
+    template <typename T>
+    void draw_line(T x1, T y1, T x2, T y2, cv::Scalar colour) {
+        cv::Point p1(calc::round(x1), calc::round(y1));
+        cv::Point p2(calc::round(x2), calc::round(y2));
+        draw_line(p1, p2, colour);
+    }
 
     void draw_line(cv::Vec4f& line, cv::Scalar colour);
 
@@ -212,7 +218,7 @@ public:
     void original(cv::Mat& newImage) {
         original_ = newImage;
         if (show_windows_)
-            cvtColor(original_, output_, CV_GRAY2BGR);
+            cvtColor(newImage, output_, CV_GRAY2BGR);
     }
 
     int min_line_len() const {
@@ -232,28 +238,25 @@ public:
     }
 };
 
-inline void HoughLinesPR::compute_borders() {
-
-
-}
+inline void HoughLinesPR::compute_borders() {}
 
 inline void HoughLinesPR::rhocb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
-    that->setTheta(value);
+    that->theta(value);
     using namespace tg;
     log_time << cv::format("%s rho : %i\n", that->window_name_, value);
 }
 
 inline void HoughLinesPR::thetacb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
-    that->setTheta(value);
+    that->theta(value);
     using namespace tg;
     log_time << cv::format("%s theta : %i\n", that->window_name_, value);
 }
 
 inline void HoughLinesPR::thresholdcb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
-    that->setThreshold(value);
+    that->threshold(value);
     using namespace tg;
     log_time << cv::format("%s threshold : %i\n", that->window_name_, value);
 }
@@ -419,7 +422,6 @@ inline void HoughLinesPR::draw_line(std::vector<tg::line_pair<float>>& line_pair
 
     for (auto& r : line_pairs) {
         draw_line(r.p1, r.p2, colour);
-        //line(original, r.first, r.second, colour, 1, CV_AA);
     }
 }
 
@@ -442,18 +444,6 @@ inline void HoughLinesPR::draw_lines(std::vector<LineH>& lines, cv::Scalar colou
 
 inline void HoughLinesPR::draw_line(cv::Vec4f& line, cv::Scalar colour) {
     draw_line(line[0], line[1], line[2], line[3], colour);
-}
-
-inline void HoughLinesPR::draw_line(int x1, int y1, int x2, int y2, cv::Scalar colour) {
-    cv::Point p1(x1, y1);
-    cv::Point p2(x2, y2);
-    draw_line(p1, p2, colour);
-}
-
-inline void HoughLinesPR::draw_line(float x1, float y1, float x2, float y2, cv::Scalar colour) {
-    cv::Point p1(calc::round(x1), calc::round(y1));
-    cv::Point p2(calc::round(x2), calc::round(y2));
-    draw_line(p1, p2, colour);
 }
 
 inline void HoughLinesPR::show() const {
