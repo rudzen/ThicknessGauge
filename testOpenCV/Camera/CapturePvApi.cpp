@@ -176,6 +176,49 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
     }
 }
 
+bool CapturePvApi::load_calibration_data(std::string& filename) {
+    
+    cv::FileStorage fs;
+    fs.open(filename, cv::FileStorage::READ);
+   
+    if (!fs.isOpened()) {
+        std::cerr << "Failed to open " << filename << std::endl;
+        return false;
+    }
+
+    std::string time;
+
+    //calibration_Time
+    fs["calibration_Time"] >> time;
+    log_time << "Loading calibration file created @ " << time << '\n';
+    int width = 0;
+    int height = 0;
+    fs["image_width"] >> width;
+    fs["image_height"] >> height;
+    log_time << cv::format("Calibration dimensions : %ix%i.\n", width, height);
+    int hsquares = 0;
+    int vsquares = 0;
+    fs["horizontal_squares"] >> hsquares;
+    fs["vertical_squares"] >> vsquares;
+    log_time << cv::format("Square count : %ix%i.\n", hsquares, vsquares);
+
+    fs["rvecs"] >> cal->rvecs;
+    log_time << cv::format("rvecs size : %i.\n", cal->rvecs.size());
+    fs["tvecs"] >> cal->tvecs;
+    log_time << cv::format("tvecs size : %i.\n", cal->rvecs.size());
+    fs["intrinsic"] >> cal->intrinsic;
+    log_time << cv::format("intrinsic size : %i.\n", cal->rvecs.size());
+    fs["dist_coeffs"] >> cal->dist_coeffs;
+    log_time << cv::format("dist_coeffs size : %i.\n", cal->rvecs.size());
+
+    log_time << __FUNCTION__ << "Calibration data loaded ok!\n";
+
+    cal->loaded = true;
+
+    fs.release();
+
+}
+
 bool CapturePvApi::frame_init() {
 
     // Get the image size of every capture
@@ -519,7 +562,7 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
 
     auto m = cv::Mat(roi.height, roi.width, CV_8UC1);
 
-    //cv::Mat undistorted;
+    cv::Mat undistorted;
 
     for (auto i = frame_count; i--;) {
         if (!PvCaptureQueueFrame(camera_.Handle, &(camera_.Frame), nullptr)) {
@@ -538,9 +581,14 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
 
             m.data = static_cast<uchar *>(camera_.Frame.ImageBuffer);
 
-            //cv::undistort(m, undistorted, cal->intrinsic, cal->dist_coeffs);
+            // if the calibration data has been loaded, the undistorted image is then used
+            if (cal->loaded) {
+                cv::undistort(m, undistorted, cal->intrinsic, cal->dist_coeffs);
+                target_vector.emplace_back(undistorted);
+            } else {
+                target_vector.emplace_back(m.clone());
+            }
 
-            target_vector.emplace_back(m.clone());
 
             //cv::imwrite("ostefars.png", target_vector.back());
         }

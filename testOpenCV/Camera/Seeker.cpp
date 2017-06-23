@@ -129,7 +129,7 @@ void Seeker::phase_one() {
     cv::Vec4d right_border_result(0.0, 0.0, 0.0, 0.0);
 
     std::vector<ulong> exposures;
-    for (auto i = exposure_levels->exposure_start; i < exposure_levels->exposure_end; i += exposure_levels->exposure_increment)
+    for (auto i = exposure_levels->exposure_start; i <= exposure_levels->exposure_end; i += exposure_levels->exposure_increment)
         exposures.emplace_back(i);
 
     std::vector<cv::Mat> targets;
@@ -170,7 +170,7 @@ void Seeker::phase_one() {
                 hough_vertical->image(t);
 
                 if (hough_vertical->hough_vertical() < 0) {
-                    log_time << "No lines detected from houghR\n";
+                    log_time << cv::format("No lines detected through hough at exposure level %i.\n", e);
                     continue;
                 }
 
@@ -186,12 +186,12 @@ void Seeker::phase_one() {
                     right_borders.emplace_back(hough_vertical->right_border());
 
                 // check for fatal zero
-                if (markings.size() + left_borders.size() + right_borders.size() == 0)
+                if (markings.size() + left_borders.size() + right_borders.size() != 0)
                     continue;
 
             }
 
-
+            // TODO : temporary structure, vectors always have a single element in them!
             // set up the avg of the detected markings and borders.
             cvr::avg_vecrect_x_width(markings, output);
             output.y = 0.0;

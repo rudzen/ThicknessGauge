@@ -21,6 +21,9 @@ void Calib::save_data(std::string& filename) const {
     fs << "vertical_squares" << corners_vertical_;
     if (!rvecs_.empty())
         fs << "rvecs" << rvecs_;
+    if (!tvecs_.empty())
+        fs << "tvecs" << tvecs_;
+
     fs << "intrinsic" << intrinsic_;
     fs << "dist_coeffs" << dist_coeffs_;
 

@@ -23,6 +23,7 @@ private:
         cv::Mat dist_coeffs;
         std::vector<cv::Mat> rvecs;
         std::vector<cv::Mat> tvecs;
+        bool loaded = false;
         /*
          * intrinsic.ptr<float>(0)[0] = 1;
          * intrinsic.ptr<float>(1)[1] = 1;
@@ -70,6 +71,8 @@ public:
     ~CapturePvApi() {
         delete[] static_cast<char*>(camera_.Frame.ImageBuffer);
     }
+
+    bool load_calibration_data(std::string& filename);
 
     bool frame_init();
 
