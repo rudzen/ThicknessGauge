@@ -94,31 +94,31 @@ void FilterR::border(int new_border) {
     border_ = new_border;
 }
 
-inline void FilterR::generate_kernel(int width, int height, float modifier) {
+void FilterR::generate_kernel(int width, int height, float modifier) {
     kernel_ = cv::Mat::ones(width, height, CV_32F) / (static_cast<float>(width * height) * modifier);
 }
 
-inline void FilterR::do_filter() {
+void FilterR::do_filter() {
     do_filter(ddepth_, kernel_, anchor_, delta_, border_);
 }
 
-inline void FilterR::do_filter(int depth) {
+void FilterR::do_filter(int depth) {
     do_filter(depth, kernel_);
 }
 
-inline void FilterR::do_filter(int depth, cv::Mat& kernel) {
+void FilterR::do_filter(int depth, cv::Mat& kernel) {
     do_filter(depth, kernel, anchor_);
 }
 
-inline void FilterR::do_filter(int depth, cv::Mat& kernel, cv::Point& anchor) {
+void FilterR::do_filter(int depth, cv::Mat& kernel, cv::Point& anchor) {
     do_filter(depth, kernel, anchor, delta_);
 }
 
-inline void FilterR::do_filter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta) {
+void FilterR::do_filter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta) {
     do_filter(depth, kernel, anchor, delta, border_);
 }
 
-inline void FilterR::do_filter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border) {
+void FilterR::do_filter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border) {
     filter2D(image_, result_, depth, kernel, anchor, delta, border);
     if (show_windows_)
         draw::showImage(window_name_, result_);
