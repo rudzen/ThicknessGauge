@@ -151,13 +151,7 @@ private:
 
     void bresenham();
 
-    double angle(cv::Vec4f& vec) const;
-
-    double angle(cv::Point& p1, cv::Point& p2) const;
-
-    double angle(int x1, int x2, int y1, int y2) const;
-
-    static bool splitLinesInX(std::vector<LineH>& source, std::vector<LineH>& right, std::vector<LineH>& left, double x, double* leftCenter, double* rightCenter);
+    static bool split_lines_x(std::vector<LineH>& source, std::vector<LineH>& right, std::vector<LineH>& left, double x, double* leftCenter, double* rightCenter);
 
     // callbacks
 
@@ -190,47 +184,47 @@ public:
 
     void hough_horizontal();
 
-    void drawLine(std::vector<tg::line_pair<float>>& linePairs, cv::Scalar colour);
+    void draw_line(std::vector<tg::line_pair<float>>& linePairs, cv::Scalar colour);
 
-    void drawLines(std::vector<cv::Vec4f>& lines, cv::Scalar colour);
+    void draw_lines(std::vector<cv::Vec4f>& lines, cv::Scalar colour);
 
-    void drawLines(std::vector<LineH>& lines, cv::Scalar colour);
+    void draw_lines(std::vector<LineH>& lines, cv::Scalar colour);
 
-    void drawLine(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour);
+    void draw_line(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour);
 
-    void drawLine(cv::Point& p1, cv::Point& p2, cv::Scalar colour);
+    void draw_line(cv::Point& p1, cv::Point& p2, cv::Scalar colour);
 
-    void drawLine(int x1, int y1, int x2, int y2, cv::Scalar colour);
+    void draw_line(int x1, int y1, int x2, int y2, cv::Scalar colour);
 
-    void drawLine(float x1, float y1, float x2, float y2, cv::Scalar colour);
+    void draw_line(float x1, float y1, float x2, float y2, cv::Scalar colour);
 
-    void drawLine(cv::Vec4f& line, cv::Scalar colour);
+    void draw_line(cv::Vec4f& line, cv::Scalar colour);
 
     void show() const;
 
-    void setAngleLimit(double angleLimit) {
+    void angle_limit(double angleLimit) {
         this->angle_limit_ = angleLimit;
     }
 
-    void setOriginal(cv::Mat& newImage) {
+    void original(cv::Mat& newImage) {
         original_ = newImage;
         if (show_windows_)
             cvtColor(original_, output_, CV_GRAY2BGR);
     }
 
-    const int& getMinLineLen() const {
+    int min_line_len() const {
         return min_line_len_;
     }
 
-    void setMinLineLen(int minLineLen) {
+    void min_line_len(int minLineLen) {
         this->min_line_len_ = minLineLen;
     }
 
-    const int& getMaxLineGab() const {
+    int max_line_gab() const {
         return max_line_gab_;
     }
 
-    void setMaxLineGab(int maxLineGab) {
+    void max_line_gab(int maxLineGab) {
         this->max_line_gab_ = maxLineGab;
     }
 };
@@ -263,14 +257,14 @@ inline void HoughLinesPR::thresholdcb(int value, void* userData) {
 
 inline void HoughLinesPR::maxLineGabcb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
-    that->setMaxLineGab(value);
+    that->max_line_gab(value);
     using namespace tg;
     log_time << cv::format("%s maxLineGab : %i\n", that->window_name_, value);
 }
 
 inline void HoughLinesPR::minLineLencb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
-    that->setMinLineLen(value);
+    that->min_line_len(value);
     using namespace tg;
     log_time << cv::format("%s minLineLen : %i\n", that->window_name_, value);
 }
@@ -304,8 +298,8 @@ inline void HoughLinesPR::hough_horizontal() {
     bresenham();
 
     if (show_windows_) {
-        drawLines(left_lines_, cv::Scalar(255, 0, 255));
-        drawLines(right_lines_, cv::Scalar(0, 255, 0));
+        draw_lines(left_lines_, cv::Scalar(255, 0, 255));
+        draw_lines(right_lines_, cv::Scalar(0, 255, 0));
         show();
     }
 
@@ -388,7 +382,7 @@ inline void HoughLinesPR::bresenham() {
 
 }
 
-inline bool HoughLinesPR::splitLinesInX(std::vector<LineH>& source, std::vector<LineH>& right, std::vector<LineH>& left, double x, double* left_center, double* right_center) {
+inline bool HoughLinesPR::split_lines_x(std::vector<LineH>& source, std::vector<LineH>& right, std::vector<LineH>& left, double x, double* left_center, double* right_center) {
 
     *left_center = 0.0;
     *right_center = 0.0;
@@ -416,54 +410,54 @@ inline bool HoughLinesPR::splitLinesInX(std::vector<LineH>& source, std::vector<
 
 }
 
-inline void HoughLinesPR::drawLine(std::vector<tg::line_pair<float>>& line_pairs, cv::Scalar colour) {
+inline void HoughLinesPR::draw_line(std::vector<tg::line_pair<float>>& line_pairs, cv::Scalar colour) {
     if (!show_windows_)
         return;
 
     for (auto& r : line_pairs) {
-        drawLine(r.p1, r.p2, colour);
+        draw_line(r.p1, r.p2, colour);
         //line(original, r.first, r.second, colour, 1, CV_AA);
     }
 }
 
-inline void HoughLinesPR::drawLines(std::vector<cv::Vec4f>& lines, cv::Scalar colour) {
+inline void HoughLinesPR::draw_lines(std::vector<cv::Vec4f>& lines, cv::Scalar colour) {
     if (!show_windows_)
         return;
 
     for (auto& line : lines)
-        drawLine(line, colour);
+        draw_line(line, colour);
 }
 
-inline void HoughLinesPR::drawLines(std::vector<LineH>& lines, cv::Scalar colour) {
+inline void HoughLinesPR::draw_lines(std::vector<LineH>& lines, cv::Scalar colour) {
     if (!show_windows_)
         return;
 
     for (auto& line : lines)
-        drawLine(line.entry_, colour);
+        draw_line(line.entry_, colour);
 }
 
-inline void HoughLinesPR::drawLine(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour) {
+inline void HoughLinesPR::draw_line(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour) {
     line(output_, p1, p2, colour, 1, CV_AA);
 }
 
-inline void HoughLinesPR::drawLine(cv::Point& p1, cv::Point& p2, cv::Scalar colour) {
+inline void HoughLinesPR::draw_line(cv::Point& p1, cv::Point& p2, cv::Scalar colour) {
     line(output_, p1, p2, colour, 1, CV_AA);
 }
 
-inline void HoughLinesPR::drawLine(cv::Vec4f& line, cv::Scalar colour) {
-    drawLine(line[0], line[1], line[2], line[3], colour);
+inline void HoughLinesPR::draw_line(cv::Vec4f& line, cv::Scalar colour) {
+    draw_line(line[0], line[1], line[2], line[3], colour);
 }
 
-inline void HoughLinesPR::drawLine(int x1, int y1, int x2, int y2, cv::Scalar colour) {
+inline void HoughLinesPR::draw_line(int x1, int y1, int x2, int y2, cv::Scalar colour) {
     cv::Point p1(x1, y1);
     cv::Point p2(x2, y2);
-    drawLine(p1, p2, colour);
+    draw_line(p1, p2, colour);
 }
 
-inline void HoughLinesPR::drawLine(float x1, float y1, float x2, float y2, cv::Scalar colour) {
+inline void HoughLinesPR::draw_line(float x1, float y1, float x2, float y2, cv::Scalar colour) {
     cv::Point p1(calc::round(x1), calc::round(y1));
     cv::Point p2(calc::round(x2), calc::round(y2));
-    drawLine(p1, p2, colour);
+    draw_line(p1, p2, colour);
 }
 
 inline void HoughLinesPR::show() const {

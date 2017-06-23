@@ -222,7 +222,7 @@ void ThicknessGauge::compute_marking_height() {
             // horizontal houghline extension class
             auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), show_windows_);
 
-            hough_horizontal->setMaxLineGab(12);
+            hough_horizontal->max_line_gab(12);
             hough_horizontal->marking_rect(pdata->marking_rect);
             hough_horizontal->show_windows(show_windows_);
 
@@ -413,7 +413,7 @@ void ThicknessGauge::compute_base_line_areas(shared_ptr<HoughLinesPR>& hough, sh
         for (auto& left : left_frames) {
             org = left.clone();
             auto h = left.clone();
-            hough->setOriginal(h);
+            hough->original(h);
 
             process_mat_for_line(org, hough, morph);
 
@@ -454,7 +454,7 @@ void ThicknessGauge::compute_base_line_areas(shared_ptr<HoughLinesPR>& hough, sh
         for (auto& right : right_frames) {
             org = right.clone();
             auto h1 = right.clone();
-            hough->setOriginal(h1);
+            hough->original(h1);
 
             process_mat_for_line(org, hough, morph);
 
