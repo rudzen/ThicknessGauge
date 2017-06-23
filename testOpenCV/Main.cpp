@@ -30,6 +30,7 @@
 #include <PvApi.h>
 #include <thread>
 #include "Camera/CapturePvApi.h"
+#include "Camera/Calib.h"
 
 using namespace std;
 using namespace TCLAP;
@@ -45,9 +46,6 @@ using namespace tg;
  */
 
 #define _USE_MATH_DEFINES
-
-
-#define VIMBA
 
 const string default_camera_calibration_file = "C2450.json";
 
@@ -143,7 +141,8 @@ int main(int argc, char** argv) {
 
             log_time << "done..\n";
         } else if (options.calibration_mode()) {
-            throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
+            Calib calib;
+            calib.run_calib();
         } else if (options.test_mode()) {
             //c.initVideoCapture();
             //c.testAggressive();
