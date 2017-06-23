@@ -18,17 +18,16 @@ void HoughLinesR::compute_meta() {
 
     using namespace tg;
 
-    log_time << __FUNCTION__ << " center: " << center << std::endl;
+    //log_time << __FUNCTION__ << " center: " << center << std::endl;
 
     for (auto& a : all_lines_) {
-        a.slobe = calc::slope(a.entry_[0], a.entry_[2], a.entry_[1], a.entry_[3]);
         // TODO : do something in regards to the slobe
-        //log_time << cv::format("slobe calc : %f\n", a.slobe);
+        a.slobe = calc::slope(a.entry_[0], a.entry_[2], a.entry_[1], a.entry_[3]);
         if (a.points.p1.x > center) {
-            log_time << __FUNCTION__ << " right point added : " << a.points.p1 << std::endl;
+            //log_time << __FUNCTION__ << " right point added : " << a.points.p1 << std::endl;
             right_lines_.emplace_back(a);
         } else {
-            log_time << __FUNCTION__ << " left point added : " << a.points.p1 << std::endl;
+            //log_time << __FUNCTION__ << " left point added : " << a.points.p1 << std::endl;
             left_lines_.emplace_back(a);
         }
     }

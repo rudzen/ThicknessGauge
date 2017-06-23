@@ -370,7 +370,7 @@ inline int HoughLinesR::hough_vertical() {
         pos++;
     }
 
-    log_time << __FUNCTION__ << " all line count : " << all_lines_.size() << std::endl;
+    //log_time << __FUNCTION__ << " all line count : " << all_lines_.size() << std::endl;
 
     if (all_lines_.empty())
         return -2;
