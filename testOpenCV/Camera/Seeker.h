@@ -18,7 +18,7 @@
  * 
  * Phase One - Marking rectangle search
  * --------------------------------------
- * The algorithm will auto-detect the marking rectangle by progressing through increasingly
+ * The algorithm will auto-detect the marking rectangle by progressing frames with increasingly
  * longer exposure values, grabbing a single frame for each setting. Each frame recieved is
  * processed through a diagonal image folding matrix before edge detection (canny) is utilized.
  * The resulting data is then processed with hough lines where it only focuses on lines within a specific

@@ -18,6 +18,15 @@ public:
 
 private:
 
+    using calibrations = struct calibration_config {
+        cv::Mat intrinsic = cv::Mat(3, 3, CV_32FC1);
+        cv::Mat distCoeffs;
+        std::vector<cv::Mat> rvecs;
+        std::vector<cv::Mat> tvecs;
+    };
+
+    std::unique_ptr<calibrations> cal = std::make_unique<calibrations>();
+
     const int mono = 1;
 
     const unsigned long def_packet_size = 8228;
@@ -155,7 +164,7 @@ public:
             return true;
 
         using namespace tg;
-        
+
         log_time << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
         return false;
 
@@ -164,12 +173,12 @@ public:
     unsigned long exposure_auto_adjust_tolerance() {
 
         unsigned long ret_val = 0;
-        
+
         auto err_code = PvAttrUint32Get(camera_.Handle, "ExposureAutoAdjustTol", &ret_val);
 
         if (err_code == ePvErrSuccess)
             return ret_val;
-        
+
         using namespace tg;
 
         log_time << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
