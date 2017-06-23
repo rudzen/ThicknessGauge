@@ -105,9 +105,7 @@ int main(int argc, char** argv) {
         thicknessGauge->init_calibration_settings(options.camera_file());
         cv::setNumThreads(options.num_open_cv_threads());
 
-        log_time << cv::format("OpenCV Optimization use : %i\n", cv::useOptimized());
-
-        //log_time << options << endl;
+        log_time << iif(cv::useOptimized(), "OpenCV is using optimization.", "Warning, OpenCV has optimization disabled.") << '\n';
 
         if (options.glob_mode()) {
             // TODO : use capture for file reading?!
@@ -152,29 +150,30 @@ int main(int argc, char** argv) {
         }
     } catch (ArgException& ae) {
         string what = ae.what();
-        log_timedate << "Exception suddenly happend (but what?)\n" + what << std::endl;
+        log_timedate << "ArgException suddenly happend (but what?)\n" + what << std::endl;
         return -1;
     }
     catch (CaptureFailException& cfe) {
         string what = cfe.what();
-        log_timedate << "Exception suddenly happend (but what?)\n" + what << std::endl;
+        log_timedate << "CaptureFailException suddenly happend (but what?)\n" + what << std::endl;
         return -2;
     }
     catch (CalibrationException& cale) {
         string what = cale.what();
-        log_timedate << "Exception suddenly happend (but what?)\n" + what << std::endl;
+        log_timedate << "CalibrationException suddenly happend (but what?)\n" + what << std::endl;
         return -3;
     }
     catch (TestException& te) {
         string what = te.what();
-        log_timedate << "Exception suddenly happend (but what?)\n" + what << std::endl;
+        log_timedate << "TestException suddenly happend (but what?)\n" + what << std::endl;
         return -4;
     } catch (cv::Exception& e) {
         cerr << cv::format("cv::Exception caught in main\n", e.msg.c_str());
     }
+
     log_time << cv::format("Smooth operator >> %i\n", return_value);
 
-    return 0;
+    return return_value;
 
 }
 

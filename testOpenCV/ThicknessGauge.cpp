@@ -220,7 +220,7 @@ void ThicknessGauge::compute_marking_height() {
             auto min_line_len = compute_houghP_min_line(10.0, pdata->marking_rect);
 
             // horizontal houghline extension class
-            auto hough_horizontal = make_shared<HoughLinesPR>(1, cvRound(calc::DEGREES), 40, cvRound(min_line_len), show_windows_);
+            auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), show_windows_);
 
             hough_horizontal->setMaxLineGab(12);
             hough_horizontal->marking_rect(pdata->marking_rect);

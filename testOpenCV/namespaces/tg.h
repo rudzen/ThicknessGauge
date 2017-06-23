@@ -343,6 +343,7 @@ namespace tg {
 
     template <typename T1, typename T2>
     T2 iif(T1 expression, T2 true_part, T2 false_part) {
+        static_assert(std::is_same<T1, bool>::value, "Only bool expression is accepted.");
         return expression ? true_part : false_part;
     }
 }
