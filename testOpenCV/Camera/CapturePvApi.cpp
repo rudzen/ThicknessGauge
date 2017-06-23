@@ -519,6 +519,8 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
 
     auto m = cv::Mat(roi.height, roi.width, CV_8UC1);
 
+    //cv::Mat undistorted;
+
     for (auto i = frame_count; i--;) {
         if (!PvCaptureQueueFrame(camera_.Handle, &(camera_.Frame), nullptr)) {
 
@@ -533,8 +535,13 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
 
             // Create an image header (mono image)
             // Push ImageBuffer data into the image matrix and clone it into target vector
+
             m.data = static_cast<uchar *>(camera_.Frame.ImageBuffer);
+
+            //cv::undistort(m, undistorted, cal->intrinsic, cal->dist_coeffs);
+
             target_vector.emplace_back(m.clone());
+
             //cv::imwrite("ostefars.png", target_vector.back());
         }
     }

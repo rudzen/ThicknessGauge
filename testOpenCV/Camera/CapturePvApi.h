@@ -23,6 +23,10 @@ private:
         cv::Mat dist_coeffs;
         std::vector<cv::Mat> rvecs;
         std::vector<cv::Mat> tvecs;
+        /*
+         * intrinsic.ptr<float>(0)[0] = 1;
+         * intrinsic.ptr<float>(1)[1] = 1;
+         */
     };
 
     std::unique_ptr<calibrations> cal = std::make_unique<calibrations>();
