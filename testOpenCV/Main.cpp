@@ -88,35 +88,35 @@ int main(int argc, char** argv) {
 
         if (parseArgs(argc, argv, options)) {
             // unique case for build information
-            if (options.isBuildInfoMode()) {
+            if (options.build_info_mode()) {
                 log_time << cv::getBuildInformation();
                 return 0;
             }
             // null save mode..
-            saveNull(options.getCameraFile());
+            saveNull(options.camera_file());
             return 0;
         }
 
-        auto thicknessGauge = std::make_unique<ThicknessGauge>(options.getFrames(), options.isShowWindows(), options.isRecordVideo(), 100, 100);
+        auto thicknessGauge = std::make_unique<ThicknessGauge>(options.frames(), options.show_windows(), options.record_video(), 100, 100);
 
         //thicknessGauge->setFrameCount(options.getFrames());
         //thicknessGauge->setShowWindows(options.isShowWindows());
         //thicknessGauge->setSaveVideo(options.isRecordVideo());
-        thicknessGauge->init_calibration_settings(options.getCameraFile());
-        cv::setNumThreads(options.getNumOpenCvThreads());
+        thicknessGauge->init_calibration_settings(options.camera_file());
+        cv::setNumThreads(options.num_open_cv_threads());
 
         log_time << cv::format("OpenCV Optimization use : %i\n", cv::useOptimized());
 
         //log_time << options << endl;
 
-        if (options.isGlobMode()) {
+        if (options.glob_mode()) {
             // TODO : use capture for file reading?!
             thicknessGauge->init_video_capture();
-            auto globName = options.getGlobFolder();
+            auto globName = options.glob_folder();
             thicknessGauge->glob_generate(globName);
-        } else if (options.isDemoMode()) {// && !options.TestMode() && !options.CalibrationMode()) {
+        } else if (options.demo_mode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
-            auto glob_name = options.getGlobFolder();
+            auto glob_name = options.glob_folder();
 
             thicknessGauge->glob_add_nulls();
 
@@ -144,9 +144,9 @@ int main(int argc, char** argv) {
             log_time << cv::format("difference: %f\n", data->difference);
 
             log_time << "done..\n";
-        } else if (options.isCalibrationMode()) {
+        } else if (options.calibration_mode()) {
             throw CalibrationException("Unable to initiate calibration mode, feature not completed.");
-        } else if (options.isTestMode()) {
+        } else if (options.test_mode()) {
             //c.initVideoCapture();
             //c.testAggressive();
         }
@@ -242,46 +242,46 @@ bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
 
         // check for null save.. this is an important thing! :-)
         if (arg_nullsave.isSet()) {
-            options.setCameraFile(arg_nullsave.getValue());
+            options.camera_file(arg_nullsave.getValue());
             return true;
         }
 
         // read all parsed command line arguments
         if (switch_demo.isSet())
-            options.setDemoMode(true);
+            options.demo_mode(true);
         else if (switch_calibration.isSet())
-            options.setCalibrationMode(true);
+            options.calibration_mode(true);
         else if (switch_test.isSet())
-            options.setTestMode(true);
+            options.test_mode(true);
         else if (switch_buildinfo.isSet()) { // check, its a instant abort if build info is found
-            options.setBuildInfoMode(true);
+            options.build_info_mode(true);
             return true;
         } else if (switch_glob.isSet())
-            options.setGlobMode(true); // glob mode
+            options.glob_mode(true); // glob mode
 
         auto sval = arg_camera_calibration_file.getValue();
-        options.setCameraFile(sval);
+        options.camera_file(sval);
 
         sval = arg_calibration_output.getValue();
-        options.setCalibrationOutput(sval);
+        options.calibration_output(sval);
 
         sval = arg_testsuite.getValue();
-        options.setTestSuite(sval);
+        options.test_suite(sval);
 
         sval = arg_glob_name.getValue();
-        options.setGlobFolder(sval);
+        options.glob_folder(sval);
 
         auto ival = arg_frame.getValue();
-        options.setFrames(ival);
+        options.frames(ival);
 
         ival = arg_max_opencv_threads.getValue();
-        options.setNumOpenCvThreads(ival);
+        options.num_open_cv_threads(ival);
 
         auto bval = arg_show_windows.getValue();
-        options.setShowWindows(bval);
+        options.show_windows(bval);
 
         bval = arg_record_video.getValue();
-        options.setRecordVideo(bval);
+        options.record_video(bval);
 
         return false;
     } catch (ArgException& e) {

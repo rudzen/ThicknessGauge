@@ -948,20 +948,21 @@ void ThicknessGauge::glob_load(std::string& glob_name) {
 
     GlobGenerator globGenerator;
 
+    // have to read from 0 to size - 1, for 
     for (auto i = 0; i < frameset_.size(); i++) {
 
         auto frames = frameset_[i].get();
 
         //cout << frames->exp_ext << endl;
 
-        globGenerator.pattern(glob_name + expusures_short_[i]);
+        globGenerator.pattern(glob_name + exposures_short_[i]);
         globGenerator.recursive(false);
         globGenerator.generate_glob();
 
         auto files = globGenerator.files();
 
         if (files.empty()) {
-            CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", glob_name + expusures_short_[i]));
+            CV_Error(cv::Error::StsError, cv::format("No files detected in glob : %s\n", glob_name + exposures_short_[i]));
         }
 
         auto size = static_cast<int>(files.size());

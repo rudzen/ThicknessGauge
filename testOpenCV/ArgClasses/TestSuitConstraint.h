@@ -30,5 +30,4 @@ public:
         return file::is_name_legal(value) && value != "input";
     }
 
-
 };

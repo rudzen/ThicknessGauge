@@ -55,5 +55,4 @@ public:
         return file::is_name_legal(value) && file::is_file(value);
     }
 
-
 };

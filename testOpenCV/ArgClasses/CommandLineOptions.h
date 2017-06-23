@@ -5,42 +5,39 @@ class CommandLineOptions {
 
 public:
 
-
     CommandLineOptions(const bool buildInfoMode, const bool testMode, const bool demoMode, const bool calibrationMode, const bool globMode, const bool showWindows, const bool recordVideo, const std::string cameraFile, const std::string calibrationOutput, const int frames, const int testMax, const int testInterval, const int numOpenCVThreads)
-        : buildInfoMode_(buildInfoMode),
-          testMode_(testMode),
-          demoMode_(demoMode),
-          calibrationMode_(calibrationMode),
-          globMode_(globMode),
-          showWindows_(showWindows),
-          recordVideo_(recordVideo),
-          cameraFile_(cameraFile),
-          calibrationOutput_(calibrationOutput),
+        : build_info_mode_(buildInfoMode),
+          test_mode_(testMode),
+          demo_mode_(demoMode),
+          calibration_mode_(calibrationMode),
+          glob_mode_(globMode),
+          show_windows_(showWindows),
+          record_video_(recordVideo),
+          camera_file_(cameraFile),
+          calibration_output_(calibrationOutput),
           frames_(frames),
-          testMax_(testMax),
-          testInterval_(testInterval),
-          numOpenCVThreads_(numOpenCVThreads) {
-    }
+          test_max_(testMax),
+          test_interval_(testInterval),
+          num_open_cv_threads_(numOpenCVThreads) { }
 
     CommandLineOptions()
-        : buildInfoMode_(false), testMode_(false), demoMode_(true), calibrationMode_(false), globMode_(false), showWindows_(true), recordVideo_(false), frames_(25), testMax_(0), testInterval_(0), numOpenCVThreads_(4) {
-    }
+        : build_info_mode_(false), test_mode_(false), demo_mode_(true), calibration_mode_(false), glob_mode_(false), show_windows_(true), record_video_(false), frames_(25), test_max_(0), test_interval_(0), num_open_cv_threads_(4) { }
 
     friend bool operator==(const CommandLineOptions& lhs, const CommandLineOptions& rhs) {
-        return lhs.buildInfoMode_ == rhs.buildInfoMode_
-            && lhs.testMode_ == rhs.testMode_
-            && lhs.demoMode_ == rhs.demoMode_
-            && lhs.calibrationMode_ == rhs.calibrationMode_
-            && lhs.showWindows_ == rhs.showWindows_
-            && lhs.recordVideo_ == rhs.recordVideo_
-            && lhs.cameraFile_ == rhs.cameraFile_
-            && lhs.globFolder_ == rhs.globFolder_
-            && lhs.calibrationOutput_ == rhs.calibrationOutput_
-            && lhs.testSuite_ == rhs.testSuite_
+        return lhs.build_info_mode_ == rhs.build_info_mode_
+            && lhs.test_mode_ == rhs.test_mode_
+            && lhs.demo_mode_ == rhs.demo_mode_
+            && lhs.calibration_mode_ == rhs.calibration_mode_
+            && lhs.show_windows_ == rhs.show_windows_
+            && lhs.record_video_ == rhs.record_video_
+            && lhs.camera_file_ == rhs.camera_file_
+            && lhs.glob_folder_ == rhs.glob_folder_
+            && lhs.calibration_output_ == rhs.calibration_output_
+            && lhs.test_suite_ == rhs.test_suite_
             && lhs.frames_ == rhs.frames_
-            && lhs.testMax_ == rhs.testMax_
-            && lhs.testInterval_ == rhs.testInterval_
-            && lhs.numOpenCVThreads_ == rhs.numOpenCVThreads_;
+            && lhs.test_max_ == rhs.test_max_
+            && lhs.test_interval_ == rhs.test_interval_
+            && lhs.num_open_cv_threads_ == rhs.num_open_cv_threads_;
     }
 
     friend bool operator!=(const CommandLineOptions& lhs, const CommandLineOptions& rhs) {
@@ -50,187 +47,184 @@ public:
 
     friend std::size_t hash_value(const CommandLineOptions& obj) {
         std::size_t seed = 0x1C34AD51;
-        seed ^= (seed << 6) + (seed >> 2) + 0x7BEF55B5 + static_cast<std::size_t>(obj.buildInfoMode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x374B74F9 + static_cast<std::size_t>(obj.testMode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x776E5645 + static_cast<std::size_t>(obj.demoMode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x766D5625 + static_cast<std::size_t>(obj.globMode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x3552D071 + static_cast<std::size_t>(obj.calibrationMode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x72B298C4 + static_cast<std::size_t>(obj.showWindows_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x1B22BAF2 + static_cast<std::size_t>(obj.recordVideo_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x2AD90237 + obj.cameraFile_.size();
-        seed ^= (seed << 6) + (seed >> 2) + 0x5BF7AD8C + obj.calibrationOutput_.size();
-        seed ^= (seed << 6) + (seed >> 2) + 0x7B8590B3 + obj.testSuite_.size();
-        seed ^= (seed << 6) + (seed >> 2) + 0x2A8590B3 + obj.globFolder_.size();
+        seed ^= (seed << 6) + (seed >> 2) + 0x7BEF55B5 + static_cast<std::size_t>(obj.build_info_mode_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x374B74F9 + static_cast<std::size_t>(obj.test_mode_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x776E5645 + static_cast<std::size_t>(obj.demo_mode_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x766D5625 + static_cast<std::size_t>(obj.glob_mode_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x3552D071 + static_cast<std::size_t>(obj.calibration_mode_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x72B298C4 + static_cast<std::size_t>(obj.show_windows_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x1B22BAF2 + static_cast<std::size_t>(obj.record_video_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x2AD90237 + obj.camera_file_.size();
+        seed ^= (seed << 6) + (seed >> 2) + 0x5BF7AD8C + obj.calibration_output_.size();
+        seed ^= (seed << 6) + (seed >> 2) + 0x7B8590B3 + obj.test_suite_.size();
+        seed ^= (seed << 6) + (seed >> 2) + 0x2A8590B3 + obj.glob_folder_.size();
         seed ^= (seed << 6) + (seed >> 2) + 0x35795544 + static_cast<std::size_t>(obj.frames_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x096C9A55 + static_cast<std::size_t>(obj.testMax_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x734629BD + static_cast<std::size_t>(obj.testInterval_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x734629BD + static_cast<std::size_t>(obj.numOpenCVThreads_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x096C9A55 + static_cast<std::size_t>(obj.test_max_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x734629BD + static_cast<std::size_t>(obj.test_interval_);
+        seed ^= (seed << 6) + (seed >> 2) + 0x734629BD + static_cast<std::size_t>(obj.num_open_cv_threads_);
         return seed;
     }
 
 
     friend std::ostream& operator<<(std::ostream& os, const CommandLineOptions& obj) {
         return os
-            << " demoMode_: " << obj.demoMode_
-            << "\nbuildInfoMode: " << obj.buildInfoMode_
-            << "\ntestMode: " << obj.testMode_
-            << "\ntestSuite: " << obj.testSuite_
-            << "\ncalibrationMode_: " << obj.calibrationMode_
-            << "\ncalibrationOutput: " << obj.calibrationOutput_
-            << "\nglobMode_: " << obj.globMode_
-            << "\nglobFolder_: " << obj.globFolder_
-            << "\ncameraFile: " << obj.cameraFile_
-            << "\nshowWindows_: " << obj.showWindows_
-            << "\nrecordVideo_: " << obj.recordVideo_
+            << " demoMode_: " << obj.demo_mode_
+            << "\nbuildInfoMode: " << obj.build_info_mode_
+            << "\ntestMode: " << obj.test_mode_
+            << "\ntestSuite: " << obj.test_suite_
+            << "\ncalibrationMode_: " << obj.calibration_mode_
+            << "\ncalibrationOutput: " << obj.calibration_output_
+            << "\nglobMode_: " << obj.glob_mode_
+            << "\nglobFolder_: " << obj.glob_folder_
+            << "\ncameraFile: " << obj.camera_file_
+            << "\nshowWindows_: " << obj.show_windows_
+            << "\nrecordVideo_: " << obj.record_video_
             << "\nframes: " << obj.frames_
-            << "\ntestMax: " << obj.testMax_
-            << "\ntestInterval: " << obj.testInterval_
-            << "\nnumOpenCVThreads_: " << obj.numOpenCVThreads_;
+            << "\ntestMax: " << obj.test_max_
+            << "\ntestInterval: " << obj.test_interval_
+            << "\nnumOpenCVThreads_: " << obj.num_open_cv_threads_;
     }
 
 private:
-    bool buildInfoMode_;
-    bool testMode_;
-    bool demoMode_;
-    bool calibrationMode_;
-    bool globMode_;
+    bool build_info_mode_;
+    bool test_mode_;
+    bool demo_mode_;
+    bool calibration_mode_;
+    bool glob_mode_;
 
-    bool showWindows_;
-    bool recordVideo_;
+    bool show_windows_;
+    bool record_video_;
 
-    std::string cameraFile_;
-    std::string calibrationOutput_;
-    std::string testSuite_;
-    std::string globFolder_;
+    std::string camera_file_;
+    std::string calibration_output_;
+    std::string test_suite_;
+    std::string glob_folder_;
 
     int frames_;
-    int testMax_;
-    int testInterval_;
+    int test_max_;
+    int test_interval_;
 
-    int numOpenCVThreads_;
-
+    int num_open_cv_threads_;
 
 public:
 
-
-    const int& getNumOpenCvThreads() const {
-        return numOpenCVThreads_;
+    const int& num_open_cv_threads() const {
+        return num_open_cv_threads_;
     }
 
-    void setNumOpenCvThreads(int numOpenCvThreads) {
-        numOpenCVThreads_ = numOpenCvThreads;
+    void num_open_cv_threads(int numOpenCvThreads) {
+        num_open_cv_threads_ = numOpenCvThreads;
     }
 
-    const std::string& getTestSuite() const {
-        return testSuite_;
+    const std::string& test_suite() const {
+        return test_suite_;
     }
 
-    void setTestSuite(const std::string& testSuite) {
-        testSuite_ = testSuite;
+    void test_suite(const std::string& testSuite) {
+        test_suite_ = testSuite;
     }
 
-    const std::string& getCalibrationOutput() const {
-        return calibrationOutput_;
+    const std::string& calibration_output() const {
+        return calibration_output_;
     }
 
-    void setCalibrationOutput(const std::string& calibrationOutput) {
-        calibrationOutput_ = calibrationOutput;
+    void calibration_output(const std::string& calibrationOutput) {
+        calibration_output_ = calibrationOutput;
     }
 
-    const bool& isBuildInfoMode() const {
-        return buildInfoMode_;
+    const bool& build_info_mode() const {
+        return build_info_mode_;
     }
 
-    void setBuildInfoMode(bool buildInfoMode) {
-        buildInfoMode_ = buildInfoMode;
+    void build_info_mode(bool buildInfoMode) {
+        build_info_mode_ = buildInfoMode;
     }
 
-    const bool& isTestMode() const {
-        return testMode_;
+    const bool& test_mode() const {
+        return test_mode_;
     }
 
-    void setTestMode(bool testMode) {
-        testMode_ = testMode;
+    void test_mode(bool testMode) {
+        test_mode_ = testMode;
     }
 
-    const bool& isDemoMode() const {
-        return demoMode_;
+    const bool& demo_mode() const {
+        return demo_mode_;
     }
 
-    void setDemoMode(bool demoMode) {
-        demoMode_ = demoMode;
+    void demo_mode(bool demoMode) {
+        demo_mode_ = demoMode;
     }
 
-    const bool& isCalibrationMode() const {
-        return calibrationMode_;
+    const bool& calibration_mode() const {
+        return calibration_mode_;
     }
 
-    void setCalibrationMode(bool calibrationMode) {
-        calibrationMode_ = calibrationMode;
+    void calibration_mode(bool calibrationMode) {
+        calibration_mode_ = calibrationMode;
     }
 
-    bool isGlobMode() const {
-        return globMode_;
+    bool glob_mode() const {
+        return glob_mode_;
     }
 
-    void setGlobMode(bool globMode) {
-        globMode_ = globMode;
+    void glob_mode(bool globMode) {
+        glob_mode_ = globMode;
     }
 
-
-    const std::string& getGlobFolder() const {
-        return globFolder_;
+    const std::string& glob_folder() const {
+        return glob_folder_;
     }
 
-    void setGlobFolder(const std::string& globFolder) {
-        globFolder_ = globFolder;
+    void glob_folder(const std::string& globFolder) {
+        glob_folder_ = globFolder;
     }
 
-    const bool& isShowWindows() const {
-        return showWindows_;
+    const bool& show_windows() const {
+        return show_windows_;
     }
 
-    void setShowWindows(bool showWindows) {
-        showWindows_ = showWindows;
+    void show_windows(bool showWindows) {
+        show_windows_ = showWindows;
     }
 
-    const bool& isRecordVideo() const {
-        return recordVideo_;
+    const bool& record_video() const {
+        return record_video_;
     }
 
-    void setRecordVideo(bool recordVideo) {
-        recordVideo_ = recordVideo;
+    void record_video(bool recordVideo) {
+        record_video_ = recordVideo;
     }
 
-    const std::string& getCameraFile() const {
-        return cameraFile_;
+    const std::string& camera_file() const {
+        return camera_file_;
     }
 
-    void setCameraFile(const std::string& cameraFile) {
-        cameraFile_ = cameraFile;
+    void camera_file(const std::string& cameraFile) {
+        camera_file_ = cameraFile;
     }
 
-    const int& getFrames() const {
+    const int& frames() const {
         return frames_;
     }
 
-    void setFrames(int frames) {
+    void frames(int frames) {
         frames_ = frames;
     }
 
-    const int& getTestMax() const {
-        return testMax_;
+    int test_max() const {
+        return test_max_;
     }
 
-    void setTestMax(int testMax) {
-        testMax_ = testMax;
+    void test_max(int new_test_max) {
+        test_max_ = new_test_max;
     }
 
-    const int& getTestInterval() const {
-        return testInterval_;
+    const int& test_interval() const {
+        return test_interval_;
     }
 
-    void setTestInterval(int testInterval) {
-        testInterval_ = testInterval;
+    void test_interval(int new_test_interval) {
+        test_interval_ = new_test_interval;
     }
 };
