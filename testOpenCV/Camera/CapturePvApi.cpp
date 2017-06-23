@@ -256,6 +256,107 @@ bool CapturePvApi::aquisition_end() const {
     return true;
 }
 
+bool CapturePvApi::exposure_auto_reset() const {
+    //--- /Controls/Exposure/Auto/ExposureAutoAlg = Mean [enum,rw  ]
+    //--- /Controls/Exposure/Auto/ExposureAutoMax = 500000 [uint32,rw  ]
+    //--- /Controls/Exposure/Auto/ExposureAutoMin = 25 [uint32,rw  ]
+
+    const unsigned long auto_max = 500000;
+    const unsigned long auto_min = 25;
+    const std::string auto_alg = "Mean";
+
+    using namespace tg;
+
+    // set the defaults
+    auto err_code = PvAttrUint32Set(camera_.Handle, "ExposureAutoMax", auto_max);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error.. ExposureAutoMax.. %s\n", error_last(err_code));
+        return false;
+    }
+    err_code = PvAttrUint32Set(camera_.Handle, "ExposureAutoMin", auto_min);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error.. ExposureAutoMin.. %s\n", error_last(err_code));
+        return false;
+    }
+    err_code = PvAttrEnumSet(camera_.Handle, "ExposureAutoAlg", auto_alg.c_str());
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error.. ExposureAutoAlg.. %s\n", error_last(err_code));
+        return false;
+    }
+
+    // check the defaults to make sure they are configured correctly
+    unsigned long auto_max_check = 0;
+    unsigned long auto_min_check = 0;
+    char lValue[128];
+
+    err_code = PvAttrUint32Get(camera_.Handle, "ExposureAutoMax", &auto_max_check);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error.. ExposureAutoMax.. %s\n", error_last(err_code));
+        return false;
+    }
+
+    err_code = PvAttrUint32Get(camera_.Handle, "ExposureAutoMin", &auto_max_check);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error.. ExposureAutoMin.. %s\n", error_last(err_code));
+        return false;
+    }
+
+
+    err_code = PvAttrEnumGet(camera_.Handle, "ExposureAutoAlg", lValue, 128, nullptr);
+    if (err_code != ePvErrSuccess) {
+        log_time << cv::format("Error.. ExposureAutoAlg.. %s\n", error_last(err_code));
+        return false;
+    }
+
+    if (auto_max_check != auto_max) {
+        log_time << cv::format("Error.. ExposureAutoMax mismatch.. %s\n", error_last(err_code));
+        return false;
+    }
+
+    if (auto_max_check != auto_max) {
+        log_time << cv::format("Error.. ExposureAutoMin mismatch.. %s\n", error_last(err_code));
+        return false;
+    }
+
+    if (std::strcmp(auto_alg.c_str(), lValue) != 0) {
+        log_time << cv::format("Error.. ExposureAutoAlg mismatch.. %s\n", error_last(err_code));
+        return false;
+    }
+
+    return true;
+
+}
+
+bool CapturePvApi::exposure_auto_adjust_tolerance(unsigned long new_value) const {
+
+    auto err_code = PvAttrUint32Set(camera_.Handle, "ExposureAutoAdjustTol", new_value);
+
+    if (err_code == ePvErrSuccess)
+        return true;
+
+    using namespace tg;
+
+    log_time << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
+    return false;
+
+}
+
+unsigned long CapturePvApi::exposure_auto_adjust_tolerance() const {
+
+    unsigned long ret_val = 0;
+
+    auto err_code = PvAttrUint32Get(camera_.Handle, "ExposureAutoAdjustTol", &ret_val);
+
+    if (err_code == ePvErrSuccess)
+        return ret_val;
+
+    using namespace tg;
+
+    log_time << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
+    return ret_val;
+
+}
+
 void CapturePvApi::reset_binning() const {
     // reset stuff like binning etc
     const auto def_binning = 1;
