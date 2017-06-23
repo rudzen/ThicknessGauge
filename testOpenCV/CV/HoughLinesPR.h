@@ -190,7 +190,10 @@ public:
 
     void draw_lines(std::vector<LineH>& lines, cv::Scalar colour);
 
-    void draw_line(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour);
+    template <typename T>
+    void draw_line(cv::Point_<T>& p1, cv::Point_<T>& p2, cv::Scalar colour) {
+        line(output_, p1, p2, colour, 1, CV_AA);
+    }
 
     void draw_line(cv::Point& p1, cv::Point& p2, cv::Scalar colour);
 
@@ -436,13 +439,6 @@ inline void HoughLinesPR::draw_lines(std::vector<LineH>& lines, cv::Scalar colou
         draw_line(line.entry_, colour);
 }
 
-inline void HoughLinesPR::draw_line(cv::Point2f& p1, cv::Point2f& p2, cv::Scalar colour) {
-    line(output_, p1, p2, colour, 1, CV_AA);
-}
-
-inline void HoughLinesPR::draw_line(cv::Point& p1, cv::Point& p2, cv::Scalar colour) {
-    line(output_, p1, p2, colour, 1, CV_AA);
-}
 
 inline void HoughLinesPR::draw_line(cv::Vec4f& line, cv::Scalar colour) {
     draw_line(line[0], line[1], line[2], line[3], colour);
