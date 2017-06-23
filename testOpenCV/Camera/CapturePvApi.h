@@ -72,7 +72,7 @@ public:
         delete[] static_cast<char*>(camera_.Frame.ImageBuffer);
     }
 
-    bool load_calibration_data(std::string& filename);
+    bool load_calibration_data(std::string& filename) const;
 
     bool frame_init();
 

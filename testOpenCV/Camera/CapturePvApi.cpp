@@ -176,7 +176,7 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
     }
 }
 
-bool CapturePvApi::load_calibration_data(std::string& filename) {
+bool CapturePvApi::load_calibration_data(std::string& filename) const {
     
     cv::FileStorage fs;
     fs.open(filename, cv::FileStorage::READ);
@@ -205,11 +205,11 @@ bool CapturePvApi::load_calibration_data(std::string& filename) {
     fs["rvecs"] >> cal->rvecs;
     log_time << cv::format("rvecs size : %i.\n", cal->rvecs.size());
     fs["tvecs"] >> cal->tvecs;
-    log_time << cv::format("tvecs size : %i.\n", cal->rvecs.size());
+    log_time << cv::format("tvecs size : %i.\n", cal->tvecs.size());
     fs["intrinsic"] >> cal->intrinsic;
-    log_time << cv::format("intrinsic size : %i.\n", cal->rvecs.size());
+    log_time << cv::format("intrinsic size : %i.\n", cal->intrinsic.size());
     fs["dist_coeffs"] >> cal->dist_coeffs;
-    log_time << cv::format("dist_coeffs size : %i.\n", cal->rvecs.size());
+    log_time << cv::format("dist_coeffs size : %i.\n", cal->dist_coeffs.size());
 
     log_time << __FUNCTION__ << "Calibration data loaded ok!\n";
 
@@ -217,6 +217,7 @@ bool CapturePvApi::load_calibration_data(std::string& filename) {
 
     fs.release();
 
+    return true;
 }
 
 bool CapturePvApi::frame_init() {
