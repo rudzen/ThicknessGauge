@@ -1,8 +1,7 @@
 #pragma once
 #include <opencv2/core/mat.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <iostream>
 #include "BaseR.h"
+#include "namespaces/tg.h"
 
 /*
 	|  __
@@ -62,120 +61,56 @@ class FilterR : public BaseR {
 
     int deltaI_ = 0;
 
-    void createWindow() {
-        cv::namedWindow(window_name_, cv::WINDOW_FREERATIO | cv::WINDOW_GUI_EXPANDED);
-        cv::createTrackbar("delta", window_name_, &deltaI_, 100, delta_cb, this);
-    }
+    void create_window();
 
-    static void delta_cb(int value, void* userData) {
-        auto that = static_cast<FilterR*>(userData);
-        auto oldVal = that->getDelta();
-        that->setDelta(static_cast<double>(value));
-        using namespace tg;
-        log_time << cv::format("%s delta : %i -> %i\n", that->window_name_, oldVal, value);
-    }
+    static void delta_cb(int value, void* user_data);
 
 public: // constructors
 
-    explicit FilterR(std::string windowName, bool showWindows)
-        : delta_(0.0)
-          , ddepth_(-1)
-          , border_(cv::BORDER_DEFAULT) {
-        generateKernel(3, 3, 1.0f);
-        anchor_ = cv::Point(-1, -1);
-        show_windows_ = showWindows;
-        this->window_name_ = windowName;
-        if (showWindows)
-            createWindow();
-    }
+    explicit FilterR(std::string window_name, bool show_windows);
 
-    explicit FilterR(std::string windowName)
-        : delta_(0.0), ddepth_(-1), border_(cv::BORDER_DEFAULT) {
-        generateKernel(3, 3, 1.0f);
-        anchor_ = cv::Point(-1, -1);
-        show_windows_ = false;
-        this->window_name_ = windowName;
-    }
+    explicit FilterR(std::string window_name);
 
-    FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool showWindows, std::string windowName)
-        : kernel_(kernel)
-          , anchor_(anchor)
-          , delta_(delta)
-          , ddepth_(ddepth)
-          , border_(border) {
-        show_windows_ = showWindows;
-        this->window_name_ = windowName;
-        if (showWindows)
-            createWindow();
-    }
+    FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool show_windows, std::string window_name);
 
+    // getters & setters
 
-    /**
-    * \brief
-    */
-    using Filters = struct Filters {
-        // TODO : Add base filters here
-    };
+    cv::Mat& result();
 
-public: // getters & setters
+    const cv::Mat& kernel() const;
 
-    cv::Mat& getResult() { return result_; }
+    void kernel(const cv::Mat& new_kernel);
 
-    const cv::Mat& getKernel() const { return kernel_; }
+    const cv::Point& anchor() const;
 
-    void setKernel(const cv::Mat& kernel) { kernel_ = kernel; }
+    void anchor(const cv::Point& new_anchor);
 
-    const cv::Point& getAnchor() const { return anchor_; }
+    double delta() const;
 
-    void setAnchor(const cv::Point& anchor) { anchor_ = anchor; }
+    void delta(double new_delta);
 
-    double getDelta() const { return delta_; }
+    int ddepth() const;
 
-    void setDelta(double delta) {
-        //kernel_ += delta;
-        delta_ = delta;
-    }
+    void ddepth(int new_ddepth);
 
-    int getDdepth() const { return ddepth_; }
+    int border() const;
 
-    void setDdepth(int ddepth) { ddepth_ = ddepth; }
-
-    int getBorder() const { return border_; }
-
-    void setBorder(int border) { border_ = border; }
+    void border(int new_border);
 
     // functions
 
-    void generateKernel(int width, int height, float modifier);
+    void generate_kernel(int width, int height, float modifier);
 
-    void doFilter();
+    void do_filter();
 
-    void doFilter(int depth);
+    void do_filter(int depth);
 
-    void doFilter(int depth, cv::Mat& kernel);
+    void do_filter(int depth, cv::Mat& kernel);
 
-    void doFilter(int depth, cv::Mat& kernel, cv::Point& anchor);
+    void do_filter(int depth, cv::Mat& kernel, cv::Point& anchor);
 
-    void doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta);
+    void do_filter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta);
 
-    void doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border);
+    void do_filter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border);
 
 };
-
-inline void FilterR::generateKernel(int width, int height, float modifier) { kernel_ = cv::Mat::ones(width, height, CV_32F) / (static_cast<float>(width * height) * modifier); }
-
-inline void FilterR::doFilter() { doFilter(ddepth_, kernel_, anchor_, delta_, border_); }
-
-inline void FilterR::doFilter(int depth) { doFilter(depth, kernel_); }
-
-inline void FilterR::doFilter(int depth, cv::Mat& kernel) { doFilter(depth, kernel, anchor_); }
-
-inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor) { doFilter(depth, kernel, anchor, delta_); }
-
-inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta) { doFilter(depth, kernel, anchor, delta, border_); }
-
-inline void FilterR::doFilter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border) {
-    filter2D(image_, result_, depth, kernel, anchor, delta, border);
-    if (show_windows_)
-        imshow(window_name_, result_);
-}

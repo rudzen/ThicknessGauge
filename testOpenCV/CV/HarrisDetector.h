@@ -29,49 +29,49 @@ class HarrisDetector {
     cv::Mat corner_strength_;
 
     // 32-bit float image of thresholded corners
-    cv::Mat corner_threshold;
+    cv::Mat corner_threshold_;
 
     // image of local maxima (internal)
     cv::Mat local_max_;
 
     // size of neighbourhood for derivatives smoothing
-    int neighbourhood;
+    int neighbourhood_;
 
     // aperture for gradient computation
-    int aperture;
+    int aperture_;
 
     // Harris parameter
-    T k;
+    T k_;
 
     // maximum strength for threshold computation
-    T max_strength;
+    T max_strength_;
 
     // calculated threshold (internal)
-    T threshold;
+    T threshold_;
 
     // size of neighbourhood for non-max suppression
-    int non_max_size;
+    int non_max_size_;
 
     // kernel for non-max suppression
-    cv::Mat kernel;
+    cv::Mat kernel_;
 
 public:
 
-    HarrisDetector() : neighbourhood(3)
-                     , aperture(3)
-                     , k(0.1)
-                     , max_strength(0.0)
-                     , threshold(0.01)
-                     , non_max_size(3) {
+    HarrisDetector()
+        : neighbourhood_(3)
+        , aperture_(3)
+        , k_(0.1)
+        , max_strength_(0.0)
+        , threshold_(0.01)
+        , non_max_size_(3) {
 
-        local_max_window_size(non_max_size);
+        local_max_window_size(non_max_size_);
     }
 
     // Create kernel used in non-maxima suppression
     void local_max_window_size(int size) {
-
-        non_max_size = size;
-        kernel.create(non_max_size, non_max_size,CV_8U);
+        non_max_size_ = size;
+        kernel_.create(non_max_size_, non_max_size_,CV_8U);
     }
 
     // Compute Harris corners
@@ -79,13 +79,13 @@ public:
 
         // Harris computation
         cv::cornerHarris(image, corner_strength_,
-                         neighbourhood,// neighborhood size
-                         aperture, // aperture size
-                         k); // Harris parameter
+                         neighbourhood_,// neighborhood size
+                         aperture_, // aperture size
+                         k_); // Harris parameter
 
         // internal threshold computation
         double min_strength; // not used
-        cv::minMaxLoc(corner_strength_, &min_strength, &max_strength);
+        cv::minMaxLoc(corner_strength_, &min_strength, &max_strength_);
 
         // local maxima detection
         cv::Mat dilated; // temporary image
@@ -99,11 +99,11 @@ public:
         cv::Mat cmap;
 
         // thresholding the corner strength
-        threshold = quality_level * max_strength;
-        cv::threshold(corner_strength_, corner_threshold, threshold, 255, cv::THRESH_BINARY);
+        threshold_ = quality_level * max_strength_;
+        cv::threshold(corner_strength_, corner_threshold_, threshold_, 255, cv::THRESH_BINARY);
 
         // convert to 8-bit image
-        corner_threshold.convertTo(cmap,CV_8U);
+        corner_threshold_.convertTo(cmap,CV_8U);
 
         // non-maxima suppression
         cv::bitwise_and(cmap, local_max_, cmap);
@@ -122,6 +122,8 @@ public:
 
     // Get the feature points vector from the computed corner map
     static void corners(std::vector<cv::Point_<T>>& points, const cv::Mat& corner_map) {
+
+        // TODO : replace with blazing fast position iteration instead
 
         // Iterate over the pixels to obtain all feature points
         for (auto y = 0; y < corner_map.rows; y++) {

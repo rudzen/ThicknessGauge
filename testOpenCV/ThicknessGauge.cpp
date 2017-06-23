@@ -320,7 +320,7 @@ void ThicknessGauge::compute_marking_height() {
  */
 void ThicknessGauge::compute_base_line_areas(shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) {
 
-    pfilter_baseline->setKernel(filters::kernel_line_left_to_right);
+    pfilter_baseline->kernel(filters::kernel_line_left_to_right);
 
     morph->method(cv::MORPH_GRADIENT);
     morph->iterations(1);
@@ -521,9 +521,9 @@ void ThicknessGauge::compute_base_line_areas(shared_ptr<HoughLinesPR>& hough, sh
  */
 void ThicknessGauge::process_mat_for_line(cv::Mat& org, shared_ptr<HoughLinesPR>& hough, shared_ptr<MorphR>& morph) const {
     pfilter_baseline->image(org);
-    pfilter_baseline->doFilter();
+    pfilter_baseline->do_filter();
 
-    pcanny->image(pfilter_baseline->getResult());
+    pcanny->image(pfilter_baseline->result());
     pcanny->do_canny();
 
     morph->image(pcanny->result());
@@ -545,7 +545,7 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
     if (show_windows_)
         draw::makeWindow(window_name);
 
-    pfilter_marking->setKernel(filters::kernel_line_right_to_left);
+    pfilter_marking->kernel(filters::kernel_line_right_to_left);
 
     vector<cv::Rect2d> markings(frame_count_);
     vector<cv::Vec4d> left_borders(frame_count_);
@@ -616,8 +616,8 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
                 //canny->doCanny();
 
                 pfilter_marking->image(frames->frames_[i].clone());
-                pfilter_marking->doFilter();
-                pcanny->image(pfilter_marking->getResult());
+                pfilter_marking->do_filter();
+                pcanny->image(pfilter_marking->result());
                 pcanny->do_canny();
 
                 auto t = pcanny->result();

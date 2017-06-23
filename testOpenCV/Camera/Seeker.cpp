@@ -110,11 +110,13 @@ void Seeker::phase_one() {
 
     log_time << "Configuring phase one.\n";
 
+    auto phase = frameset(current_phase_);
+
     // configure hough for this phase.. the int cast is only used for UI purpose.
     auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, false);
     hough_vertical->angle_limit(30);
 
-    pfilter->setKernel(filters::kernel_line_left_to_right);
+    pfilter->kernel(filters::kernel_line_left_to_right);
 
     // me not know what long they is
     vector<cv::Rect2d> markings;
@@ -156,9 +158,9 @@ void Seeker::phase_one() {
                 right_borders.clear();
 
                 pfilter->image(current_frame);
-                pfilter->doFilter();
+                pfilter->do_filter();
 
-                pcanny->image(pfilter->getResult());
+                pcanny->image(pfilter->result());
                 pcanny->do_canny();
 
                 auto t = pcanny->result();
@@ -182,16 +184,31 @@ void Seeker::phase_one() {
 
                 if (validate::valid_vec(hough_vertical->right_border()))
                     right_borders.emplace_back(hough_vertical->right_border());
+
+                // check for fatal zero
+                if (markings.size() + left_borders.size() + right_borders.size() == 0)
+                    continue;
+
             }
 
-            // check for fatal zero
-            if (markings.size() + left_borders.size() + right_borders.size() == 0)
-                continue;
 
             // set up the avg of the detected markings and borders.
             cvr::avg_vecrect_x_width(markings, output);
+            output.y = 0.0;
+            output.height = static_cast<double>(phase_roi_[phase].height);
+
             cvr::avg_vector_vec(left_borders, left_border_result);
+            left_border_result[1] = 0.0;
+            left_border_result[3] = static_cast<double>(phase_roi_[phase].height);
+
             cvr::avg_vector_vec(right_borders, right_border_result);
+            left_border_result[1] = static_cast<double>(phase_roi_[phase].height);
+            left_border_result[3] = 0.0;
+
+            
+
+
+
 
             // TODO : adjust the heights to match the current ROI
 
@@ -224,11 +241,10 @@ void Seeker::phase_one() {
 
     switch_phase();
 
-
- /*   for (auto& fs : frameset_) {
-        pcapture->exposure(fs->exp_ms_);
-        pcapture->cap(25, fs->frames_);
-    }*/
+    /*   for (auto& fs : frameset_) {
+           pcapture->exposure(fs->exp_ms_);
+           pcapture->cap(25, fs->frames_);
+       }*/
 
 }
 

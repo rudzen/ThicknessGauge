@@ -165,6 +165,9 @@
     <ClCompile Include="Camera\Calib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CV\FilterR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -255,9 +258,6 @@
       <Filter>Header Files\UI\CommandLine\Visitors</Filter>
     </ClInclude>
     <ClInclude Include="CV\HoughLinesR.h">
-      <Filter>Header Files\CV</Filter>
-    </ClInclude>
-    <ClInclude Include="CV\Gaussian.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
     <ClInclude Include="CV\FilterR.h">

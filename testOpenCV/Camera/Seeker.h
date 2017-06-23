@@ -132,6 +132,8 @@ private:
         ulong fail; // <- important.. determine high fail chance
     };
 
+    ulong phase_one_exposure = exposure_levels->exposure_start;
+
     std::shared_ptr<CapturePvApi> pcapture = std::make_shared<CapturePvApi>();
 
     // common canny with default settings for detecting marking borders

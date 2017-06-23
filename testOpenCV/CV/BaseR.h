@@ -1,23 +1,23 @@
 #pragma once
 #include <string>
 
-   /*
-	|  __
-	| /__\
-	| X~~|			"The eternal code god
-	|-\|//-.		 watches over this mess."
-   /|`.|'.' \			- R.A.Kohn, 2017
-  |,|.\~~ /||
-  |:||   ';||
-  ||||   | ||
-  \ \|     |`.
-  |\X|     | |
-  | .'     |||
-  | |   .  |||
-  |||   |  `.| JS
-  ||||  |   ||
-  ||||  |   ||
-  `+.__._._+*/
+/*
+   |  __
+   | /__\
+   | X~~|			"The eternal code god
+   |-\|//-.		 watches over this mess."
+/|`.|'.' \			- R.A.Kohn, 2017
+|,|.\~~ /||
+|:||   ';||
+||||   | ||
+\ \|     |`.
+|\X|     | |
+| .'     |||
+| |   .  |||
+|||   |  `.| JS
+||||  |   ||
+||||  |   ||
+`+.__._._+*/
 
 class BaseR {
 
@@ -43,18 +43,25 @@ protected:
 
 protected:
 
-    BaseR(std::string windowName, bool showWindows) : window_name_(windowName)
-                                                    , show_windows_(showWindows) {}
+    BaseR(std::string windowName, bool showWindows)
+        : window_name_(windowName)
+        , show_windows_(showWindows) {}
 
 public:
 
     BaseR() { }
 
-    void original(const cv::Mat& original) { original_ = original; }
+    void original(const cv::Mat& original) {
+        original_ = original;
+    }
 
-    cv::Mat& image() { return image_; }
+    cv::Mat& image() {
+        return image_;
+    }
 
-    void image(const cv::Mat& image) { image_ = image; }
+    void image(const cv::Mat& image) {
+        image_ = image;
+    }
 
     const cv::Rect2d& marking_rect() const {
         return marking_rect_;

@@ -270,48 +270,48 @@ inline void HoughLinesR::compute_rect_from_lines(vector<LineV>& input, cv::Rect2
 
 inline void HoughLinesR::compute_borders() {
 
-    cv::Rect2d leftRoi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
-    cv::Rect2d rightRoi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
+    cv::Rect2d left_roi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
+    cv::Rect2d right_roi(0.0, 0.0, 0.0, static_cast<double>(image_.rows));
 
-    compute_rect_from_lines(left_lines_, leftRoi);
-    if (!validate::validate_rect(leftRoi)) {
-        for (int i = 0; i < left_lines_.size(); i++) {
-            cv::Rect2f t = cv::boundingRect(left_lines_[i].elements);
-            log_time << __FUNCTION__ << " bounding rect for line : " << t << std::endl;
-        }
-        log_time << __FUNCTION__ << " leftRoi : " << leftRoi << std::endl;
-        throw_assert(!validate::validate_rect(leftRoi), "Left ROI rect failed validation!!!");
+    compute_rect_from_lines(left_lines_, left_roi);
+    if (!validate::validate_rect(left_roi)) {
+        //for (int i = 0; i < left_lines_.size(); i++) {
+        //    cv::Rect2f t = cv::boundingRect(left_lines_[i].elements);
+        //    log_time << __FUNCTION__ << " bounding rect for line : " << t << std::endl;
+        //}
+        log_time << __FUNCTION__ << " leftRoi : " << left_roi << std::endl;
+        throw_assert(!validate::validate_rect(left_roi), "Left ROI rect failed validation!!!");
     }
 
 
-    compute_rect_from_lines(right_lines_, rightRoi);
-    if (!validate::validate_rect(rightRoi)) {
-        for (auto i = 0; i < right_lines_.size(); i++) {
-            cv::Rect2f t = cv::boundingRect(right_lines_[i].elements);
-            log_time << __FUNCTION__ << " bounding rect for right line : " << t << std::endl;
-        }
-        log_time << __FUNCTION__ << " rightRoi : " << leftRoi << std::endl;
-        throw_assert(!validate::validate_rect(rightRoi), "Right ROI rect failed validation!!!");
+    compute_rect_from_lines(right_lines_, right_roi);
+    if (!validate::validate_rect(right_roi)) {
+        //for (auto i = 0; i < right_lines_.size(); i++) {
+        //    cv::Rect2f t = cv::boundingRect(right_lines_[i].elements);
+        //    log_time << __FUNCTION__ << " bounding rect for right line : " << t << std::endl;
+        //}
+        log_time << __FUNCTION__ << " rightRoi : " << left_roi << std::endl;
+        throw_assert(!validate::validate_rect(right_roi), "Right ROI rect failed validation!!!");
     }
 
-    auto imgHeight = static_cast<double>(image_.rows);
+    auto img_height = static_cast<double>(image_.rows);
 
-    marking_rect_.x = leftRoi.x;
-    marking_rect_.y = leftRoi.y;
-    marking_rect_.width = rightRoi.x - leftRoi.x + rightRoi.width;
-    marking_rect_.height = imgHeight;
+    marking_rect_.x = left_roi.x;
+    marking_rect_.y = left_roi.y;
+    marking_rect_.width = right_roi.x - left_roi.x + right_roi.width;
+    marking_rect_.height = img_height;
     throw_assert(validate::validate_rect(marking_rect_), "Marking rect failed validation!!!");
 
-    left_border_[0] = leftRoi.x;
-    left_border_[1] = imgHeight;
-    left_border_[2] = leftRoi.x + leftRoi.width;
+    left_border_[0] = left_roi.x;
+    left_border_[1] = img_height;
+    left_border_[2] = left_roi.x + left_roi.width;
     left_border_[3] = 0.0f;
     throw_assert((validate::valid_vec<float, 4>(left_border_)), "Left border failed validation!!!");
 
-    right_border_[0] = rightRoi.x;
+    right_border_[0] = right_roi.x;
     right_border_[1] = 0.0f;
-    right_border_[2] = rightRoi.x + rightRoi.width;
-    right_border_[3] = imgHeight;
+    right_border_[2] = right_roi.x + right_roi.width;
+    right_border_[3] = img_height;
     throw_assert((validate::valid_vec<float, 4>(right_border_)), "Right border failed validation!!!");
 
     if (show_windows_) {
