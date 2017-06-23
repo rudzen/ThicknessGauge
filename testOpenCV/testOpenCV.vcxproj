@@ -150,7 +150,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MinimalRebuild>false</MinimalRebuild>
       <FloatingPointModel>Strict</FloatingPointModel>
-      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <FloatingPointExceptions>true</FloatingPointExceptions>
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
       <ShowIncludes>false</ShowIncludes>
       <UseFullPaths>true</UseFullPaths>

@@ -19,7 +19,7 @@
  * Phase One - Marking rectangle search
  * --------------------------------------
  * The algorithm will auto-detect the marking rectangle by progressing through increasingly
- * higher exposure values, grabbing a single frame for each setting. Each frame recieved is
+ * longer exposure values, grabbing a single frame for each setting. Each frame recieved is
  * processed through a diagonal image folding matrix before edge detection (canny) is utilized.
  * The resulting data is then processed with hough lines where it only focuses on lines within a specific
  * angle in an attempt to localize the borders of the marking.
@@ -122,6 +122,11 @@ private:
         const ulong exposure_increment = 500;
     };
 
+    using phase_two_results = struct results {
+        ulong ok;   // <- important.. comparison to other side
+        ulong fail; // <- important.. determine high fail chance
+    };
+
     std::shared_ptr<CapturePvApi> pcapture = std::make_shared<CapturePvApi>();
 
     const capture_roi def_phase_one_roi_ = capture_roi(0UL, 1006, 2448, 256);
@@ -159,8 +164,18 @@ private: // internal functions
 
     void switch_phase();
 
-    void process_phase(ulong set_index);
+    void phase_one(ulong set_index);
+
+    void phase_two();
+
+    void phase_three();
+
+    void phase_finalize();
 
     int frameset(Phase phase);
+
+public:
+
+    void compute();
 
 };
