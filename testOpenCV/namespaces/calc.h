@@ -45,7 +45,7 @@ namespace calc {
      */
     template <typename T>
     int round(T value) {
-        static_assert(std::is_same<T, double>::value || std::is_same<T, float>::value, "round is only possible for floating points.");
+        static_assert(std::is_floating_point<T>::value, "round is only possible for floating points.");
 #if ((defined _MSC_VER && defined _M_X64) || (defined __GNUC__ && defined __x86_64__ \
     && defined __SSE2__ && !defined __APPLE__) || CV_SSE2) && !defined(__CUDACC__)
 		__m128d t = _mm_set_sd(value);
@@ -210,8 +210,8 @@ namespace calc {
     template <typename T>
     double dist_real(const T x1, const T x2, const T y1, const T y2) {
         static_assert(std::is_arithmetic<T>::value, "dist_real is only possible for arithmetic types.");
-        T x = pow(x2 - x1, 2);
-        T y = pow(y2 - y1, 2);
+        double x = pow(x2 - x1, 2);
+        double y = pow(y2 - y1, 2);
         return sqrt(x + y);
     }
 
@@ -562,7 +562,6 @@ namespace calc {
     double avg_y(cv::Vec<T, cn>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         static_assert(cn == 4, "avg_y only supports Vec<T, 4>");
-
         return (vec[1] + vec[3]) / 2;
     }
 
@@ -598,6 +597,16 @@ namespace calc {
         static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
         return (vec[0] + vec[2] + vec[4]) * (1 / 3);
     }
+
+    template <typename T, int C>
+    double avg_x(cv::Vec<T, C>& vec) {
+        static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
+        auto sum = 0.0;
+        for (auto i = 0; i < C; i += 2)
+            sum += vec[i];
+        return sum * (1 / (C / 2));
+    }
+
 
     template <typename T>
     cv::Vec2d avg_xy(std::vector<cv::Point_<T>>& vec) {
@@ -787,7 +796,7 @@ namespace calc {
     template <typename T>
     bool in_between(int value, T lower, T upper) {
         static_assert(std::is_integral<T>::value, "invalid type.");
-        return (static_cast<unsigned>(value) - static_cast<unsigned>(lower) < static_cast<unsigned>(upper) - static_cast<unsigned>(lower));
+        return (static_cast<unsigned int>(value) - static_cast<unsigned int>(lower) < static_cast<unsigned int>(upper) - static_cast<unsigned int>(lower));
     }
 
     template <typename T1, typename T2>

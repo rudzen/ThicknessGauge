@@ -15,7 +15,7 @@ namespace sorter {
     template <typename T>
     void sort_contours(std::vector<std::vector<cv::Point_<T>>>& contours) {
         static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
-        std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>>& a, std::vector<cv::Point_<T>>& b) {
+        std::sort(contours.begin(), contours.end(), [](const std::vector<cv::Point_<T>>& a, const std::vector<cv::Point_<T>>& b) {
               return contourArea(a) > contourArea(b);
           });
     }
@@ -28,7 +28,7 @@ namespace sorter {
     template <typename T>
     void sort_pixels_x_ascending(std::vector<cv::Point_<T>>& vector) {
         static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
-        std::sort(vector.begin(), vector.end(), [](cv::Point_<T>& p1, cv::Point_<T>& p2) {
+        std::sort(vector.begin(), vector.end(), [](const cv::Point_<T>& p1, const cv::Point_<T>& p2) {
               return p1.x < p2.x;
           });
     }
@@ -41,7 +41,7 @@ namespace sorter {
     template <typename T>
     void sort_pixels_x_descending(std::vector<cv::Point_<T>>& vector) {
         static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
-        std::sort(vector.begin(), vector.end(), [](cv::Point_<T>& p1, cv::Point_<T>& p2) {
+        std::sort(vector.begin(), vector.end(), [](const cv::Point_<T>& p1, const cv::Point_<T>& p2) {
               return p1.x > p2.x;
           });
     }
@@ -54,7 +54,7 @@ namespace sorter {
     template <typename T>
     void sort_pixels_y_ascending(std::vector<cv::Point_<T>>& vector) {
         static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
-        std::sort(vector.begin(), vector.end(), [](cv::Point_<T>& p1, cv::Point_<T>& p2) {
+        std::sort(vector.begin(), vector.end(), [](const cv::Point_<T>& p1, const cv::Point_<T>& p2) {
               return p1.y < p2.y;
           });
     }
@@ -67,7 +67,7 @@ namespace sorter {
     template <typename T>
     void sort_pixels_y_descending(std::vector<cv::Point_<T>>& vector) {
         static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
-        std::sort(vector.begin(), vector.end(), [](cv::Point_<T> p1, cv::Point_<T>& p2) {
+        std::sort(vector.begin(), vector.end(), [](const cv::Point_<T> p1, const cv::Point_<T>& p2) {
               return p1.y > & p2.y;
           });
     }

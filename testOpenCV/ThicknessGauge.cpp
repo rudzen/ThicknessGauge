@@ -183,7 +183,7 @@ void ThicknessGauge::compute_marking_height() {
     // test print for all framesets
     for (auto& f: frameset_) {
         f->compute();
-        log_time << f << endl;
+        //log_time << f << endl;
     }
 
     while (true) {

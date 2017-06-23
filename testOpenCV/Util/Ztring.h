@@ -41,37 +41,38 @@ typedef __int128_t i128;
     typedef unsigned long long i128;
 #endif
 
-enum class HexType {
-    NONE,
-    HEX32,
-    HEX64
-};
-
 class Ztring : public std::string {
 public:
-    explicit Ztring(const std::string& s) : std::string(s) { }
+    enum class HexType {
+        NONE,
+        HEX32,
+        HEX64
+    };
 
-    explicit Ztring(const char* s) : std::string(s) { }
+    explicit Ztring(const std::string& s)
+        : std::string(s) { }
+
+    explicit Ztring(const char* s)
+        : std::string(s) { }
 
     Ztring() { }
 
-    bool endsWith(const std::string& ending) {
+    bool ends_with(const std::string& ending) {
         return ending.size() <= this->size() && equal(ending.rbegin(), ending.rend(), this->rbegin());
     }
 
     Ztring& trim() {
-        trimLeft();
-        trimRight();
+        trim_left();
+        trim_right();
         return *this;
     }
 
-    Ztring& trimLeft() {
+    Ztring& trim_left() {
         this->erase(this->begin(), find_if(this->begin(), this->end(), not1(std::ptr_fun<int, int>(static_cast<int (*)(int)>(isspace)))));
         return *this;
-
     }
 
-    Ztring& trimRight() {
+    Ztring& trim_right() {
         this->erase(find_if(this->rbegin(), this->rend(), not1(std::ptr_fun<int, int>(static_cast<int (*)(int)>(isspace)))).base(), this->end());
         return *this;
     }
@@ -90,13 +91,23 @@ public:
         return *this;
     }
 
-    Ztring& toUpper() {
+    Ztring& to_upper() {
         transform(begin(), end(), begin(), ::toupper);
         return *this;
     }
 
-    Ztring& toLower() {
+    Ztring& to_lower() {
         transform(begin(), end(), begin(), ::tolower);
+        return *this;
+    }
+
+    Ztring& spaces(size_t amount) {
+        append(std::string(" ", amount));
+        return *this;
+    }
+
+    Ztring& replicate(size_t amount, char to_replicate) {
+        append(std::string(to_replicate, amount));
         return *this;
     }
 
@@ -106,24 +117,24 @@ public:
         std::stringstream ss;
         std::stringstream ss2;
         switch (hex_type) {
-            case HexType::NONE:
-                ss << d;
-                break;
-            case HexType::HEX32:
-                ss2 << std::hex << d;
-                ss << "0x";
-                for (size_t i = 0; i < 8 - ss2.str().length(); i++)
-                    ss << "0";
-                ss << std::hex << d;
-                break;
-            case HexType::HEX64:
-                ss2 << std::hex << d;
-                ss << "0x";
-                for (size_t i = 0; i < 16 - ss2.str().length(); i++)
-                    ss << "0";
-                ss << std::hex << d << "ULL";
-                break;
-            default: ;
+        case HexType::NONE:
+            ss << d;
+            break;
+        case HexType::HEX32:
+            ss2 << std::hex << d;
+            ss << "0x";
+            for (size_t i = 0; i < 8 - ss2.str().length(); i++)
+                ss << "0";
+            ss << std::hex << d;
+            break;
+        case HexType::HEX64:
+            ss2 << std::hex << d;
+            ss << "0x";
+            for (size_t i = 0; i < 16 - ss2.str().length(); i++)
+                ss << "0";
+            ss << std::hex << d << "ULL";
+            break;
+        default: ;
         }
         assign(ss.str());
     }
@@ -140,24 +151,24 @@ public:
         std::stringstream ss;
         std::stringstream ss2;
         switch (hex_type) {
-            case HexType::NONE:
-                ss << d;
-                break;
-            case HexType::HEX32:
-                ss2 << std::hex << d;
-                ss << "0x";
-                for (size_t i = 0; i < 8 - ss2.str().length(); i++)
-                    ss << "0";
-                ss << std::hex << d;
-                break;
-            case HexType::HEX64:
-                ss2 << std::hex << d;
-                ss << "0x";
-                for (size_t i = 0; i < 16 - ss2.str().length(); i++)
-                    ss << "0";
-                ss << std::hex << d << "ULL";
-                break;
-            default: ;
+        case HexType::NONE:
+            ss << d;
+            break;
+        case HexType::HEX32:
+            ss2 << std::hex << d;
+            ss << "0x";
+            for (size_t i = 0; i < 8 - ss2.str().length(); i++)
+                ss << "0";
+            ss << std::hex << d;
+            break;
+        case HexType::HEX64:
+            ss2 << std::hex << d;
+            ss << "0x";
+            for (size_t i = 0; i < 16 - ss2.str().length(); i++)
+                ss << "0";
+            ss << std::hex << d << "ULL";
+            break;
+        default: ;
         }
         assign(ss.str());
         return *this;

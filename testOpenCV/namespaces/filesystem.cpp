@@ -82,11 +82,11 @@ namespace file {
         token.reserve(full_path.size());
 
         while (getline(ss, token, path_seperator))
-            current.complete_path.emplace_back(token);
+            current.complete_path.emplace_back(std::move(token));
 
         token.clear();
 
-        for (auto& p : current.complete_path) {
+        for (const auto& p : current.complete_path) {
             token += p;
             token += path_seperator;
             if (!is_directory(token))
@@ -100,10 +100,9 @@ namespace file {
 
     inline
     bool is_name_legal(const std::string& name) {
-        for (auto& c : name) {
+        for (const auto& c : name)
             if (illegal_chars.find(c) != std::string::npos)
                 return false;
-        }
         return true;
     }
 }

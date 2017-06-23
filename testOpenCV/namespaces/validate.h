@@ -8,7 +8,10 @@
 #include <vector>
 #include "tg.h"
 
+using namespace tg;
+
 namespace validate {
+
 
 #ifdef CV_VERSION
 
@@ -22,7 +25,7 @@ namespace validate {
     bool validate_rect(const cv::Rect_<T>& rect) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
-        auto valid_rectangle = [rect]()->bool {
+        auto valid_rectangle = [rect]()-> bool {
             return rect.width > 0.0 && rect.height > 0.0 && rect.x >= 0.0 && rect.y >= 0.0;
         };
 
@@ -49,7 +52,7 @@ namespace validate {
     bool validate_rect(const cv::Rect_<T>& rect, const cv::Mat& boundry) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
-        auto valid_rectangle = [rect](cv::Rect_<T>& boundry)->bool {
+        auto valid_rectangle = [rect](cv::Rect_<T>& boundry)-> bool {
 
             if (!validate_rect(rect) || !validate_rect(boundry))
                 return false;
@@ -79,8 +82,8 @@ namespace validate {
             return false;
 
         auto it = find_if(vec.begin(), vec.end(), [](cv::Point_<T>& p) {
-                      return p.x >= 0 && p.y >= 0;
-                  });
+                          return p.x >= 0 && p.y >= 0;
+                      });
 
         return it != vec.end();
 

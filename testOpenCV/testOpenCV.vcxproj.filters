@@ -156,6 +156,12 @@
     <ClCompile Include="Histogram\Histogram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera\Seeker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CV\Frames.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -330,6 +336,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera\CapturePvApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\Seeker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CV\Frames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

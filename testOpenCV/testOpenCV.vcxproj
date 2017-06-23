@@ -172,7 +172,9 @@
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
     <ClCompile Include="Camera\CapturePvApi.cpp" />
+    <ClCompile Include="Camera\Seeker.cpp" />
     <ClCompile Include="CV\CannyR.cpp" />
+    <ClCompile Include="CV\Frames.cpp" />
     <ClCompile Include="CV\HoughLinesR.cpp" />
     <ClCompile Include="CV\LaserR.cpp" />
     <ClCompile Include="Histogram\Histogram.cpp" />
@@ -191,6 +193,8 @@
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
     <ClInclude Include="Camera\CapturePvApi.h" />
+    <ClInclude Include="Camera\Seeker.h" />
+    <ClInclude Include="CV\Frames.h" />
     <ClInclude Include="CV\HarrisDetector.h" />
     <ClInclude Include="Exceptions\ThrowAssert.h" />
     <ClInclude Include="namespaces\calc.h" />

@@ -31,12 +31,13 @@ namespace tg {
             p2.y = y2;
         }
 
-        line_pair(cv::Point_<T> p1, cv::Point_<T> p2) : p1(p1)
-                                                      , p2(p2) {}
+        line_pair(cv::Point_<T> p1, cv::Point_<T> p2)
+            : p1(p1)
+              , p2(p2) {}
 
         friend bool operator==(const line_pair& lhs, const line_pair& rhs) {
             return lhs.p1 == rhs.p1
-                    && lhs.p2 == rhs.p2;
+                && lhs.p2 == rhs.p2;
         }
 
         friend bool operator!=(const line_pair& lhs, const line_pair& rhs) {
@@ -204,44 +205,44 @@ namespace tg {
 
         static std::string DataMemberName(DataMemberIndex index) {
             switch (index) {
-                case DataMemberIndex::CenterPoints:
-                    return "CenterPoints";
-                case DataMemberIndex::LeftPoints:
-                    return "LeftPoints";
-                case DataMemberIndex::RightPoints:
-                    return "RightPoints";
-                case DataMemberIndex::PointsStart:
-                    return "PointsStart";
-                case DataMemberIndex::CameraData:
-                    return "CameraData";
-                case DataMemberIndex::CameraPtr:
-                    return "CameraPtr";
-                case DataMemberIndex::GlobName:
-                    return "GlobName";
-                case DataMemberIndex::MarkingRect:
-                    return "MarkingRect";
-                case DataMemberIndex::LeftBorder:
-                    return "LeftBorder";
-                case DataMemberIndex::RightBorder:
-                    return "RightBorder";
-                case DataMemberIndex::BaseLines:
-                    return "BaseLines";
-                case DataMemberIndex::Intersections:
-                    return "Intersections";
-                case DataMemberIndex::IntersectionCuts:
-                    return "IntersectionCuts";
-                case DataMemberIndex::MiddlePieces:
-                    return "MiddlePieces";
-                case DataMemberIndex::LeftAvg:
-                    return "LeftAvg";
-                case DataMemberIndex::CenterAvg:
-                    return "CenterAvg";
-                case DataMemberIndex::RightAvg:
-                    return "RightAvg";
-                case DataMemberIndex::Difference:
-                    return "Difference";
-                default:
-                    return "feeeeek";
+            case DataMemberIndex::CenterPoints:
+                return "CenterPoints";
+            case DataMemberIndex::LeftPoints:
+                return "LeftPoints";
+            case DataMemberIndex::RightPoints:
+                return "RightPoints";
+            case DataMemberIndex::PointsStart:
+                return "PointsStart";
+            case DataMemberIndex::CameraData:
+                return "CameraData";
+            case DataMemberIndex::CameraPtr:
+                return "CameraPtr";
+            case DataMemberIndex::GlobName:
+                return "GlobName";
+            case DataMemberIndex::MarkingRect:
+                return "MarkingRect";
+            case DataMemberIndex::LeftBorder:
+                return "LeftBorder";
+            case DataMemberIndex::RightBorder:
+                return "RightBorder";
+            case DataMemberIndex::BaseLines:
+                return "BaseLines";
+            case DataMemberIndex::Intersections:
+                return "Intersections";
+            case DataMemberIndex::IntersectionCuts:
+                return "IntersectionCuts";
+            case DataMemberIndex::MiddlePieces:
+                return "MiddlePieces";
+            case DataMemberIndex::LeftAvg:
+                return "LeftAvg";
+            case DataMemberIndex::CenterAvg:
+                return "CenterAvg";
+            case DataMemberIndex::RightAvg:
+                return "RightAvg";
+            case DataMemberIndex::Difference:
+                return "Difference";
+            default:
+                return "feeeeek";
             }
         }
 
@@ -340,4 +341,8 @@ namespace tg {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
     }
 
+    template <typename T1, typename T2>
+    T2 iif(T1 expression, T2 true_part, T2 false_part) {
+        return expression ? true_part : false_part;
+    }
 }

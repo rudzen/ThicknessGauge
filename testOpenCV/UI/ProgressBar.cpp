@@ -1,4 +1,6 @@
-﻿#include "ProgressBar.h"
+﻿#include <string>
+#include "ProgressBar.h"
+
 
 ProgressBar::ProgressBar() {}
 
@@ -51,10 +53,7 @@ int ProgressBar::bar_length() const {
 }
 
 void ProgressBar::clear_bar_field() const {
-
-    for (auto i = 0; i < get_console_width(); ++i)
-        *out_ << ' ';
-    *out_ << '\r' << std::flush;
+    *out_ << std::string(" ", get_console_width()) << '\r' << std::flush;
 }
 
 void ProgressBar::progressed(unsigned long idx) {
