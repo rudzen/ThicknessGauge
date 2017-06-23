@@ -49,8 +49,10 @@ namespace cvr {
         marking_rect.width = intersection_points[2] - marking_rect.x - buffer;
     }
 
-    template <typename T>
-    void avg_vector_vec(const std::vector<cv::Vec<T, 4>>& vecvec, cv::Vec<T, 4>& out) {
+    template <typename T1, typename T2>
+    void avg_vector_vec(const std::vector<cv::Vec<T1, 4>>& vecvec, cv::Vec<T2, 4>& out) {
+        static_assert(std::is_floating_point<T1>::value, "Wrong type.");
+        static_assert(std::is_floating_point<T2>::value, "Wrong type.");
         out[0] = 0.0;
         out[1] = 0.0;
         out[2] = 0.0;
@@ -65,6 +67,31 @@ namespace cvr {
         out[1] /= vecvec.size();
         out[2] /= vecvec.size();
         out[3] /= vecvec.size();
+    }
+
+    template <typename T1, typename T2>
+    void avg_vecrect_x_width(const std::vector<cv::Rect_<T1>>& vecrec, cv::Rect_<T2>& out) {
+        static_assert(std::is_floating_point<T1>::value, "Wrong type.");
+        static_assert(std::is_floating_point<T2>::value, "Wrong type.");
+
+        if (vecrec.empty()) {
+            clear::rect(out);
+            return;
+        }
+
+        out.x = 0.0;
+        out.width = 0.0;
+        auto count = 0;
+        for (const auto& r : vecrec) {
+            if (!validate::validate_rect(r))
+                continue;
+            out.x += r.x;
+            out.width += r.width;
+            count++;
+        }
+        out.x /= count;
+        out.width /= count;
+
     }
 
     /**

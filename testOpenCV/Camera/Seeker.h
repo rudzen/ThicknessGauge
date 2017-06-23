@@ -3,6 +3,8 @@
 #include <array>
 #include "CapturePvApi.h"
 #include "CV/Frames.h"
+#include "CV/CannyR.h"
+#include "CV/FilterR.h"
 
 /**
  * * NOT COMPLETE YET *
@@ -112,6 +114,7 @@ public:
 
 private:
 
+
     using ulong = unsigned long;
 
     using capture_roi = cv::Rect_<ulong>;
@@ -122,6 +125,8 @@ private:
         const ulong exposure_increment = 500;
     };
 
+    std::unique_ptr<phase_one_exp> exposure_levels = std::make_unique<phase_one_exp>();
+
     using phase_two_results = struct results {
         ulong ok;   // <- important.. comparison to other side
         ulong fail; // <- important.. determine high fail chance
@@ -129,9 +134,15 @@ private:
 
     std::shared_ptr<CapturePvApi> pcapture = std::make_shared<CapturePvApi>();
 
+    // common canny with default settings for detecting marking borders
+    std::unique_ptr<CannyR> pcanny = std::make_unique<CannyR>(130, 200, 3, true, false, false);;
+
+    // filter used for base line detection
+    std::unique_ptr<FilterR> pfilter = std::make_unique<FilterR>("Baseline filter");
+
     const capture_roi def_phase_one_roi_ = capture_roi(0UL, 1006, 2448, 256);
 
-    const capture_roi phase_null_ = capture_roi(0UL, 0UL, 0UL, 0UL);
+    const capture_roi phase_roi_null_ = capture_roi(0UL, 0UL, 0UL, 0UL);
 
     Phase current_phase_;
 
@@ -139,8 +150,8 @@ private:
     // note that only phase one is known from the beginning
     std::array<capture_roi, 3> phase_roi_{
         def_phase_one_roi_,
-        phase_null_,
-        phase_null_
+        phase_roi_null_,
+        phase_roi_null_
     };
 
     std::array<ulong, 3> exposures_ = {5000, 20000, 40000};
@@ -148,6 +159,8 @@ private:
     std::array<std::string, 3> exposures_short_ = {"_5k", "_20k", "_40k"};
 
     std::array<std::unique_ptr<Frames>, 3> frameset_;
+
+    Frames *current_frameset_;
 
     Seeker();
 
@@ -158,13 +171,13 @@ private:
      */
     bool initialize();
 
-    bool shut_down();
+    bool shut_down() const;
 
 private: // internal functions
 
     void switch_phase();
 
-    void phase_one(ulong set_index);
+    void phase_one();
 
     void phase_two();
 
@@ -172,7 +185,7 @@ private: // internal functions
 
     void phase_finalize();
 
-    int frameset(Phase phase);
+    static int frameset(Phase phase);
 
 public:
 

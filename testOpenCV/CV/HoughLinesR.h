@@ -349,7 +349,7 @@ inline int HoughLinesR::hough_vertical() {
         lines_.clear();
 
     //cv::HoughLines(image, lines, rho, angle, threshold, srn, stn, minTheta, maxTheta);
-    HoughLines(image_, lines_, 1, calc::DEGREES, threshold_, 0, 0);
+    HoughLines(image_, lines_, 1.0, calc::DEGREES, threshold_, 0, 0);
 
     if (lines_.empty())
         return -1;
