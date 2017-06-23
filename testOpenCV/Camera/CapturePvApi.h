@@ -20,7 +20,7 @@ private:
 
     using calibrations = struct calibration_config {
         cv::Mat intrinsic = cv::Mat(3, 3, CV_32FC1);
-        cv::Mat distCoeffs;
+        cv::Mat dist_coeffs;
         std::vector<cv::Mat> rvecs;
         std::vector<cv::Mat> tvecs;
     };
