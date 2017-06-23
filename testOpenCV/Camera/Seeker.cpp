@@ -222,6 +222,9 @@ void Seeker::phase_one() {
 
     }
 
+    switch_phase();
+
+
  /*   for (auto& fs : frameset_) {
         pcapture->exposure(fs->exp_ms_);
         pcapture->cap(25, fs->frames_);
