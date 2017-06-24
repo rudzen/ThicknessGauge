@@ -159,6 +159,7 @@ void Seeker::phase_one() {
     for (auto i = exposure_levels->exposure_start; i <= exposure_levels->exposure_end; i += exposure_levels->exposure_increment)
         exposures.emplace_back(i);
 
+    cv::Mat single_target;
     std::vector<cv::Mat> targets;
     targets.reserve(1); // lel
 
@@ -178,9 +179,9 @@ void Seeker::phase_one() {
                 pcapture->exposure(e);
 
                 targets.clear();
-                pcapture->cap(1, targets);
+                pcapture->cap_single(single_target);
 
-                auto current_frame = targets.front();
+                auto current_frame = single_target;
 
                 markings.clear();
                 left_borders.clear();

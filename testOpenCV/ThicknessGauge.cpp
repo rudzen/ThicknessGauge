@@ -177,10 +177,6 @@ void ThicknessGauge::glob_generate(std::string& name) {
  */
 void ThicknessGauge::compute_marking_height() {
 
-    //testEdge();
-
-    //return;
-
     // test print for all framesets
     for (auto& f: frameset_) {
         f->compute();

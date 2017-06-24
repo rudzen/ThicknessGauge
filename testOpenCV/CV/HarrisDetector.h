@@ -123,8 +123,6 @@ public:
     // Get the feature points vector from the computed corner map
     static void corners(std::vector<cv::Point_<T>>& points, const cv::Mat& corner_map) {
 
-        // TODO : replace with blazing fast position iteration instead
-
         // Iterate over the pixels to obtain all feature points
         for (auto y = 0; y < corner_map.rows; y++) {
 
