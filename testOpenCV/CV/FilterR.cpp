@@ -1,5 +1,3 @@
-
-
 #include "FilterR.h"
 #include "namespaces/draw.h"
 

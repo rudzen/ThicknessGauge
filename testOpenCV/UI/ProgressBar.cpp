@@ -1,7 +1,6 @@
 ﻿#include <string>
 #include "ProgressBar.h"
 
-
 ProgressBar::ProgressBar() {}
 
 ProgressBar::ProgressBar(unsigned long n, const char* description, std::ostream& out) {

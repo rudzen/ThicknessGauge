@@ -15,17 +15,22 @@ class ImageSave : public VideoInfo {
 
 public:
 
-    ImageSave() : ImageSave("", SaveType::Image_Png, Information::Basic) { }
+    ImageSave()
+        : ImageSave("", SaveType::Image_Png, Information::Basic) { }
 
-    explicit ImageSave(std::string FileName) : ImageSave(FileName, SaveType::Image_Png, Information::Basic) { }
+    explicit ImageSave(std::string FileName)
+        : ImageSave(FileName, SaveType::Image_Png, Information::Basic) { }
 
-    ImageSave(std::string FileName, SaveType SaveType) : ImageSave(FileName, SaveType, Information::Basic) { }
+    ImageSave(std::string FileName, SaveType SaveType)
+        : ImageSave(FileName, SaveType, Information::Basic) { }
 
-    ImageSave(ImageSave& imageSave) : ImageSave(imageSave.file_name_, imageSave.save_type_, imageSave.information_) { }
+    ImageSave(ImageSave& imageSave)
+        : ImageSave(imageSave.file_name_, imageSave.save_type_, imageSave.information_) { }
 
-    ImageSave(std::string FileName, SaveType save_type, Information information) : save_type_(save_type)
-                                                                                 , information_(information)
-                                                                                 , file_name_(FileName) {
+    ImageSave(std::string FileName, SaveType save_type, Information information)
+        : save_type_(save_type)
+        , information_(information)
+        , file_name_(FileName) {
         update_time_stamp();
     }
 

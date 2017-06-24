@@ -18,10 +18,6 @@
 #include "Exceptions/CalibrationException.h"
 #include "Exceptions/TestException.h"
 
-#include "Vimba/GC2450MCamera.h"
-#include "Vimba/CameraData.h"
-#include "Vimba/CameraFrame.h"
-
 #include "Calibrate/CalibrationTest.cpp"
 
 #include "ThicknessGauge.h"
@@ -57,9 +53,9 @@ const string default_camera_calibration_file = "C2450.json";
  * \return true if an action which doesn't allow the thicknessgauge to proceed afterwards, fx show information etc.
  * otherwise false.
  */
-bool parseArgs(int argc, char** argv, CommandLineOptions& options);
+bool parse_args(int argc, char** argv, CommandLineOptions& options);
 
-void saveNull(std::string filename) {
+void save_null(std::string filename) {
 
     // quick and dirty hack to save null image quickly
     log_time << cv::format("Enter delay in seconds before capture to %s\n>", filename);
@@ -84,39 +80,39 @@ int main(int argc, char** argv) {
 
     try {
 
-        if (parseArgs(argc, argv, options)) {
+        if (parse_args(argc, argv, options)) {
             // unique case for build information
             if (options.build_info_mode()) {
                 log_time << cv::getBuildInformation();
                 return 0;
             }
             // null save mode..
-            saveNull(options.camera_file());
+            save_null(options.camera_file());
             return 0;
         }
 
-        auto thicknessGauge = std::make_unique<ThicknessGauge>(options.frames(), options.show_windows(), options.record_video(), 100, 100);
+        auto thickness_gauge = std::make_unique<ThicknessGauge>(options.frames(), options.show_windows(), options.record_video(), 100, 100);
 
         //thicknessGauge->setFrameCount(options.getFrames());
         //thicknessGauge->setShowWindows(options.isShowWindows());
         //thicknessGauge->setSaveVideo(options.isRecordVideo());
-        thicknessGauge->init_calibration_settings(options.camera_file());
+        thickness_gauge->init_calibration_settings(options.camera_file());
         cv::setNumThreads(options.num_open_cv_threads());
         log_time << iif(cv::useOptimized(), "OpenCV is using optimization.", "Warning, OpenCV has optimization disabled.") << '\n';
 
         if (options.glob_mode()) {
             // TODO : use capture for file reading?!
-            thicknessGauge->init_video_capture();
-            auto globName = options.glob_folder();
-            thicknessGauge->glob_generate(globName);
+            thickness_gauge->init_video_capture();
+            auto glob_name = options.glob_folder();
+            thickness_gauge->glob_generate(glob_name);
         } else if (options.demo_mode()) {// && !options.TestMode() && !options.CalibrationMode()) {
 
             auto glob_name = options.glob_folder();
 
-            thicknessGauge->glob_add_nulls();
+            thickness_gauge->glob_add_nulls();
 
             while (true) {
-                auto initialized_ok = thicknessGauge->initialize(glob_name);
+                auto initialized_ok = thickness_gauge->initialize(glob_name);
                 if (initialized_ok)
                     break;
 
@@ -125,16 +121,15 @@ int main(int argc, char** argv) {
                 tg::sleep(500);
             }
 
-
             //    log_time << "Catastrofic failure.. exiting..\n";
             //    return -20;
             //}
 
-            thicknessGauge->compute_marking_height();
+            thickness_gauge->compute_marking_height();
 
-            auto data = thicknessGauge->data<double>(); // virker :-)
+            auto data = thickness_gauge->pdata; // virker :-)
 
-            thicknessGauge->save_data("output_mufmuf");
+            thickness_gauge->save_data("output_mufmuf");
 
             log_time << cv::format("difference: %f\n", data->difference);
 
@@ -175,7 +170,7 @@ int main(int argc, char** argv) {
 
 }
 
-bool parseArgs(int argc, char** argv, CommandLineOptions& options) {
+bool parse_args(int argc, char** argv, CommandLineOptions& options) {
     try {
         CmdLine cmd("ThicknessGauge [OpenCV]", '=', "0.1", true);
 

@@ -30,7 +30,6 @@
 ||||  |   ||
 `+.__._._+*/
 
-
 using namespace std;
 using namespace tg;
 
@@ -44,24 +43,27 @@ public:
 
     typedef struct LineV {
         cv::Vec2f entry_;
+
         tg::line_pair<float> points;
+
         std::vector<cv::Point_<float>> elements;
 
         double slobe;
+
         calc::SlobeDirection slobe_direction = calc::SlobeDirection::HORIZONTAL;
 
         LineV(cv::Vec2f entry, tg::line_pair<float> points)
-            : entry_(entry),
-              points(points) {
+            : entry_(entry)
+            , points(points) {
             elements.reserve(calc::round(calc::dist_manhattan(points.p1.x, points.p2.x, points.p1.y, points.p2.y)));
             slobe = 0.0f;
         }
 
         friend bool operator==(const LineV& lhs, const LineV& rhs) {
             return lhs.slobe == rhs.slobe
-                && lhs.entry_ == rhs.entry_
-                && lhs.points == rhs.points
-                && lhs.elements == rhs.elements;
+                    && lhs.entry_ == rhs.entry_
+                    && lhs.points == rhs.points
+                    && lhs.elements == rhs.elements;
         }
 
         friend bool operator!=(const LineV& lhs, const LineV& rhs) {
@@ -70,10 +72,10 @@ public:
 
         friend std::ostream& operator<<(std::ostream& os, const LineV& obj) {
             return os
-                << "entry: " << obj.entry_
-                << "slobe: " << obj.slobe
-                << " points(1/2): " << obj.points.p1 << '/' << obj.points.p2
-                << " elements: " << obj.elements;
+                    << "entry: " << obj.entry_
+                    << "slobe: " << obj.slobe
+                    << " points(1/2): " << obj.points.p1 << '/' << obj.points.p2
+                    << " elements: " << obj.elements;
         }
     } LineV;
 
@@ -113,6 +115,7 @@ private:
     int threshold_;
 
     const int APERTURE_MIN = 3;
+
     const int APERTURE_MAX = 7;
 
     double srn_;
@@ -129,10 +132,11 @@ private:
 
 public:
 
-    HoughLinesR(const int rho, const int theta, const int threshold, const bool show_window) : BaseR("HoughLines", show_window)
-                                                                                            , rho_(rho)
-                                                                                            , theta_(theta)
-                                                                                            , threshold_(threshold) {
+    HoughLinesR(const int rho, const int theta, const int threshold, const bool show_window)
+        : BaseR("HoughLines", show_window)
+        , rho_(rho)
+        , theta_(theta)
+        , threshold_(threshold) {
         angle_ = calc::DEGREES * theta;
         srn_ = 0;
         stn_ = 0;
@@ -282,7 +286,6 @@ inline void HoughLinesR::compute_borders() {
         log_time << __FUNCTION__ << " leftRoi : " << left_roi << std::endl;
         throw_assert(!validate::validate_rect(left_roi), "Left ROI rect failed validation!!!");
     }
-
 
     compute_rect_from_lines(right_lines_, right_roi);
     if (!validate::validate_rect(right_roi)) {

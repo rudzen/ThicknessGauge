@@ -1,9 +1,7 @@
 #include <opencv2/core.hpp>
 #include "LaserR.h"
 
-bool LaserR::doLaser() {
-
-}
+bool LaserR::doLaser() {}
 
 bool LaserR::computeIntensityWeigth(vector<v3<float>>& output) {
 

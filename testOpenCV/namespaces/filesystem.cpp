@@ -14,7 +14,7 @@ namespace file {
 #ifdef _WIN32
             '\\';
 #else
-                            '/';
+            '/';
 #endif
 
     using path_legal = struct path {

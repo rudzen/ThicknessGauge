@@ -1,12 +1,13 @@
 #include "Frames.h"
 
-
 Frames::Frames(const unsigned long index)
-    : index_(index), exp_ms_(0) { }
+    : index_(index)
+    , exp_ms_(0) { }
 
 Frames::Frames(const std::string& expExt, unsigned long expMs)
     : exp_ext_(expExt)
-      , index_(0), exp_ms_(expMs) { }
+    , index_(0)
+    , exp_ms_(expMs) { }
 
 void Frames::clear() {
     frames_.clear();

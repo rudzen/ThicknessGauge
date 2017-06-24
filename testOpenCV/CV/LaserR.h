@@ -41,17 +41,29 @@ class LaserR : public BaseR {
             i.reserve(x);
         }
 
-        friend bool operator==(const xLine& lhs, const xLine& rhs) { return lhs.y == rhs.y; }
+        friend bool operator==(const xLine& lhs, const xLine& rhs) {
+            return lhs.y == rhs.y;
+        }
 
-        friend bool operator!=(const xLine& lhs, const xLine& rhs) { return !(lhs == rhs); }
+        friend bool operator!=(const xLine& lhs, const xLine& rhs) {
+            return !(lhs == rhs);
+        }
 
-        friend bool operator<(const xLine& lhs, const xLine& rhs) { return lhs.y < rhs.y; }
+        friend bool operator<(const xLine& lhs, const xLine& rhs) {
+            return lhs.y < rhs.y;
+        }
 
-        friend bool operator<=(const xLine& lhs, const xLine& rhs) { return !(rhs < lhs); }
+        friend bool operator<=(const xLine& lhs, const xLine& rhs) {
+            return !(rhs < lhs);
+        }
 
-        friend bool operator>(const xLine& lhs, const xLine& rhs) { return rhs < lhs; }
+        friend bool operator>(const xLine& lhs, const xLine& rhs) {
+            return rhs < lhs;
+        }
 
-        friend bool operator>=(const xLine& lhs, const xLine& rhs) { return !(lhs < rhs); }
+        friend bool operator>=(const xLine& lhs, const xLine& rhs) {
+            return !(lhs < rhs);
+        }
 
         friend std::ostream& operator<<(std::ostream& os, const xLine& obj) {
             os << "x: " << obj.x;
@@ -97,7 +109,9 @@ inline bool LaserR::computeXLine() {
             continue;
 
         auto sum = 0.0f;
-        for (auto& intensity : xl.i) { sum += xl.i.size() * intensity; }
+        for (auto& intensity : xl.i) {
+            sum += xl.i.size() * intensity;
+        }
         xl.y = 100.0f / sum;
         ok = true;
         log_time << "x / y: " << xl.x << " / " << xl.y << endl;
@@ -133,7 +147,6 @@ inline void LaserR::configureXLine(vector<cv::Point2i>& nonZeroes, vector<v3<flo
         output.emplace_back(v3<float>(static_cast<float>(line.x), line.y, static_cast<float>(line.i.size())));
 
 }
-
 
 /*
  |  __

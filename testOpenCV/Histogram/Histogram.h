@@ -35,7 +35,8 @@ private:
 
 public:
 
-    Histogram() : value_max_(0) { }
+    Histogram()
+        : value_max_(0) { }
 
     /**
      * \brief Populate local histogram array from external map

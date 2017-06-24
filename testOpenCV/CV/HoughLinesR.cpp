@@ -80,7 +80,9 @@ void HoughLinesR::compute_meta() {
             left.elements.emplace_back(it.pos());
     }
 
-    auto line_sort = [](const LineV& l1, const LineV& l2) { return l1.elements.size() < l2.elements.size(); };
+    auto line_sort = [](const LineV& l1, const LineV& l2) {
+        return l1.elements.size() < l2.elements.size();
+    };
 
     if (lSize > 1)
         std::sort(left_lines_.begin(), left_lines_.end(), line_sort);

@@ -40,18 +40,19 @@ class LineConfig {
 
 public:
     LineConfig(const cv::DistanceTypes distType, const double params, const double reps, const double aepa)
-        : dist_type_(distType),
-          params_(params),
-          reps_(reps),
-          aepa_(aepa) {
-    }
+        : dist_type_(distType)
+        , params_(params)
+        , reps_(reps)
+        , aepa_(aepa) { }
 
     /**
      * \brief Default configuration
      */
     LineConfig()
-        : dist_type_(cv::DIST_L12), params_(0.0), reps_(0.01), aepa_(0.01) {
-    }
+        : dist_type_(cv::DIST_L12)
+        , params_(0.0)
+        , reps_(0.01)
+        , aepa_(0.01) { }
 
     cv::DistanceTypes dist_type() const {
         return dist_type_;

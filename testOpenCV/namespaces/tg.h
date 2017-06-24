@@ -18,6 +18,10 @@
  */
 namespace tg {
 
+    /**
+     * \brief Structure to hold a pair of opencv points, supports equalization check and a couple of useful constructors
+     * \tparam T The type of the point pair
+     */
     template <typename T>
     struct line_pair {
         cv::Point_<T> p1;
@@ -33,16 +37,17 @@ namespace tg {
 
         line_pair(cv::Point_<T> p1, cv::Point_<T> p2)
             : p1(p1)
-              , p2(p2) {}
+            , p2(p2) {}
 
         friend bool operator==(const line_pair& lhs, const line_pair& rhs) {
             return lhs.p1 == rhs.p1
-                && lhs.p2 == rhs.p2;
+                    && lhs.p2 == rhs.p2;
         }
 
         friend bool operator!=(const line_pair& lhs, const line_pair& rhs) {
             return !(lhs == rhs);
         }
+
     };
 
     //    typedef std::pair<cv::Point2f, cv::Point2f> linePair;

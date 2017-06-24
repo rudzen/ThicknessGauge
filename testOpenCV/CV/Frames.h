@@ -55,6 +55,4 @@ public:
     // output stream operator, outputs the entire dataset as json
     friend std::ostream& operator<<(std::ostream& os, const Frames& obj);
 
-
-
 };

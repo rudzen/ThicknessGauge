@@ -5,7 +5,7 @@
 using namespace tg;
 
 void CannyR::do_canny() {
-        try {
+    try {
         Canny(image_, edges_, threshold_1_, threshold_2_, aperture_size_, gradient_ > 0);
 
         if (remove_pepper_noise_)

@@ -18,9 +18,10 @@ class MorphR : public BaseR {
 
 public:
 
-    explicit MorphR(cv::MorphTypes method, const int iterations, const bool show_window) : BaseR("MorphR", show_window)
-                                                                                        , method_(method)
-                                                                                        , iterations_(iterations) {
+    explicit MorphR(cv::MorphTypes method, const int iterations, const bool show_window)
+        : BaseR("MorphR", show_window)
+        , method_(method)
+        , iterations_(iterations) {
         structure_element_ = cv::Mat();
         element_shape_ = cv::MORPH_RECT;
     }
@@ -72,6 +73,5 @@ private:
     void show() const {
         cv::imshow(window_name_, output_);
     }
-
 
 };

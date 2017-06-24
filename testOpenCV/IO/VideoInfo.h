@@ -15,8 +15,9 @@ class VideoInfo {
 public:
 
     VideoInfo()
-        : fps_(25.0), codec_(0), colour_(false) {
-    }
+        : fps_(25.0)
+        , codec_(0)
+        , colour_(false) { }
 
     int codec() const;
 

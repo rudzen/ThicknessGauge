@@ -15,15 +15,19 @@ public:
         MONO8, MONO12, MONO12_PACKED, UNKNOWN
     };
 
-
 private:
 
     using calibrations = struct calibration_config {
         cv::Mat intrinsic = cv::Mat(3, 3, CV_32FC1);
+
         cv::Mat dist_coeffs;
+
         std::vector<cv::Mat> rvecs;
+
         std::vector<cv::Mat> tvecs;
+
         bool loaded = false;
+
         /*
          * intrinsic.ptr<float>(0)[0] = 1;
          * intrinsic.ptr<float>(1)[1] = 1;
@@ -61,12 +65,20 @@ public:
     const cv::Rect_<unsigned long> default_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
 
     CapturePvApi()
-        : frame_size_(0), retry_count_(10), initialized_(false), is_open_(false), exposure_target_reached_(false) { }
+        : frame_size_(0)
+        , retry_count_(10)
+        , initialized_(false)
+        , is_open_(false)
+        , exposure_target_reached_(false) { }
 
     CapturePvApi(tg::tCamera myCamera, tPvCameraInfo cameraInfo, unsigned long frameSize)
-        : camera_(myCamera),
-          camera_info_(cameraInfo),
-          frame_size_(frameSize), retry_count_(10), initialized_(true), is_open_(false), exposure_target_reached_(false) { }
+        : camera_(myCamera)
+        , camera_info_(cameraInfo)
+        , frame_size_(frameSize)
+        , retry_count_(10)
+        , initialized_(true)
+        , is_open_(false)
+        , exposure_target_reached_(false) { }
 
     ~CapturePvApi() {
         delete[] static_cast<char*>(camera_.Frame.ImageBuffer);
@@ -91,9 +103,7 @@ public:
     //Controls/Exposure/Auto/ExposureAutoTarget = 50 [uint32,rw  ]
     //Controls/Exposure/ExposureMode = Manual [enum,rwv ]
 
-    void exposure_mode() {
-        
-    }
+    void exposure_mode() { }
 
     bool exposure_auto_adjust_tolerance(unsigned long new_value) const;
 
@@ -110,7 +120,6 @@ public:
     void exposure_auto_target(unsigned long new_value);
 
     unsigned long exposure_auto_target();
-
 
     /**
      * \brief Resets binning

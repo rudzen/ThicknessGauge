@@ -35,6 +35,7 @@ class CannyR : public BaseR {
     int threshold_2_;
 
     const int APER_MIN = 3;
+
     const int APER_MAX = 7;
 
     int aperture_size_;
@@ -52,8 +53,11 @@ class CannyR : public BaseR {
     }
 
     static void threshold1cb(int value, void* userData);
+
     static void threshold2cb(int value, void* userData);
+
     static void apertureSizecb(int value, void* userData);
+
     static void gradientcb(int value, void* userData);
 
     void threshold_1(int threshold1) {
@@ -81,11 +85,12 @@ class CannyR : public BaseR {
 public:
 
     CannyR(const int threshold_1, const int threshold_2, const int aperture_size, const bool gradient, const bool show_windows, const bool remove_pepper_noise)
-        : BaseR("Canny", show_windows),
-          threshold_1_(threshold_1),
-          threshold_2_(threshold_2),
-          aperture_size_(aperture_size),
-          gradient_(gradient), remove_pepper_noise_(remove_pepper_noise) {
+        : BaseR("Canny", show_windows)
+        , threshold_1_(threshold_1)
+        , threshold_2_(threshold_2)
+        , aperture_size_(aperture_size)
+        , gradient_(gradient)
+        , remove_pepper_noise_(remove_pepper_noise) {
         if (show_windows)
             createWindow();
     }
@@ -124,5 +129,3 @@ inline void CannyR::gradientcb(int value, void* user_data) {
     using namespace tg;
     log_time << cv::format("Canny gradient : %s\n", boltab[static_cast<bool>(value)]);
 }
-
-

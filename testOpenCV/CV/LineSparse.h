@@ -23,10 +23,10 @@ private:
     };
 
     const std::map<Location, int> locationBaseMap = {{Location::baseOne , 0}, {Location::baseTwo, 1}};
+
     const std::map<Location, int> locationHeigthMap = {{Location::heigthOne , 0}, {Location::heigthTwo, 1}};
 
     std::map<int, int> intensity_;
-
 
 public:
     const std::map<int, int>& intensity() const {
@@ -117,7 +117,6 @@ public:
      */
     void differentiateY();
 
-
     void saveAllData(std::string& filePrefix);
 
     /**
@@ -164,6 +163,7 @@ public:
      * \param rightTwo The left section border in X
      */
     void split(double leftOne, double leftTwo, double rightOne, double rightTwo);
+
     void drawPoly();
 
 public: // getters and setter + minor functions
@@ -206,13 +206,14 @@ public: // getters and setter + minor functions
      */
     double getLine(Location location) {
         switch (location) {
-        case Location::baseOne: ;
-        case Location::baseTwo: return baseLine_[locationBaseMap.at(location)];
-            break;
-        case Location::heigthOne: ;
-        case Location::heigthTwo: ;
-        default: ;
-            return heigthLin_[locationHeigthMap.at(location)];
+            case Location::baseOne: ;
+            case Location::baseTwo:
+                return baseLine_[locationBaseMap.at(location)];
+                break;
+            case Location::heigthOne: ;
+            case Location::heigthTwo: ;
+            default: ;
+                return heigthLin_[locationHeigthMap.at(location)];
         }
     }
 

@@ -31,22 +31,24 @@ public:
 
     typedef struct LineH {
         cv::Vec4f entry_;
+
         tg::line_pair<float> points_;
+
         std::vector<cv::Point2f> elements_;
 
         LineH()
             : points_(cv::Point2f(0.0f, 0.0f), cv::Point2f(0.0f, 0.0f)) { }
 
         LineH(cv::Vec4f entry, tg::line_pair<float> points)
-            : entry_(entry),
-              points_(points) {
+            : entry_(entry)
+            , points_(points) {
             elements_.reserve(calc::round(calc::dist_manhattan(points.p1.x, points.p2.x, points.p1.y, points.p2.y)));
         }
 
         friend bool operator==(const LineH& lhs, const LineH& rhs) {
             return lhs.entry_ == rhs.entry_
-                && lhs.points_ == rhs.points_
-                && lhs.elements_ == rhs.elements_;
+                    && lhs.points_ == rhs.points_
+                    && lhs.elements_ == rhs.elements_;
         }
 
         friend bool operator!=(const LineH& lhs, const LineH& rhs) {
@@ -55,9 +57,9 @@ public:
 
         friend std::ostream& operator<<(std::ostream& os, const LineH& obj) {
             return os
-                << "entry: " << obj.entry_
-                << " points(1/2): " << obj.points_.p1 << '/' << obj.points_.p2
-                << " elements: " << obj.elements_;
+                    << "entry: " << obj.entry_
+                    << " points(1/2): " << obj.points_.p1 << '/' << obj.points_.p2
+                    << " elements: " << obj.elements_;
         }
     } LineH;
 
@@ -80,7 +82,9 @@ private:
     std::vector<cv::Vec4f> lines_;
 
     std::vector<LineH> all_lines_;
+
     std::vector<LineH> right_lines_;
+
     std::vector<LineH> left_lines_;
 
 public:
@@ -128,11 +132,11 @@ private:
 public:
 
     HoughLinesPR(const int rho, const int theta, const int threshold, const int min_line_len, const bool show_window)
-        : BaseR("HoughLinesP", show_window),
-          rho_(rho),
-          theta_(theta),
-          threshold_(threshold),
-          min_line_len_(min_line_len) {
+        : BaseR("HoughLinesP", show_window)
+        , rho_(rho)
+        , theta_(theta)
+        , threshold_(threshold)
+        , min_line_len_(min_line_len) {
         angle_ = calc::DEGREES * theta;
         min_theta_ = 0.0;
         max_theta_ = calc::PI;
@@ -357,7 +361,6 @@ inline void HoughLinesPR::bresenham() {
     //else
     //	onlyRight = lSize == 0;
 
-
     // build right side line points
     for (auto& right_line : right_lines_) {
         cv::LineIterator it(image_, right_line.points_.p1, right_line.points_.p2, 8);
@@ -440,7 +443,6 @@ inline void HoughLinesPR::draw_lines(std::vector<LineH>& lines, cv::Scalar colou
     for (auto& line : lines)
         draw_line(line.entry_, colour);
 }
-
 
 inline void HoughLinesPR::draw_line(cv::Vec4f& line, cv::Scalar colour) {
     draw_line(line[0], line[1], line[2], line[3], colour);

@@ -65,7 +65,7 @@ void Calib::run_calib() {
     obj_.reserve(num_squares);
 
     for (auto j = 0; j < num_squares; j++)
-        obj_.emplace_back(cv::Point3f(j / corners_horizontal_, j % corners_horizontal_, 0.0f));
+        obj_.emplace_back(cv::Point3f(j / static_cast<float>(corners_horizontal_), static_cast<float>(j % corners_horizontal_), 0.0f));
 
     corners_.reserve(num_squares);
     image_points_.reserve(num_squares);
