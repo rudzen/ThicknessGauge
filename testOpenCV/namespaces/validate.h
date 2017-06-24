@@ -13,7 +13,6 @@ using namespace tg;
 
 namespace validate {
 
-
     /**
      * \brief Validates a rectangle that its boundries are all valid numbers
      * \tparam T The type of rectangle
@@ -80,7 +79,8 @@ namespace validate {
         if (vec.empty())
             return false;
 
-        auto it = find_if(vec.begin(), vec.end(), [](cv::Point_<T>& p) {
+        // could be done with checkRange too, but that would add another dependency from opencv
+        auto it = find_if(vec.begin(), vec.end(), [](const cv::Point_<T>& p) {
                           return p.x >= 0 && p.y >= 0;
                       });
 

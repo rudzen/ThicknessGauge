@@ -205,7 +205,7 @@ template <class T>
 inline void HistoPeak<T>::draw_dales(cv::Mat& histImage, std::vector<int>& dales) const {
     auto bin_w = calc::round(static_cast<double>(histImage.cols) / hist_size_);
     auto col = cv::Scalar(255, 255, 0);
-    for (auto& d : dales)
+    for (const auto& d : dales)
         line(histImage, cv::Point(bin_w * d, histImage.rows), cv::Point(bin_w * d, 0), col, 2);
 
     imshow("Dales", histImage);

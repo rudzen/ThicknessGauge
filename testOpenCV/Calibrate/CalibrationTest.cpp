@@ -138,13 +138,12 @@ public:
         atImageList = 0;
     }
 
-    cv::Mat nextImage() {
+    cv::Mat next_image() {
         cv::Mat result;
         if (inputCapture.isOpened()) {
             cv::Mat view0;
             inputCapture >> view0;
             return view0;
-            //view0.copyTo(result);
         }
         if (atImageList < static_cast<int>(imageList.size()))
             result = cv::imread(imageList[atImageList++], CV_LOAD_IMAGE_COLOR);
@@ -212,22 +211,22 @@ public:
             "how to edit it.  It may be any OpenCV supported file format XML/YAML/JSON." << endl;
     }
 
-    static double computeReprojectionErrors(const vector<vector<cv::Point3f>>& objectPoints,
-                                            const vector<vector<cv::Point2f>>& imagePoints,
+    static double compute_reprojection_errors(const vector<vector<cv::Point3f>>& object_points,
+                                            const vector<vector<cv::Point2f>>& image_points,
                                             const vector<cv::Mat>& rvecs, const vector<cv::Mat>& tvecs,
-                                            const cv::Mat& cameraMatrix, const cv::Mat& distCoeffs,
-                                            vector<float>& perViewErrors) {
+                                            const cv::Mat& camera_matrix, const cv::Mat& dist_coeffs,
+                                            vector<float>& per_view_errors) {
         vector<cv::Point2f> image_points_2;
         auto total_points = 0;
         double total_err = 0;
-        perViewErrors.resize(objectPoints.size());
+        per_view_errors.resize(object_points.size());
 
-        for (auto i = 0; i < static_cast<int>(objectPoints.size()); ++i) {
-            projectPoints(cv::Mat(objectPoints[i]), rvecs[i], tvecs[i], cameraMatrix, distCoeffs, image_points_2);
-            auto err = norm(cv::Mat(imagePoints[i]), cv::Mat(image_points_2), CV_L2);
+        for (auto i = 0; i < static_cast<int>(object_points.size()); ++i) {
+            projectPoints(cv::Mat(object_points[i]), rvecs[i], tvecs[i], camera_matrix, dist_coeffs, image_points_2);
+            auto err = norm(cv::Mat(image_points[i]), cv::Mat(image_points_2), CV_L2);
 
-            auto n = static_cast<int>(objectPoints[i].size());
-            perViewErrors[i] = static_cast<float>(std::sqrt(err * err / n));
+            auto n = static_cast<int>(object_points[i].size());
+            per_view_errors[i] = static_cast<float>(std::sqrt(err * err / n));
             total_err += err * err;
             total_points += n;
         }
@@ -235,7 +234,7 @@ public:
     }
 
     // Print camera parameters to the output file
-    void saveCameraParams(Settings& s, cv::Size& image_size, cv::Mat& camera_matrix, cv::Mat& dist_coeffs,
+    void save_camera_params(Settings& s, cv::Size& image_size, cv::Mat& camera_matrix, cv::Mat& dist_coeffs,
                           const vector<cv::Mat>& rvecs, const vector<cv::Mat>& tvecs,
                           const vector<float>& reproj_errs, const vector<vector<cv::Point2f>>& image_points,
                           double total_avg_err) const {
@@ -253,7 +252,6 @@ public:
 
         if (s.flag & CV_CALIB_FIX_ASPECT_RATIO)
             fs << "FixAspectRatio" << s.aspectRatio;
-
 
         if (s.flag) {
             string out("flags: ");
@@ -308,16 +306,16 @@ public:
         if (image_points.empty())
             return;
 
-        cv::Mat imagePtMat(static_cast<int>(image_points.size()), static_cast<int>(image_points[0].size()), CV_32FC2);
+        cv::Mat pimage_mat(static_cast<int>(image_points.size()), static_cast<int>(image_points[0].size()), CV_32FC2);
         for (auto i = 0; i < static_cast<int>(image_points.size()); i++) {
-            auto r = imagePtMat.row(i).reshape(2, imagePtMat.cols);
+            auto r = pimage_mat.row(i).reshape(2, pimage_mat.cols);
             cv::Mat imgpti(image_points[i]);
             imgpti.copyTo(r);
         }
-        fs << "Image_points" << imagePtMat;
+        fs << "Image_points" << pimage_mat;
     }
 
-    bool runCalibration(Settings& s, cv::Size& image_size, cv::Mat& camera_matrix, cv::Mat& dist_coeffs,
+    bool run_calibration(Settings& s, cv::Size& image_size, cv::Mat& camera_matrix, cv::Mat& dist_coeffs,
                         vector<vector<cv::Point2f>> image_points, vector<cv::Mat>& rvecs, vector<cv::Mat>& tvecs,
                         vector<float>& reproj_errs, double& total_avg_err) const {
 
@@ -331,27 +329,27 @@ public:
 
         log_time << "Calculating board corner positions and resizing object points.." << endl;
 
-        vector<vector<cv::Point3f>> objectPoints(1);
-        calcBoardCornerPositions(s.boardSize, s.squareSize, objectPoints[0], s.calibrationPattern);
+        vector<vector<cv::Point3f>> object_points(1);
+        compute_board_corner_positions(s.boardSize, s.squareSize, object_points[0], s.calibrationPattern);
 
-        objectPoints.resize(image_points.size(), objectPoints[0]);
+        object_points.resize(image_points.size(), object_points[0]);
 
         log_time << "Configuring camera intrinsic & extrinsic parameters." << endl;
 
         //Find intrinsic and extrinsic camera parameters
-        auto rms = calibrateCamera(objectPoints, image_points, image_size, camera_matrix,
+        auto rms = calibrateCamera(object_points, image_points, image_size, camera_matrix,
                                    dist_coeffs, rvecs, tvecs, s.flag | CV_CALIB_FIX_K4 | CV_CALIB_FIX_K5);
 
         log_time << "Re-projection error reported by calibrateCamera: " << rms << endl;
 
         auto ok = checkRange(camera_matrix) && checkRange(dist_coeffs);
 
-        total_avg_err = computeReprojectionErrors(objectPoints, image_points, rvecs, tvecs, camera_matrix, dist_coeffs, reproj_errs);
+        total_avg_err = compute_reprojection_errors(object_points, image_points, rvecs, tvecs, camera_matrix, dist_coeffs, reproj_errs);
 
         return ok;
     }
 
-    static void calcBoardCornerPositions(cv::Size board_size, float square_size, vector<cv::Point3f>& corners, Pattern pattern_type /*= Settings::CHESSBOARD*/) {
+    static void compute_board_corner_positions(cv::Size board_size, float square_size, vector<cv::Point3f>& corners, Pattern pattern_type /*= Settings::CHESSBOARD*/) {
         corners.clear();
 
         switch (pattern_type) {
@@ -360,7 +358,6 @@ public:
                 for (auto j = 0; j < board_size.width; ++j)
                     corners.emplace_back(cv::Point3f(float(j * square_size), float(i * square_size), 0));
             break;
-
         case Pattern::ASYMMETRIC_CIRCLES_GRID: for (auto i = 0; i < board_size.height; i++)
                 for (auto j = 0; j < board_size.width; j++)
                     corners.emplace_back(cv::Point3f(float((2 * j + i % 2) * square_size), float(i * square_size), 0));
@@ -369,17 +366,17 @@ public:
         }
     }
 
-    bool runCalibrationAndSave(Settings& s, cv::Size image_size, cv::Mat& camera_matrix, cv::Mat& dist_coeffs, vector<vector<cv::Point2f>> image_points) const {
+    bool run_calibration_and_save(Settings& s, cv::Size image_size, cv::Mat& camera_matrix, cv::Mat& dist_coeffs, vector<vector<cv::Point2f>> image_points) const {
         vector<cv::Mat> rvecs;
         vector<cv::Mat> tvecs;
         vector<float> reprojErrs;
         double totalAvgErr = 0;
 
-        auto ok = runCalibration(s, image_size, camera_matrix, dist_coeffs, image_points, rvecs, tvecs, reprojErrs, totalAvgErr);
+        auto ok = run_calibration(s, image_size, camera_matrix, dist_coeffs, image_points, rvecs, tvecs, reprojErrs, totalAvgErr);
         log_time << cv::format("Calibration %s. avg re projection error = %f", (ok ? "succeeded" : "failed"), totalAvgErr);
 
         if (ok)
-            saveCameraParams(s, image_size, camera_matrix, dist_coeffs, rvecs, tvecs, reprojErrs, image_points, totalAvgErr);
+            save_camera_params(s, image_size, camera_matrix, dist_coeffs, rvecs, tvecs, reprojErrs, image_points, totalAvgErr);
 
         return ok;
     }
@@ -414,13 +411,16 @@ public:
 
         cv::namedWindow("Image View", cv::WINDOW_FREERATIO);
 
+        const auto def_zero_zone = cv::Size(-1, -1);
+        const auto def_win_size = cv::Size(11, 11);
+
         for (auto i = 0;; ++i) {
-            auto view = s.nextImage();
+            auto view = s.next_image();
             auto blink_output = false;
 
             //-----  If no more image, or got enough, then stop calibration and show result -------------
             if (mode == Mode::CAPTURING && image_points.size() >= static_cast<unsigned>(s.nrFrames)) {
-                if (s.runCalibrationAndSave(s, image_size, camera_matrix, dist_coeffs, image_points))
+                if (s.run_calibration_and_save(s, image_size, camera_matrix, dist_coeffs, image_points))
                     mode = Mode::CALIBRATED;
                 else
                     mode = Mode::DETECTION;
@@ -429,7 +429,7 @@ public:
             // If no more images then run calibration, save and stop loop.
             if (view.empty()) {
                 if (image_points.size() > 0)
-                    s.runCalibrationAndSave(s, image_size, camera_matrix, dist_coeffs, image_points);
+                    s.run_calibration_and_save(s, image_size, camera_matrix, dist_coeffs, image_points);
                 break;
             }
 
@@ -461,7 +461,7 @@ public:
                     // from colour to gray
                     cv::Mat view_gray;
                     cvtColor(view, view_gray, cv::COLOR_BGR2GRAY);
-                    cornerSubPix(view_gray, point_buf, cv::Size(11, 11), cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+                    cornerSubPix(view_gray, point_buf, def_win_size, def_zero_zone, cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
                 }
 
                 // For camera only take new samples after delay time
@@ -481,12 +481,8 @@ public:
             auto text_size = cv::getTextSize(msg, 1, 1, 1, &base_line);
             cv::Point text_origin(view.cols - 2 * text_size.width - 10, view.rows - 2 * base_line - 10);
 
-            if (mode == Mode::CAPTURING) {
-                if (s.showUndistorsed)
-                    msg = cv::format("%d/%d Undist", static_cast<int>(image_points.size()), s.nrFrames);
-                else
-                    msg = cv::format("%d/%d", static_cast<int>(image_points.size()), s.nrFrames);
-            }
+            if (mode == Mode::CAPTURING)
+                msg = cv::format(tg::iif(s.showUndistorsed, "%d/%d Undist", "%d/%d"), static_cast<int>(image_points.size()), s.nrFrames);
 
             putText(view, msg, text_origin, 1, 1, mode == Mode::CALIBRATED ? GREEN : RED);
 
@@ -544,10 +540,11 @@ private:
 };
 
 static void read(const cv::FileNode& node, Settings& x, const Settings& default_value = Settings()) {
-    if (node.empty())
+    if (node.empty()) {
         x = default_value;
-    else
-        x.read(node);
+        return;
+    }
+    x.read(node);
 }
 
 //bool runCalibrationAndSave(Settings& s, Size imageSize, Mat&  cameraMatrix, Mat& distCoeffs,
