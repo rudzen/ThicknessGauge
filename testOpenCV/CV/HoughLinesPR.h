@@ -247,35 +247,30 @@ inline void HoughLinesPR::compute_borders() {}
 inline void HoughLinesPR::rhocb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->theta(value);
-    using namespace tg;
     log_time << cv::format("%s rho : %i\n", that->window_name_, value);
 }
 
 inline void HoughLinesPR::thetacb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->theta(value);
-    using namespace tg;
     log_time << cv::format("%s theta : %i\n", that->window_name_, value);
 }
 
 inline void HoughLinesPR::thresholdcb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->threshold(value);
-    using namespace tg;
     log_time << cv::format("%s threshold : %i\n", that->window_name_, value);
 }
 
 inline void HoughLinesPR::maxLineGabcb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->max_line_gab(value);
-    using namespace tg;
     log_time << cv::format("%s maxLineGab : %i\n", that->window_name_, value);
 }
 
 inline void HoughLinesPR::minLineLencb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->min_line_len(value);
-    using namespace tg;
     log_time << cv::format("%s minLineLen : %i\n", that->window_name_, value);
 }
 

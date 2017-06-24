@@ -12,6 +12,7 @@
 #include <chrono>
 #include "../Vimba/GC2450MCamera.h"
 #include "Vimba/CameraData.h"
+#include "tg.h"
 
 /**
  * \brief Contains utilitary functionality for the entire program
@@ -206,6 +207,17 @@ namespace tg {
 #define log_date std::cout << LogTime::LOG_DATE
 
 #endif
+
+    /**
+     * \brief Wrapping log_time operator + cv::format together.
+     * \tparam Ts Variadic template type
+     * \param fmt The output string to be formatted
+     * \param ts The variadic arguments
+     */
+    template <typename ... Ts>
+    void out(const char* fmt, Ts ... ts) {
+        log_time << cv::format(fmt, ts...);
+    }
 
     // ----------------------------------------------
 

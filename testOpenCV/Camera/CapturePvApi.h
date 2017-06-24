@@ -178,6 +178,8 @@ public:
      */
     void cap(int frame_count, std::vector<cv::Mat>& target_vector);
 
+    void cap_single(cv::Mat& target);
+
     bool initialize();
 
     void uninitialize();

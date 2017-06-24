@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
         if (parse_args(argc, argv, options)) {
             // unique case for build information
             if (options.build_info_mode()) {
-                log_time << cv::getBuildInformation();
+                log_time << cv::format(cv::getBuildInformation().c_str());
                 return 0;
             }
             // null save mode..
@@ -98,7 +98,6 @@ int main(int argc, char** argv) {
         //thicknessGauge->setSaveVideo(options.isRecordVideo());
         thickness_gauge->init_calibration_settings(options.camera_file());
         cv::setNumThreads(options.num_open_cv_threads());
-        log_time << iif(cv::useOptimized(), "OpenCV is using optimization.", "Warning, OpenCV has optimization disabled.") << '\n';
 
         if (options.glob_mode()) {
             // TODO : use capture for file reading?!
@@ -116,14 +115,10 @@ int main(int argc, char** argv) {
                 if (initialized_ok)
                     break;
 
-                log_time << "Unable to initialize....\n";
-                log_time << "Retrying in a moment [press ctrl-c to abort].\n";
+                log_time << cv::format("Unable to initialize....\n");
+                log_time << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
                 tg::sleep(500);
             }
-
-            //    log_time << "Catastrofic failure.. exiting..\n";
-            //    return -20;
-            //}
 
             thickness_gauge->compute_marking_height();
 
@@ -132,8 +127,8 @@ int main(int argc, char** argv) {
             thickness_gauge->save_data("output_mufmuf");
 
             log_time << cv::format("difference: %f\n", data->difference);
+            log_time << cv::format("done..\n");
 
-            log_time << "done..\n";
         } else if (options.calibration_mode()) {
             Calib calib;
             calib.run_calib();

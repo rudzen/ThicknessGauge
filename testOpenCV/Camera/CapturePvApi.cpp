@@ -184,7 +184,7 @@ bool CapturePvApi::load_calibration_data(std::string& filename) const {
 
     //calibration_Time
     fs["calibration_Time"] >> time;
-    log_time << "Loading calibration file created @ " << time << '\n';
+    log_time << cv::format("Loading calibration file created @ %s.\n", time);
     int width = 0;
     int height = 0;
     fs["image_width"] >> width;
@@ -205,7 +205,7 @@ bool CapturePvApi::load_calibration_data(std::string& filename) const {
     fs["dist_coeffs"] >> cal->dist_coeffs;
     log_time << cv::format("dist_coeffs size : %i.\n", cal->dist_coeffs.size());
 
-    log_time << __FUNCTION__ << "Calibration data loaded ok!\n";
+    log_time << cv::format("Calibration data loaded ok!\n");
 
     cal->loaded = true;
 
@@ -586,6 +586,42 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
             //cv::imwrite("ostefars.png", target_vector.back());
         }
     }
+}
+
+void CapturePvApi::cap_single(cv::Mat& target) {
+
+    // retrieve the roi to use
+    auto roi = region();
+
+    target = cv::Mat(roi.height, roi.width, CV_8UC1);
+
+    cv::Mat undistorted;
+
+    if (!PvCaptureQueueFrame(camera_.Handle, &(camera_.Frame), nullptr)) {
+
+        while (true) {
+            auto err_code = PvCaptureWaitForFrameDone(camera_.Handle, &(camera_.Frame), 100);
+            if (err_code == ePvErrTimeout)
+                continue;
+            if (err_code == ePvErrSuccess)
+                break;
+            log_time << cv::format("Error while waiting for frame. %s\n", error_last(err_code));
+        }
+
+        // Create an image header (mono image)
+        // Push ImageBuffer data into the image matrix and clone it into target vector
+
+        target.data = static_cast<uchar *>(camera_.Frame.ImageBuffer);
+
+        // if the calibration data has been loaded, the undistorted image is then used
+        if (cal->loaded) {
+            cv::undistort(target, undistorted, cal->intrinsic, cal->dist_coeffs);
+            target = undistorted.clone();
+        }
+
+        //cv::imwrite("ostefars.png", target_vector.back());
+    }
+
 }
 
 bool CapturePvApi::initialize() {

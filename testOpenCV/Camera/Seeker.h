@@ -6,6 +6,7 @@
 #include "CV/CannyR.h"
 #include "CV/FilterR.h"
 #include "CV/MorphR.h"
+#include "CV/HoughLinesPR.h"
 
 /**
  * * NOT COMPLETE YET *
@@ -136,6 +137,8 @@ private:
 
     ulong phase_one_exposure = exposure_levels->exposure_start;
 
+    ulong phase_two_exposure = 0;
+
     std::shared_ptr<CapturePvApi> pcapture = std::make_shared<CapturePvApi>();
 
     // common canny with default settings for detecting marking borders
@@ -145,7 +148,7 @@ private:
     std::unique_ptr<FilterR> pfilter = std::make_unique<FilterR>("Baseline filter");
 
     // morph for phase two and three
-    std::unique_ptr<MorphR> morph = std::make_unique<MorphR>(cv::MORPH_GRADIENT, 1, false);
+    std::unique_ptr<MorphR> pmorph = std::make_unique<MorphR>(cv::MORPH_GRADIENT, 1, false);
 
     std::shared_ptr<Data<double>> pdata;
 
@@ -191,6 +194,14 @@ private:
     bool shut_down() const;
 
 private: // internal functions
+
+    /**
+ * \brief Processes the matrix for optimal output and computes the line information based on the results
+ * \param org The matrix to perform the process on
+ * \param hough The hough extension class used
+ * \param morph The morphology extenstion class used
+ */
+    void process_mat_for_line(cv::Mat& org, std::shared_ptr<HoughLinesPR>& hough, MorphR* morph) const;
 
     void switch_phase();
 

@@ -95,6 +95,20 @@ bool Seeker::shut_down() const {
     return true;
 }
 
+void Seeker::process_mat_for_line(cv::Mat& org, std::shared_ptr<HoughLinesPR>& hough, MorphR* morph) const {
+    pfilter->image(org);
+    pfilter->do_filter();
+
+    pcanny->image(pfilter->result());
+    pcanny->do_canny();
+
+    morph->image(pcanny->result());
+    morph->morph();
+
+    hough->image(morph->result());
+    hough->hough_horizontal();
+}
+
 void Seeker::switch_phase() {
     switch (current_phase_) {
         case Phase::NONE:
@@ -159,6 +173,8 @@ void Seeker::phase_one() {
 
             for (const auto e : exposures) {
 
+                phase_one_exposure = e;
+
                 pcapture->exposure(e);
 
                 targets.clear();
@@ -182,9 +198,21 @@ void Seeker::phase_one() {
                 hough_vertical->original(tmp);
                 hough_vertical->image(t);
 
-                if (hough_vertical->hough_vertical() < 0) {
-                    log_time << cv::format("No lines detected through hough at exposure level %i.\n", e);
-                    continue;
+                auto hough_result = hough_vertical->hough_vertical();
+
+                switch (hough_result) {
+                    case 0:
+                        // everything ok
+                        break;
+                    case -1:
+                        log_time << __FUNCTION__ << " No lines detect.\n";
+                        continue;
+                    case -2:
+                        log_time << __FUNCTION__ << " No valid lines detected.\n";
+                        continue;
+                    default:
+                        // nada
+                        break;
                 }
 
                 if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Left))
@@ -277,6 +305,128 @@ void Seeker::phase_two() {
 
     hough_horizontal->max_line_gab(12);
     hough_horizontal->marking_rect(pdata->marking_rect);
+
+    auto quarter = static_cast<double>(phase_roi_[0].height) / 4.0;
+    auto base_line_y = phase_roi_[0].height - quarter;
+
+    auto marking = pdata->marking_rect;
+    log_time << marking << std::endl;
+
+    capture_roi left_baseline;
+    left_baseline.x = 0;
+    left_baseline.y = base_line_y;
+    left_baseline.width = marking.x;
+    left_baseline.height = quarter;
+
+    capture_roi right_baseline;
+    right_baseline.x = marking.x + marking.width;
+    right_baseline.y = base_line_y;
+    right_baseline.width = phase_roi_[0].height - right_baseline.x;
+    right_baseline.height = quarter;
+
+    pcapture->region(right_baseline);
+
+    std::vector<cv::Mat> left_frames;
+    std::vector<cv::Mat> right_frames;
+
+    auto left_size = cv::Size(left_baseline.width, left_baseline.height);
+    auto left_cutoff = left_size.width / 2.0;
+    auto right_size = cv::Size(right_baseline.width, right_baseline.height);
+    auto right_cutoff = right_size.width / 2.0;
+
+    auto left_y = 0.0;
+    auto right_y = 0.0;
+
+    std::vector<cv::Point2f> left_elements(left_size.area());
+    std::vector<cv::Point2f> right_elements(right_size.area());
+
+    auto offset_y = phase_roi_[0].height - quarter;
+
+    auto left_avg = 0.0;
+    auto right_avg = 0.0;
+
+    phase_two_exposure = 30000 - exposure_levels->exposure_increment;
+
+    auto running = true;
+
+    cv::Mat exposure_test;
+
+    cv::Mat org;
+
+    // ************  LEFT SIDE **************
+
+    // attempt to find a good exposure for this phase
+    while (running) {
+
+        phase_two_exposure += exposure_levels->exposure_increment;
+
+        pcapture->exposure(phase_two_exposure);
+
+        pcapture->cap_single(exposure_test);
+
+        org = exposure_test.clone();
+        auto h = exposure_test.clone();
+        hough_horizontal->original(h);
+
+        process_mat_for_line(org, hough_horizontal, pmorph.get());
+
+        const auto& lines = hough_horizontal->right_lines(); // inner most side
+        for (auto& line : lines)
+            if (line.entry_[0] > left_cutoff)
+                stl::copy_vector(line.elements_, left_elements);
+
+        if (left_elements.size() > 4)
+            break;
+
+        if (phase_two_exposure > 100'000) {
+            log_time << "left side failed to produce valid lines.";
+        }
+
+    }
+
+    // TODO : adjust capture ROI based on found lines. ?
+    auto left_boundry = cv::minAreaRect(left_elements);
+    auto left_boundry_rect = left_boundry.boundingRect();
+
+    pcapture->region(left_boundry_rect);
+
+    // capture left frames for real
+    while (running) {
+
+        pcapture->cap(25, left_frames);
+
+        for (const auto& left : left_frames) {
+            org = left.clone();
+            auto h = left.clone();
+            hough_horizontal->original(h);
+
+            process_mat_for_line(org, hough_horizontal, pmorph.get());
+
+            const auto& lines = hough_horizontal->right_lines(); // inner most side
+            for (auto& line : lines)
+                if (line.entry_[0] > left_cutoff)
+                    stl::copy_vector(line.elements_, left_elements);
+
+        }
+
+        // generate real boundry
+        left_boundry = cv::minAreaRect(left_elements);
+        left_boundry_rect = left_boundry.boundingRect();
+
+        log_time << "left_boundry_rect: " << left_boundry_rect.y << endl;
+
+        left_boundry_rect.width -= 40;
+
+        auto t = org(left_boundry_rect);
+        left_y = static_cast<double>(left_boundry_rect.y);
+        left_y += offset_y;
+        left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
+
+        log_time << "left baseline: " << left_y << endl;
+
+    }
+
+    // ************  RIGHT SIDE **************
 
 }
 

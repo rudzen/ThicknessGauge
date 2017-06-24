@@ -361,7 +361,6 @@ void ThicknessGauge::compute_base_line_areas(shared_ptr<HoughLinesPR>& hough, sh
         log_time << "Validation error for right_baseline in computeBaseLineAreas()." << endl;
     }
 
-    // cannot be resized
     vector<cv::Mat> left_frames;
     vector<cv::Mat> right_frames;
 
