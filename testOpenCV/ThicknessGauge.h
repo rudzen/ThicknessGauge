@@ -17,10 +17,9 @@
 #include "CV/LaserR.h"
 #include "CV/MorphR.h"
 
-#include "Vimba/GC2450MCamera.h"
-
 #include "namespaces/tg.h"
 #include "Camera/CapturePvApi.h"
+#include "CV/Data.h"
 #include "namespaces/draw.h"
 
 using namespace tg;
@@ -44,13 +43,7 @@ public:
         //draw::showWindows = showWindows;
     }
 
-    std::shared_ptr<Data<double>> pdata; // there can be only one!
-
-public: // data return point
-    template <typename T>
-    std::shared_ptr<Data<T>> data() const {
-        return pdata;
-    }
+    std::shared_ptr<Data<double>> pdata;
 
     //AVT::VmbAPI::CameraPtr* getCamera() const {
     //	return data->cameraPtr.get();

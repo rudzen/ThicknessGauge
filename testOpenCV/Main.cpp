@@ -38,7 +38,7 @@ using namespace tg;
 
 /*
  * Application return codes :
- * 
+ *
  * -1	= Argument parsing error
  * -2	= Capture fail
  * -3	= Calibration error
@@ -102,7 +102,6 @@ int main(int argc, char** argv) {
         //thicknessGauge->setSaveVideo(options.isRecordVideo());
         thicknessGauge->init_calibration_settings(options.camera_file());
         cv::setNumThreads(options.num_open_cv_threads());
-
         log_time << iif(cv::useOptimized(), "OpenCV is using optimization.", "Warning, OpenCV has optimization disabled.") << '\n';
 
         if (options.glob_mode()) {

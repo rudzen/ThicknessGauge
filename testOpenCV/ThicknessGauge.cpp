@@ -12,6 +12,7 @@
 #include "Histogram/Histogram.h"
 #include "Histogram/HistoPeak.h"
 
+#include "CV/Data.h"
 #include "CV/CannyR.h"
 #include "CV/HoughLinesR.h"
 #include "CV/FilterR.h"
@@ -217,7 +218,7 @@ void ThicknessGauge::compute_marking_height() {
             //}
 
             // make sure the minimum is at least 10 pixels.
-            auto min_line_len = compute_houghP_min_line(10.0, pdata->marking_rect);
+            auto min_line_len = calc::line::compute_houghp_min_line(10.0, pdata->marking_rect);
 
             // horizontal houghline extension class
             auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), show_windows_);
@@ -826,8 +827,8 @@ void ThicknessGauge::compute_laser_locations(shared_ptr<LaserR>& laser, shared_p
 
         if (show_windows_) {
             draw::drawRectangle(tmpOut, rect_draw, cv::Scalar(255, 0, 0));
-            draw::drawHorizontalLine(&tmpOut, cvRound(highest_total), cv::Scalar(0, 255, 0));
-            draw::drawHorizontalLine(&tmpOut, cvRound(base), cv::Scalar(0, 0, 255));
+            draw::drawHorizontalLine(&tmpOut, calc::round(highest_total), cv::Scalar(0, 255, 0));
+            draw::drawHorizontalLine(&tmpOut, calc::round(base), cv::Scalar(0, 0, 255));
             draw::drawText(&tmpOut, cv::format("%f pixels", pdata->difference), TextDrawPosition::UpperLeft, cv::Scalar(255, 255, 255));
             draw::showImage(window_name, tmpOut);
             if (draw::is_escape_pressed(30))
@@ -903,21 +904,6 @@ void ThicknessGauge::computer_in_between(shared_ptr<FilterR>& filter, shared_ptr
     cv::imwrite("__left_.png", base.front());
     cv::imwrite("__right_.png", mark.front());
 
-}
-
-/**
- * \brief Computes the minimum houghline lenght for properlistic houghline
- * \tparam minLen The minimim length of the line
- * \param rect The rectangle of the marking location
- * \return the computed value, but not less than minLen
- */
-double ThicknessGauge::compute_houghP_min_line(double min_len, cv::Rect2d& rect) {
-    auto min_line_len = rect.width / 32.0;
-
-    if (min_line_len < min_len)
-        min_line_len = min_len;
-
-    return min_line_len;
 }
 
 /**
@@ -1107,15 +1093,15 @@ bool ThicknessGauge::save_data(string filename) {
 #pragma message("MSC compatible compiler detected -- turning off warning 4309")
 #pragma warning( disable : 4309)
 #endif
-    const char default_intensity = static_cast<char>(210);
+    const auto default_intensity = static_cast<char>(210);
     cv::Scalar default_col(0, 0, 250.0);
     cv::Scalar default_bw(200.0, 200.0, 200.0);
 
     auto paintY = [](cv::Mat& image, std::vector<cv::Point2d>& points, double offset_x, double offset_y = 0.0, cv::Scalar col = cv::Scalar(0.0, 0.0, 255.0)) {
         for (auto& p : points) {
-            cv::Point p1(cvRound(p.x + offset_x), cvRound(p.y + offset_y));
+            cv::Point p1(calc::round(p.x + offset_x), calc::round(p.y + offset_y));
             cv::line(image, p1, p1, col);
-            //image.at<char>(cvRound(p.y), cvRound(p.x + offset)) = default_intensity;
+            //image.at<char>(calc::round(p.y), calc::round(p.x + offset)) = default_intensity;
         }
     };
 

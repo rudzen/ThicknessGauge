@@ -43,13 +43,13 @@ void Histogram::populate_histogram(cv::Mat& image) {
     normalize(hist_, hist_normalized_, 0, histogram_image_.rows, cv::NORM_MINMAX, -1, cv::Mat());
 
     for (auto i = 0; i < count; i++) {
-        cv::line(histogram_image_, cv::Point(bin_w_ * (i - 1), hist_h_ - cvRound(hist_normalized_.at<float>(i - 1))),
-                 cv::Point(bin_w_ * (i), hist_h_ - cvRound(hist_normalized_.at<float>(i))),
+        cv::line(histogram_image_, cv::Point(bin_w_ * (i - 1), hist_h_ - calc::round(hist_normalized_.at<float>(i - 1))),
+                 cv::Point(bin_w_ * (i), hist_h_ - calc::round(hist_normalized_.at<float>(i))),
                  cv::Scalar(255, 0, 0), 1, cv::LINE_8, 0);
     }
 
     for (auto i = 0; i < count; ++i) {
-        auto val = cvRound(hist_.at<float>(1, i));
+        auto val = calc::round(hist_.at<float>(1, i));
         //if (val > 0)
         dale_.emplace_back(v2<int>(i, val));
     }
@@ -57,13 +57,13 @@ void Histogram::populate_histogram(cv::Mat& image) {
     // attempt to seperate highest peak with line
     //auto currentValley = 0;
     //for (auto i = 2; i < hist_.rows - 2; ++i) {
-    //	auto val = cvRound(hist_.at<float>(1, i));
+    //	auto val = calc::round(hist_.at<float>(1, i));
     //	if (val < 500)
     //		continue;
-    //	auto previous = cvRound(hist_.at<float>(1, i - 2));
+    //	auto previous = calc::round(hist_.at<float>(1, i - 2));
     //	if (previous < 500)
     //		continue;
-    //	auto next = cvRound(hist_.at<float>(1, i + 2));
+    //	auto next = calc::round(hist_.at<float>(1, i + 2));
     //	if (next < 500)
     //		continue;
     //	if (next > val && previous < val) {
@@ -103,7 +103,7 @@ void Histogram::create_histogram_image() {
 
     for (auto i = 0; i < hist_size_; i++) {
         auto x = bin_w_ * i;
-        line(histogram_image_, cv::Point(x, hist_h_), cv::Point(x, hist_h_ - cvRound(histogram_[i])), black, 1, cv::LINE_8, 0);
+        line(histogram_image_, cv::Point(x, hist_h_), cv::Point(x, hist_h_ - calc::round(histogram_[i])), black, 1, cv::LINE_8, 0);
     }
 }
 

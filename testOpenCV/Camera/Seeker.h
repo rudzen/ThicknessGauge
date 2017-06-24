@@ -5,6 +5,7 @@
 #include "CV/Frames.h"
 #include "CV/CannyR.h"
 #include "CV/FilterR.h"
+#include "CV/MorphR.h"
 
 /**
  * * NOT COMPLETE YET *
@@ -114,21 +115,22 @@ public:
 
 private:
 
-
     using ulong = unsigned long;
 
     using capture_roi = cv::Rect_<ulong>;
 
     using phase_one_exp = struct phase_exp {
         const ulong exposure_start = 500;
+
         const ulong exposure_end = 30000;
+
         const ulong exposure_increment = 500;
     };
 
     std::unique_ptr<phase_one_exp> exposure_levels = std::make_unique<phase_one_exp>();
 
     using phase_two_results = struct results {
-        ulong ok;   // <- important.. comparison to other side
+        ulong ok; // <- important.. comparison to other side
         ulong fail; // <- important.. determine high fail chance
     };
 
@@ -141,6 +143,19 @@ private:
 
     // filter used for base line detection
     std::unique_ptr<FilterR> pfilter = std::make_unique<FilterR>("Baseline filter");
+
+    // morph for phase two and three
+    std::unique_ptr<MorphR> morph = std::make_unique<MorphR>(cv::MORPH_GRADIENT, 1, false);
+
+    std::shared_ptr<Data<double>> pdata;
+
+public: // data return point
+    template <typename T>
+    std::shared_ptr<Data<T>> data() const {
+        return pdata;
+    }
+
+private:
 
     const capture_roi def_phase_one_roi_ = capture_roi(0UL, 1006, 2448, 256);
 
@@ -162,7 +177,7 @@ private:
 
     std::array<std::unique_ptr<Frames>, 3> frameset_;
 
-    Frames *current_frameset_;
+    Frames* current_frameset_;
 
     Seeker();
 

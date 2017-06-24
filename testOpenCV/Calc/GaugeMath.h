@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Util/Vec.h"
 #include <opencv2/core/mat.hpp>
 #include <opencv2/videostab/fast_marching.hpp>
 

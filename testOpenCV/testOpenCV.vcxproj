@@ -197,6 +197,7 @@
     <ClInclude Include="Camera\Calib.h" />
     <ClInclude Include="Camera\CapturePvApi.h" />
     <ClInclude Include="Camera\Seeker.h" />
+    <ClInclude Include="CV\Data.h" />
     <ClInclude Include="CV\Frames.h" />
     <ClInclude Include="CV\HarrisDetector.h" />
     <ClInclude Include="Exceptions\ThrowAssert.h" />

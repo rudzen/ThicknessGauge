@@ -38,6 +38,10 @@ class HoughLinesR : public BaseR {
 
 public:
 
+    enum class Side {
+        Left, Right
+    };
+
     typedef struct LineV {
         cv::Vec2f entry_;
         tg::line_pair<float> points;
@@ -49,7 +53,7 @@ public:
         LineV(cv::Vec2f entry, tg::line_pair<float> points)
             : entry_(entry),
               points(points) {
-            elements.reserve(cvRound(calc::dist_manhattan(points.p1.x, points.p2.x, points.p1.y, points.p2.y)));
+            elements.reserve(calc::round(calc::dist_manhattan(points.p1.x, points.p2.x, points.p1.y, points.p2.y)));
             slobe = 0.0f;
         }
 
@@ -72,12 +76,6 @@ public:
                 << " elements: " << obj.elements;
         }
     } LineV;
-
-    struct lineVsizeSort {
-        bool operator()(const LineV& l1, const LineV& l2) const {
-            return l1.elements.size() < l2.elements.size();
-        }
-    } lineVsizeSort;
 
 private:
 
@@ -146,6 +144,8 @@ public:
     }
 
     void compute_borders();
+
+    bool is_lines_intersecting(Side side);
 
 private:
     void create_window() {

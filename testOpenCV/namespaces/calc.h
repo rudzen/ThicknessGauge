@@ -91,11 +91,25 @@ namespace calc {
          */
         template <typename T1, typename T2>
         void adjust_base_lines_x(cv::Vec<T1, 4>& base_lines, cv::Vec<T1, 4>& intersection_points, T2 buffer) {
-            static_assert(std::is_same<T1, T2>::value, "requires identical types.");
-            static_assert(std::is_same<T2, double>::value, "buffer must be double floating point.");
+            static_assert(std::is_floating_point<T1>::value, "Requires floating point.");
+            static_assert(std::is_same<T2, double>::value, "Required double floating point.");
 
             base_lines[0] = intersection_points[0] - buffer;
             base_lines[2] = intersection_points[2] + buffer;
+        }
+
+        /**
+         * \brief Computes the minimum houghline lenght for properlistic houghline
+         * \tparam T Type, only floating points
+         * \param min_len The minimim length of the line
+         * \param rect The rectangle of the marking location
+         * \return  the computed value, but not less than min_len
+         */
+        template <typename T>
+        double compute_houghp_min_line(T min_len, cv::Rect_<T>& rect) {
+            static_assert(std::is_floating_point<T>::value, "Only floating point type allowed.");
+            auto min_line_len = rect.width / static_cast<double>(32);
+            return align_min_value(min_line_len, min_len);
         }
 
         /**
@@ -501,6 +515,27 @@ namespace calc {
     }
 
     /** @overload
+    * \param o1 Point one of pair one
+    * \param p1 Point one of pair two
+    * \param o2 Point two of pair one
+    * \param p2 Point two of pair two
+    * \return true if intersection was found, otherwise false
+    */
+    template <typename T>
+    bool intersection(cv::Point_<T> o1, cv::Point_<T> p1, cv::Point_<T> o2, cv::Point_<T> p2) {
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
+        auto d1 = p1 - o1;
+        auto d2 = p2 - o2;
+
+        auto cross = d1.x * d2.y - d1.y * d2.x;
+
+        // check for EPS boundry
+        if (abs(cross) < 1e-8)
+            return false;
+        return true;
+    }
+
+    /** @overload
     * \param border The border vector containing x/y coordinates for both borders
     * \param line The line vector The line for which to check intersections with borders
     * \param result The resulting point coordinates if they intersect
@@ -510,6 +545,17 @@ namespace calc {
     bool intersection(const cv::Vec<T, 4>& border, cv::Vec<T, 4>& line, cv::Point_<T>& result) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return intersection(cv::Point_<T>(border[0], border[1]), cv::Point_<T>(line[0], line[1]), cv::Point_<T>(border[2], border[3]), cv::Point_<T>(line[2], line[3]), result);
+    }
+
+    /** @overload
+    * \param border The border vector containing x/y coordinates for both borders
+    * \param line The line vector The line for which to check intersections with borders
+    * \return true if intersection was found, otherwise false
+    */
+    template <typename T>
+    bool intersection(const cv::Vec<T, 4>& border, cv::Vec<T, 4>& line) {
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
+        return intersection(cv::Point_<T>(border[0], border[1]), cv::Point_<T>(line[0], line[1]), cv::Point_<T>(border[2], border[3]), cv::Point_<T>(line[2], line[3]));
     }
 
     /**
@@ -606,7 +652,6 @@ namespace calc {
             sum += vec[i];
         return sum * (1 / (C / 2));
     }
-
 
     template <typename T>
     cv::Vec2d avg_xy(std::vector<cv::Point_<T>>& vec) {

@@ -1,6 +1,34 @@
 #include <opencv2/core.hpp>
 #include "HoughLinesR.h"
 
+bool HoughLinesR::is_lines_intersecting(Side side) {
+
+    auto& lines = side == Side::Right ? right_lines_ : left_lines_;
+
+    if (lines.empty())
+        return false;
+
+    auto size = lines.size();
+
+    if (size == 1)
+        return true;
+
+    auto intersects = true;
+
+    auto& first = lines.front();
+
+    for (size_t i = 1; i < size; ++i) {
+        auto& p1 = lines[i].points.p1;
+        auto& p2 = lines[i].points.p2;
+        intersects = calc::intersection(first.points.p1, p1, first.points.p2, p2);
+        if (!intersects)
+            return false;
+    }
+
+    return intersects;
+
+}
+
 void HoughLinesR::compute_meta() {
 
     if (all_lines_.empty())

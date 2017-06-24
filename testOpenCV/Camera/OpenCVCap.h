@@ -171,154 +171,154 @@ public:
 
     }
 
-    template <typename T>
-    void initialize_vimba(Data<T>* data) {
+    //template <typename T>
+    //void initialize_vimba(Data<T>* data) {
 
-        // MESSY FOR NOW
+    //    // MESSY FOR NOW
 
-        log_time << "Camera initialization in progress.\n";
+    //    log_time << "Camera initialization in progress.\n";
 
-        // just to check if everything was fine :-)
-        auto cam_ok = true;
+    //    // just to check if everything was fine :-)
+    //    auto cam_ok = true;
 
-        AVT::VmbAPI::CameraPtrVector cameras;
-        auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
-        if (VmbErrorSuccess == system.Startup()) {
-            if (VmbErrorSuccess == system.GetCameras(cameras))
-                data->cameraData->parse(cameras);
-            if (cameras.empty()) {
-                log_time << "Error, no cameras currently available.";
-                return;
-            }
-            data->cameraPtr = cameras.front();
-        }
+    //    AVT::VmbAPI::CameraPtrVector cameras;
+    //    auto& system = AVT::VmbAPI::VimbaSystem::GetInstance();
+    //    if (VmbErrorSuccess == system.Startup()) {
+    //        if (VmbErrorSuccess == system.GetCameras(cameras))
+    //            data->cameraData->parse(cameras);
+    //        if (cameras.empty()) {
+    //            log_time << "Error, no cameras currently available.";
+    //            return;
+    //        }
+    //        data->cameraPtr = cameras.front();
+    //    }
 
-        // gather information if the camera is found
-        if (data->cameraPtr != nullptr) {
+    //    // gather information if the camera is found
+    //    if (data->cameraPtr != nullptr) {
 
-            bool success;
+    //        bool success;
 
-            //interface permissions
-            VmbErrorType error = data->cameraPtr->GetPermittedAccess(data->vimbaData->interfacePermittedAccess);
-            success = error == VmbErrorSuccess;
-            log_time << status("data->cameraPtr->GetPermittedAccess", success);
-            if (!success)
-                cam_ok = false;
+    //        //interface permissions
+    //        VmbErrorType error = data->cameraPtr->GetPermittedAccess(data->vimbaData->interfacePermittedAccess);
+    //        success = error == VmbErrorSuccess;
+    //        log_time << status("data->cameraPtr->GetPermittedAccess", success);
+    //        if (!success)
+    //            cam_ok = false;
 
-            //if (success) {
-            //    log_time << "data->cameraPtr->GetPermittedAccess ok.\n";
-            //} else {
-            //    log_time << "data->cameraPtr->GetPermittedAccess fail.\n";
-            //    cam_ok = false;
-            //}
+    //        //if (success) {
+    //        //    log_time << "data->cameraPtr->GetPermittedAccess ok.\n";
+    //        //} else {
+    //        //    log_time << "data->cameraPtr->GetPermittedAccess fail.\n";
+    //        //    cam_ok = false;
+    //        //}
 
-            // interface type
-            error = data->cameraPtr->GetInterfaceType(data->vimbaData->interfaceType);
+    //        // interface type
+    //        error = data->cameraPtr->GetInterfaceType(data->vimbaData->interfaceType);
 
-            if (error == VmbErrorSuccess) {
-                log_time << "data->data->cameraPtr->GetInterfaceType ok.\n";
-            } else {
-                log_time << "data->data->cameraPtr->GetInterfaceType fail.\n";
-                cam_ok = false;
-            }
+    //        if (error == VmbErrorSuccess) {
+    //            log_time << "data->data->cameraPtr->GetInterfaceType ok.\n";
+    //        } else {
+    //            log_time << "data->data->cameraPtr->GetInterfaceType fail.\n";
+    //            cam_ok = false;
+    //        }
 
-            std::string output_string;
+    //        std::string output_string;
 
-            auto vimb = data->vimbaData.get();
+    //        auto vimb = data->vimbaData.get();
 
-            // copy over data from the camera which info is already known
-            vimb->pCameraID = data->cameraData->getId();
-            vimb->pCameraName = data->cameraData->getName();
-            vimb->pCameraModel = data->cameraData->getModel();
-            vimb->pCameraSerialNumber = data->cameraData->getSn();
-            vimb->pInterfaceID = data->cameraData->getInterfaceId();
+    //        // copy over data from the camera which info is already known
+    //        vimb->pCameraID = data->cameraData->getId();
+    //        vimb->pCameraName = data->cameraData->getName();
+    //        vimb->pCameraModel = data->cameraData->getModel();
+    //        vimb->pCameraSerialNumber = data->cameraData->getSn();
+    //        vimb->pInterfaceID = data->cameraData->getInterfaceId();
 
-            // attempt to retrieve the interface information
-            AVT::VmbAPI::InterfacePtr pInterface;
-            error = system.GetInterfaceByID(vimb->pInterfaceID, pInterface);
-            if (error == VmbErrorSuccess) {
-                log_time << "system.GetInterfaceByID ok.\n";
-                error = pInterface->GetSerialNumber(output_string);
-                if (error == VmbErrorSuccess) {
-                    vimb->pInterfaceSerialNumber = output_string.c_str();
-                    log_time << cv::format("pInterface->GetSerialNumber ok : %s\n", output_string.c_str());
-                } else {
-                    log_time << "pInterface->GetSerialNumber fail.\n";
-                    cam_ok = false;
-                }
+    //        // attempt to retrieve the interface information
+    //        AVT::VmbAPI::InterfacePtr pInterface;
+    //        error = system.GetInterfaceByID(vimb->pInterfaceID, pInterface);
+    //        if (error == VmbErrorSuccess) {
+    //            log_time << "system.GetInterfaceByID ok.\n";
+    //            error = pInterface->GetSerialNumber(output_string);
+    //            if (error == VmbErrorSuccess) {
+    //                vimb->pInterfaceSerialNumber = output_string.c_str();
+    //                log_time << cv::format("pInterface->GetSerialNumber ok : %s\n", output_string.c_str());
+    //            } else {
+    //                log_time << "pInterface->GetSerialNumber fail.\n";
+    //                cam_ok = false;
+    //            }
 
-                output_string.clear();
+    //            output_string.clear();
 
-                error = pInterface->GetName(output_string);
-                if (error == VmbErrorSuccess) {
-                    vimb->pInterfaceName = output_string.c_str();
-                    log_time << cv::format("pInterface->GetName ok : %s\n", output_string.c_str());
-                } else {
-                    log_time << "pInterface->GetName fail.\n";
-                    cam_ok = false;
-                }
+    //            error = pInterface->GetName(output_string);
+    //            if (error == VmbErrorSuccess) {
+    //                vimb->pInterfaceName = output_string.c_str();
+    //                log_time << cv::format("pInterface->GetName ok : %s\n", output_string.c_str());
+    //            } else {
+    //                log_time << "pInterface->GetName fail.\n";
+    //                cam_ok = false;
+    //            }
 
-                output_string.clear();
+    //            output_string.clear();
 
-            } else {
-                log_time << "system.GetInterfaceByID fail.\n";
-                cam_ok = false;
-            }
+    //        } else {
+    //            log_time << "system.GetInterfaceByID fail.\n";
+    //            cam_ok = false;
+    //        }
 
-            if (cam_ok) {
-                // create the camera object pointer, with shareable properties
-                data->camera = std::make_shared<GC2450MCamera>(vimb->pCameraID,
-                                                               vimb->pCameraName,
-                                                               vimb->pCameraModel,
-                                                               vimb->pCameraSerialNumber,
-                                                               vimb->pInterfaceID,
-                                                               vimb->interfaceType,
-                                                               vimb->pInterfaceName,
-                                                               vimb->pInterfaceSerialNumber,
-                                                               vimb->interfacePermittedAccess);
+    //        if (cam_ok) {
+    //            // create the camera object pointer, with shareable properties
+    //            data->camera = std::make_shared<GC2450MCamera>(vimb->pCameraID,
+    //                                                           vimb->pCameraName,
+    //                                                           vimb->pCameraModel,
+    //                                                           vimb->pCameraSerialNumber,
+    //                                                           vimb->pInterfaceID,
+    //                                                           vimb->interfaceType,
+    //                                                           vimb->pInterfaceName,
+    //                                                           vimb->pInterfaceSerialNumber,
+    //                                                           vimb->interfacePermittedAccess);
 
-                if (data->camera == nullptr) {
-                    log_time << "Failed to initialize camera.\n";
-                } else {
-                    log_time << "Camera initialized. Getting information.\n";
-                }
+    //            if (data->camera == nullptr) {
+    //                log_time << "Failed to initialize camera.\n";
+    //            } else {
+    //                log_time << "Camera initialized. Getting information.\n";
+    //            }
 
-                // test it
+    //            // test it
 
-                log_time << "Checking for auto exposure. ";
+    //            log_time << "Checking for auto exposure. ";
 
-                AVT::VmbAPI::FeaturePtr feature;
-                double exposure_time = 0.0;
-                error = data->camera->SetExposureTimeAbs(200.0);
-                if (error != VmbErrorSuccess) {
-                    log_time << "failed to set exposure....\n";
-                }
+    //            AVT::VmbAPI::FeaturePtr feature;
+    //            double exposure_time = 0.0;
+    //            error = data->camera->SetExposureTimeAbs(200.0);
+    //            if (error != VmbErrorSuccess) {
+    //                log_time << "failed to set exposure....\n";
+    //            }
 
 
 
-                error = data->camera->GetExposureTimeAbs(exposure_time);
-                log_time << exposure_time << std::endl;
-                //error = data->camera->GetExposureAutoFeature(feature);
-                if (error == VmbErrorSuccess) {
-                    std::cout << "supported. ";
-                    error = feature->GetName(output_string);
-                    if (error == VmbErrorSuccess) {
-                        std::cout << "activated.\n";
-                        auto_exposure = true;
-                    } else {
-                        std::cout << "deactivated.\n";
-                    }
-                } else {
-                    std::cout << "not supported.\n";
-                }
+    //            error = data->camera->GetExposureTimeAbs(exposure_time);
+    //            log_time << exposure_time << std::endl;
+    //            //error = data->camera->GetExposureAutoFeature(feature);
+    //            if (error == VmbErrorSuccess) {
+    //                std::cout << "supported. ";
+    //                error = feature->GetName(output_string);
+    //                if (error == VmbErrorSuccess) {
+    //                    std::cout << "activated.\n";
+    //                    auto_exposure = true;
+    //                } else {
+    //                    std::cout << "deactivated.\n";
+    //                }
+    //            } else {
+    //                std::cout << "not supported.\n";
+    //            }
 
-            } else {
-                log_time << "Generic fail while initializing camera.\n";
-            }
+    //        } else {
+    //            log_time << "Generic fail while initializing camera.\n";
+    //        }
 
-        }
+    //    }
 
-    }
+    //}
 
     bool isOpen() const {
         return cap.isOpened();

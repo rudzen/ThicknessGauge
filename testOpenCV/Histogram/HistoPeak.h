@@ -226,7 +226,7 @@ inline cv::Mat HistoPeak<T>::draw_histogram(cv::Mat& hist, int hist_h, int hist_
                 const unsigned x = i;
                 const unsigned y = hist_h;
 
-                line(histImage, cv::Point(bin_w * x, y), cv::Point(bin_w * x, y - cvRound(hist.at<float>(i))), color);
+                line(histImage, cv::Point(bin_w * x, y), cv::Point(bin_w * x, y - calc::round(hist.at<float>(i))), color);
             }
 
             break;
@@ -234,8 +234,8 @@ inline cv::Mat HistoPeak<T>::draw_histogram(cv::Mat& hist, int hist_h, int hist_
             for (auto i = 1; i < hist_size; ++i) {
                 auto pt1 = cv::Point(bin_w * (i - 1), hist_h);
                 auto pt2 = cv::Point(bin_w * i, hist_h);
-                auto pt3 = cv::Point(bin_w * i, hist_h - cvRound(hist.at<float>(i)));
-                auto pt4 = cv::Point(bin_w * (i - 1), hist_h - cvRound(hist.at<float>(i - 1)));
+                auto pt3 = cv::Point(bin_w * i, hist_h - calc::round(hist.at<float>(i)));
+                auto pt4 = cv::Point(bin_w * (i - 1), hist_h - calc::round(hist.at<float>(i - 1)));
                 cv::Point pts[] = {pt1, pt2, pt3, pt4, pt1};
 
                 fillConvexPoly(histImage, pts, 5, color);
@@ -243,8 +243,8 @@ inline cv::Mat HistoPeak<T>::draw_histogram(cv::Mat& hist, int hist_h, int hist_
             break;
         default:
             for (auto i = 1; i < hist_size; ++i)
-                line(histImage, cv::Point(bin_w * (i - 1), hist_h - cvRound(hist.at<float>(i - 1))),
-                     cv::Point(bin_w * (i), hist_h - cvRound(hist.at<float>(i))), color, 1, 8, 0);
+                line(histImage, cv::Point(bin_w * (i - 1), hist_h - calc::round(hist.at<float>(i - 1))),
+                     cv::Point(bin_w * (i), hist_h - calc::round(hist.at<float>(i))), color, 1, 8, 0);
 
             break;
     }
@@ -265,7 +265,7 @@ std::vector<typename HistoPeak<T>::PeakInfo> HistoPeak<T>::find_peaks(cv::InputA
     // Transform initial matrix into 1channel, and 1 row matrix
     auto src2 = src.reshape(1, 1);
 
-    auto size = windowSize / 2;
+    auto size = window_size / 2;
 
     Length up_hill, down_hill;
     std::vector<PeakInfo> output;

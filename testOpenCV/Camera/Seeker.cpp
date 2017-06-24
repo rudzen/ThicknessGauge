@@ -1,14 +1,17 @@
 #include "Seeker.h"
 #include "CV/HoughLinesR.h"
 #include "namespaces/filters.h"
+#include "CV/HoughLinesPR.h"
 
-Seeker::Seeker() : current_phase_(Phase::ONE)
-                 , current_frameset_(nullptr) {
+Seeker::Seeker()
+    : current_phase_(Phase::ONE)
+    , current_frameset_(nullptr) {
     phase_roi_[0] = def_phase_one_roi_;
 }
 
-Seeker::Seeker(capture_roi phase_one_roi) : current_phase_(Phase::ONE)
-                                          , current_frameset_(nullptr) {
+Seeker::Seeker(capture_roi phase_one_roi)
+    : current_phase_(Phase::ONE)
+    , current_frameset_(nullptr) {
     phase_roi_[0] = phase_one_roi;
 }
 
@@ -65,14 +68,23 @@ bool Seeker::initialize() {
 
     current_frameset_ = frameset_[frame_switch].get();
 
-    pcapture->region(phase_roi_[frame_switch]);
+    auto ok = pcapture->frame_init();
+    if (!ok)
+        return false;
 
-    pcapture->frame_init();
+    ok = pcapture->cap_init();
+    if (!ok)
+        return false;
 
-    pcapture->cap_init();
+    ok = pcapture->aquisition_init();
+    if (!ok)
+        return false;
 
-    pcapture->aquisition_init();
+    ok = pcapture->region(phase_roi_[frame_switch]);
+    if (!ok)
+        return false;
 
+    return ok;
 }
 
 bool Seeker::shut_down() const {
@@ -119,6 +131,7 @@ void Seeker::phase_one() {
     pfilter->kernel(filters::kernel_line_left_to_right);
 
     // me not know what long they is
+    // TODO : temporary structure, vectors always have a single element in them!
     vector<cv::Rect2d> markings;
     vector<cv::Vec4d> left_borders;
     vector<cv::Vec4d> right_borders;
@@ -174,6 +187,12 @@ void Seeker::phase_one() {
                     continue;
                 }
 
+                if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Left))
+                    continue;
+
+                if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Right))
+                    continue;
+
                 hough_vertical->compute_borders();
 
                 if (validate::validate_rect(hough_vertical->marking_rect()))
@@ -188,6 +207,9 @@ void Seeker::phase_one() {
                 // check for fatal zero
                 if (markings.size() + left_borders.size() + right_borders.size() != 0)
                     continue;
+
+                running = false;
+                break;
 
             }
 
@@ -204,11 +226,6 @@ void Seeker::phase_one() {
             cvr::avg_vector_vec(right_borders, right_border_result);
             left_border_result[1] = static_cast<double>(phase_roi_[phase].height);
             left_border_result[3] = 0.0;
-
-            
-
-
-
 
             // TODO : adjust the heights to match the current ROI
 
@@ -239,12 +256,27 @@ void Seeker::phase_one() {
 
     }
 
-    switch_phase();
-
     /*   for (auto& fs : frameset_) {
            pcapture->exposure(fs->exp_ms_);
            pcapture->cap(25, fs->frames_);
        }*/
+
+}
+
+void Seeker::phase_two() {
+
+    switch_phase();
+
+    auto phase = frameset(current_phase_);
+
+    // make sure the minimum is at least 10 pixels.
+    auto min_line_len = calc::line::compute_houghp_min_line(10.0, pdata->marking_rect);
+
+    // horizontal houghline extension class
+    auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), false);
+
+    hough_horizontal->max_line_gab(12);
+    hough_horizontal->marking_rect(pdata->marking_rect);
 
 }
 

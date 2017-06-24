@@ -350,6 +350,9 @@
     <ClInclude Include="Camera\Calib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CV\Data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

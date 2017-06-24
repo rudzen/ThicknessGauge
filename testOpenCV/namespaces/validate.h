@@ -7,13 +7,12 @@
 
 #include <vector>
 #include "tg.h"
+#include "CV/Data.h"
 
 using namespace tg;
 
 namespace validate {
 
-
-#ifdef CV_VERSION
 
     /**
      * \brief Validates a rectangle that its boundries are all valid numbers
@@ -104,7 +103,7 @@ namespace validate {
      * \return true if a-okay, otherwise false
      */
     template <typename T>
-    bool valid_data(const std::shared_ptr<tg::Data<T>>& data) {
+    bool valid_data(const std::shared_ptr<Data<T>>& data) {
 
         // logging is temporary !
         using namespace tg;
@@ -170,7 +169,5 @@ namespace validate {
 
         return failures == 0;
     }
-
-#endif
 
 }
