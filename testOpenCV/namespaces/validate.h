@@ -88,9 +88,16 @@ namespace validate {
 
     }
 
+    /**
+     * \brief Validates a opencv vec type for negative values
+     * \tparam T The type of the vector
+     * \tparam cn The size of the vector
+     * \param v The vector
+     * \return true if all values are >= 0, otherwise false
+     */
     template <typename T, int cn>
     bool valid_vec(const cv::Vec<T, cn>& v) {
-        for (auto i = 0; i < cn; i++)
+        for (auto i = cn; i--;)
             if (v[i] < 0)
                 return false;
 
