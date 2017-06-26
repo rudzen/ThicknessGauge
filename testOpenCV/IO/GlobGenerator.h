@@ -24,69 +24,37 @@ class GlobGenerator {
 
 public:
 
-    GlobGenerator()
-        : recursive_(false)
-          , count_(0)
-          , glob_(tg::GlobType::Sequence) { }
+    GlobGenerator();
 
-    GlobGenerator(const std::string pattern, const bool recursive)
-        : pattern_(pattern)
-          , recursive_(recursive) {
-        generate_glob();
-    }
+    GlobGenerator(const std::string pattern, const bool recursive);
 
     explicit GlobGenerator(const std::string pattern)
         : pattern_(pattern)
-          , recursive_(false) {
+        , recursive_(false) {
         generate_glob();
     }
 
-    void generate_glob() {
-        cv::glob(pattern_, files_, recursive_);
-        for (auto& f : files_)
-            images_.emplace_back(cv::imread(f, type_));
-    }
+    void generate_glob();
 
-    void clear() {
-        images_.clear();
-        files_.clear();
-        pattern_.clear();
-        recursive_ = false;
-    }
+    void clear();
 
     /* getters */
 
-    const std::vector<cv::Mat>& images() const {
-        return images_;
-    }
+    const std::vector<cv::Mat>& images() const;
 
-    const std::vector<cv::String>& files() const {
-        return files_;
-    }
+    const std::vector<cv::String>& files() const;
 
     /* getters and setters */
 
-    const cv::String& pattern() const {
-        return pattern_;
-    }
+    const cv::String& pattern() const;
 
-    void pattern(const cv::String& pattern) {
-        pattern_ = pattern;
-    }
+    void pattern(const cv::String& pattern);
 
-    const bool& recursive() const {
-        return recursive_;
-    }
+    const bool& recursive() const;
 
-    void recursive(bool recursive) {
-        recursive_ = recursive;
-    }
+    void recursive(bool recursive);
 
-    tg::GlobType glob() const {
-        return glob_;
-    }
+    tg::GlobType glob() const;
 
-    void glob(tg::GlobType glob) {
-        glob_ = glob;
-    }
+    void glob(tg::GlobType glob);
 };

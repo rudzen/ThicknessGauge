@@ -31,8 +31,6 @@ namespace tg {
 
     enum class GlobType { Test, Calibration, Sequence };
 
-    enum class FilterKernels { Simple3x3, Horizontal10x10 };
-
     enum class ValidationStatus { SUCESS, FAIL, ACCEPTABLE };
 
     enum class DataMemberIndex {

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
-#include "namespaces/calc.h"
+#include "../testOpenCV/namespaces/calc.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

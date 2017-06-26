@@ -7,7 +7,6 @@
 
 #include <vector>
 #include "tg.h"
-#include "CV/Data.h"
 
 using namespace tg;
 
