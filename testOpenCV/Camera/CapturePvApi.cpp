@@ -627,7 +627,7 @@ void CapturePvApi::cap_single(cv::Mat& target) {
         // if the calibration data has been loaded, the undistorted image is then used
         if (cal->loaded) {
             cv::Mat undistorted;
-            cv::undistort(target, undistorted, cal->intrinsic, cal->dist_coeffs);
+            cv::undistort(grabbed, undistorted, cal->intrinsic, cal->dist_coeffs);
             target = undistorted.clone();
         } else
             target = grabbed.clone();

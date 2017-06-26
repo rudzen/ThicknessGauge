@@ -173,6 +173,7 @@
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
     <ClCompile Include="Camera\Calib.cpp" />
+    <ClCompile Include="Camera\Calib2.cpp" />
     <ClCompile Include="Camera\CapturePvApi.cpp" />
     <ClCompile Include="Camera\Seeker.cpp" />
     <ClCompile Include="CV\CannyR.cpp" />
@@ -196,6 +197,7 @@
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
     <ClInclude Include="Camera\Calib.h" />
+    <ClInclude Include="Camera\Calib2.h" />
     <ClInclude Include="Camera\CapturePvApi.h" />
     <ClInclude Include="Camera\Seeker.h" />
     <ClInclude Include="CV\Data.h" />

@@ -21,10 +21,6 @@ namespace tg {
 
     enum Side { Left = 0, Right = 1, Center = 2 };
 
-    enum XY { X = 0, Y = 1 };
-
-    enum class SortBy { X, Y };
-
     enum class TextDrawPosition { UpperLeft, UpperRight, LowerLeft, LowerRight };
 
     enum class WindowType { Input, Output, Temp };
@@ -197,6 +193,12 @@ namespace tg {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
     }
 
+    // ----------------------------------------------
+
+    // ----------------------------------------------
+    // -------------- timer related ----------------
+    // ----------------------------------------------
+
     /**
      * Retrieves the current time as high resolution clock (ms)
      * @return The current time as time_point
@@ -237,6 +239,17 @@ namespace tg {
         return get_now_ms() - t;
     }
 
+    // ----------------------------------------------
+
+    /**
+     * \brief Wrapped ternary expression handler, to allow for better typechecking etc
+     * \tparam T1 expression type, bool
+     * \tparam T2 true/false part type
+     * \param expression The expression part
+     * \param true_part if expression is true
+     * \param false_part if expression is false
+     * \return true_part if expression is true, otherwise false_part
+     */
     template <typename T1, typename T2>
     T2 iif(T1 expression, T2 true_part, T2 false_part) {
         static_assert(std::is_same<T1, bool>::value, "Only bool expression is accepted.");

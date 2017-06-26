@@ -63,6 +63,8 @@ private:
 
 public:
 
+    const cv::Rect_<unsigned long> default_roi_full = cv::Rect_<unsigned long>(0, 0, 2448, 2040);
+
     const cv::Rect_<unsigned long> default_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
 
     CapturePvApi()
