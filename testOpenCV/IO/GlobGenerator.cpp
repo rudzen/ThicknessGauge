@@ -11,6 +11,12 @@ GlobGenerator::GlobGenerator(const std::string pattern, const bool recursive)
     generate_glob();
 }
 
+GlobGenerator::GlobGenerator(const std::string pattern)
+    : pattern_(pattern)
+    , recursive_(false) {
+    generate_glob();
+}
+
 void GlobGenerator::generate_glob() {
     cv::glob(pattern_, files_, recursive_);
     for (auto& f : files_)

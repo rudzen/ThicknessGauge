@@ -28,11 +28,7 @@ public:
 
     GlobGenerator(const std::string pattern, const bool recursive);
 
-    explicit GlobGenerator(const std::string pattern)
-        : pattern_(pattern)
-        , recursive_(false) {
-        generate_glob();
-    }
+    explicit GlobGenerator(const std::string pattern);
 
     void generate_glob();
 

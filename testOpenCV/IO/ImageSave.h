@@ -15,28 +15,17 @@ class ImageSave : public VideoInfo {
 
 public:
 
-    ImageSave()
-        : ImageSave("", SaveType::Image_Png, Information::Basic) { }
+    ImageSave();
 
-    explicit ImageSave(std::string FileName)
-        : ImageSave(FileName, SaveType::Image_Png, Information::Basic) { }
+    explicit ImageSave(std::string FileName);
 
-    ImageSave(std::string FileName, SaveType SaveType)
-        : ImageSave(FileName, SaveType, Information::Basic) { }
+    ImageSave(std::string FileName, SaveType SaveType);
 
-    ImageSave(ImageSave& imageSave)
-        : ImageSave(imageSave.file_name_, imageSave.save_type_, imageSave.information_) { }
+    ImageSave(ImageSave& imageSave);
 
-    ImageSave(std::string FileName, SaveType save_type, Information information)
-        : save_type_(save_type)
-          , information_(information)
-          , file_name_(FileName) {
-        update_time_stamp();
-    }
+    ImageSave(std::string FileName, SaveType save_type, Information information);
 
-    ~ImageSave() {
-        video_writer_.~VideoWriter();
-    }
+    ~ImageSave();
 
     void save_image(cv::Mat* image) const;
 
