@@ -477,7 +477,12 @@ bool CapturePvApi::region(cv::Rect_<unsigned long> new_region) const {
     if (!region_height(new_region.height))
         failures++;
 
-    return failures == 0;
+    if (failures == 0) {
+        log_time << "Capture roi changed to " << new_region << std::endl;
+        return true;
+    }
+
+    return false;
 }
 
 cv::Rect_<unsigned long> CapturePvApi::region() const {
