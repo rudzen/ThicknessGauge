@@ -197,6 +197,46 @@ namespace tg {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
     }
 
+    /**
+     * Retrieves the current time as high resolution clock (ms)
+     * @return The current time as time_point
+     */
+    inline long long int get_now_ms() {
+        return std::chrono::high_resolution_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+    }
+
+    /**
+     * Retrieves the current time as high resolution clock (ns)
+     * @return The current time as time_point
+     */
+    inline long long int get_now_ns() {
+        return std::chrono::high_resolution_clock::now().time_since_epoch() / std::chrono::nanoseconds(1);
+    }
+
+    /**
+     * Computes the difference in time from the parsed time and now
+     * @tparam T The time type, must be arithmetic
+     * @param t The time to substract from now
+     * @return The difference between parsed time and now in ms
+     */
+    template <typename T>
+    long long int diff_now_ms(T& t) {
+        static_assert(std::is_arithmetic<T>::value, "feck, nan.");
+        return get_now_ms() - t;
+    }
+
+    /**
+     * Computes the difference in time from the parsed time and now in ns
+     * @tparam T The time type, must be arithmetic
+     * @param t The time to substract from now
+     * @return The difference between parsed time and now in ns
+     */
+    template <typename T>
+    long long int diff_now_ns(T& t) {
+        static_assert(std::is_arithmetic<T>::value, "feck, nan.");
+        return get_now_ms() - t;
+    }
+
     template <typename T1, typename T2>
     T2 iif(T1 expression, T2 true_part, T2 false_part) {
         static_assert(std::is_same<T1, bool>::value, "Only bool expression is accepted.");

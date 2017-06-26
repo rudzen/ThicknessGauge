@@ -17,6 +17,8 @@ Seeker::Seeker(capture_roi phase_one_roi)
 
 bool Seeker::initialize() {
 
+    auto now = tg::get_now_ns();
+
     // generate phase frameset pointers
     for (auto i = 0; i < frameset_.size(); i++)
         frameset_[i] = std::make_unique<Frames>(i);
@@ -83,6 +85,8 @@ bool Seeker::initialize() {
     ok = pcapture->region(phase_roi_[frame_switch]);
     if (!ok)
         return false;
+
+    log_time << cv::format("Seeker initialize complete, took %i ns.\n", tg::diff_now_ns(now));
 
     return ok;
 }
@@ -168,6 +172,8 @@ void Seeker::phase_one() {
 
     log_time << "Running phase one.\n";
 
+    auto now = tg::get_now_ns();
+
     while (running) {
         try {
 
@@ -215,11 +221,15 @@ void Seeker::phase_one() {
                     break;
                 }
 
-                if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Left))
+                if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Left)) {
+                    log_time << cv::format("Phase one intersection check for left side failed (exposure = %i).\n", phase_one_exposure);
                     continue;
+                }
 
-                if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Right))
+                if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Right)) {
+                    log_time << cv::format("Phase one intersection check for right side failed (exposure = %i).\n", phase_one_exposure);
                     continue;
+                }
 
                 hough_vertical->compute_borders();
 
@@ -240,6 +250,8 @@ void Seeker::phase_one() {
                 break;
 
             }
+
+            log_time << cv::format("Scan complete.. took %i ns.\n", tg::diff_now_ns(now));
 
             // TODO : temporary structure, vectors always have a single element in them!
             // set up the avg of the detected markings and borders.
@@ -283,15 +295,11 @@ void Seeker::phase_one() {
             running = false;
 
     }
-
-    /*   for (auto& fs : frameset_) {
-           pcapture->exposure(fs->exp_ms_);
-           pcapture->cap(25, fs->frames_);
-       }*/
-
 }
 
 void Seeker::phase_two() {
+
+    log_time << "Phase two configuration started..\n";
 
     switch_phase();
 
@@ -360,6 +368,8 @@ void Seeker::phase_two() {
     cv::Mat exposure_test;
 
     cv::Mat org;
+
+    log_time << "Phase two begun..\n";
 
     // ************  LEFT SIDE **************
 
