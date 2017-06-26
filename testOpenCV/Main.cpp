@@ -69,26 +69,6 @@ void save_null(std::string filename) {
 
 int main(int argc, char** argv) {
 
-    std::string pa = "C:\\Program Files\\Allied Vision Technologies\\GigESDK\\examples\\CamSetup";
-
-    std::shared_ptr<file::path_legal> path_testing = std::make_shared<file::path_legal>(pa);
-
-    auto anything = file::is_path_legal(path_testing);
-
-    if (anything) {
-        std::cout << pa << std::endl;
-        std::cout << "complete:\n";
-        for (const auto& p : path_testing->complete_path) {
-            std::cout << p << std::endl;
-        }
-        std::cout << "legal:\n";
-        for (const auto& p : path_testing->legal_part) {
-            std::cout << p << std::endl;
-        }
-    }
-
-    return 0;
-
     //file::legal_path test = file::is_path_legal("c:\\");
 
 
