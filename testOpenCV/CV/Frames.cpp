@@ -27,7 +27,7 @@ void Frames::compute() {
 
     cv::Vec2d ms;
     for (auto& frame : frames_) {
-        cvr::compute_intensity_dtd_dev(frame, ms);
+        cvr::compute_intensity_std_dev(frame, ms);
         means_.emplace_back(ms[0]);
         stddevs_.emplace_back(ms[1]);
     }

@@ -17,12 +17,6 @@ namespace file {
         '/';
 #endif
 
-    using path_legal = struct path {
-        std::vector<std::string> legal_part;
-        std::vector<std::string> complete_path;
-        bool any_legal;
-    };
-
     bool create_directory(const std::string& pathname) {
 #ifdef __unix__
         if (!is_name_legal(std::string(r.begin(), r.end())))
@@ -65,35 +59,34 @@ namespace file {
 #endif
     }
 
-    inline
-    path_legal is_path_legal(const std::string& full_path) {
-        path_legal current;
+    bool is_path_legal(const std::shared_ptr<path_legal> &output) {
 
-        current.any_legal = false;
+        output->any_legal = false;
 
-        if (full_path.empty())
-            return current;
+        if (output->org.empty())
+            return false;
 
-        std::istringstream ss(full_path);
+        std::istringstream ss(output->org);
         std::string token;
 
-        token.reserve(full_path.size());
+        token.reserve(output->org.size());
 
         while (getline(ss, token, path_seperator))
-            current.complete_path.emplace_back(std::move(token));
+            output->complete_path.emplace_back(std::move(token));
 
         token.clear();
 
-        for (const auto& p : current.complete_path) {
+        for (const auto& p : output->complete_path) {
             token += p;
             token += path_seperator;
             if (!is_directory(token))
                 break;
-            current.legal_part.emplace_back(token);
-            current.any_legal = true;
+            output->legal_part.emplace_back(token);
         }
+        
+        output->any_legal = !output->legal_part.empty();
 
-        return current;
+        return output->any_legal;
     }
 
     inline

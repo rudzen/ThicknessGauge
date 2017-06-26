@@ -116,7 +116,7 @@ namespace cvr {
      * \return the avg as a 2d double precision float vector
      */
     template <typename T>
-    void compute_intensity_dtd_dev(cv::Mat& image, cv::Vec<T, 2>& output) {
+    void compute_intensity_std_dev(cv::Mat& image, cv::Vec<T, 2>& output) {
         static_assert(std::is_floating_point<T>::value, "Only floating points makes sense");
 
         cv::Scalar mean;
@@ -198,12 +198,10 @@ namespace cvr {
             }
             if (gab) {
                 // construct line and populate output vector
-                //cv::Mat tmp(elements[i + 1].x - elements[i].x, calc::maxval(elements[i + 1].y, elements[i].y), CV_8U);
                 auto it = cv::LineIterator(cv::Mat(elements[i + 1].x - elements[i].x, calc::maxval(elements[i + 1].y, elements[i].y), CV_8U), elements[i], elements[i + 1], 8);
                 for (auto& p : it)
                     target.emplace_back(p);
 
-                //line(target, elements[i], elements[i + 1], cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
                 sum.x += abs(elements[i + 1].x - elements[i].x);
                 sum.y += abs(elements[i + 1].y - elements[i].y);
             }
