@@ -5,7 +5,11 @@
 
 #include "filesystem.h"
 #include <vector>
+#include <iostream>
 #include <sstream>
+#include <fstream>
+#include <cstring>
+#include <cstdlib>
 #include "stl.h"
 
 namespace file {
@@ -59,7 +63,40 @@ namespace file {
 #endif
     }
 
-    bool is_path_legal(const std::shared_ptr<path_legal> &output) {
+    bool are_files_equal(std::string& file_one, std::string& file_two) {
+
+        std::ifstream in1(file_one, std::ios::binary);
+        std::ifstream in2(file_two, std::ios::binary);
+
+        auto size1 = in1.seekg(0, std::ifstream::end).tellg();
+        in1.seekg(0, std::ifstream::beg);
+
+        auto size2 = in2.seekg(0, std::ifstream::end).tellg();
+        in2.seekg(0, std::ifstream::beg);
+
+        if (size1 != size2)
+            return false;
+
+        static const size_t BLOCKSIZE = 4096;
+        size_t remaining = size1;
+
+        while (remaining) {
+            char buffer1[BLOCKSIZE], buffer2[BLOCKSIZE];
+            auto size = std::min(BLOCKSIZE, remaining);
+
+            in1.read(buffer1, size);
+            in2.read(buffer2, size);
+
+            if (0 != memcmp(buffer1, buffer2, size))
+                return false;
+
+            remaining -= size;
+        }
+
+        return true;
+    }
+
+    bool is_path_legal(const std::shared_ptr<path_legal>& output) {
 
         output->any_legal = false;
 
@@ -83,7 +120,7 @@ namespace file {
                 break;
             output->legal_part.emplace_back(token);
         }
-        
+
         output->any_legal = !output->legal_part.empty();
 
         return output->any_legal;

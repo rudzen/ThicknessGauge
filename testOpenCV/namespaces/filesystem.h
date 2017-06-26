@@ -53,6 +53,15 @@ namespace file {
     bool is_file(const std::string& name);
 
     /**
+     * \brief Relaxed method to check if two files are identical.
+     * Note: This is aimed towards minor file and low file count.
+     * \param file_one The first filename
+     * \param file_two The second filename
+     * \return true if files are identical, otherwise false
+     */
+    bool are_files_equal(std::string& file_one, std::string& file_two);
+
+    /**
      * \brief Checks if a string can be used to create a file or a folder with that name
      * \param name The name string to check
      * \return true if it seems legal, otherwise false
