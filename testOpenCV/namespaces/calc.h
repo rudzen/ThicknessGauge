@@ -830,6 +830,17 @@ namespace calc {
         return maxval(maxval(a, b), c);
     }
 
+    template <typename T1, typename T2>
+    double minval(T1 a, T2 b) {
+        return a < b ? a : b;
+    }
+
+    template <typename T1, typename T2, typename T3>
+    double minval(T1 a, T2 b, T3 c) {
+        return minval(minval(a, b), c);
+    }
+
+
     /**
      * \brief Stupid fast value in-between check
      * \tparam T Value type of boundries

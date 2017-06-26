@@ -4,13 +4,12 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 
 #include "filesystem.h"
+#include <algorithm>
 #include <vector>
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <cstring>
-#include <cstdlib>
-#include "stl.h"
+#include "calc.h"
 
 namespace file {
 
@@ -82,7 +81,7 @@ namespace file {
 
         while (remaining) {
             char buffer1[BLOCKSIZE], buffer2[BLOCKSIZE];
-            auto size = std::min(BLOCKSIZE, remaining);
+            auto size = static_cast<size_t>(calc::minval(BLOCKSIZE, remaining));
 
             in1.read(buffer1, size);
             in2.read(buffer2, size);
@@ -96,7 +95,7 @@ namespace file {
         return true;
     }
 
-    bool is_path_legal(const std::shared_ptr<path_legal>& output) {
+    bool is_path_legal(const std::shared_ptr<file::path_legal>& output) {
 
         output->any_legal = false;
 

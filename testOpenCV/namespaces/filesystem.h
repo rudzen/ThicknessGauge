@@ -21,7 +21,7 @@ namespace file {
         std::string org;
         bool any_legal;
 
-        explicit path(std::string org)
+        explicit path(std::string& org)
             : org(org), any_legal(false) { }
     };
 

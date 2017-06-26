@@ -5,6 +5,7 @@
 
 #pragma once
 #include <opencv2/core/types.hpp>
+#include <opencv2/shape/hist_cost.hpp>
 
 namespace stl {
 

@@ -120,7 +120,7 @@ int Calib2::calib() {
         drawChessboardCorners(image, board_sz, corners, found);
         // If we got a good board, add it to our data
         //
-        double timestamp = static_cast<double>(clock()) / CLOCKS_PER_SEC;
+        auto timestamp = static_cast<double>(clock()) / CLOCKS_PER_SEC;
         if (found && timestamp - last_captured_timestamp > 1) {
             last_captured_timestamp = timestamp;
             image ^= cv::Scalar::all(255);
@@ -128,13 +128,12 @@ int Calib2::calib() {
             mcorners *= (1. / image_sf); // scale the corner coordinates
             image_points.push_back(corners);
             object_points.push_back(std::vector<cv::Point3f>());
-            std::vector<cv::Point3f>& opts = object_points.back();
+            auto& opts = object_points.back();
             opts.resize(board_n);
             for (int j = 0; j < board_n; j++) {
                 opts[j] = cv::Point3f(static_cast<float>(j / board_w), static_cast<float>(j % board_w), 0.f);
             }
-            std::cout << "Collected our " << static_cast<int>(image_points.size()) <<
-                " of " << n_boards << " needed chessboard images\n" << std::endl;
+            log_time << "Collected our " << static_cast<int>(image_points.size()) << " of " << n_boards << " needed chessboard images\n" << std::endl;
         }
         cv::imshow("Calibration", image); //show in color if we did collect the image
         if ((cv::waitKey(30) & 255) == 27)
@@ -143,37 +142,37 @@ int Calib2::calib() {
     // END COLLECTION WHILE LOOP.
 
     cv::destroyWindow("Calibration");
-    std::cout << "\n\n*** CALIBRATING THE CAMERA...\n" << std::endl;
+    log_time << "\n\n*** CALIBRATING THE CAMERA...\n" << std::endl;
 
     // CALIBRATE THE CAMERA!
     //
     cv::Mat intrinsic_matrix, distortion_coeffs;
-    double err = cv::calibrateCamera(object_points, image_points, image_size, intrinsic_matrix, distortion_coeffs, cv::noArray(), cv::noArray(), cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT);
+    auto err = cv::calibrateCamera(object_points, image_points, image_size, intrinsic_matrix, distortion_coeffs, cv::noArray(), cv::noArray(), cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_FIX_PRINCIPAL_POINT);
     // SAVE THE INTRINSICS AND DISTORTIONS
-    std::cout << " *** DONE!\n\nReprojection error is " << err <<
-        "\nStoring Intrinsics.xml and Distortions.xml files\n\n";
-    cv::FileStorage fs("intrinsics.xml", cv::FileStorage::WRITE);
-    fs << "image_width" << image_size.width << "image_height" << image_size.height
-        << "camera_matrix" << intrinsic_matrix << "distortion_coefficients"
-        << distortion_coeffs;
+    log_time << " *** DONE!\n\nReprojection error is " << err;
+    log_time << "\nStoring data in intrins_distors.xml file\n\n";
+    cv::FileStorage fs("intrins_distors.xml", cv::FileStorage::WRITE);
+    fs << "image_width" << image_size.width
+       << "image_height" << image_size.height
+       << "camera_matrix" << intrinsic_matrix
+       << "distortion_coefficients" << distortion_coeffs;
     fs.release();
     // EXAMPLE OF LOADING THESE MATRICES BACK IN:
-    fs.open("intrinsics.xml", cv::FileStorage::READ);
-    std::cout << "\nimage width: " << static_cast<int>(fs["image_width"]);
-    std::cout << "\nimage height: " << static_cast<int>(fs["image_height"]);
+    fs.open("intrins_distors.xml", cv::FileStorage::READ);
+    log_time << "\nimage width: " << static_cast<int>(fs["image_width"]);
+    log_time << "\nimage height: " << static_cast<int>(fs["image_height"]);
     cv::Mat intrinsic_matrix_loaded, distortion_coeffs_loaded;
     fs["camera_matrix"] >> intrinsic_matrix_loaded;
     fs["distortion_coefficients"] >> distortion_coeffs_loaded;
-    std::cout << "\nintrinsic matrix:" << intrinsic_matrix_loaded;
-    std::cout << "\ndistortion coefficients: " << distortion_coeffs_loaded << std::endl;
+    log_time << "\nintrinsic matrix:" << intrinsic_matrix_loaded;
+    log_time << "\ndistortion coefficients: " << distortion_coeffs_loaded << std::endl;
     // Build the undistort map which we will use for all
     // subsequent frames.
     //
     cv::Mat map1, map2;
     cv::initUndistortRectifyMap(intrinsic_matrix_loaded, distortion_coeffs_loaded, cv::Mat(), intrinsic_matrix_loaded, image_size, CV_16SC2, map1, map2);
-    // Just run the camera to the screen, now showing the raw and
-    // the undistorted image.
-    //
+
+    // Just run the camera to the screen, now showing the raw and the undistorted image.
     cv::Mat image, image0;
     for (;;) {
         pcapture->cap_single(image0);
@@ -187,6 +186,8 @@ int Calib2::calib() {
 
     pcapture->close();
     pcapture->uninitialize();
+
+    log_time << "Done..\n";
 
     return 0;
 }

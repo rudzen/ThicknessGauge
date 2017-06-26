@@ -51,7 +51,8 @@ char const* CapturePvApi::error_last(tPvErr error) {
         return_string += "unknown error";
     }
 
-    return return_string.c_str();
+	auto return_ = return_string.c_str();
+    return return_;
 
 }
 

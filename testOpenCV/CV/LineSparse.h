@@ -138,7 +138,7 @@ public:
      * \param target The target vector with sourceOne and sourceTwo data
      * \param sortX Sorting method to be used when combining is done
      */
-    void combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sortX) const;
+    static void combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sortX);
 
     /**
      * \brief Get the pixel intensity of a location from the current frame
@@ -209,7 +209,6 @@ public: // getters and setter + minor functions
         case Location::baseOne: ;
         case Location::baseTwo:
             return baseLine_[locationBaseMap.at(location)];
-            break;
         case Location::heigthOne: ;
         case Location::heigthTwo: ;
         default: ;
@@ -334,7 +333,7 @@ inline void Line::mergeIntensity() {
     sorter::sort_pixels_x_ascending(allComplete_);
 }
 
-inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sort) const {
+inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sort) {
     target.reserve(sourceOne.size() + sourceTwo.size());
     target.insert(target.begin(), sourceOne.begin(), sourceOne.end());
     target.insert(target.end(), sourceTwo.begin(), sourceTwo.end());
