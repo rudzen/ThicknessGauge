@@ -1,0 +1,45 @@
+ThicknessGauge
+--------------
+by Rudy Alex Kohn, 2017
+
+) Overview of file structure
+  --------------------------
+
+
+Directories:
+
+ArgClasses		: Classes for handling command line parameters
+Calc			: Calculation classes 
+Calibrate		: Calibration of camera related classes
+Camera			: Camera classes, responsible for capture, changing settings etc.
+CV				: OpenCV wrapper classes. Each of the main functionalities used from OpenCV
+				  has their own class which contains the settings used for each algorithm.
+Exceptions		: To handle error gracefully
+Histogram		: Histogram classes, note that HistoPeak is the primary choice
+IO				: Input/Output classes. Can handle import and export of images and videos to a certain degree
+namespaces	    : Misc functionalities, each file pair (h/cpp) contains seperated functions which can be used from anywhere in the entirety of the software package.
+tclap			: The command line parameter library, the files are needed but they are not "included" in the project
+Testing			: Old testing configuration classes
+UI				: User interface classes.. Currently only holds a Progress Bar, which is used when capturing series of frames to check if progress had stalled or not.
+Util			: Utility classes, such as Ztring which is a powerful enhancement over regular string class.
+Vimba			: Not needed, contains classes i made when the Vimba SDK still was being investigated.
+x64				: Used by visual studio as temporary compilation output.
+
+
+Important files :
+
+Main.cpp				: Where the program is started.
+ThicknessGauge.h/cpp	: Main controller class
+
+namespaces/
+calc.h/cpp				: Computational functions, some are not used atm, but could be useful
+cvr.h/cpp				: OpenCV helper functions
+draw.h					: To enable visual display of many things while testing.
+filters.h				: Kernels for filters used in the main process.
+tg.h/cpp				: Main helper functions, contains several informational data structures and so on.
+validate.h				: Validation functionality for all used data types, including those from open cv.
+pixel.h/cpp				: Core function is located here
+sort.h					: Sorting of pixel elements etc is done through here.
+
+
+

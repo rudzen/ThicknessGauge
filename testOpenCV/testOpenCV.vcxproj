@@ -76,16 +76,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\RUAK\Downloads\software\ocv_complete\build\install\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\RUAK\Downloads\software\ocv_complete\build\install\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\OpenCV\build\install\include;C:\Program Files\Allied Vision Technologies\GigESDK\inc-pc;C:\Program Files\Allied Vision\Vimba_2.1\;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OpenCV\build\install\x64\vc15\lib;C:\Program Files\Allied Vision Technologies\GigESDK\lib-pc\x64;$(VIMBA_HOME)\VimbaCPP\Lib\Win64;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\OpenCV\build\install\include;C:\Program Files\Allied Vision Technologies\GigESDK\inc-pc;C:\Program Files\Allied Vision\Vimba_2.1\;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\OpenCV\build\install\x64\vc15\lib;C:\Program Files\Allied Vision Technologies\GigESDK\lib-pc\x64;$(VIMBA_HOME)\VimbaCPP\Lib\Win64;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\OpenCV\build\install\include;C:\Program Files\Allied Vision Technologies\GigESDK\inc-pc;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OpenCV\build\install\x64\vc15\lib;C:\Program Files\Allied Vision Technologies\GigESDK\lib-pc\x64;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -101,15 +101,16 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(PVAPI_HOME);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>opencv_aruco320.lib;opencv_aruco320d.lib;opencv_bgsegm320.lib;opencv_bgsegm320d.lib;opencv_bioinspired320.lib;opencv_bioinspired320d.lib;opencv_calib3d320.lib;opencv_calib3d320d.lib;opencv_ccalib320.lib;opencv_ccalib320d.lib;opencv_core320.lib;opencv_core320d.lib;opencv_datasets320.lib;opencv_datasets320d.lib;opencv_dnn320.lib;opencv_dnn320d.lib;opencv_dpm320.lib;opencv_dpm320d.lib;opencv_face320.lib;opencv_face320d.lib;opencv_features2d320.lib;opencv_features2d320d.lib;opencv_flann320.lib;opencv_flann320d.lib;opencv_fuzzy320.lib;opencv_fuzzy320d.lib;opencv_highgui320.lib;opencv_highgui320d.lib;opencv_imgcodecs320.lib;opencv_imgcodecs320d.lib;opencv_imgproc320.lib;opencv_imgproc320d.lib;opencv_line_descriptor320.lib;opencv_line_descriptor320d.lib;opencv_ml320.lib;opencv_ml320d.lib;opencv_objdetect320.lib;opencv_objdetect320d.lib;opencv_optflow320.lib;opencv_optflow320d.lib;opencv_phase_unwrapping320.lib;opencv_phase_unwrapping320d.lib;opencv_photo320.lib;opencv_photo320d.lib;opencv_plot320.lib;opencv_plot320d.lib;opencv_reg320.lib;opencv_reg320d.lib;opencv_rgbd320.lib;opencv_rgbd320d.lib;opencv_saliency320.lib;opencv_saliency320d.lib;opencv_shape320.lib;opencv_shape320d.lib;opencv_stereo320.lib;opencv_stereo320d.lib;opencv_stitching320.lib;opencv_stitching320d.lib;opencv_structured_light320.lib;opencv_structured_light320d.lib;opencv_superres320.lib;opencv_superres320d.lib;opencv_surface_matching320.lib;opencv_surface_matching320d.lib;opencv_text320.lib;opencv_text320d.lib;opencv_tracking320.lib;opencv_tracking320d.lib;opencv_video320.lib;opencv_video320d.lib;opencv_videoio320.lib;opencv_videoio320d.lib;opencv_videostab320.lib;opencv_videostab320d.lib;opencv_xfeatures2d320.lib;opencv_xfeatures2d320d.lib;opencv_ximgproc320.lib;opencv_ximgproc320d.lib;opencv_xobjdetect320.lib;opencv_xobjdetect320d.lib;opencv_xphoto320.lib;opencv_xphoto320d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PvAPI.lib;opencv_aruco320.lib;opencv_bgsegm320.lib;opencv_bioinspired320.lib;opencv_calib3d320.lib;opencv_ccalib320.lib;opencv_core320.lib;opencv_datasets320.lib;opencv_dnn320.lib;opencv_dpm320.lib;opencv_face320.lib;opencv_features2d320.lib;opencv_flann320.lib;opencv_fuzzy320.lib;opencv_highgui320.lib;opencv_imgcodecs320.lib;opencv_imgproc320.lib;opencv_line_descriptor320.lib;opencv_ml320.lib;opencv_objdetect320.lib;opencv_optflow320.lib;opencv_phase_unwrapping320.lib;opencv_photo320.lib;opencv_plot320.lib;opencv_reg320.lib;opencv_rgbd320.lib;opencv_saliency320.lib;opencv_shape320.lib;opencv_stereo320.lib;opencv_stitching320.lib;opencv_structured_light320.lib;opencv_superres320.lib;opencv_surface_matching320.lib;opencv_text320.lib;opencv_tracking320.lib;opencv_video320.lib;opencv_videoio320.lib;opencv_videostab320.lib;opencv_xfeatures2d320.lib;opencv_ximgproc320.lib;opencv_xobjdetect320.lib;opencv_xphoto320.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,7 +142,7 @@
       <LanguageStandard>stdcpp14</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OpenMPSupport>true</OpenMPSupport>
-      <AdditionalIncludeDirectories>$(Path);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(PVAPI_HOME);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <OmitFramePointers>true</OmitFramePointers>
       <StringPooling>true</StringPooling>
@@ -172,6 +173,7 @@
     <ClCompile Include="Calibrate\CalibrationSettings.cpp" />
     <ClCompile Include="Calibrate\CalibrationTest.cpp" />
     <ClCompile Include="Camera\Calib.cpp" />
+    <ClCompile Include="Camera\Calib2.cpp" />
     <ClCompile Include="Camera\CapturePvApi.cpp" />
     <ClCompile Include="Camera\Seeker.cpp" />
     <ClCompile Include="CV\CannyR.cpp" />
@@ -195,11 +197,13 @@
   <ItemGroup>
     <ClInclude Include="ArgClasses\GlobModeVisitor.h" />
     <ClInclude Include="Camera\Calib.h" />
+    <ClInclude Include="Camera\Calib2.h" />
     <ClInclude Include="Camera\CapturePvApi.h" />
     <ClInclude Include="Camera\Seeker.h" />
     <ClInclude Include="CV\Data.h" />
     <ClInclude Include="CV\Frames.h" />
     <ClInclude Include="CV\HarrisDetector.h" />
+    <ClInclude Include="CV\LinePair.h" />
     <ClInclude Include="Exceptions\ThrowAssert.h" />
     <ClInclude Include="namespaces\calc.h" />
     <ClInclude Include="Calc\GaugeMath.h" />
@@ -265,6 +269,7 @@
     <None Include="_run_test.bat" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="CV\Doc_Simple.txt" />
     <Text Include="GC2450M_attributes.txt" />
     <Text Include="Intersection bug.txt" />
     <Text Include="LICENSE_1_0.txt" />

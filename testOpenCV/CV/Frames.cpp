@@ -2,12 +2,12 @@
 
 Frames::Frames(const unsigned long index)
     : index_(index)
-    , exp_ms_(0) { }
+      , exp_ms_(0) { }
 
 Frames::Frames(const std::string& expExt, unsigned long expMs)
     : exp_ext_(expExt)
-    , index_(0)
-    , exp_ms_(expMs) { }
+      , index_(0)
+      , exp_ms_(expMs) { }
 
 void Frames::clear() {
     frames_.clear();
@@ -27,7 +27,7 @@ void Frames::compute() {
 
     cv::Vec2d ms;
     for (auto& frame : frames_) {
-        cvr::compute_intensity_dtd_dev(frame, ms);
+        cvr::compute_intensity_std_dev(frame, ms);
         means_.emplace_back(ms[0]);
         stddevs_.emplace_back(ms[1]);
     }

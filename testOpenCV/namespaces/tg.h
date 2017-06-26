@@ -10,8 +10,6 @@
 #include <PvApi.h>
 #include <thread>
 #include <chrono>
-#include "../Vimba/GC2450MCamera.h"
-#include "Vimba/CameraData.h"
 #include "tg.h"
 
 /**
@@ -19,45 +17,9 @@
  */
 namespace tg {
 
-    /**
-     * \brief Structure to hold a pair of opencv points, supports equalization check and a couple of useful constructors
-     * \tparam T The type of the point pair
-     */
-    template <typename T>
-    struct line_pair {
-        cv::Point_<T> p1;
-
-        cv::Point_<T> p2;
-
-        line_pair(T x1, T x2, T y1, T y2) {
-            p1.x = x1;
-            p1.y = y1;
-            p2.x = x2;
-            p2.y = y2;
-        }
-
-        line_pair(cv::Point_<T> p1, cv::Point_<T> p2)
-            : p1(p1)
-            , p2(p2) {}
-
-        friend bool operator==(const line_pair& lhs, const line_pair& rhs) {
-            return lhs.p1 == rhs.p1
-                    && lhs.p2 == rhs.p2;
-        }
-
-        friend bool operator!=(const line_pair& lhs, const line_pair& rhs) {
-            return !(lhs == rhs);
-        }
-
-    };
-
     //    typedef std::pair<cv::Point2f, cv::Point2f> linePair;
 
     enum Side { Left = 0, Right = 1, Center = 2 };
-
-    enum XY { X = 0, Y = 1 };
-
-    enum class SortBy { X, Y };
 
     enum class TextDrawPosition { UpperLeft, UpperRight, LowerLeft, LowerRight };
 
@@ -100,25 +62,25 @@ namespace tg {
     /**
      * \brief Vimba camera structure
      */
-    using VimbaData = struct vim {
-        const char* pCameraID;
+    //using VimbaData = struct vim {
+    //    const char* pCameraID;
 
-        const char* pCameraName;
+    //    const char* pCameraName;
 
-        const char* pCameraModel;
+    //    const char* pCameraModel;
 
-        const char* pCameraSerialNumber;
+    //    const char* pCameraSerialNumber;
 
-        const char* pInterfaceID;
+    //    const char* pInterfaceID;
 
-        VmbInterfaceType interfaceType;
+    //    VmbInterfaceType interfaceType;
 
-        const char* pInterfaceName;
+    //    const char* pInterfaceName;
 
-        const char* pInterfaceSerialNumber;
+    //    const char* pInterfaceSerialNumber;
 
-        VmbAccessModeType interfacePermittedAccess;
-    };
+    //    VmbAccessModeType interfacePermittedAccess;
+    //};
 
     /**
      * \brief PvApi camera structure
@@ -220,6 +182,63 @@ namespace tg {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
     }
 
+    // ----------------------------------------------
+
+    // ----------------------------------------------
+    // -------------- timer related ----------------
+    // ----------------------------------------------
+
+    /**
+     * Retrieves the current time as high resolution clock (ms)
+     * @return The current time as time_point
+     */
+    inline long long int get_now_ms() {
+        return std::chrono::high_resolution_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+    }
+
+    /**
+     * Retrieves the current time as high resolution clock (ns)
+     * @return The current time as time_point
+     */
+    inline long long int get_now_ns() {
+        return std::chrono::high_resolution_clock::now().time_since_epoch() / std::chrono::nanoseconds(1);
+    }
+
+    /**
+     * Computes the difference in time from the parsed time and now
+     * @tparam T The time type, must be arithmetic
+     * @param t The time to substract from now
+     * @return The difference between parsed time and now in ms
+     */
+    template <typename T>
+    long long int diff_now_ms(T& t) {
+        static_assert(std::is_arithmetic<T>::value, "feck, nan.");
+        return get_now_ms() - t;
+    }
+
+    /**
+     * Computes the difference in time from the parsed time and now in ns
+     * @tparam T The time type, must be arithmetic
+     * @param t The time to substract from now
+     * @return The difference between parsed time and now in ns
+     */
+    template <typename T>
+    long long int diff_now_ns(T& t) {
+        static_assert(std::is_arithmetic<T>::value, "feck, nan.");
+        return get_now_ms() - t;
+    }
+
+    // ----------------------------------------------
+
+    /**
+     * \brief Wrapped ternary expression handler, to allow for better typechecking etc
+     * \tparam T1 expression type, bool
+     * \tparam T2 true/false part type
+     * \param expression The expression part
+     * \param true_part if expression is true
+     * \param false_part if expression is false
+     * \return true_part if expression is true, otherwise false_part
+     */
     template <typename T1, typename T2>
     T2 iif(T1 expression, T2 true_part, T2 false_part) {
         static_assert(std::is_same<T1, bool>::value, "Only bool expression is accepted.");

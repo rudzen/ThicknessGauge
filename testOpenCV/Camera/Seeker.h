@@ -106,7 +106,7 @@
  * - If a phase fails, the next phase will not proceed with failed attempts, since the roi is invalid.
  * 
  */
-class Seeker {
+class Seeker : public std::enable_shared_from_this<Seeker> {
 
 public:
 
@@ -156,6 +156,10 @@ public: // data return point
     template <typename T>
     std::shared_ptr<Data<T>> data() const {
         return pdata;
+    }
+
+    std::shared_ptr<Seeker> get_ptr() {
+        return shared_from_this();
     }
 
 private:

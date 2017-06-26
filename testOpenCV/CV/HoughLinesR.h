@@ -11,6 +11,7 @@
 
 #include "Exceptions/NoLineDetectedException.h"
 #include "Exceptions/ThrowAssert.h"
+#include "LinePair.h"
 
 /*
    |  __
@@ -44,7 +45,7 @@ public:
     typedef struct LineV {
         cv::Vec2f entry_;
 
-        tg::line_pair<float> points;
+        line_pair<float> points;
 
         std::vector<cv::Point_<float>> elements;
 
@@ -52,18 +53,18 @@ public:
 
         calc::SlobeDirection slobe_direction = calc::SlobeDirection::HORIZONTAL;
 
-        LineV(cv::Vec2f entry, tg::line_pair<float> points)
+        LineV(cv::Vec2f entry, line_pair<float> points)
             : entry_(entry)
-            , points(points) {
+              , points(points) {
             elements.reserve(calc::round(calc::dist_manhattan(points.p1.x, points.p2.x, points.p1.y, points.p2.y)));
             slobe = 0.0f;
         }
 
         friend bool operator==(const LineV& lhs, const LineV& rhs) {
             return lhs.slobe == rhs.slobe
-                    && lhs.entry_ == rhs.entry_
-                    && lhs.points == rhs.points
-                    && lhs.elements == rhs.elements;
+                && lhs.entry_ == rhs.entry_
+                && lhs.points == rhs.points
+                && lhs.elements == rhs.elements;
         }
 
         friend bool operator!=(const LineV& lhs, const LineV& rhs) {
@@ -72,10 +73,10 @@ public:
 
         friend std::ostream& operator<<(std::ostream& os, const LineV& obj) {
             return os
-                    << "entry: " << obj.entry_
-                    << "slobe: " << obj.slobe
-                    << " points(1/2): " << obj.points.p1 << '/' << obj.points.p2
-                    << " elements: " << obj.elements;
+                << "entry: " << obj.entry_
+                << "slobe: " << obj.slobe
+                << " points(1/2): " << obj.points.p1 << '/' << obj.points.p2
+                << " elements: " << obj.elements;
         }
     } LineV;
 
@@ -134,9 +135,9 @@ public:
 
     HoughLinesR(const int rho, const int theta, const int threshold, const bool show_window)
         : BaseR("HoughLines", show_window)
-        , rho_(rho)
-        , theta_(theta)
-        , threshold_(threshold) {
+          , rho_(rho)
+          , theta_(theta)
+          , threshold_(threshold) {
         angle_ = calc::DEGREES * theta;
         srn_ = 0;
         stn_ = 0;
@@ -159,7 +160,7 @@ private:
         cv::createTrackbar("threshold", window_name_, &threshold_, 100, thresholdcb, this);
     }
 
-    tg::line_pair<float> compute_point_pair(cv::Vec2f& line) const;
+    line_pair<float> compute_point_pair(cv::Vec2f& line) const;
 
     void draw_lines(vector<LineV>& linePairs, cv::Scalar colour);
 
@@ -387,7 +388,7 @@ inline int HoughLinesR::hough_vertical() {
 
 }
 
-inline tg::line_pair<float> HoughLinesR::compute_point_pair(cv::Vec2f& line) const {
+inline line_pair<float> HoughLinesR::compute_point_pair(cv::Vec2f& line) const {
     auto rho = line[0];
     auto theta = line[1];
     double a = cos(theta);
@@ -396,7 +397,7 @@ inline tg::line_pair<float> HoughLinesR::compute_point_pair(cv::Vec2f& line) con
     auto y0 = b * rho;
     cv::Point2f pt1(static_cast<float>(x0 + 1000 * (-b)), static_cast<float>(y0 + 1000 * (a)));
     cv::Point2f pt2(static_cast<float>(x0 - 1000 * (-b)), static_cast<float>(y0 - 1000 * (a)));
-    return tg::line_pair<float>(pt1, pt2);
+    return line_pair<float>(pt1, pt2);
 }
 
 inline void HoughLinesR::draw_lines(vector<LineV>& line_pairs, cv::Scalar colour) {

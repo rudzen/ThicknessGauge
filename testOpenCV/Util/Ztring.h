@@ -222,10 +222,10 @@ public:
 
         auto start = static_cast<size_t>(startPos);
 
-        ss << into.substr(0, startPos - 1);
+        ss << into.substr(0, start - 1);
         ss << toInsert;
 
-        if (startPos - 1 + lenInsert <= len - 1)
+        if (start - 1 + lenInsert <= len - 1)
             ss << into.substr(ss.str().length(), into.length());
 
         return ss.str();

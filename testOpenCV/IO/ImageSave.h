@@ -29,8 +29,8 @@ public:
 
     ImageSave(std::string FileName, SaveType save_type, Information information)
         : save_type_(save_type)
-        , information_(information)
-        , file_name_(FileName) {
+          , information_(information)
+          , file_name_(FileName) {
         update_time_stamp();
     }
 

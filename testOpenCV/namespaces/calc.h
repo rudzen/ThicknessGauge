@@ -424,7 +424,7 @@ namespace calc {
     }
 
     template <typename T1, typename T2>
-    double dist_real(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
+    double dist_norm(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "dist_real is only possible for arithmetic types.");
         return cv::norm(p2 - p1);
     }
@@ -829,6 +829,18 @@ namespace calc {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return maxval(maxval(a, b), c);
     }
+
+    template <typename T>
+    double minval(T a, T b) {
+        static_assert(std::is_compound<T>::value, "Wrong type.");
+        return a < b ? a : b;
+    }
+
+    template <typename T1, typename T2, typename T3>
+    double minval(T1 a, T2 b, T3 c) {
+        return minval(minval(a, b), c);
+    }
+
 
     /**
      * \brief Stupid fast value in-between check

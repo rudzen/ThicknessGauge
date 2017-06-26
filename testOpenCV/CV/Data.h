@@ -1,8 +1,6 @@
 #pragma once
 
-#include <memory>
 #include <vector>
-#include <opencv2/core/core.hpp>
 
 template <class T>
 class Data {

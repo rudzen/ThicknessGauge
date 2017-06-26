@@ -20,8 +20,7 @@ class Settings {
 public:
 
     Settings()
-        : calibrationPattern(), squareSize(0), nrFrames(0), aspectRatio(0), delay(0), bwritePoints(false), bwriteExtrinsics(false), calibZeroTangentDist(false), calibFixPrincipalPoint(false), flipVertical(false), showUndistorsed(false), cameraID(0), atImageList(0), inputType(), good_input(false), flag(0) {
-    }
+        : calibrationPattern(), squareSize(0), nrFrames(0), aspectRatio(0), delay(0), bwritePoints(false), bwriteExtrinsics(false), calibZeroTangentDist(false), calibFixPrincipalPoint(false), flipVertical(false), showUndistorsed(false), cameraID(0), atImageList(0), inputType(), good_input(false), flag(0) { }
 
     enum class Mode { DETECTION = 0, CAPTURING = 1, CALIBRATED = 2 };
 
@@ -212,10 +211,10 @@ public:
     }
 
     static double compute_reprojection_errors(const vector<vector<cv::Point3f>>& object_points,
-                                            const vector<vector<cv::Point2f>>& image_points,
-                                            const vector<cv::Mat>& rvecs, const vector<cv::Mat>& tvecs,
-                                            const cv::Mat& camera_matrix, const cv::Mat& dist_coeffs,
-                                            vector<float>& per_view_errors) {
+                                              const vector<vector<cv::Point2f>>& image_points,
+                                              const vector<cv::Mat>& rvecs, const vector<cv::Mat>& tvecs,
+                                              const cv::Mat& camera_matrix, const cv::Mat& dist_coeffs,
+                                              vector<float>& per_view_errors) {
         vector<cv::Point2f> image_points_2;
         auto total_points = 0;
         double total_err = 0;
@@ -235,9 +234,9 @@ public:
 
     // Print camera parameters to the output file
     void save_camera_params(Settings& s, cv::Size& image_size, cv::Mat& camera_matrix, cv::Mat& dist_coeffs,
-                          const vector<cv::Mat>& rvecs, const vector<cv::Mat>& tvecs,
-                          const vector<float>& reproj_errs, const vector<vector<cv::Point2f>>& image_points,
-                          double total_avg_err) const {
+                            const vector<cv::Mat>& rvecs, const vector<cv::Mat>& tvecs,
+                            const vector<float>& reproj_errs, const vector<vector<cv::Point2f>>& image_points,
+                            double total_avg_err) const {
         cv::FileStorage fs(s.outputFileName, cv::FileStorage::WRITE_BASE64);
 
         fs << "calibration_Time" << get_time_date();
@@ -316,8 +315,8 @@ public:
     }
 
     bool run_calibration(Settings& s, cv::Size& image_size, cv::Mat& camera_matrix, cv::Mat& dist_coeffs,
-                        vector<vector<cv::Point2f>> image_points, vector<cv::Mat>& rvecs, vector<cv::Mat>& tvecs,
-                        vector<float>& reproj_errs, double& total_avg_err) const {
+                         vector<vector<cv::Point2f>> image_points, vector<cv::Mat>& rvecs, vector<cv::Mat>& tvecs,
+                         vector<float>& reproj_errs, double& total_avg_err) const {
 
         log_time << "Configuring matricies.." << endl;
 
@@ -354,15 +353,18 @@ public:
 
         switch (pattern_type) {
         case Pattern::CHESSBOARD:
-        case Pattern::CIRCLES_GRID: for (auto i = 0; i < board_size.height; ++i)
+        case Pattern::CIRCLES_GRID:
+            for (auto i = 0; i < board_size.height; ++i)
                 for (auto j = 0; j < board_size.width; ++j)
                     corners.emplace_back(cv::Point3f(float(j * square_size), float(i * square_size), 0));
             break;
-        case Pattern::ASYMMETRIC_CIRCLES_GRID: for (auto i = 0; i < board_size.height; i++)
+        case Pattern::ASYMMETRIC_CIRCLES_GRID:
+            for (auto i = 0; i < board_size.height; i++)
                 for (auto j = 0; j < board_size.width; j++)
                     corners.emplace_back(cv::Point3f(float((2 * j + i % 2) * square_size), float(i * square_size), 0));
             break;
-        default: break;
+        default:
+            break;
         }
     }
 
@@ -444,13 +446,17 @@ public:
             // Find feature points on the input format
             bool found;
             switch (s.calibrationPattern) {
-            case Pattern::CHESSBOARD: found = findChessboardCorners(view, s.boardSize, point_buf, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE);
+            case Pattern::CHESSBOARD:
+                found = findChessboardCorners(view, s.boardSize, point_buf, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE);
                 break;
-            case Pattern::CIRCLES_GRID: found = findCirclesGrid(view, s.boardSize, point_buf);
+            case Pattern::CIRCLES_GRID:
+                found = findCirclesGrid(view, s.boardSize, point_buf);
                 break;
-            case Pattern::ASYMMETRIC_CIRCLES_GRID: found = findCirclesGrid(view, s.boardSize, point_buf, cv::CALIB_CB_ASYMMETRIC_GRID);
+            case Pattern::ASYMMETRIC_CIRCLES_GRID:
+                found = findCirclesGrid(view, s.boardSize, point_buf, cv::CALIB_CB_ASYMMETRIC_GRID);
                 break;
-            default: found = false;
+            default:
+                found = false;
                 break;
             }
 

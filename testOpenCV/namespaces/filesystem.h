@@ -5,6 +5,8 @@
 
 #pragma once
 #include <string>
+#include <vector>
+#include <memory>
 #ifdef __unix__
 #include <direct.h>
 #else
@@ -13,10 +15,29 @@
 
 namespace file {
 
+    using path_legal = struct path {
+        std::vector<std::string> legal_part;
+        std::vector<std::string> complete_path;
+        std::string org;
+        bool any_legal;
+
+        explicit path(std::string& org)
+            : org(org), any_legal(false) { }
+    };
+
     /**
      * \brief The current known illegal chars
      */
     const std::string illegal_chars = "\\/:?\"<>|";
+
+    /**
+     * \brief Relaxed method to check if two files are identical.
+     * Note: This is aimed towards minor file and low file count.
+     * \param file_one The first filename
+     * \param file_two The second filename
+     * \return true if files are identical, otherwise false
+     */
+    bool are_files_equal(std::string& file_one, std::string& file_two);
 
     /**
      * \brief Creates a directory from specified name
@@ -47,4 +68,13 @@ namespace file {
      */
     bool is_name_legal(const std::string& name);
 
+    /**
+     * \brief Checks a entire path for legal parts, will split the path into seperate sub folder
+     * entities in seperate vector, while keeping a corresponding "full" path for each as well,
+     * as long as the path is legal. Path seperation is also handled gracefully.
+     * \param output The construct containing the original string, and will be populated with
+     * the resulting data.
+     * \return true if _any_ part of the parsed data is legal, otherwise false.
+     */
+    bool is_path_legal(const std::shared_ptr<path_legal> &output);
 }

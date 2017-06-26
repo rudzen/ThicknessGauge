@@ -16,8 +16,8 @@ public:
 
     VideoInfo()
         : fps_(25.0)
-        , codec_(0)
-        , colour_(false) { }
+          , codec_(0)
+          , colour_(false) { }
 
     int codec() const;
 

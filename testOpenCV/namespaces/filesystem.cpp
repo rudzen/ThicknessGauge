@@ -4,26 +4,22 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 
 #include "filesystem.h"
+#include <algorithm>
 #include <vector>
+#include <iostream>
 #include <sstream>
-#include "stl.h"
+#include <fstream>
+#include "calc.h"
+
 
 namespace file {
 
     constexpr char path_seperator =
 #ifdef _WIN32
-            '\\';
+        '\\';
 #else
-            '/';
+        '/';
 #endif
-
-    using path_legal = struct path {
-        std::vector<std::string> legal_part;
-
-        std::vector<std::string> complete_path;
-
-        bool any_legal;
-    };
 
     bool create_directory(const std::string& pathname) {
 #ifdef __unix__
@@ -67,35 +63,67 @@ namespace file {
 #endif
     }
 
-    inline
-    path_legal is_path_legal(const std::string& full_path) {
-        path_legal current;
+    bool are_files_equal(std::string& file_one, std::string& file_two) {
 
-        current.any_legal = false;
+        std::ifstream in1(file_one, std::ios::binary);
+        std::ifstream in2(file_two, std::ios::binary);
 
-        if (full_path.empty())
-            return current;
+        auto size1 = in1.seekg(0, std::ifstream::end).tellg();
+        auto size2 = in2.seekg(0, std::ifstream::end).tellg();
 
-        std::istringstream ss(full_path);
+        if (size1 != size2)
+            return false;
+
+        in1.seekg(0, std::ifstream::beg);
+        in2.seekg(0, std::ifstream::beg);
+
+        static const size_t BLOCKSIZE = 4096;
+        size_t remaining = size1;
+
+        while (remaining) {
+            char buffer1[BLOCKSIZE], buffer2[BLOCKSIZE];
+            auto size = static_cast<size_t>(std::min(BLOCKSIZE, remaining));
+
+            in1.read(buffer1, size);
+            in2.read(buffer2, size);
+
+            if (0 != memcmp(buffer1, buffer2, size))
+                return false;
+
+            remaining -= size;
+        }
+
+        return true;
+    }
+
+    bool is_path_legal(const std::shared_ptr<file::path_legal>& output) {
+
+        output->any_legal = false;
+
+        if (output->org.empty())
+            return false;
+
+        std::istringstream ss(output->org);
         std::string token;
 
-        token.reserve(full_path.size());
+        token.reserve(output->org.size());
 
         while (getline(ss, token, path_seperator))
-            current.complete_path.emplace_back(std::move(token));
+            output->complete_path.emplace_back(std::move(token));
 
         token.clear();
 
-        for (const auto& p : current.complete_path) {
+        for (const auto& p : output->complete_path) {
             token += p;
             token += path_seperator;
             if (!is_directory(token))
                 break;
-            current.legal_part.emplace_back(token);
-            current.any_legal = true;
+            output->legal_part.emplace_back(token);
         }
 
-        return current;
+        output->any_legal = !output->legal_part.empty();
+
+        return output->any_legal;
     }
 
     inline

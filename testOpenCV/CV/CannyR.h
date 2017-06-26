@@ -86,11 +86,11 @@ public:
 
     CannyR(const int threshold_1, const int threshold_2, const int aperture_size, const bool gradient, const bool show_windows, const bool remove_pepper_noise)
         : BaseR("Canny", show_windows)
-        , threshold_1_(threshold_1)
-        , threshold_2_(threshold_2)
-        , aperture_size_(aperture_size)
-        , gradient_(gradient)
-        , remove_pepper_noise_(remove_pepper_noise) {
+          , threshold_1_(threshold_1)
+          , threshold_2_(threshold_2)
+          , aperture_size_(aperture_size)
+          , gradient_(gradient)
+          , remove_pepper_noise_(remove_pepper_noise) {
         if (show_windows)
             createWindow();
     }
