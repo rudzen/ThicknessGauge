@@ -150,6 +150,13 @@ public:
         return validate::validate_rect(target);
     }
 
+    template <typename T>
+    bool region_sub_def_offset(cv::Rect_<T>& target) {
+        static_assert(std::is_arithmetic<T>::value, "Wrong type.");
+        target.y -= default_roi.y;
+        return validate::validate_rect(target);
+    }
+
     /**
      * \brief Apply a specific ROI to the camera
      * \param new_region The region as opencv rect of unsigned long
