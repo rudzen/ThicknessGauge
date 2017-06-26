@@ -594,6 +594,7 @@ void CapturePvApi::cap_single(cv::Mat& target) {
     auto roi = region();
 
     target = cv::Mat(roi.height, roi.width, CV_8UC1);
+    auto grabbed = cv::Mat(roi.height, roi.width, CV_8UC1);
 
     cv::Mat undistorted;
 
@@ -611,13 +612,14 @@ void CapturePvApi::cap_single(cv::Mat& target) {
         // Create an image header (mono image)
         // Push ImageBuffer data into the image matrix and clone it into target vector
 
-        target.data = static_cast<uchar *>(camera_.Frame.ImageBuffer);
+        grabbed.data = static_cast<uchar *>(camera_.Frame.ImageBuffer);
 
         // if the calibration data has been loaded, the undistorted image is then used
         if (cal->loaded) {
             cv::undistort(target, undistorted, cal->intrinsic, cal->dist_coeffs);
             target = undistorted.clone();
-        }
+        } else
+            target = grabbed.clone();
 
         //cv::imwrite("ostefars.png", target_vector.back());
     }
