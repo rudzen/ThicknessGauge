@@ -21,7 +21,7 @@ namespace validate {
      */
     template <typename T>
     bool validate_rect(const cv::Rect_<T>& rect) {
-        static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for fundamental types.");
 
         auto valid_rectangle = [rect]()->bool {
             return rect.width > 0.0 && rect.height > 0.0 && rect.x >= 0.0 && rect.y >= 0.0;

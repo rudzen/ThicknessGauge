@@ -2,6 +2,7 @@
 #include <chrono>
 #include "../namespaces/tg.h"
 #include "CapturePvApi.h"
+#include "namespaces/validate.h"
 
 using namespace tg;
 

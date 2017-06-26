@@ -3,6 +3,7 @@
 #include "CaptureInterface.h"
 #include <PvApi.h>
 #include "UI/ProgressBar.h"
+#include "namespaces/validate.h"
 
 /**
  * \brief Allows capture through PvAPI -> OpenCV data structure
@@ -66,19 +67,19 @@ public:
 
     CapturePvApi()
         : frame_size_(0)
-        , retry_count_(10)
-        , initialized_(false)
-        , is_open_(false)
-        , exposure_target_reached_(false) { }
+          , retry_count_(10)
+          , initialized_(false)
+          , is_open_(false)
+          , exposure_target_reached_(false) { }
 
     CapturePvApi(tg::tCamera myCamera, tPvCameraInfo cameraInfo, unsigned long frameSize)
         : camera_(myCamera)
-        , camera_info_(cameraInfo)
-        , frame_size_(frameSize)
-        , retry_count_(10)
-        , initialized_(true)
-        , is_open_(false)
-        , exposure_target_reached_(false) { }
+          , camera_info_(cameraInfo)
+          , frame_size_(frameSize)
+          , retry_count_(10)
+          , initialized_(true)
+          , is_open_(false)
+          , exposure_target_reached_(false) { }
 
     ~CapturePvApi() {
         delete[] static_cast<char*>(camera_.Frame.ImageBuffer);
@@ -141,6 +142,13 @@ public:
     unsigned long frame_size() const;
 
     std::string version() const;
+
+    template <typename T>
+    bool region_add_def_offset(cv::Rect_<T>& target) {
+        static_assert(std::is_arithmetic<T>::value, "Wrong type.");
+        target.y += default_roi.y;
+        return validate::validate_rect(target);
+    }
 
     /**
      * \brief Apply a specific ROI to the camera

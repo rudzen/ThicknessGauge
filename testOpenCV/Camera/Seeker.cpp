@@ -5,13 +5,13 @@
 
 Seeker::Seeker()
     : current_phase_(Phase::ONE)
-    , current_frameset_(nullptr) {
+      , current_frameset_(nullptr) {
     phase_roi_[0] = def_phase_one_roi_;
 }
 
 Seeker::Seeker(capture_roi phase_one_roi)
     : current_phase_(Phase::ONE)
-    , current_frameset_(nullptr) {
+      , current_frameset_(nullptr) {
     phase_roi_[0] = phase_one_roi;
 }
 
@@ -111,23 +111,23 @@ void Seeker::process_mat_for_line(cv::Mat& org, std::shared_ptr<HoughLinesPR>& h
 
 void Seeker::switch_phase() {
     switch (current_phase_) {
-        case Phase::NONE:
-            current_phase_ = Phase::ONE;
-            break;
-        case Phase::ONE:
-            current_phase_ = Phase::TWO;
-            break;
-        case Phase::TWO:
-            current_phase_ = Phase::THREE;
-            break;
-        case Phase::THREE:
-            current_phase_ = Phase::DONE;
-            break;
-        case Phase::DONE:
-            current_phase_ = Phase::NONE;
-            break;
-        default:
-            current_phase_ = Phase::FAIL;
+    case Phase::NONE:
+        current_phase_ = Phase::ONE;
+        break;
+    case Phase::ONE:
+        current_phase_ = Phase::TWO;
+        break;
+    case Phase::TWO:
+        current_phase_ = Phase::THREE;
+        break;
+    case Phase::THREE:
+        current_phase_ = Phase::DONE;
+        break;
+    case Phase::DONE:
+        current_phase_ = Phase::NONE;
+        break;
+    default:
+        current_phase_ = Phase::FAIL;
     }
 
 }
@@ -201,18 +201,18 @@ void Seeker::phase_one() {
                 auto hough_result = hough_vertical->hough_vertical();
 
                 switch (hough_result) {
-                    case 0:
-                        // everything ok
-                        break;
-                    case -1:
-                        log_time << __FUNCTION__ << " No lines detect.\n";
-                        continue;
-                    case -2:
-                        log_time << __FUNCTION__ << " No valid lines detected.\n";
-                        continue;
-                    default:
-                        // nada
-                        break;
+                case 0:
+                    // everything ok
+                    break;
+                case -1:
+                    log_time << __FUNCTION__ << " No lines detect.\n";
+                    continue;
+                case -2:
+                    log_time << __FUNCTION__ << " No valid lines detected.\n";
+                    continue;
+                default:
+                    // nada
+                    break;
                 }
 
                 if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Left))
@@ -318,11 +318,19 @@ void Seeker::phase_two() {
     left_baseline.width = marking.x;
     left_baseline.height = quarter;
 
+    if (!pcapture->region_add_def_offset(left_baseline)) {
+        log_time << __FUNCTION__ << " Warning, left_baseline failed validation.\n";
+    }
+
     capture_roi right_baseline;
     right_baseline.x = marking.x + marking.width;
     right_baseline.y = base_line_y;
     right_baseline.width = phase_roi_[0].height - right_baseline.x;
     right_baseline.height = quarter;
+
+    if (!pcapture->region_add_def_offset(right_baseline)) {
+        log_time << __FUNCTION__ << " Warning, right_baseline failed validation.\n";
+    }
 
     pcapture->region(right_baseline);
 
@@ -388,6 +396,10 @@ void Seeker::phase_two() {
     auto left_boundry = cv::minAreaRect(left_elements);
     auto left_boundry_rect = left_boundry.boundingRect();
 
+    if (!pcapture->region_add_def_offset(right_baseline)) {
+        log_time << __FUNCTION__ << " Warning, left_boundry failed validation.\n";
+    }
+
     pcapture->region(left_boundry_rect);
 
     // capture left frames for real
@@ -432,13 +444,13 @@ void Seeker::phase_two() {
 
 int Seeker::frameset(Phase phase) {
     switch (phase) {
-        case Phase::ONE:
-            return 0;
-        case Phase::TWO:
-            return 1;
-        case Phase::THREE:
-            return 2;
-        default:
-            return -1;
+    case Phase::ONE:
+        return 0;
+    case Phase::TWO:
+        return 1;
+    case Phase::THREE:
+        return 2;
+    default:
+        return -1;
     }
 }
