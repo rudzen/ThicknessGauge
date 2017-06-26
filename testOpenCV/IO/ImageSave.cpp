@@ -8,19 +8,19 @@
 ImageSave::ImageSave()
     : ImageSave("", SaveType::Image_Png, Information::Basic) { }
 
-ImageSave::ImageSave(std::string FileName)
-    : ImageSave(FileName, SaveType::Image_Png, Information::Basic) { }
+ImageSave::ImageSave(std::string filename)
+    : ImageSave(filename, SaveType::Image_Png, Information::Basic) { }
 
-ImageSave::ImageSave(std::string FileName, SaveType SaveType)
-    : ImageSave(FileName, SaveType, Information::Basic) { }
+ImageSave::ImageSave(std::string filename, SaveType SaveType)
+    : ImageSave(filename, SaveType, Information::Basic) { }
 
 ImageSave::ImageSave(ImageSave& imageSave)
     : ImageSave(imageSave.file_name_, imageSave.save_type_, imageSave.information_) { }
 
-ImageSave::ImageSave(std::string FileName, SaveType save_type, Information information)
+ImageSave::ImageSave(std::string filename, SaveType save_type, Information information)
     : save_type_(save_type)
     , information_(information)
-    , file_name_(FileName) {
+    , file_name_(filename) {
     update_time_stamp();
 }
 
@@ -73,7 +73,7 @@ void ImageSave::save_video_frame(cv::Mat& image) {
     video_writer_.write(image);
 }
 
-void ImageSave::set_save_type(const SaveType new_type) {
+void ImageSave::savetype(const SaveType new_type) {
     save_type_ = new_type;
 }
 

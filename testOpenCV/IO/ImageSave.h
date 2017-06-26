@@ -17,19 +17,19 @@ public:
 
     ImageSave();
 
-    explicit ImageSave(std::string FileName);
+    explicit ImageSave(std::string filename);
 
-    ImageSave(std::string FileName, SaveType SaveType);
+    ImageSave(std::string filename, SaveType save_type);
 
-    ImageSave(ImageSave& imageSave);
+    ImageSave(ImageSave& image_save);
 
-    ImageSave(std::string FileName, SaveType save_type, Information information);
+    ImageSave(std::string filename, SaveType save_type, Information information);
 
     ~ImageSave();
 
     void save_image(cv::Mat* image) const;
 
-    void save_image(cv::Mat* image, std::string filename) const;
+    void save_image(cv::Mat* image, std::string file_name) const;
 
     void open_video();
 
@@ -37,7 +37,7 @@ public:
 
     void save_video_frame(cv::Mat& image);
 
-    void set_save_type(const SaveType type);
+    void savetype(const SaveType type);
 
     SaveType save_mode() const;
 
@@ -47,7 +47,7 @@ public:
 
     void update_time_stamp();
 
-    void file_name(std::string FileName);
+    void file_name(std::string new_filename);
 
 private:
 
