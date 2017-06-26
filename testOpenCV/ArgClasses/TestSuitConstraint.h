@@ -3,15 +3,13 @@
 
 class TestSuitConstraint : public TCLAP::Constraint<std::string> {
 
-    const std::string illegalChars = "\\/:?\"<>|";
-
 public:
 
     /**
     * Returns a description of the Constraint.
     */
     std::string description() const override {
-        return "Input contains " + illegalChars + " in the name.";
+        return "Input contains " + file::illegal_chars + " in the name.";
     }
 
     /**
