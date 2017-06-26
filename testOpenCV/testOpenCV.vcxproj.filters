@@ -376,6 +376,7 @@
     </Text>
     <Text Include="LICENSE_1_0.txt" />
     <Text Include="GC2450M_attributes.txt" />
+    <Text Include="CV\Doc_Simple.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Vimba_Exposure_Control.PNG">

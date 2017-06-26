@@ -267,6 +267,7 @@
     <None Include="_run_test.bat" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="CV\Doc_Simple.txt" />
     <Text Include="GC2450M_attributes.txt" />
     <Text Include="Intersection bug.txt" />
     <Text Include="LICENSE_1_0.txt" />
