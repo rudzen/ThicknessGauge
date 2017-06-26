@@ -31,6 +31,15 @@ namespace file {
     const std::string illegal_chars = "\\/:?\"<>|";
 
     /**
+     * \brief Relaxed method to check if two files are identical.
+     * Note: This is aimed towards minor file and low file count.
+     * \param file_one The first filename
+     * \param file_two The second filename
+     * \return true if files are identical, otherwise false
+     */
+    bool are_files_equal(std::string& file_one, std::string& file_two);
+
+    /**
      * \brief Creates a directory from specified name
      * Note, this is non-recursive!
      * \param pathname The name of the directory to create
@@ -51,15 +60,6 @@ namespace file {
      * \return true if exists, otherwise false
      */
     bool is_file(const std::string& name);
-
-    /**
-     * \brief Relaxed method to check if two files are identical.
-     * Note: This is aimed towards minor file and low file count.
-     * \param file_one The first filename
-     * \param file_two The second filename
-     * \return true if files are identical, otherwise false
-     */
-    bool are_files_equal(std::string& file_one, std::string& file_two);
 
     /**
      * \brief Checks if a string can be used to create a file or a folder with that name
