@@ -84,8 +84,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\OpenCV\build\install\include;C:\Program Files\Allied Vision Technologies\GigESDK\inc-pc;C:\Program Files\Allied Vision\Vimba_2.1\;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\OpenCV\build\install\x64\vc15\lib;C:\Program Files\Allied Vision Technologies\GigESDK\lib-pc\x64;$(VIMBA_HOME)\VimbaCPP\Lib\Win64;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\OpenCV\build\install\include;C:\Program Files\Allied Vision Technologies\GigESDK\inc-pc;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OpenCV\build\install\x64\vc15\lib;C:\Program Files\Allied Vision Technologies\GigESDK\lib-pc\x64;C:\Users\RUAK\Downloads\software\ocv_complete\build_v2\install\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
