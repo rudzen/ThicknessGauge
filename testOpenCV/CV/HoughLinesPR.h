@@ -332,11 +332,6 @@ inline void HoughLinesPR::bresenham() {
             left_lines_.emplace_back(line);
         else
             right_lines_.emplace_back(line);
-
-        //if (line.entry[0] + ((line.entry[2] - line.entry[0]) / 2) < center_)
-        //	leftLines.emplace_back(line);
-        //else
-        //	rightLines.emplace_back(line);
     }
 
     auto left_size = left_lines_.size();
@@ -419,9 +414,8 @@ inline void HoughLinesPR::draw_line(std::vector<line_pair<float>>& line_pairs, c
     if (!show_windows_)
         return;
 
-    for (auto& r : line_pairs) {
+    for (auto& r : line_pairs)
         draw_line(r.p1, r.p2, colour);
-    }
 }
 
 inline void HoughLinesPR::draw_lines(std::vector<cv::Vec4f>& lines, cv::Scalar colour) {

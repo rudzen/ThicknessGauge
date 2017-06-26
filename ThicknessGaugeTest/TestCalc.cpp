@@ -8,14 +8,14 @@ namespace ThicknessGaugeTest {
     cv::Point p1(2, 4);
     cv::Point p2(4, 4);
 
-    TEST_CLASS(FILE_PATH_TEST) {
+    TEST_CLASS(CALC_TEST) {
 
     private:
 
     public:
 
         TEST_METHOD(TestDistNorm) {
-            auto dist = calc::dist_real(p1, p2);
+            auto dist = calc::dist_norm(p1, p2);
             auto expected = 2.0;
             Assert::AreEqual(expected, dist, 0.01);
         }

@@ -424,7 +424,7 @@ namespace calc {
     }
 
     template <typename T1, typename T2>
-    double dist_real(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
+    double dist_norm(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "dist_real is only possible for arithmetic types.");
         return cv::norm(p2 - p1);
     }
