@@ -11,7 +11,7 @@
 #include "tg.h"
 #include "stl.h"
 #include "validate.h"
-#include "CV/LineConfig.h"
+#include "../CV/LineConfig.h"
 #include "sort.h"
 
 #ifndef CV_VERSION
