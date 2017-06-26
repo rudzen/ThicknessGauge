@@ -4,6 +4,11 @@ double VideoInfo::fps() const {
     return fps_;
 }
 
+VideoInfo::VideoInfo()
+    : fps_(25.0)
+    , codec_(0)
+    , colour_(false) { }
+
 int VideoInfo::codec() const {
     return codec_;
 }
@@ -12,8 +17,8 @@ void VideoInfo::codec(VideoCodec codec) {
     codec_ = video_codecs_.at(codec);
 }
 
-void VideoInfo::fps(float FPS) {
-    fps_ = FPS;
+void VideoInfo::fps(float new_fps) {
+    fps_ = new_fps;
 }
 
 cv::Size VideoInfo::size() const {

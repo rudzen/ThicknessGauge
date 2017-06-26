@@ -14,10 +14,7 @@ class VideoInfo {
 
 public:
 
-    VideoInfo()
-        : fps_(25.0)
-          , codec_(0)
-          , colour_(false) { }
+    VideoInfo();
 
     int codec() const;
 
@@ -25,7 +22,7 @@ public:
 
     double fps() const;
 
-    void fps(float FPS);
+    void fps(float new_fps);
 
     cv::Size size() const;
 
