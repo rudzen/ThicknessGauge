@@ -11,6 +11,7 @@
 #include <fstream>
 #include "calc.h"
 
+
 namespace file {
 
     constexpr char path_seperator =
@@ -68,20 +69,20 @@ namespace file {
         std::ifstream in2(file_two, std::ios::binary);
 
         auto size1 = in1.seekg(0, std::ifstream::end).tellg();
-        in1.seekg(0, std::ifstream::beg);
-
         auto size2 = in2.seekg(0, std::ifstream::end).tellg();
-        in2.seekg(0, std::ifstream::beg);
 
         if (size1 != size2)
             return false;
+
+        in1.seekg(0, std::ifstream::beg);
+        in2.seekg(0, std::ifstream::beg);
 
         static const size_t BLOCKSIZE = 4096;
         size_t remaining = size1;
 
         while (remaining) {
             char buffer1[BLOCKSIZE], buffer2[BLOCKSIZE];
-            auto size = static_cast<size_t>(calc::minval(BLOCKSIZE, remaining));
+            auto size = static_cast<size_t>(std::min(BLOCKSIZE, remaining));
 
             in1.read(buffer1, size);
             in2.read(buffer2, size);

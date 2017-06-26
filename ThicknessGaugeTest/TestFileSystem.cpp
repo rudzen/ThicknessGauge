@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "../testOpenCV/namespaces/filesystem.h"
+#include "../testOpenCV/Util/Ztring.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -33,7 +34,6 @@ namespace ThicknessGaugeTest {
 
             Assert::IsTrue(anything);
 
-
             // test sizes
 
             const size_t target_count = 6;
@@ -45,6 +45,36 @@ namespace ThicknessGaugeTest {
             for (size_t i = 0; i < target_count; i++) {
                 Assert::AreEqual(path_testing->complete_path[i], results_complete[i]);
                 Assert::AreEqual(path_testing->legal_part[i], results_legal[i]);
+            }
+
+        }
+
+
+        TEST_METHOD(TestIsDirectory) {
+            Ztring base("C:\\");
+            auto result = file::is_directory(base);
+            Assert::IsTrue(result);
+            base.to_lower();
+            result = file::is_directory(base);
+            Assert::IsTrue(result);
+
+            base += "Windows\\";
+            result = file::is_directory(base);
+            Assert::IsTrue(result);
+            base.to_lower();
+            result = file::is_directory(base);
+            Assert::IsTrue(result);
+        }
+
+        TEST_METHOD(TestValidFileName) {
+
+            // negative test
+            std::string temp;
+            for (const auto& s : file::illegal_chars) {
+                temp.clear();
+                temp = s;
+                auto result = file::is_name_legal(temp);
+                Assert::IsFalse(result);
             }
 
         }

@@ -830,8 +830,9 @@ namespace calc {
         return maxval(maxval(a, b), c);
     }
 
-    template <typename T1, typename T2>
-    double minval(T1 a, T2 b) {
+    template <typename T>
+    double minval(T a, T b) {
+        static_assert(std::is_compound<T>::value, "Wrong type.");
         return a < b ? a : b;
     }
 

@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThicknessGauge", "testOpenCV\testOpenCV.vcxproj", "{1463A1B1-1383-4142-8001-FF934EDD3AD6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThicknessGaugeTest", "ThicknessGaugeTest\ThicknessGaugeTest.vcxproj", "{4EB2B007-B5DD-4262-8192-BB8FADCDE56C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1463A1B1-1383-4142-8001-FF934EDD3AD6} = {1463A1B1-1383-4142-8001-FF934EDD3AD6}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
