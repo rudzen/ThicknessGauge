@@ -206,14 +206,14 @@ public: // getters and setter + minor functions
      */
     double getLine(Location location) {
         switch (location) {
-            case Location::baseOne: ;
-            case Location::baseTwo:
-                return baseLine_[locationBaseMap.at(location)];
-                break;
-            case Location::heigthOne: ;
-            case Location::heigthTwo: ;
-            default: ;
-                return heigthLin_[locationHeigthMap.at(location)];
+        case Location::baseOne: ;
+        case Location::baseTwo:
+            return baseLine_[locationBaseMap.at(location)];
+            break;
+        case Location::heigthOne: ;
+        case Location::heigthTwo: ;
+        default: ;
+            return heigthLin_[locationHeigthMap.at(location)];
         }
     }
 

@@ -41,14 +41,14 @@ public:
 
         LineH(cv::Vec4f entry, tg::line_pair<float> points)
             : entry_(entry)
-            , points_(points) {
+              , points_(points) {
             elements_.reserve(calc::round(calc::dist_manhattan(points.p1.x, points.p2.x, points.p1.y, points.p2.y)));
         }
 
         friend bool operator==(const LineH& lhs, const LineH& rhs) {
             return lhs.entry_ == rhs.entry_
-                    && lhs.points_ == rhs.points_
-                    && lhs.elements_ == rhs.elements_;
+                && lhs.points_ == rhs.points_
+                && lhs.elements_ == rhs.elements_;
         }
 
         friend bool operator!=(const LineH& lhs, const LineH& rhs) {
@@ -57,9 +57,9 @@ public:
 
         friend std::ostream& operator<<(std::ostream& os, const LineH& obj) {
             return os
-                    << "entry: " << obj.entry_
-                    << " points(1/2): " << obj.points_.p1 << '/' << obj.points_.p2
-                    << " elements: " << obj.elements_;
+                << "entry: " << obj.entry_
+                << " points(1/2): " << obj.points_.p1 << '/' << obj.points_.p2
+                << " elements: " << obj.elements_;
         }
     } LineH;
 
@@ -133,10 +133,10 @@ public:
 
     HoughLinesPR(const int rho, const int theta, const int threshold, const int min_line_len, const bool show_window)
         : BaseR("HoughLinesP", show_window)
-        , rho_(rho)
-        , theta_(theta)
-        , threshold_(threshold)
-        , min_line_len_(min_line_len) {
+          , rho_(rho)
+          , theta_(theta)
+          , threshold_(threshold)
+          , min_line_len_(min_line_len) {
         angle_ = calc::DEGREES * theta;
         min_theta_ = 0.0;
         max_theta_ = calc::PI;

@@ -26,18 +26,18 @@ public:
 
     GlobGenerator()
         : recursive_(false)
-        , count_(0)
-        , glob_(tg::GlobType::Sequence) { }
+          , count_(0)
+          , glob_(tg::GlobType::Sequence) { }
 
     GlobGenerator(const std::string pattern, const bool recursive)
         : pattern_(pattern)
-        , recursive_(recursive) {
+          , recursive_(recursive) {
         generate_glob();
     }
 
     explicit GlobGenerator(const std::string pattern)
         : pattern_(pattern)
-        , recursive_(false) {
+          , recursive_(false) {
         generate_glob();
     }
 

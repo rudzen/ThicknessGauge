@@ -12,16 +12,14 @@ namespace file {
 
     constexpr char path_seperator =
 #ifdef _WIN32
-            '\\';
+        '\\';
 #else
-            '/';
+        '/';
 #endif
 
     using path_legal = struct path {
         std::vector<std::string> legal_part;
-
         std::vector<std::string> complete_path;
-
         bool any_legal;
     };
 

@@ -59,11 +59,11 @@ public:
 
     HarrisDetector()
         : neighbourhood_(3)
-        , aperture_(3)
-        , k_(0.1)
-        , max_strength_(0.0)
-        , threshold_(0.01)
-        , non_max_size_(3) {
+          , aperture_(3)
+          , k_(0.1)
+          , max_strength_(0.0)
+          , threshold_(0.01)
+          , non_max_size_(3) {
 
         local_max_window_size(non_max_size_);
     }
@@ -123,15 +123,10 @@ public:
     // Get the feature points vector from the computed corner map
     static void corners(std::vector<cv::Point_<T>>& points, const cv::Mat& corner_map) {
 
-        // TODO : replace with blazing fast position iteration instead
-
         // Iterate over the pixels to obtain all feature points
         for (auto y = 0; y < corner_map.rows; y++) {
-
             auto rowPtr = corner_map.ptr<uchar>(y);
-
             for (auto x = 0; x < corner_map.cols; x++) {
-
                 // if it is a feature point
                 if (rowPtr[x])
                     points.emplace_back(cv::Point(x, y));

@@ -54,16 +54,16 @@ public:
 
         LineV(cv::Vec2f entry, tg::line_pair<float> points)
             : entry_(entry)
-            , points(points) {
+              , points(points) {
             elements.reserve(calc::round(calc::dist_manhattan(points.p1.x, points.p2.x, points.p1.y, points.p2.y)));
             slobe = 0.0f;
         }
 
         friend bool operator==(const LineV& lhs, const LineV& rhs) {
             return lhs.slobe == rhs.slobe
-                    && lhs.entry_ == rhs.entry_
-                    && lhs.points == rhs.points
-                    && lhs.elements == rhs.elements;
+                && lhs.entry_ == rhs.entry_
+                && lhs.points == rhs.points
+                && lhs.elements == rhs.elements;
         }
 
         friend bool operator!=(const LineV& lhs, const LineV& rhs) {
@@ -72,10 +72,10 @@ public:
 
         friend std::ostream& operator<<(std::ostream& os, const LineV& obj) {
             return os
-                    << "entry: " << obj.entry_
-                    << "slobe: " << obj.slobe
-                    << " points(1/2): " << obj.points.p1 << '/' << obj.points.p2
-                    << " elements: " << obj.elements;
+                << "entry: " << obj.entry_
+                << "slobe: " << obj.slobe
+                << " points(1/2): " << obj.points.p1 << '/' << obj.points.p2
+                << " elements: " << obj.elements;
         }
     } LineV;
 
@@ -134,9 +134,9 @@ public:
 
     HoughLinesR(const int rho, const int theta, const int threshold, const bool show_window)
         : BaseR("HoughLines", show_window)
-        , rho_(rho)
-        , theta_(theta)
-        , threshold_(threshold) {
+          , rho_(rho)
+          , theta_(theta)
+          , threshold_(threshold) {
         angle_ = calc::DEGREES * theta;
         srn_ = 0;
         stn_ = 0;

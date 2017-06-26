@@ -45,7 +45,7 @@ protected:
 
     BaseR(std::string windowName, bool showWindows)
         : window_name_(windowName)
-        , show_windows_(showWindows) {}
+          , show_windows_(showWindows) {}
 
 public:
 

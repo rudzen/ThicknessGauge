@@ -1,11 +1,9 @@
 #include "CalibrationSettings.h"
 
 CalibrationSettings::CalibrationSettings()
-    : calibration_Time(0), nrOfFrames(0), image_Width(0), image_Height(0), board_Width(0), board_Height(0), square_Size(0), FixAspectRatio(0), flagValue(0), Avg_Reprojection_Error(0) {
-}
+    : calibration_Time(0), nrOfFrames(0), image_Width(0), image_Height(0), board_Width(0), board_Height(0), square_Size(0), FixAspectRatio(0), flagValue(0), Avg_Reprojection_Error(0) {}
 
-CalibrationSettings::~CalibrationSettings() {
-}
+CalibrationSettings::~CalibrationSettings() {}
 
 int CalibrationSettings::readSettings(const string calibrationFile) {
     cv::FileStorage fs;

@@ -11,44 +11,44 @@ char const* CapturePvApi::error_last(tPvErr error) {
     std::string return_string;
 
     switch (error) {
-        case ePvErrSuccess:
-            return_string += "no error";
-            break;
-        case ePvErrInternalFault:
-            return_string += "an internal fault occurred";
-            break;
-        case ePvErrBadHandle:
-            return_string += "the handle of the camera is invalid";
-            break;
-        case ePvErrBadSequence:
-            return_string += "API isn't initialized or capture already started/camera already open";
-            break;
-        case ePvErrNotFound:
-            return_string += "the requested attribute doesn't exist or the camera was not found";
-            break;
-        case ePvErrUnplugged:
-            return_string += "the camera was found but unplugged during the function call";
-            break;
-        case ePvErrOutOfRange:
-            return_string += "the supplied value is out of range";
-            break;
-        case ePvErrWrongType:
-            return_string += "the requested attribute is not of the correct type";
-            break;
-        case ePvErrForbidden:
-            return_string += "the requested attribute forbid this operation";
-            break;
-        case ePvErrResources:
-            return_string += "resources requested from the OS were not available";
-            break;
-        case ePvErrAccessDenied:
-            return_string += "the camera couldn't be open in the requested mode";
-            break;
-        case ePvErrBadParameter:
-            return_string += "a valid pointer for pCamera was not supplied";
-            break;
-        default:
-            return_string += "unknown error";
+    case ePvErrSuccess:
+        return_string += "no error";
+        break;
+    case ePvErrInternalFault:
+        return_string += "an internal fault occurred";
+        break;
+    case ePvErrBadHandle:
+        return_string += "the handle of the camera is invalid";
+        break;
+    case ePvErrBadSequence:
+        return_string += "API isn't initialized or capture already started/camera already open";
+        break;
+    case ePvErrNotFound:
+        return_string += "the requested attribute doesn't exist or the camera was not found";
+        break;
+    case ePvErrUnplugged:
+        return_string += "the camera was found but unplugged during the function call";
+        break;
+    case ePvErrOutOfRange:
+        return_string += "the supplied value is out of range";
+        break;
+    case ePvErrWrongType:
+        return_string += "the requested attribute is not of the correct type";
+        break;
+    case ePvErrForbidden:
+        return_string += "the requested attribute forbid this operation";
+        break;
+    case ePvErrResources:
+        return_string += "resources requested from the OS were not available";
+        break;
+    case ePvErrAccessDenied:
+        return_string += "the camera couldn't be open in the requested mode";
+        break;
+    case ePvErrBadParameter:
+        return_string += "a valid pointer for pCamera was not supplied";
+        break;
+    default:
+        return_string += "unknown error";
     }
 
     return return_string.c_str();
@@ -57,26 +57,26 @@ char const* CapturePvApi::error_last(tPvErr error) {
 
 const char* CapturePvApi::data_type_to_string(tPvDatatype aType) {
     switch (aType) {
-        case ePvDatatypeUnknown:
-            return "unknown";
-        case ePvDatatypeCommand:
-            return "command";
-        case ePvDatatypeRaw:
-            return "raw";
-        case ePvDatatypeString:
-            return "string";
-        case ePvDatatypeEnum:
-            return "enum";
-        case ePvDatatypeUint32:
-            return "uint32";
-        case ePvDatatypeFloat32:
-            return "float32";
-        case ePvDatatypeInt64:
-            return "int64";
-        case ePvDatatypeBoolean:
-            return "boolean";
-        default:
-            return "";
+    case ePvDatatypeUnknown:
+        return "unknown";
+    case ePvDatatypeCommand:
+        return "command";
+    case ePvDatatypeRaw:
+        return "raw";
+    case ePvDatatypeString:
+        return "string";
+    case ePvDatatypeEnum:
+        return "enum";
+    case ePvDatatypeUint32:
+        return "uint32";
+    case ePvDatatypeFloat32:
+        return "float32";
+    case ePvDatatypeInt64:
+        return "int64";
+    case ePvDatatypeBoolean:
+        return "boolean";
+    default:
+        return "";
     }
 }
 
@@ -104,7 +104,8 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
     //    printf("%s/%s = %s [%s]{%s}\n",lInfo.Category,aLabel,lValue,DatatypeToString(lInfo.Datatype),lFlags); 
 
     switch (lInfo.Datatype) {
-        case ePvDatatypeString: {
+    case ePvDatatypeString:
+        {
             char lValue[128];
 
             // we assume here that any string value will be less than 128 characters
@@ -117,7 +118,8 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
 
             break;
         }
-        case ePvDatatypeEnum: {
+    case ePvDatatypeEnum:
+        {
             char lValue[128];
 
             // we assume here that any string value will be less than 128 characters
@@ -129,7 +131,8 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
                 printf("ERROR!\n");
             break;
         }
-        case ePvDatatypeUint32: {
+    case ePvDatatypeUint32:
+        {
             tPvUint32 lValue;
 
             if (PvAttrUint32Get(camera_.Handle, aLabel, &lValue) == ePvErrSuccess)
@@ -138,7 +141,8 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
                 printf("ERROR!\n");
             break;
         }
-        case ePvDatatypeInt64: {
+    case ePvDatatypeInt64:
+        {
             tPvInt64 lValue;
 
             if (PvAttrInt64Get(camera_.Handle, aLabel, &lValue) == ePvErrSuccess)
@@ -147,7 +151,8 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
                 printf("ERROR!\n");
             break;
         }
-        case ePvDatatypeFloat32: {
+    case ePvDatatypeFloat32:
+        {
             tPvFloat32 lValue;
 
             if (PvAttrFloat32Get(camera_.Handle, aLabel, &lValue) == ePvErrSuccess)
@@ -156,7 +161,8 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
                 printf("ERROR!\n");
             break;
         }
-        case ePvDatatypeBoolean: {
+    case ePvDatatypeBoolean:
+        {
             tPvBoolean lValue;
 
             if (PvAttrBooleanGet(camera_.Handle, aLabel, &lValue) == ePvErrSuccess)
@@ -165,9 +171,9 @@ void CapturePvApi::query_attribute(const char* aLabel) const {
                 printf("ERROR!\n");
             break;
         }
-        default:
-            //command
-            printf("%s/%s [%s,%s]\n", lInfo.Category, aLabel, data_type_to_string(lInfo.Datatype), lFlags);
+    default:
+        //command
+        printf("%s/%s [%s,%s]\n", lInfo.Category, aLabel, data_type_to_string(lInfo.Datatype), lFlags);
     }
 }
 
@@ -793,21 +799,21 @@ void CapturePvApi::pixel_format(const PixelFormat format) const {
     std::string sformat;
     tPvImageFormat f;
     switch (format) {
-        case PixelFormat::MONO8:
-            sformat += "Mono8";
-            f = ePvFmtMono8;
-            break;
-        case PixelFormat::MONO12:
-            sformat += "Mono12";
-            f = ePvFmtMono8;
-            break;
-        case PixelFormat::MONO12_PACKED:
-            sformat += "Mono12Packed";
-            f = ePvFmtMono12Packed;
-            break;
-        default:
-            sformat += "Mono8";
-            f = ePvFmtMono8;
+    case PixelFormat::MONO8:
+        sformat += "Mono8";
+        f = ePvFmtMono8;
+        break;
+    case PixelFormat::MONO12:
+        sformat += "Mono12";
+        f = ePvFmtMono8;
+        break;
+    case PixelFormat::MONO12_PACKED:
+        sformat += "Mono12Packed";
+        f = ePvFmtMono12Packed;
+        break;
+    default:
+        sformat += "Mono8";
+        f = ePvFmtMono8;
     }
 
     // temporary check

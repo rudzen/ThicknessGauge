@@ -16,8 +16,8 @@ void FilterR::delta_cb(int value, void* user_data) {
 
 FilterR::FilterR(std::string window_name, bool show_windows)
     : delta_(0.0)
-    , ddepth_(-1)
-    , border_(cv::BORDER_DEFAULT) {
+      , ddepth_(-1)
+      , border_(cv::BORDER_DEFAULT) {
     generate_kernel(3, 3, 1.0f);
     anchor_ = cv::Point(-1, -1);
     show_windows_ = show_windows;
@@ -28,8 +28,8 @@ FilterR::FilterR(std::string window_name, bool show_windows)
 
 FilterR::FilterR(std::string window_name)
     : delta_(0.0)
-    , ddepth_(-1)
-    , border_(cv::BORDER_DEFAULT) {
+      , ddepth_(-1)
+      , border_(cv::BORDER_DEFAULT) {
     generate_kernel(3, 3, 1.0f);
     anchor_ = cv::Point(-1, -1);
     show_windows_ = false;
@@ -38,11 +38,11 @@ FilterR::FilterR(std::string window_name)
 
 FilterR::FilterR(const cv::Mat& original, const cv::Mat& image, int ddepth, cv::Mat kernel, const cv::Point& anchor, double delta, int border, bool show_windows, std::string window_name)
     : BaseR(window_name, show_windows)
-    , kernel_(kernel)
-    , anchor_(anchor)
-    , delta_(delta)
-    , ddepth_(ddepth)
-    , border_(border) {
+      , kernel_(kernel)
+      , anchor_(anchor)
+      , delta_(delta)
+      , ddepth_(ddepth)
+      , border_(border) {
     if (show_windows)
         create_window();
 }

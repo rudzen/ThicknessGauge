@@ -164,15 +164,15 @@ inline void HistoPeak<T>::process_image(cv::Mat& image, bool uniform, bool accum
     auto size = peaks_.size();
 
     switch (size) {
-        case 2:
-            low = peaks_.front();
-            high = peaks_.back();
-            split = (low + high) / 2;
-            break;
-        case 1:
-            break;
-        default: ;
-            //return;
+    case 2:
+        low = peaks_.front();
+        high = peaks_.back();
+        split = (low + high) / 2;
+        break;
+    case 1:
+        break;
+    default: ;
+        //return;
     }
 
     auto lowest = hist_image_.rows;
@@ -221,32 +221,32 @@ inline cv::Mat HistoPeak<T>::draw_histogram(cv::Mat& hist, int hist_h, int hist_
     normalize(hist, hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
 
     switch (type) {
-        case 1:
-            for (auto i = 0; i < histImage.cols; i++) {
-                const unsigned x = i;
-                const unsigned y = hist_h;
+    case 1:
+        for (auto i = 0; i < histImage.cols; i++) {
+            const unsigned x = i;
+            const unsigned y = hist_h;
 
-                line(histImage, cv::Point(bin_w * x, y), cv::Point(bin_w * x, y - calc::round(hist.at<float>(i))), color);
-            }
+            line(histImage, cv::Point(bin_w * x, y), cv::Point(bin_w * x, y - calc::round(hist.at<float>(i))), color);
+        }
 
-            break;
-        case 2:
-            for (auto i = 1; i < hist_size; ++i) {
-                auto pt1 = cv::Point(bin_w * (i - 1), hist_h);
-                auto pt2 = cv::Point(bin_w * i, hist_h);
-                auto pt3 = cv::Point(bin_w * i, hist_h - calc::round(hist.at<float>(i)));
-                auto pt4 = cv::Point(bin_w * (i - 1), hist_h - calc::round(hist.at<float>(i - 1)));
-                cv::Point pts[] = {pt1, pt2, pt3, pt4, pt1};
+        break;
+    case 2:
+        for (auto i = 1; i < hist_size; ++i) {
+            auto pt1 = cv::Point(bin_w * (i - 1), hist_h);
+            auto pt2 = cv::Point(bin_w * i, hist_h);
+            auto pt3 = cv::Point(bin_w * i, hist_h - calc::round(hist.at<float>(i)));
+            auto pt4 = cv::Point(bin_w * (i - 1), hist_h - calc::round(hist.at<float>(i - 1)));
+            cv::Point pts[] = {pt1, pt2, pt3, pt4, pt1};
 
-                fillConvexPoly(histImage, pts, 5, color);
-            }
-            break;
-        default:
-            for (auto i = 1; i < hist_size; ++i)
-                line(histImage, cv::Point(bin_w * (i - 1), hist_h - calc::round(hist.at<float>(i - 1))),
-                     cv::Point(bin_w * (i), hist_h - calc::round(hist.at<float>(i))), color, 1, 8, 0);
+            fillConvexPoly(histImage, pts, 5, color);
+        }
+        break;
+    default:
+        for (auto i = 1; i < hist_size; ++i)
+            line(histImage, cv::Point(bin_w * (i - 1), hist_h - calc::round(hist.at<float>(i - 1))),
+                 cv::Point(bin_w * (i), hist_h - calc::round(hist.at<float>(i))), color, 1, 8, 0);
 
-            break;
+        break;
     }
 
     //cv::flip(histImage, histImage, 1);
