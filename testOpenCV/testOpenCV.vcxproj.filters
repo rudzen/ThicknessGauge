@@ -353,6 +353,9 @@
     <ClInclude Include="CV\Data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CV\LinePair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

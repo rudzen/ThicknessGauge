@@ -6,6 +6,7 @@
 
 #include "../namespaces/tg.h"
 #include "../namespaces/calc.h"
+#include "LinePair.h"
 
 /*
 	|  __
@@ -32,14 +33,14 @@ public:
     typedef struct LineH {
         cv::Vec4f entry_;
 
-        tg::line_pair<float> points_;
+        line_pair<float> points_;
 
         std::vector<cv::Point2f> elements_;
 
         LineH()
             : points_(cv::Point2f(0.0f, 0.0f), cv::Point2f(0.0f, 0.0f)) { }
 
-        LineH(cv::Vec4f entry, tg::line_pair<float> points)
+        LineH(cv::Vec4f entry, line_pair<float> points)
             : entry_(entry)
               , points_(points) {
             elements_.reserve(calc::round(calc::dist_manhattan(points.p1.x, points.p2.x, points.p1.y, points.p2.y)));
@@ -193,7 +194,7 @@ public:
 
     void hough_horizontal();
 
-    void draw_line(std::vector<tg::line_pair<float>>& linePairs, cv::Scalar colour);
+    void draw_line(std::vector<line_pair<float>>& linePairs, cv::Scalar colour);
 
     void draw_lines(std::vector<cv::Vec4f>& lines, cv::Scalar colour);
 
@@ -298,7 +299,7 @@ inline void HoughLinesPR::hough_horizontal() {
 
     // insert lines into data structure.
     for (auto& line : lines_)
-        all_lines_.emplace_back(LineH(line, tg::line_pair<float>(line[0], line[2], line[1], line[3])));
+        all_lines_.emplace_back(LineH(line, line_pair<float>(line[0], line[2], line[1], line[3])));
 
     bresenham();
 
@@ -414,7 +415,7 @@ inline bool HoughLinesPR::split_lines_x(std::vector<LineH>& source, std::vector<
 
 }
 
-inline void HoughLinesPR::draw_line(std::vector<tg::line_pair<float>>& line_pairs, cv::Scalar colour) {
+inline void HoughLinesPR::draw_line(std::vector<line_pair<float>>& line_pairs, cv::Scalar colour) {
     if (!show_windows_)
         return;
 

@@ -4,8 +4,7 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
-
-#include <opencv2/core/core.hpp>
+#include <opencv2/core/types.hpp>
 
 namespace stl {
 
