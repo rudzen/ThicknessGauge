@@ -4,39 +4,13 @@
 
 class FolderConstraint : public TCLAP::Constraint<std::string> {
 
-    const std::string illegalChars = "\\/:?\"<>|";
-
-    /**
-    * \brief Checks if a file exists.
-    * \param name The filename to check
-    * \return true if exists, otherwise false
-    */
-    static bool isFolder(const std::string& name) {
-#ifdef _MSC_VER
-
-        // should only be POSIX, but M$ is weird..
-
-        struct stat buffer;
-        return (stat(name.c_str(), &buffer) == 0);
-
-#else
-
-		if (auto file = fopen(name.c_str(), "r")) {
-			fclose(file);
-			return true;
-		}
-		return false;
-
-#endif
-    }
-
 public:
 
     /**
     * Returns a description of the Constraint.
     */
     std::string description() const override {
-        return "File does not exist or it contains " + illegalChars + " in the name.";
+        return "File does not exist or it contains " + file::illegal_chars + " in the name.";
     }
 
     /**
