@@ -149,13 +149,16 @@
       <BrowseInformation>true</BrowseInformation>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>false</MinimalRebuild>
+      <MinimalRebuild>true</MinimalRebuild>
       <FloatingPointModel>Strict</FloatingPointModel>
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
       <ShowIncludes>false</ShowIncludes>
       <UseFullPaths>true</UseFullPaths>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -188,6 +191,7 @@
     <ClCompile Include="namespaces\filesystem.cpp" />
     <ClCompile Include="namespaces\filters.h" />
     <ClCompile Include="namespaces\pixel.cpp" />
+    <ClCompile Include="namespaces\str.cpp" />
     <ClCompile Include="namespaces\tg.cpp" />
     <ClCompile Include="UI\ProgressBar.cpp" />
     <ClCompile Include="ThicknessGauge.cpp" />
@@ -238,6 +242,7 @@
     <ClInclude Include="namespaces\pixel.h" />
     <ClInclude Include="namespaces\sort.h" />
     <ClInclude Include="namespaces\stl.h" />
+    <ClInclude Include="namespaces\str.h" />
     <ClInclude Include="namespaces\validate.h" />
     <ClInclude Include="UI\ProgressBar.h" />
     <ClInclude Include="Testing\TestConfig.h" />

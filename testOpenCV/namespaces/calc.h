@@ -188,6 +188,110 @@ namespace calc {
 
     } // namespace pixels
 
+    namespace lens {
+
+        /**
+         * Calculates the angular field of view based on the dimension and the focal length
+         * @param dimension The dimension in mm
+         * @param focal_lenght The focal length
+         * @return The angular fov in degrees
+         */
+        template <typename T>
+        double angular_fov(T dimension, T focal_lenght) {
+            static_assert(std::is_floating_point<T>::value, "Wrong type.");
+            return 2 * atan(dimension) / (2 * focal_lenght);
+        }
+
+        /**
+         * Calculates the effective focal length based on magninification
+         * @param focal_length The base focal length
+         * @param magnification The maginifaction factor
+         * @return The effective focal length
+         */
+        template <typename T>
+        double effective_focal_lenght(T focal_length, T magnification) {
+            static_assert(std::is_floating_point<T>::value, "Wrong type.");
+            return focal_length * (1.0 + magnification);
+        }
+
+        /**
+         * Calculate the angular extend of the target based on the target dimension and the focal length
+         * @param target_dimension The target dimension
+         * @param focal_length The focal length
+         * @return The angular extend of the target
+         */
+        template <typename T>
+        double angular_extend(T target_dimension, T focal_length) {
+            static_assert(std::is_floating_point<T>::value, "Wrong type.");
+            return 2 * atan(target_dimension / 2 * focal_length);
+        }
+
+        /**
+         * Calculates camera field of view, based on the angular extend, image dimension and the image of the target dimension
+         * @param angular_extend The angular extend
+         * @param image_dimension The image dimension
+         * @param image_of_target_dimension The image of target dimension
+         * @return The camera field of view
+         */
+        template <typename T>
+        double camera_fov(T angular_extend, T image_dimension, T image_of_target_dimension) {
+            static_assert(std::is_floating_point<T>::value, "Wrong type.");
+            return angular_extend * image_dimension / image_of_target_dimension;
+        }
+
+        /**
+         * Calculates camera field of view for rectilinear lensing, based on the angular extend, image dimension and the image of the target dimension
+         * @param target_dimension
+         * @param focal_length
+         * @param image_dimension
+         * @param image_of_target_dimension
+         * @return
+         */
+        template <typename T>
+        double camera_fov(T target_dimension, T focal_length, T image_dimension, T image_of_target_dimension) {
+            static_assert(std::is_floating_point<T>::value, "Wrong type.");
+            return 2.0 * atan(target_dimension * image_dimension / 2.0 * focal_length * image_of_target_dimension);
+        }
+
+        /**
+         * Calculate the rectilinear field of view with magnification
+         * @param frame_size The frame size
+         * @param focal_length The focal length
+         * @param magnification The magnification
+         * @return The calculated field of view
+         */
+        template <typename T>
+        double fov_rectilinear(T frame_size, T focal_length, T magnification) {
+            static_assert(std::is_floating_point<T>::value, "Wrong type.");
+            return 2.0 * atan(frame_size / (focal_length * 2.0 * (magnification + 1.0)));
+        }
+
+        /**
+         * Calculate the rectilinear field of view
+         * @param frame_size The frame size
+         * @param focal_length The focal length
+         * @return The calculated field of view
+         */
+        template <typename T>
+        double fov_rectilinear(T frame_size, T focal_length) {
+            static_assert(std::is_floating_point<T>::value, "Wrong type.");
+            return fov_rectilinear(frame_size, focal_length, 0.0);
+        }
+
+        /**
+         * Estimates the magnification based on focal length and focus distance.
+         * @param focal_length The focal length
+         * @param focus_distance The focus distance
+         * @return The estimated magnification
+         */
+        template <typename T>
+        double maginifaction(T focal_length, T focus_distance) {
+            static_assert(std::is_floating_point<T>::value, "Wrong type.");
+            return focal_length / (focus_distance - focal_length);
+        }
+
+    }
+
     /**
      * \brief Indicated the direction of a slobe
      */
@@ -509,7 +613,7 @@ namespace calc {
 
         auto x = o2 - o1;
 
-        auto t1 = (x.x * d2.y - x.y * d2.x) / cross;
+        auto t1 = (x.x * d2.y - x.y * d2.x) * (1.0 / cross);
         result = o1 + d1 * t1;
         return true;
     }
@@ -595,7 +699,7 @@ namespace calc {
         for (const auto& v : vec)
             sum += v.y;
 
-        return sum / vec.size();
+        return sum / static_cast<double>(vec.size());
     }
 
     /**
@@ -608,13 +712,13 @@ namespace calc {
     double avg_y(cv::Vec<T, cn>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         static_assert(cn == 4, "avg_y only supports Vec<T, 4>");
-        return (vec[1] + vec[3]) / 2;
+        return (vec[1] + vec[3]) * (1.0 / 2.0);
     }
 
     template <typename T>
     double avg_y(cv::Vec<T, 6>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
-        return (vec[1] + vec[3] + vec[5]) * (1 / 3);
+        return (vec[1] + vec[3] + vec[5]) * (1.0 / 3.0);
     }
 
     template <typename T>
@@ -651,6 +755,18 @@ namespace calc {
         for (auto i = 0; i < C; i += 2)
             sum += vec[i];
         return sum * (1 / (C / 2));
+    }
+
+    template <typename T, int C>
+    cv::Vec<T, 2> avg_xy(cv::Vec<T, C>& vec) {
+        static_assert(std::is_floating_point<T>::value, "avg_x is only possible for arithmetic types.");
+        auto sumX = 0.0;
+        auto sumY = 0.0;
+        for (auto i = 0; i < C; i += 2) {
+            sumX += vec[i];
+            sumY += vec[i + 1];
+        }
+        return cv::Vec<T, C>(sumX, sumY);
     }
 
     template <typename T>
@@ -840,7 +956,6 @@ namespace calc {
     double minval(T1 a, T2 b, T3 c) {
         return minval(minval(a, b), c);
     }
-
 
     /**
      * \brief Stupid fast value in-between check
