@@ -7,11 +7,10 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "Util/Stringtools.h"
 #include "../namespaces/tg.h"
+#include "namespaces/str.h"
 
 using namespace std;
-using namespace utils;
 using namespace tg;
 
 
@@ -166,16 +165,10 @@ public:
 
     static bool is_list_of_images(const string& filename) {
 
-        return StringTools::endsWith(filename, ".xml") ||
-            StringTools::endsWith(filename, ".yaml") ||
-            StringTools::endsWith(filename, ".yml") ||
-            StringTools::endsWith(filename, ".json");
-        //auto s(filename);
-        //// Look for file extension
-        //if (s.find(".xml") == string::npos && s.find(".yaml") == string::npos && s.find(".yml") == string::npos && string::npos && s.find(".json") == string::npos)
-        //	return false;
-        //else
-        //	return true;
+        return str::end_with(filename, ".xml") ||
+            str::end_with(filename, ".yaml") ||
+            str::end_with(filename, ".yml") ||
+            str::end_with(filename, ".json");
     }
 
 public:

@@ -1,9 +1,9 @@
 #include "IO/ImageSave.h"
 #include "ThicknessGauge.h"
-#include "Util/Stringtools.h"
 #include "Exceptions/InvalidFileException.h"
 
 #include "../namespaces/filesystem.h"
+#include "namespaces/str.h"
 
 ImageSave::ImageSave()
     : ImageSave("", SaveType::Image_Png, Information::Basic) { }
@@ -36,7 +36,7 @@ void ImageSave::save_image(cv::Mat* image, string filename) const {
 
     replace(filename.begin(), filename.end(), ' ', '_');
 
-    auto outFile = "./images/_" + to_string(time_stamp_) + '-' + filename + '.' + (!utils::StringTools::endsWith(filename, file_extensions_.at(save_type_)) ? file_extensions_.at(save_type_) : "");
+    auto outFile = "./images/_" + to_string(time_stamp_) + '-' + filename + '.' + (!str::end_with(filename, file_extensions_.at(save_type_)) ? file_extensions_.at(save_type_) : "");
 
     if (!file::is_name_legal(outFile)) {
         throw InvalidFileException("Invalid filename for " + outFile);

@@ -11,12 +11,11 @@
 #include <fstream>
 #include "calc.h"
 
-
 namespace file {
 
     constexpr char path_seperator =
 #ifdef _WIN32
-        '\\';
+            '\\';
 #else
         '/';
 #endif
@@ -31,12 +30,17 @@ namespace file {
         auto slength = static_cast<int>(pathname.length()) + 1;
         auto len = MultiByteToWideChar(CP_ACP, 0, pathname.c_str(), slength, nullptr, 0);
         auto buf = new wchar_t[len];
+
         MultiByteToWideChar(CP_ACP, 0, pathname.c_str(), slength, buf, len);
         std::wstring r(buf);
         delete[] buf;
-        if (!is_name_legal(std::string(r.begin(), r.end())))
+
+        auto done = is_name_legal(std::string(r.begin(), r.end()));
+
+        if (!done)
             return false;
-        auto done = CreateDirectory(r.c_str(), nullptr);
+
+        done = CreateDirectory(r.c_str(), nullptr);
         return done;
 #endif
     }
@@ -71,14 +75,19 @@ namespace file {
         auto size1 = in1.seekg(0, std::ifstream::end).tellg();
         auto size2 = in2.seekg(0, std::ifstream::end).tellg();
 
-        if (size1 != size2)
+        if (size1 != size2) {
+            in1.close();
+            in2.close();
             return false;
+        }
 
         in1.seekg(0, std::ifstream::beg);
         in2.seekg(0, std::ifstream::beg);
 
         static const size_t BLOCKSIZE = 4096;
         size_t remaining = size1;
+
+        auto identical = true;
 
         while (remaining) {
             char buffer1[BLOCKSIZE], buffer2[BLOCKSIZE];
@@ -87,13 +96,18 @@ namespace file {
             in1.read(buffer1, size);
             in2.read(buffer2, size);
 
-            if (0 != memcmp(buffer1, buffer2, size))
-                return false;
+            if (memcmp(buffer1, buffer2, size) != 0) {
+                identical = false;
+                break;
+            }
 
             remaining -= size;
         }
 
-        return true;
+        in1.close();
+        in2.close();
+
+        return identical;
     }
 
     bool is_path_legal(const std::shared_ptr<file::path_legal>& output) {
@@ -121,7 +135,7 @@ namespace file {
             output->legal_part.emplace_back(token);
         }
 
-        output->any_legal = !output->legal_part.empty();
+        output->any_legal = output->legal_part.empty() ^ true;
 
         return output->any_legal;
     }

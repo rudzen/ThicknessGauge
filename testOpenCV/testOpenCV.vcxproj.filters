@@ -251,9 +251,6 @@
     <ClInclude Include="IO\GlobGenerator.h">
       <Filter>Header Files\CV</Filter>
     </ClInclude>
-    <ClInclude Include="Util\Stringtools.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Testing\TestConfig.h">
       <Filter>Header Files\CV\Data</Filter>
     </ClInclude>

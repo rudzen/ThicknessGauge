@@ -28,13 +28,14 @@ SOFTWARE.
 #include <string>
 #include <algorithm>
 #include <sstream>
-#include <string.h>
 #include <functional>
 
 #if UINTPTR_MAX == UINT64_MAX
 //64 bit
 #ifndef _MSC_VER
 typedef __int128_t i128;
+#else
+typedef unsigned long long i128;
 #endif
 #else
 //32 bit
@@ -42,6 +43,8 @@ typedef unsigned long long i128;
 #endif
 
 class Ztring : public std::string {
+
+
 public:
     enum class HexType {
         NONE,
@@ -175,11 +178,11 @@ public:
     }
 
     /**
- * Creates a string containing spaces
- *
- * @param amount : how many spaces to make
- * @return the string containing amount spaces
- */
+     * Creates a string containing spaces
+     *
+     * @param amount : how many spaces to make
+     * @return the string containing amount spaces
+     */
     static std::string space(size_t amount) {
         return replicate(' ', amount);
     }
