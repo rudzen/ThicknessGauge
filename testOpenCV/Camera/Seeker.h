@@ -111,7 +111,7 @@ class Seeker : public std::enable_shared_from_this<Seeker> {
 public:
 
     enum class Phase {
-        ONE, TWO, THREE, DONE, NONE, FAIL
+        ONE, TWO_RIGHT, TWO_LEFT, THREE, DONE, NONE, FAIL
     };
 
 private:
@@ -187,7 +187,7 @@ private:
 
     std::array<std::string, 3> exposures_short_ = {"_5k", "_20k", "_40k"};
 
-    std::array<std::unique_ptr<Frames>, 3> frameset_;
+    std::array<std::unique_ptr<Frames>, 4> frameset_;
 
     Frames* current_frameset_;
 
@@ -205,11 +205,11 @@ private: // internal functions
     }
 
     /**
- * \brief Processes the matrix for optimal output and computes the line information based on the results
- * \param org The matrix to perform the process on
- * \param hough The hough extension class used
- * \param morph The morphology extenstion class used
- */
+     * \brief Processes the matrix for optimal output and computes the line information based on the results
+     * \param org The matrix to perform the process on
+     * \param hough The hough extension class used
+     * \param morph The morphology extenstion class used
+     */
     void process_mat_for_line(cv::Mat& org, std::shared_ptr<HoughLinesPR>& hough, MorphR* morph) const;
 
     void switch_phase();

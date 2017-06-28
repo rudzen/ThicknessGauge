@@ -116,9 +116,12 @@ void Seeker::switch_phase() {
         current_phase_ = Phase::ONE;
         break;
     case Phase::ONE:
-        current_phase_ = Phase::TWO;
+        current_phase_ = Phase::TWO_LEFT;
         break;
-    case Phase::TWO:
+    case Phase::TWO_LEFT:
+        current_phase_ = Phase::TWO_RIGHT;
+        break;
+    case Phase::TWO_RIGHT:
         current_phase_ = Phase::THREE;
         break;
     case Phase::THREE:
@@ -173,8 +176,11 @@ void Seeker::phase_one() {
         exposures.emplace_back(i);
 
     // BUG :: hack for camera exposure
-    pcapture->exposure(1);
+    pcapture->exposure(rand() % (10 - 1 + 1) + 1);
     auto first_cap = true;
+
+
+    auto const frames_to_capture = 3;
 
     log_time << "Running phase one.\n";
 
@@ -201,9 +207,9 @@ void Seeker::phase_one() {
                     continue;
 
                 targets.clear();
-                pcapture->cap(1, targets);
+                pcapture->cap(frames_to_capture, targets);
 
-                auto current_frame = targets.front();
+                auto current_frame = targets.back();
 
                 log_time << __FUNCTION__ << " filter processing..\n";
 
@@ -316,6 +322,11 @@ void Seeker::phase_one() {
             running = false;
 
     }
+
+    pdata->marking_rect = hough_vertical->marking_rect();
+
+    log_time << __FUNCTION__ << " marking rect found : " << markings.front() << '\n';
+
 }
 
 void Seeker::phase_two() {
@@ -501,10 +512,12 @@ int Seeker::frameset(Phase phase) {
     switch (phase) {
     case Phase::ONE:
         return 0;
-    case Phase::TWO:
+    case Phase::TWO_RIGHT:
         return 1;
-    case Phase::THREE:
+    case Phase::TWO_LEFT:
         return 2;
+    case Phase::THREE:
+        return 3;
     default:
         return -1;
     }
@@ -515,5 +528,14 @@ void Seeker::compute() {
     initialize();
 
     phase_one();
+
+    pcapture->aquisition_end();
+
+    pcapture->cap_end();
+
+    pcapture->close();
+
+    pcapture->uninitialize();
+
 
 }
