@@ -115,8 +115,8 @@ int main(int argc, char** argv) {
                 if (initialized_ok)
                     break;
 
-                log_time << cv::format("Unable to initialize....\n");
-                log_time << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
+                log_err << cv::format("Unable to initialize....\n");
+                log_err << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
                 tg::sleep(500);
             }
 
@@ -126,8 +126,8 @@ int main(int argc, char** argv) {
 
             thickness_gauge->save_data("output_mufmuf");
 
-            log_time << cv::format("difference: %f\n", data->difference);
-            log_time << cv::format("done..\n");
+            log_ok << cv::format("difference: %f\n", data->difference);
+            log_err << cv::format("done..\n");
 
         } else if (options.calibration_mode()) {
             Calib calib;
@@ -138,25 +138,25 @@ int main(int argc, char** argv) {
         }
     } catch (ArgException& ae) {
         string what = ae.what();
-        log_timedate << "ArgException suddenly happend (but what?)\n" + what << std::endl;
+        log_err << "ArgException suddenly happend (but what?)\n" + what << std::endl;
         return -1;
     }
     catch (CaptureFailException& cfe) {
         string what = cfe.what();
-        log_timedate << "CaptureFailException suddenly happend (but what?)\n" + what << std::endl;
+        log_err << "CaptureFailException suddenly happend (but what?)\n" + what << std::endl;
         return -2;
     }
     catch (CalibrationException& cale) {
         string what = cale.what();
-        log_timedate << "CalibrationException suddenly happend (but what?)\n" + what << std::endl;
+        log_err << "CalibrationException suddenly happend (but what?)\n" + what << std::endl;
         return -3;
     }
     catch (TestException& te) {
         string what = te.what();
-        log_timedate << "TestException suddenly happend (but what?)\n" + what << std::endl;
+        log_err << "TestException suddenly happend (but what?)\n" + what << std::endl;
         return -4;
     } catch (cv::Exception& e) {
-        cerr << cv::format("cv::Exception caught in main\n", e.msg.c_str());
+        log_err << cv::format("cv::Exception caught in main\n", e.msg.c_str());
     }
 
     log_time << cv::format("Smooth operator >> %i\n", return_value);

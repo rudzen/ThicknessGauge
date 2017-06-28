@@ -368,6 +368,9 @@
     <ClInclude Include="namespaces\str.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UI\rlutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="testConfig.xml" />

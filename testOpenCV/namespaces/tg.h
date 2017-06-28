@@ -151,7 +151,7 @@ namespace tg {
 
 #endif
 
-    enum class LogTime { LOG_TIME, LOG_DATE, LOG_TIME_DATE };
+    enum class LogTime { LOG_TIME, LOG_DATE, LOG_TIME_DATE, LOG_OK_TIME, LOG_ERR_TIME };
 
 #ifndef _TIME_DATE_OUT
 #define _TIME_DATE_OUT
@@ -165,6 +165,8 @@ namespace tg {
 #define log_timedate std::cout << LogTime::LOG_TIME_DATE
 #define log_time std::cout << LogTime::LOG_TIME
 #define log_date std::cout << LogTime::LOG_DATE
+#define log_ok std::cout << LogTime::LOG_OK_TIME
+#define log_err std::cerr << LogTime::LOG_ERR_TIME
 
 #endif
 

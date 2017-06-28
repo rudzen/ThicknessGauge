@@ -323,7 +323,7 @@ void Seeker::phase_two() {
 
     capture_roi left_baseline;
     left_baseline.x = 0;
-    left_baseline.y = base_line_y;
+    left_baseline.y = floor(base_line_y);
     left_baseline.width = marking.x;
     left_baseline.height = quarter;
 
@@ -341,7 +341,7 @@ void Seeker::phase_two() {
         log_time << __FUNCTION__ << " Warning, right_baseline failed validation.\n";
     }
 
-    pcapture->region(right_baseline);
+    pcapture->region(left_baseline);
 
     std::vector<cv::Mat> left_frames;
     std::vector<cv::Mat> right_frames;
@@ -403,9 +403,12 @@ void Seeker::phase_two() {
 
     }
 
-    // TODO : adjust capture ROI based on found lines. ?
+    // adjust capture ROI based on found lines. ?
     auto left_boundry = cv::minAreaRect(left_elements);
     auto left_boundry_rect = left_boundry.boundingRect();
+
+    // update the phase roi for left side
+    phase_roi<int, 1>(left_boundry_rect);
 
     if (!pcapture->region_add_def_offset(right_baseline)) {
         log_time << __FUNCTION__ << " Warning, left_boundry failed validation.\n";
@@ -450,6 +453,11 @@ void Seeker::phase_two() {
     }
 
     // ************  RIGHT SIDE **************
+
+
+    // update the phase roi for left side
+    phase_roi<int, 1>(left_boundry_rect);
+
 
 }
 

@@ -7,6 +7,7 @@
 #include "tg.h"
 #include <mutex>
 #include <type_traits>
+#include "UI/rlutil.h"
 
 namespace tg {
 
@@ -15,33 +16,48 @@ namespace tg {
         static std::mutex m;
 
         switch (sc) {
-            case SyncCout::IO_LOCK:
-                m.lock();
-                break;
-            case SyncCout::IO_UNLOCK:
-                m.unlock();
-            default: ;
+        case SyncCout::IO_LOCK:
+            m.lock();
+            break;
+        case SyncCout::IO_UNLOCK:
+            m.unlock();
+        default: ;
         }
         return os;
     }
 
     std::ostream& operator<<(std::ostream& os, const LogTime lt) {
 
-        os << '[';
-
         switch (lt) {
-            case LogTime::LOG_TIME:
-                os << get_time();
-                break;
-            case LogTime::LOG_DATE:
-                os << get_date();
-                break;
-            case LogTime::LOG_TIME_DATE:
-                os << get_time_date();
-                break;
+        case LogTime::LOG_TIME:
+            rlutil::setColor(rlutil::GREEN);
+            os << '[' << get_time();
+            break;
+        case LogTime::LOG_DATE:
+            rlutil::setColor(rlutil::GREEN);
+            os << '[' << get_date();
+            break;
+        case LogTime::LOG_TIME_DATE:
+            rlutil::setColor(rlutil::GREEN);
+            os << '[' << get_time_date();
+            break;
+        case LogTime::LOG_OK_TIME:
+            rlutil::setColor(rlutil::GREEN);
+            os << '[' << get_time();
+            break;
+        case LogTime::LOG_ERR_TIME:
+            rlutil::setColor(rlutil::RED);
+            os << '[' << get_time();
+            break;
+        default: ;
         }
 
-        return os << "]: ";
+        os << ']';
+
+        rlutil::setColor(rlutil::GREY);
+
+        return os << ": ";
+
 
     }
 

@@ -172,8 +172,13 @@ private:
 
     // roi for the different phases (3)
     // note that only phase one is known from the beginning
-    std::array<capture_roi, 3> phase_roi_{
+    // 0 = default phase one frame (used to get offsets)
+    // 1 = phase two left side
+    // 2 = phase two right side
+    // 3 = phase three
+    std::array<capture_roi, 4> phase_roi_{
         def_phase_one_roi_,
+        phase_roi_null_,
         phase_roi_null_,
         phase_roi_null_
     };
@@ -199,6 +204,15 @@ private:
 
 private: // internal functions
 
+    template <typename T, int index>
+    bool phase_roi(cv::Rect_<T> roi) {
+        phase_roi_[index].x = static_cast<unsigned long>(ceil(roi.x));
+        phase_roi_[index].y = static_cast<unsigned long>(ceil(roi.y));
+        phase_roi_[index].width = static_cast<unsigned long>(ceil(roi.width));
+        phase_roi_[index].height = static_cast<unsigned long>(ceil(roi.height));
+        return validate::validate_rect(phase_roi_[index]);
+    }
+
     /**
  * \brief Processes the matrix for optimal output and computes the line information based on the results
  * \param org The matrix to perform the process on
@@ -218,6 +232,7 @@ private: // internal functions
     void phase_finalize();
 
     static int frameset(Phase phase);
+
 
 public:
 

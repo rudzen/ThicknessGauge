@@ -184,7 +184,7 @@ bool CapturePvApi::load_calibration_data(std::string& filename) const {
     fs.open(filename, cv::FileStorage::READ);
 
     if (!fs.isOpened()) {
-        std::cerr << "Failed to open " << filename << std::endl;
+        log_err << "Failed to open " << filename << std::endl;
         return false;
     }
 
@@ -227,7 +227,7 @@ bool CapturePvApi::frame_init() {
     // Get the image size of every capture
     auto err_code = PvAttrUint32Get(camera_.Handle, "TotalBytesPerFrame", &frame_size_);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error while initializing frame! %s\n", error_last(err_code));
+        log_err << cv::format("Error while initializing frame! %s\n", error_last(err_code));
         return false;
     }
 
@@ -244,18 +244,18 @@ int CapturePvApi::cap_init() const {
     // Start the camera
     auto err_code = PvCaptureStart(camera_.Handle);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error starting capture.. %s\n", error_last(err_code));
+        log_err << cv::format("Error starting capture.. %s\n", error_last(err_code));
         return -1;
     }
 
     unsigned long ready = 0;
     err_code = PvCaptureQuery(camera_.Handle, &ready);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error. Capture query failed. %s\n", error_last(err_code));
+        log_err << cv::format("Error. Capture query failed. %s\n", error_last(err_code));
         return -2;
     }
     if (ready == 0) {
-        log_time << cv::format("Error. Unit is not ready to capture.\n");
+        log_err << cv::format("Error. Unit is not ready to capture.\n");
         return -3;
     }
 
@@ -265,7 +265,7 @@ int CapturePvApi::cap_init() const {
 bool CapturePvApi::cap_end() const {
     auto err_code = PvCaptureEnd(camera_.Handle);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error. Failed to end capture. %s\n", error_last(err_code));
+        log_err << cv::format("Error. Failed to end capture. %s\n", error_last(err_code));
         return false;
     }
     return true;
@@ -275,17 +275,17 @@ bool CapturePvApi::aquisition_init() const {
     // Set the camera to capture continuously
     auto err_code = PvAttrEnumSet(camera_.Handle, "AcquisitionMode", "Continuous");
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error setting acquisition mode.. %s\n", error_last(err_code));
+        log_err << cv::format("Error setting acquisition mode.. %s\n", error_last(err_code));
         return false;
     }
     err_code = PvCommandRun(camera_.Handle, "AcquisitionStart");
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error setting acquisition start.. %s\n", error_last(err_code));
+        log_err << cv::format("Error setting acquisition start.. %s\n", error_last(err_code));
         return false;
     }
     err_code = PvAttrEnumSet(camera_.Handle, "FrameStartTriggerMode", "Freerun");
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error setting frame start trigger mode.. %s\n", error_last(err_code));
+        log_err << cv::format("Error setting frame start trigger mode.. %s\n", error_last(err_code));
         return false;
     }
     return true;
@@ -295,7 +295,7 @@ bool CapturePvApi::aquisition_end() const {
     // Stop the acquisition
     auto err_code = PvCommandRun(camera_.Handle, "AcquisitionStop");
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error..AcquisitionStop.. %s\n", error_last(err_code));
+        log_err << cv::format("Error..AcquisitionStop.. %s\n", error_last(err_code));
         return false;
     }
 
@@ -316,17 +316,17 @@ bool CapturePvApi::exposure_auto_reset() const {
     // set the defaults
     auto err_code = PvAttrUint32Set(camera_.Handle, "ExposureAutoMax", auto_max);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error.. ExposureAutoMax.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. ExposureAutoMax.. %s\n", error_last(err_code));
         return false;
     }
     err_code = PvAttrUint32Set(camera_.Handle, "ExposureAutoMin", auto_min);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error.. ExposureAutoMin.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. ExposureAutoMin.. %s\n", error_last(err_code));
         return false;
     }
     err_code = PvAttrEnumSet(camera_.Handle, "ExposureAutoAlg", auto_alg.c_str());
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error.. ExposureAutoAlg.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. ExposureAutoAlg.. %s\n", error_last(err_code));
         return false;
     }
 
@@ -337,34 +337,34 @@ bool CapturePvApi::exposure_auto_reset() const {
 
     err_code = PvAttrUint32Get(camera_.Handle, "ExposureAutoMax", &auto_max_check);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error.. ExposureAutoMax.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. ExposureAutoMax.. %s\n", error_last(err_code));
         return false;
     }
 
     err_code = PvAttrUint32Get(camera_.Handle, "ExposureAutoMin", &auto_max_check);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error.. ExposureAutoMin.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. ExposureAutoMin.. %s\n", error_last(err_code));
         return false;
     }
 
     err_code = PvAttrEnumGet(camera_.Handle, "ExposureAutoAlg", lValue, 128, nullptr);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error.. ExposureAutoAlg.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. ExposureAutoAlg.. %s\n", error_last(err_code));
         return false;
     }
 
     if (auto_max_check != auto_max) {
-        log_time << cv::format("Error.. ExposureAutoMax mismatch.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. ExposureAutoMax mismatch.. %s\n", error_last(err_code));
         return false;
     }
 
     if (auto_max_check != auto_max) {
-        log_time << cv::format("Error.. ExposureAutoMin mismatch.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. ExposureAutoMin mismatch.. %s\n", error_last(err_code));
         return false;
     }
 
     if (std::strcmp(auto_alg.c_str(), lValue) != 0) {
-        log_time << cv::format("Error.. ExposureAutoAlg mismatch.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. ExposureAutoAlg mismatch.. %s\n", error_last(err_code));
         return false;
     }
 
@@ -381,7 +381,7 @@ bool CapturePvApi::exposure_auto_adjust_tolerance(unsigned long new_value) const
 
     using namespace tg;
 
-    log_time << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
+    log_err << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
     return false;
 
 }
@@ -397,7 +397,7 @@ unsigned long CapturePvApi::exposure_auto_adjust_tolerance() const {
 
     using namespace tg;
 
-    log_time << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
+    log_err << cv::format("Error.. ExposureAutoAdjustTol.. %s\n", error_last(err_code));
     return ret_val;
 
 }
@@ -407,11 +407,11 @@ void CapturePvApi::reset_binning() const {
     const auto def_binning = 1;
     auto err_code = PvAttrUint32Set(camera_.Handle, "BinningX", def_binning);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error setting BinningX.. %s\n", error_last(err_code));
+        log_err << cv::format("Error setting BinningX.. %s\n", error_last(err_code));
     }
     err_code = PvAttrUint32Set(camera_.Handle, "BinningY", def_binning);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error setting BinningY.. %s\n", error_last(err_code));
+        log_err << cv::format("Error setting BinningY.. %s\n", error_last(err_code));
     }
 }
 
@@ -422,7 +422,7 @@ bool CapturePvApi::is_open() const {
 void CapturePvApi::is_open(bool new_value) {
     is_open_ = new_value;
     if (new_value) {
-        log_time << "Warning. Manually opening of camera unit invoked.\n";
+        log_err << "Warning. Manually opening of camera unit invoked.\n";
     }
 }
 
@@ -433,7 +433,7 @@ bool CapturePvApi::initialized() const {
 void CapturePvApi::initialized(bool new_value) {
     this->initialized_ = new_value;
     if (new_value) {
-        log_time << "Warning. Manually initialization of camera unit invoked.\n";
+        log_err << "Warning. Manually initialization of camera unit invoked.\n";
     }
 }
 
@@ -443,7 +443,7 @@ unsigned CapturePvApi::retry_count() const {
 
 void CapturePvApi::retry_count(unsigned new_value) {
     if (new_value == retry_count()) {
-        log_time << cv::format("Capture retry count already set to %i.\n", new_value);
+        log_err << cv::format("Capture retry count already set to %i.\n", new_value);
         return;
     }
     log_time << cv::format("Capture retry count set to %i.\n", new_value);
@@ -498,7 +498,7 @@ bool CapturePvApi::region_x(unsigned new_x) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "RegionX", new_x);
     if (err_code == ePvErrSuccess)
         return true;
-    log_time << cv::format("Error setting roi x.. %s\n", error_last(err_code));
+    log_err << cv::format("Error setting roi x.. %s\n", error_last(err_code));
     return false;
 }
 
@@ -506,7 +506,7 @@ unsigned long CapturePvApi::region_x() const {
     unsigned long x = 0;
     auto err_code = PvAttrUint32Get(camera_.Handle, "RegionX", &x);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error getting roi x.. %s\n", error_last(err_code));
+        log_err << cv::format("Error getting roi x.. %s\n", error_last(err_code));
     }
     return x;
 }
@@ -515,7 +515,7 @@ bool CapturePvApi::region_y(unsigned new_y) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "RegionY", new_y);
     if (err_code == ePvErrSuccess)
         return true;
-    log_time << cv::format("Error setting roi y.. %s\n", error_last(err_code));
+    log_err << cv::format("Error setting roi y.. %s\n", error_last(err_code));
     return false;
 }
 
@@ -523,7 +523,7 @@ unsigned long CapturePvApi::region_y() const {
     unsigned long y = 0;
     auto err_code = PvAttrUint32Get(camera_.Handle, "RegionY", &y);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error getting roi y.. %s\n", error_last(err_code));
+        log_err << cv::format("Error getting roi y.. %s\n", error_last(err_code));
     }
     return y;
 }
@@ -540,7 +540,7 @@ unsigned long CapturePvApi::region_height() const {
     unsigned long height = 0;
     auto err_code = PvAttrUint32Get(camera_.Handle, "Height", &height);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error getting roi height.. %s\n", error_last(err_code));
+        log_err << cv::format("Error getting roi height.. %s\n", error_last(err_code));
     }
     return height;
 }
@@ -549,7 +549,7 @@ bool CapturePvApi::region_width(unsigned new_width) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "Width", new_width);
     if (err_code == ePvErrSuccess)
         return true;
-    log_time << cv::format("Error setting roi width.. %s\n", error_last(err_code));
+    log_err << cv::format("Error setting roi width.. %s\n", error_last(err_code));
     return false;
 }
 
@@ -557,7 +557,7 @@ unsigned long CapturePvApi::region_width() const {
     unsigned long width = 0;
     auto err_code = PvAttrUint32Get(camera_.Handle, "Width", &width);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error getting roi width.. %s\n", error_last(err_code));
+        log_err << cv::format("Error getting roi width.. %s\n", error_last(err_code));
     }
     return width;
 }
@@ -580,7 +580,7 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
                     continue;
                 if (err_code == ePvErrSuccess)
                     break;
-                log_time << cv::format("Error while waiting for frame. %s\n", error_last(err_code));
+                log_err << cv::format("Error while waiting for frame. %s\n", error_last(err_code));
             }
 
             // Create an image header (mono image)
@@ -617,7 +617,7 @@ void CapturePvApi::cap_single(cv::Mat& target) {
                 continue;
             if (err_code == ePvErrSuccess)
                 break;
-            log_time << cv::format("Error while waiting for frame. %s\n", error_last(err_code));
+            log_err << cv::format("Error while waiting for frame. %s\n", error_last(err_code));
         }
 
         // Create an image header (mono image)
@@ -645,7 +645,7 @@ bool CapturePvApi::initialize() {
         initialized_ = err_code == ePvErrSuccess;
         is_open_ = false;
         if (!initialized_) { // something went to shiets...
-            log_time << cv::format("Error. initialize(). %s\n", error_last(err_code));
+            log_err << cv::format("Error. initialize(). %s\n", error_last(err_code));
             return false;
         }
     }
@@ -672,7 +672,7 @@ bool CapturePvApi::initialize() {
     if (cameras && retry_count_) {
         log_time << cv::format("Found %i camera(s).\n", cameras);
     } else {
-        log_time << cv::format("Failed to locate camera, try increasing retry amount. Current is %i\n", retry_count());
+        log_err << cv::format("Failed to locate camera, try increasing retry amount. Current is %i\n", retry_count());
         close();
         return false;
     }
@@ -682,7 +682,7 @@ bool CapturePvApi::initialize() {
     is_open_ = cam_list_count;
 
     if (!is_open_) {
-        log_time << "Error while getting camera info.\n";
+        log_err << "Error while getting camera info.\n";
         return false;
     }
 
@@ -703,7 +703,7 @@ unsigned long CapturePvApi::camera_count() {
 bool CapturePvApi::open() {
 
     if (!initialized_) {
-        log_time << "PvApi not initialized.\n";
+        log_err << "PvApi not initialized.\n";
         return false;
     }
 
@@ -711,7 +711,7 @@ bool CapturePvApi::open() {
     is_open_ = err_code == ePvErrSuccess;
 
     if (!is_open_) { // something went to shiets...
-        log_time << cv::format("Error. camera not open.. %s\n", error_last(err_code));
+        log_err << cv::format("Error. camera not open.. %s\n", error_last(err_code));
     }
 
     log_time << "Camera opened ok.\n";
@@ -724,7 +724,7 @@ void CapturePvApi::close() {
     is_open_ = err_code != ePvErrSuccess;
 
     if (is_open_) {
-        log_time << cv::format("Error. close(), %s\n", error_last(err_code));
+        log_err << cv::format("Error. close(), %s\n", error_last(err_code));
         return;
     }
     log_time << "Camera closed.\n";
@@ -733,14 +733,14 @@ void CapturePvApi::close() {
 void CapturePvApi::packet_size(const unsigned long new_value) const {
     auto err_code = PvCaptureAdjustPacketSize(camera_.Handle, new_value);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error.. adjusting packet size.. %s\n", error_last(err_code));
+        log_err << cv::format("Error.. adjusting packet size.. %s\n", error_last(err_code));
     }
 }
 
 void CapturePvApi::gain(unsigned long new_value) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "GainValue", new_value);
     if (err_code != ePvErrSuccess) {
-        log_time << "Gain changed failed.\n";
+        log_err << "Gain changed failed.\n";
         return;
     }
     log_time << "Gain changed to " << new_value << std::endl;
@@ -750,7 +750,7 @@ unsigned long CapturePvApi::gain() const {
     unsigned long val = 0;
     auto err_code = PvAttrUint32Get(camera_.Handle, "GainValue", &val);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error. gain(). %s\n", error_last(err_code));
+        log_err << cv::format("Error. gain(). %s\n", error_last(err_code));
         return 0;
     }
     log_time << "Gain fetched " << val << std::endl;
@@ -760,7 +760,7 @@ unsigned long CapturePvApi::gain() const {
 void CapturePvApi::exposure(unsigned long new_value) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "ExposureValue", new_value);
     if (err_code != ePvErrSuccess) {
-        log_time << "Exposure changed failed.\n";
+        log_err << "Exposure changed failed.\n";
         return;
     }
     log_time << "Exposure changed to " << new_value << std::endl;
@@ -770,7 +770,7 @@ unsigned long CapturePvApi::exposure() const {
     unsigned long val = 0;
     auto err_code = PvAttrUint32Get(camera_.Handle, "ExposureValue", &val);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error. exposure(). %s\n", error_last(err_code));
+        log_err << cv::format("Error. exposure(). %s\n", error_last(err_code));
         return 0;
     }
     log_time << "Exposure fetched " << val << std::endl;
@@ -794,7 +794,7 @@ void CapturePvApi::print_attr() const {
     tPvAttrListPtr pListPtr;
     auto err_code = PvAttrList(camera_.Handle, &pListPtr, &count);
     if (err_code != ePvErrSuccess) {
-        log_time << "Unable to read attributes..\n";
+        log_err << "Unable to read attributes..\n";
     }
 
     for (unsigned long i = 0; i < count; i++)
@@ -824,14 +824,14 @@ void CapturePvApi::pixel_format(const PixelFormat format) const {
 
     // temporary check
     if (format != PixelFormat::MONO8) {
-        log_time << "Warning, data structure not enabled for this format (yet).\n";
+        log_err << "Warning, data structure not enabled for this format (yet).\n";
         sformat = "Mono8";
         f = ePvFmtMono8;
     }
 
     auto err_code = PvAttrEnumSet(camera_.Handle, "PixelFormat", sformat.c_str());
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error while setting pixel format. %s\n", error_last(err_code));
+        log_err << cv::format("Error while setting pixel format. %s\n", error_last(err_code));
         return;
     }
 
@@ -844,7 +844,7 @@ CapturePvApi::PixelFormat CapturePvApi::pixel_format() const {
     char lValue[128];
     auto err_code = PvAttrEnumGet(camera_.Handle, "PixelFormat", lValue, 128, nullptr);
     if (err_code != ePvErrSuccess) {
-        log_time << cv::format("Error. Retrieving pixel format. %s\n", error_last(err_code));
+        log_err << cv::format("Error. Retrieving pixel format. %s\n", error_last(err_code));
         return PixelFormat::UNKNOWN;
     }
 

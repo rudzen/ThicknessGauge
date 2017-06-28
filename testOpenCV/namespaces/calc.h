@@ -342,7 +342,7 @@ namespace calc {
     template <typename T>
     double rad_to_deg(T radians) {
         static_assert(std::is_floating_point<T>::value, "rad_to_deg is only possible for floating point.");
-        return radians * DEGREES;
+        return (radians * 180.0) / PI;
     }
 
     /**
@@ -354,7 +354,7 @@ namespace calc {
     template <typename T>
     double deg_to_rad(T degrees) {
         static_assert(std::is_floating_point<T>::value, "deg_to_rad is only possible for floating point.");
-        return degrees * RADIANS;
+        return (degrees * PI) / 180;
     }
 
     /**
@@ -364,7 +364,7 @@ namespace calc {
      * \param x2 X of second point
      * \param y1 Y of first point
      * \param y2 Y of second point;
-     * \return The angle in radians
+     * \return The angle in degrees
      */
     template <typename T>
     double angle_between_points(const T x1, const T x2, const T y1, const T y2) {

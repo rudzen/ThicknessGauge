@@ -62,7 +62,7 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
         auto capture_device_ok = pcapture->initialize();
 
         if (!capture_device_ok) {
-            log_time << "Capture device could not be initialized, aborting.\n";
+            log_err << "Capture device could not be initialized, aborting.\n";
             return false;
         }
 
@@ -71,7 +71,7 @@ bool ThicknessGauge::initialize(std::string& glob_name) {
         capture_device_ok = pcapture->open();
 
         if (!capture_device_ok) {
-            log_time << "Capture device could not be openened, aborting.\n";
+            log_err << "Capture device could not be openened, aborting.\n";
             pcapture->initialized(false);
             return false;
         }
@@ -236,7 +236,7 @@ void ThicknessGauge::compute_marking_height() {
             // grabs the in between parts and stores the data
             //computerInBetween(filter_baseline, hough_horizontal, morph);
 
-            log_time << "intersection points: " << pdata->intersections << endl;
+            log_ok << "intersection points: " << pdata->intersections << endl;
 
             // pixel cut off is based on the border of the marking..
             auto intersect_cutoff = calc::compute_intersection_cut(hough_vertical->left_border(), hough_vertical->right_border());
@@ -291,19 +291,19 @@ void ThicknessGauge::compute_marking_height() {
             std::for_each(pdata->center_points.begin(), pdata->center_points.end(), adjust_points);
 
             uint64 time_end = cv::getTickCount();
-
+            
             frame_time_ = static_cast<double>((time_end - time_start) / cv::getTickFrequency());
 
-            log_time << "Total compute time (seconds) : " << frame_time_ << endl;
+            log_ok << "Total compute time (seconds) : " << frame_time_ << endl;
 
             if (show_windows_ && !draw::is_escape_pressed(30))
                 continue;
-
+            
             break;
         } catch (cv::Exception& e) {
-            cerr << cv::format("CV Exception caught in computeMarkingHeight().\n%s\n", e.msg.c_str());
+            log_err << cv::format("CV Exception caught in computeMarkingHeight().\n%s\n", e.msg.c_str());
         } catch (std::exception& ex) {
-            cerr << cv::format("Exception caught in computeMarkingHeight().\n%s\n", ex.what());
+            log_err << cv::format("Exception caught in computeMarkingHeight().\n%s\n", ex.what());
         }
 
     }
@@ -627,7 +627,7 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
                 //log_time << "hough2\n";
 
                 if (hough->hough_vertical() < 0) {
-                    log_time << "No lines detected from houghR\n";
+                    log_err << "No lines detected from houghR\n";
                     //continue;
                 }
 
@@ -663,13 +663,13 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
 
             for (const auto& lb : left_borders) {
                 if (!validate::valid_vec(lb)) {
-                    log_time << __FUNCTION__ << " left_borders validation fail for " << lb << std::endl;
+                    log_err << __FUNCTION__ << " left_borders validation fail for " << lb << std::endl;
                 }
             }
 
             for (const auto& lb : right_borders) {
                 if (!validate::valid_vec(lb)) {
-                    log_time << __FUNCTION__ << " right_borders validation fail for " << lb << std::endl;
+                    log_err << __FUNCTION__ << " right_borders validation fail for " << lb << std::endl;
                 }
             }
 
@@ -683,10 +683,10 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
                     running = false;
             }
         } catch (cv::Exception& e) {
-            log_time << "CV Exception\n" << e.what();
+            log_err << "CV Exception\n" << e.what();
             exit(-991);
         } catch (NoLineDetectedException& e) {
-            log_time << cv::format("NoLineDetectedException : %s\n", e.what());
+            log_err << cv::format("NoLineDetectedException : %s\n", e.what());
             exit(-100);
         }
 
@@ -695,7 +695,7 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
     if (show_windows_)
         draw::removeWindow(window_name);
 
-    log_time << __FUNCTION__ << " : " << output << std::endl;
+    log_ok << __FUNCTION__ << " : " << output << std::endl;
     //    if (validate::validate_rect(output)) {
     pdata->left_border = left_border_result;
     pdata->right_border = right_border_result;
