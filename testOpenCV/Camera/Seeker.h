@@ -121,7 +121,7 @@ private:
     using capture_roi = cv::Rect_<ulong>;
 
     using phase_one_exp = struct phase_exp {
-        const ulong exposure_start = 500;
+        const ulong exposure_start = 1000;
 
         const ulong exposure_end = 30000;
 
@@ -191,15 +191,6 @@ private:
 
     Frames* current_frameset_;
 
-    Seeker();
-
-    explicit Seeker(capture_roi phase_one_roi);
-
-    /**
-     * \brief Initializes all sekker class data members
-     */
-    bool initialize();
-
     bool shut_down() const;
 
 private: // internal functions
@@ -233,9 +224,19 @@ private: // internal functions
 
     static int frameset(Phase phase);
 
+    bool initialize();
 
 public:
 
+    Seeker();
+
+    explicit Seeker(capture_roi phase_one_roi);
+
     void compute();
+
+    /**
+ * \brief Initializes all sekker class data members
+ */
+
 
 };

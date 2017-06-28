@@ -8,6 +8,12 @@
 
 namespace cvr {
 
+    /**
+     * \brief Unique seperate function to save null
+     * \param frames 
+     * \param left_out 
+     * \param right_out 
+     */
     void split_frames(std::vector<cv::Mat>& frames, std::vector<cv::Mat>& left_out, std::vector<cv::Mat>& right_out) {
 
         cv::Point top_left(0, 0);

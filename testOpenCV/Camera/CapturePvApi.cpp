@@ -2,7 +2,6 @@
 #include <chrono>
 #include "../namespaces/tg.h"
 #include "CapturePvApi.h"
-#include "namespaces/validate.h"
 
 using namespace tg;
 
@@ -589,12 +588,12 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
             m.data = static_cast<uchar *>(camera_.Frame.ImageBuffer);
 
             // if the calibration data has been loaded, the undistorted image is then used
-            if (cal->loaded) {
-                cv::undistort(m, undistorted, cal->intrinsic, cal->dist_coeffs);
-                target_vector.emplace_back(undistorted);
-            } else {
+            //if (cal->loaded) {
+            //    cv::undistort(m, undistorted, cal->intrinsic, cal->dist_coeffs);
+            //    target_vector.emplace_back(undistorted);
+            //} else {
                 target_vector.emplace_back(m.clone());
-            }
+            //}
 
             //cv::imwrite("ostefars.png", target_vector.back());
         }

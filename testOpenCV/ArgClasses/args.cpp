@@ -43,9 +43,6 @@ namespace args {
 
         cmd.xorAdd(xors);
 
-        TCLAP::ValueArg<std::string> arg_nullsave("", "null_save", "Save a singular image and exit", false, "null.png", new TestSuitConstraint());
-        cmd.add(arg_nullsave);
-
         /* end switches */
 
         /* begin value base argument*/
@@ -74,12 +71,6 @@ namespace args {
         cmd.add(arg_glob_name);
 
         cmd.parse(argc, argv);
-
-        // check for null save.. this is an important thing! :-)
-        if (arg_nullsave.isSet()) {
-            options->camera_file(arg_nullsave.getValue());
-            return true;
-        }
 
         // read all parsed command line arguments
         if (switch_demo.isSet())

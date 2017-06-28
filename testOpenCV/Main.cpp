@@ -15,7 +15,8 @@
 
 #include "namespaces/tg.h"
 #include "Camera/Calib.h"
-#include "namespaces/args.h"
+#include "ArgClasses/args.h"
+#include "Camera/Seeker.h"
 
 using namespace tg;
 
@@ -28,25 +29,15 @@ using namespace tg;
  * -4	= Test mode exception
  */
 
-#define _USE_MATH_DEFINES
-
-
-void save_null(std::string filename) {
-
-    // quick and dirty hack to save null image quickly
-    log_time << cv::format("Enter delay in seconds before capture to %s\n>", filename);
-    int t;
-    cin >> t;
-    cv::setNumThreads(2);
-    cv::Mat nullImage;
-    cv::VideoCapture cap;
-    cap.open(CV_CAP_PVAPI);
-    cap >> nullImage;
-    cv::imwrite(filename, nullImage);
-    cap.release();
-}
 
 int main(int argc, char** argv) {
+
+    auto seeker = std::make_shared<Seeker>();
+
+    seeker->compute();
+
+    return 99999;
+
 
     // jump directly into vimba testing for now!
     //return testCPP(argc, argv);
@@ -63,9 +54,6 @@ int main(int argc, char** argv) {
                 log_time << cv::format(cv::getBuildInformation().c_str());
                 return 0;
             }
-            // null save mode..
-            save_null(options->camera_file());
-            return 0;
         }
 
         auto thickness_gauge = std::make_unique<ThicknessGauge>(options->frames(), options->show_windows(), options->record_video(), 100, 100);

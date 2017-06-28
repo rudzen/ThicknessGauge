@@ -177,7 +177,7 @@
     <ClCompile Include="namespaces\str.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="namespaces\args.cpp">
+    <ClCompile Include="ArgClasses\args.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -374,7 +374,7 @@
     <ClInclude Include="UI\rlutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="namespaces\args.h">
+    <ClInclude Include="ArgClasses\args.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,8 +2,7 @@
 
 #include "CaptureInterface.h"
 #include <PvApi.h>
-#include "UI/ProgressBar.h"
-#include "namespaces/validate.h"
+#include "../namespaces/validate.h"
 
 /**
  * \brief Allows capture through PvAPI -> OpenCV data structure

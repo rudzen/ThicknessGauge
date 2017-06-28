@@ -35,10 +35,22 @@ bool Seeker::initialize() {
 
     // always perform complete re-init.
 
+    if (pcapture == nullptr) {
+        // run the basic process for the capture object
+        pcapture = std::make_unique<CapturePvApi>();
+    } else {
+        // double check for weirdness
+        if (pcapture->is_open()) {
+            pcapture->close();
+        }
+    }
+
+    // always perform complete re-init.
+
     auto capture_device_ok = pcapture->initialize();
 
     if (!capture_device_ok) {
-        log_time << "Capture device could not be initialized, aborting.\n";
+        log_err << "Capture device could not be initialized, aborting.\n";
         return false;
     }
 
@@ -47,7 +59,7 @@ bool Seeker::initialize() {
     capture_device_ok = pcapture->open();
 
     if (!capture_device_ok) {
-        log_time << "Capture device could not be openened, aborting.\n";
+        log_err << "Capture device could not be openened, aborting.\n";
         pcapture->initialized(false);
         return false;
     }
@@ -60,35 +72,20 @@ bool Seeker::initialize() {
 
     pcapture->packet_size(8228);
 
-    // switch frameset
-    auto frame_switch = frameset(current_phase_);
+    auto def_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
 
-    if (frame_switch == -1) {
-        log_time << "Frameset configured.\n";
-        return false;
-    }
+    pcapture->region(def_roi);
 
-    current_frameset_ = frameset_[frame_switch].get();
+    pcapture->frame_init();
 
-    auto ok = pcapture->frame_init();
-    if (!ok)
-        return false;
+    pcapture->cap_init();
 
-    ok = pcapture->cap_init();
-    if (!ok)
-        return false;
-
-    ok = pcapture->aquisition_init();
-    if (!ok)
-        return false;
-
-    ok = pcapture->region(phase_roi_[frame_switch]);
-    if (!ok)
-        return false;
+    pcapture->aquisition_init();
 
     log_time << cv::format("Seeker initialize complete, took %i ns.\n", tg::diff_now_ns(now));
 
-    return ok;
+    return true;
+
 }
 
 bool Seeker::shut_down() const {
@@ -159,9 +156,6 @@ void Seeker::phase_one() {
     cv::Vec4d left_border_result(0.0, 0.0, 0.0, 0.0);
     cv::Vec4d right_border_result(0.0, 0.0, 0.0, 0.0);
 
-    std::vector<ulong> exposures;
-    for (auto i = exposure_levels->exposure_start; i <= exposure_levels->exposure_end; i += exposure_levels->exposure_increment)
-        exposures.emplace_back(i);
 
     cv::Mat single_target;
     std::vector<cv::Mat> targets;
@@ -171,30 +165,54 @@ void Seeker::phase_one() {
 
     auto failures = 0;
 
+    pcapture->region(pcapture->default_roi);
+
+    std::vector<ulong> exposures;
+    exposures.emplace_back(exposure_levels->exposure_start / 2); //<- lel
+    for (auto i = exposure_levels->exposure_start; i <= exposure_levels->exposure_end; i += exposure_levels->exposure_increment)
+        exposures.emplace_back(i);
+
+    // BUG :: hack for camera exposure
+    pcapture->exposure(1);
+    auto first_cap = true;
+
     log_time << "Running phase one.\n";
 
-    auto now = tg::get_now_ns();
+    auto now = tg::get_now_ms();
 
     while (running) {
         try {
 
             for (const auto e : exposures) {
 
-                phase_one_exposure = e;
-
-                pcapture->exposure(e);
-
-                targets.clear();
-                pcapture->cap_single(single_target);
-
-                auto current_frame = single_target;
+                // BUG :: hack for camera exposure
+                if (first_cap) {
+                    first_cap = false;
+                    continue;
+                }
 
                 markings.clear();
                 left_borders.clear();
                 right_borders.clear();
 
+                phase_one_exposure = e;
+
+                if (!pcapture->exposure(e))
+                    continue;
+
+                targets.clear();
+                pcapture->cap(1, targets);
+
+                auto current_frame = targets.front();
+
+                log_time << __FUNCTION__ << " filter processing..\n";
+
                 pfilter->image(current_frame);
                 pfilter->do_filter();
+
+                log_time << __FUNCTION__ << " canny processing..\n";
+
+                cv::imwrite("exposure" + std::to_string(e) + ".png", pfilter->result());
 
                 pcanny->image(pfilter->result());
                 pcanny->do_canny();
@@ -205,6 +223,8 @@ void Seeker::phase_one() {
                 hough_vertical->original(tmp);
                 hough_vertical->image(t);
 
+                log_time << __FUNCTION__ << " houghline processing..\n";
+
                 auto hough_result = hough_vertical->hough_vertical();
 
                 switch (hough_result) {
@@ -212,10 +232,10 @@ void Seeker::phase_one() {
                     // everything ok
                     break;
                 case -1:
-                    log_time << __FUNCTION__ << " No lines detect.\n";
+                    log_err << __FUNCTION__ << " No lines detect.\n";
                     continue;
                 case -2:
-                    log_time << __FUNCTION__ << " No valid lines detected.\n";
+                    log_err << __FUNCTION__ << " No valid lines detected.\n";
                     continue;
                 default:
                     // nada
@@ -223,12 +243,12 @@ void Seeker::phase_one() {
                 }
 
                 if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Left)) {
-                    log_time << cv::format("Phase one intersection check for left side failed (exposure = %i).\n", phase_one_exposure);
+                    log_err << cv::format("Phase one intersection check for left side failed (exposure = %i).\n", phase_one_exposure);
                     continue;
                 }
 
                 if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Right)) {
-                    log_time << cv::format("Phase one intersection check for right side failed (exposure = %i).\n", phase_one_exposure);
+                    log_err << cv::format("Phase one intersection check for right side failed (exposure = %i).\n", phase_one_exposure);
                     continue;
                 }
 
@@ -244,15 +264,15 @@ void Seeker::phase_one() {
                     right_borders.emplace_back(hough_vertical->right_border());
 
                 // check for fatal zero
-                if (markings.size() + left_borders.size() + right_borders.size() != 0)
-                    continue;
+                //if (markings.size() + left_borders.size() + right_borders.size() != 0)
+                //    continue;
 
                 running = false;
                 break;
 
             }
 
-            log_time << cv::format("Scan complete.. took %i ns.\n", tg::diff_now_ns(now));
+            log_time << cv::format("Scan complete.. took %i ms.\n", tg::diff_now_ms(now));
 
             // TODO : temporary structure, vectors always have a single element in them!
             // set up the avg of the detected markings and borders.
@@ -402,7 +422,7 @@ void Seeker::phase_two() {
         org = exposure_test.clone();
         auto h = exposure_test.clone();
         hough_horizontal->original(h);
-        
+
         process_mat_for_line(org, hough_horizontal, pmorph.get());
 
         const auto& lines = hough_horizontal->right_lines(); // inner most side
@@ -488,4 +508,12 @@ int Seeker::frameset(Phase phase) {
     default:
         return -1;
     }
+}
+
+void Seeker::compute() {
+
+    initialize();
+
+    phase_one();
+
 }
