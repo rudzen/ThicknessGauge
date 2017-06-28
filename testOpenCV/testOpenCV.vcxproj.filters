@@ -177,6 +177,9 @@
     <ClCompile Include="namespaces\str.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="namespaces\args.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -369,6 +372,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\rlutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="namespaces\args.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

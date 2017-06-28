@@ -328,7 +328,7 @@ void Seeker::phase_two() {
     left_baseline.height = quarter;
 
     if (!pcapture->region_add_def_offset(left_baseline)) {
-        log_time << __FUNCTION__ << " Warning, left_baseline failed validation.\n";
+        log_err << __FUNCTION__ << " Warning, left_baseline failed validation.\n";
     }
 
     capture_roi right_baseline;
@@ -338,7 +338,7 @@ void Seeker::phase_two() {
     right_baseline.height = quarter;
 
     if (!pcapture->region_add_def_offset(right_baseline)) {
-        log_time << __FUNCTION__ << " Warning, right_baseline failed validation.\n";
+        log_err << __FUNCTION__ << " Warning, right_baseline failed validation.\n";
     }
 
     pcapture->region(left_baseline);
@@ -372,21 +372,37 @@ void Seeker::phase_two() {
 
     log_time << "Phase two begun..\n";
 
+    auto exposure_retry_count = 3;
+
     // ************  LEFT SIDE **************
 
     // attempt to find a good exposure for this phase
     while (running) {
 
+        if (exposure_retry_count == 0) {
+            log_err << __FUNCTION__ << " failed to alter exposure.. aborting process..\n";
+            exit(-201);
+        }
+
         phase_two_exposure += exposure_levels->exposure_increment;
 
-        pcapture->exposure(phase_two_exposure);
+        log_time << __FUNCTION__ << " phase two exposure level now at " << phase_two_exposure << '\n';
+
+        auto exposure_ok = pcapture->exposure(phase_two_exposure);
+
+        if (!exposure_ok) {
+            log_err << __FUNCTION__ << " failed to update the exposure level to " << phase_two_exposure << '\n';
+            exposure_retry_count--;
+            tg::sleep(150);
+            continue;
+        }
 
         pcapture->cap_single(exposure_test);
 
         org = exposure_test.clone();
         auto h = exposure_test.clone();
         hough_horizontal->original(h);
-
+        
         process_mat_for_line(org, hough_horizontal, pmorph.get());
 
         const auto& lines = hough_horizontal->right_lines(); // inner most side
@@ -398,7 +414,7 @@ void Seeker::phase_two() {
             break;
 
         if (phase_two_exposure > 100'000) {
-            log_time << "left side failed to produce valid lines.";
+            log_err << "left side failed to produce valid lines.";
         }
 
     }

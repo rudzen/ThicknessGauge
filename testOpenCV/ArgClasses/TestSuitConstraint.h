@@ -1,5 +1,6 @@
 #pragma once
 #include <tclap/Constraint.h>
+#include "../namespaces/filesystem.h"
 
 class TestSuitConstraint : public TCLAP::Constraint<std::string> {
 

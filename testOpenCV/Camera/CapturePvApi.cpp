@@ -757,13 +757,14 @@ unsigned long CapturePvApi::gain() const {
     return val;
 }
 
-void CapturePvApi::exposure(unsigned long new_value) const {
+bool CapturePvApi::exposure(unsigned long new_value) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "ExposureValue", new_value);
     if (err_code != ePvErrSuccess) {
         log_err << "Exposure changed failed.\n";
-        return;
+        return false;
     }
     log_time << "Exposure changed to " << new_value << std::endl;
+    return true;
 }
 
 unsigned long CapturePvApi::exposure() const {

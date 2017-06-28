@@ -188,6 +188,7 @@
     <ClCompile Include="CV\LaserR.cpp" />
     <ClCompile Include="Histogram\Histogram.cpp" />
     <ClCompile Include="IO\GlobGenerator.cpp" />
+    <ClCompile Include="namespaces\args.cpp" />
     <ClCompile Include="namespaces\calc.cpp" />
     <ClCompile Include="namespaces\cvr.cpp" />
     <ClCompile Include="namespaces\filesystem.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="CV\HarrisDetector.h" />
     <ClInclude Include="CV\LinePair.h" />
     <ClInclude Include="Exceptions\ThrowAssert.h" />
+    <ClInclude Include="namespaces\args.h" />
     <ClInclude Include="namespaces\calc.h" />
     <ClInclude Include="Calc\GaugeMath.h" />
     <ClInclude Include="Camera\CaptureInterface.h" />

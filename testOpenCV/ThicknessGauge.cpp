@@ -787,7 +787,7 @@ void ThicknessGauge::compute_laser_locations(shared_ptr<LaserR>& laser, shared_p
                 }
 
             } catch (std::exception& e) {
-                log_time << e.what() << std::endl;
+                log_err << e.what() << std::endl;
                 failures++;
             }
 
@@ -1026,7 +1026,7 @@ bool ThicknessGauge::save_data(string filename) {
     auto f(filename + ".json");
     cv::FileStorage fs(f, cv::FileStorage::WRITE);
     if (!fs.isOpened()) {
-        cerr << "Error while opening " << f << " for output." << endl;
+        log_err << "Error while opening " << f << " for output." << endl;
         return false;
     }
 

@@ -213,7 +213,7 @@ public:
 
     unsigned long gain() const;
 
-    void exposure(unsigned long new_value) const;
+    bool exposure(unsigned long new_value) const;
 
     unsigned long exposure() const;
 
