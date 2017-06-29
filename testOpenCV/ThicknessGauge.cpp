@@ -208,6 +208,8 @@ void ThicknessGauge::compute_marking_height() {
             hough_vertical->marking_rect(compute_marking_rectangle(hough_vertical));
             pdata->marking_rect = hough_vertical->marking_rect();
 
+            log_time << "1 ok\n";
+
             // check the resulting rectangle for weirdness
             //if (data->markingRect.x < 0.0 || data->markingRect.y < 0.0 || data->markingRect.width > imageSize_.width || data->markingRect.height > imageSize_.height || data->markingRect.area() >= imageSize_.area()) {
             //    CV_Error(cv::Error::StsBadSize, cv::format("Marking rectangle has bad size : [x:%f] [y:%f] [w:%f] [h:%f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height));
@@ -216,12 +218,18 @@ void ThicknessGauge::compute_marking_height() {
             // make sure the minimum is at least 10 pixels.
             auto min_line_len = calc::line::compute_houghp_min_line(10.0, pdata->marking_rect);
 
+            log_time << "2 ok\n";
+
             // horizontal houghline extension class
             auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), show_windows_);
+
+            log_time << "3 ok\n";
 
             hough_horizontal->max_line_gab(12);
             hough_horizontal->marking_rect(pdata->marking_rect);
             hough_horizontal->show_windows(show_windows_);
+
+            log_time << "4 ok\n";
 
             // morph extension class
             auto morph = make_shared<MorphR>(cv::MORPH_GRADIENT, 1, show_windows_);
@@ -233,6 +241,8 @@ void ThicknessGauge::compute_marking_height() {
             // compute the intersection points based on the borders of the markings and the baseline for the laser outside the marking
             calc::compute_intersection_points(pdata->base_lines, hough_vertical->left_border(), hough_vertical->right_border(), pdata->intersections);
 
+            log_time << "5 ok\n";
+
             // grabs the in between parts and stores the data
             //computerInBetween(filter_baseline, hough_horizontal, morph);
 
@@ -240,6 +250,8 @@ void ThicknessGauge::compute_marking_height() {
 
             // pixel cut off is based on the border of the marking..
             auto intersect_cutoff = calc::compute_intersection_cut(hough_vertical->left_border(), hough_vertical->right_border());
+
+            log_time << "6 ok\n";
 
             pdata->intersection_cuts[0] = pdata->intersections[0] - intersect_cutoff[0];
             pdata->intersection_cuts[3] = pdata->intersections[3] + intersect_cutoff[1];
@@ -255,12 +267,16 @@ void ThicknessGauge::compute_marking_height() {
             // adjust the baselines according to the intersection points. (could perhaps be useful in the future)
             cvr::adjust_marking_rect(pdata->marking_rect, pdata->intersections, intersect_cutoff[0]);
 
+            log_time << "7 ok\n";
+
             // testing angles between baseline.. should be max 5 degrees
             cv::Point2d line_left(pdata->marking_rect.x, pdata->base_lines[1]);
             cv::Point2d line_right(line_left.x + pdata->marking_rect.width, pdata->base_lines[3]);
 
             auto angle = calc::angle_between_lines(line_left, line_right);
             log_time << cv::format("Angle between baselines: [r/d] = [%f/%f]\n", angle, calc::rad_to_deg(angle));
+
+            log_time << "8 ok\n";
 
             //std::cout << cv::format("Adjusted marking rect: [x: %f | y: %f | w: %f | h: %f]\n", data->markingRect.x, data->markingRect.y, data->markingRect.width, data->markingRect.height);
             //std::cout << cv::format("Adjusted base line Y [left] : %f\n", data->baseLines[1]);
@@ -291,14 +307,14 @@ void ThicknessGauge::compute_marking_height() {
             std::for_each(pdata->center_points.begin(), pdata->center_points.end(), adjust_points);
 
             uint64 time_end = cv::getTickCount();
-            
+
             frame_time_ = static_cast<double>((time_end - time_start) / cv::getTickFrequency());
 
             log_ok << "Total compute time (seconds) : " << frame_time_ << endl;
 
             if (show_windows_ && !draw::is_escape_pressed(30))
                 continue;
-            
+
             break;
         } catch (cv::Exception& e) {
             log_err << cv::format("CV Exception caught in computeMarkingHeight().\n%s\n", e.msg.c_str());
@@ -321,6 +337,9 @@ void ThicknessGauge::compute_base_line_areas(shared_ptr<HoughLinesPR>& hough, sh
 
     morph->method(cv::MORPH_GRADIENT);
     morph->iterations(1);
+
+    pcanny->threshold_1(200);
+    pcanny->threshold_2(250);
 
     const std::string window_left = "test baseline left";
     const std::string window_right = "test baseline right";
@@ -404,94 +423,102 @@ void ThicknessGauge::compute_base_line_areas(shared_ptr<HoughLinesPR>& hough, sh
 
         cv::Mat org;
 
-        // left
+        try {
 
-        for (auto& left : left_frames) {
-            org = left.clone();
-            auto h = left.clone();
-            hough->original(h);
+            // left
 
-            process_mat_for_line(org, hough, morph);
+            for (auto& left : left_frames) {
+                org = left.clone();
+                auto h = left.clone();
+                hough->original(h);
 
-            const auto& lines = hough->right_lines(); // inner most side
-            for (auto& line : lines)
-                if (line.entry_[0] > left_cutoff)
-                    stl::copy_vector(line.elements_, left_elements);
+                process_mat_for_line(org, hough, morph);
 
-            if (show_windows_ && draw::is_escape_pressed(30))
-                running = false;
+                const auto& lines = hough->right_lines(); // inner most side
+                for (auto& line : lines)
+                    if (line.entry_[0] > left_cutoff)
+                        stl::copy_vector(line.elements_, left_elements);
 
-        }
+                if (show_windows_ && draw::is_escape_pressed(30))
+                    running = false;
 
-        // generate real boundry
-        auto left_boundry = cv::minAreaRect(left_elements);
-        auto left_boundry_rect = left_boundry.boundingRect();
-
-        log_time << "left_boundry_rect: " << left_boundry_rect.y << endl;
-
-        left_boundry_rect.width -= 40;
-
-        if (show_windows_) {
-            draw::drawRectangle(org, left_boundry_rect, cv::Scalar(255, 255, 255));
-            draw::showImage(window_left, org);
-            if (draw::is_escape_pressed(30))
-                running = false;
-        }
-
-        auto t = org(left_boundry_rect);
-        left_y = static_cast<double>(left_boundry_rect.y);
-        left_y += offset_y;
-        left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
-
-        log_time << "left baseline: " << left_y << endl;
-
-        // right
-
-        for (auto& right : right_frames) {
-            org = right.clone();
-            auto h1 = right.clone();
-            hough->original(h1);
-
-            process_mat_for_line(org, hough, morph);
-
-            const auto& lines = hough->left_lines(); // inner most side
-            for (auto& h : lines) {
-                if (h.entry_[2] < right_cutoff)
-                    stl::copy_vector(h.elements_, right_elements);
             }
 
-            if (show_windows_ && draw::is_escape_pressed(30))
-                running = false;
+            // generate real boundry
+            auto left_boundry = cv::minAreaRect(left_elements);
+            auto left_boundry_rect = left_boundry.boundingRect();
 
+            log_time << "left_boundry_rect: " << left_boundry_rect.y << endl;
+
+            left_boundry_rect.width -= 40;
+
+            if (show_windows_) {
+                draw::drawRectangle(org, left_boundry_rect, cv::Scalar(255, 255, 255));
+                draw::showImage(window_left, org);
+                if (draw::is_escape_pressed(30))
+                    running = false;
+            }
+
+            auto t = org(left_boundry_rect);
+            left_y = static_cast<double>(left_boundry_rect.y);
+            left_y += offset_y;
+            left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
+
+            log_time << "left baseline: " << left_y << endl;
+
+            // right
+
+            for (auto& right : right_frames) {
+                org = right.clone();
+                auto h1 = right.clone();
+                hough->original(h1);
+
+                process_mat_for_line(org, hough, morph);
+
+                const auto& lines = hough->left_lines(); // inner most side
+                for (auto& h : lines) {
+                    if (h.entry_[2] < right_cutoff)
+                        stl::copy_vector(h.elements_, right_elements);
+                }
+
+                if (show_windows_ && draw::is_escape_pressed(30))
+                    running = false;
+
+            }
+
+            // generate real boundry
+            auto right_boundry = cv::minAreaRect(right_elements);
+            auto right_boundry_rect = right_boundry.boundingRect();
+
+            right_boundry_rect.x += 40;
+
+            if (show_windows_) {
+                draw::drawRectangle(org, right_boundry_rect, cv::Scalar(255, 255, 255));
+                draw::showImage(window_right, org);
+                if (draw::is_escape_pressed(30))
+                    running = false;
+            }
+
+            log_time << "right_boundry_rect: " << right_boundry_rect.y << endl;
+
+            t = org(right_boundry_rect);
+            right_y = static_cast<double>(right_boundry_rect.y);
+            right_y += calc::real_intensity_line(t, pdata->right_points, t.rows, 0);
+            right_y += offset_y;
+
+            log_time << "right baseline: " << right_y << endl;
+
+            // forcefully break out of the loop
+            if (!show_windows_)
+                break;
+
+            //running = false;
+
+        } catch (cv::Exception& e) {
+            log_err << __FUNCTION__ << " cv exception caugth " << e.what();
+            continue;
         }
 
-        // generate real boundry
-        auto right_boundry = cv::minAreaRect(right_elements);
-        auto right_boundry_rect = right_boundry.boundingRect();
-
-        right_boundry_rect.x += 40;
-
-        if (show_windows_) {
-            draw::drawRectangle(org, right_boundry_rect, cv::Scalar(255, 255, 255));
-            draw::showImage(window_right, org);
-            if (draw::is_escape_pressed(30))
-                running = false;
-        }
-
-        log_time << "right_boundry_rect: " << right_boundry_rect.y << endl;
-
-        t = org(right_boundry_rect);
-        right_y = static_cast<double>(right_boundry_rect.y);
-        right_y += calc::real_intensity_line(t, pdata->right_points, t.rows, 0);
-        right_y += offset_y;
-
-        log_time << "right baseline: " << right_y << endl;
-
-        // forcefully break out of the loop
-        if (!show_windows_)
-            break;
-
-        running = false;
     }
 
     pdata->base_lines[0] = 0.0;
@@ -593,7 +620,7 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
         //out[1] /= vecs.size();
         out[2] /= vecs.size();
         out[3] /= vecs.size();
-        log_time << __FUNCTION__ << " accuVecs 0 : " << out << std::endl;
+        //log_time << __FUNCTION__ << " accuVecs 0 : " << out << std::endl;
     };
 
     while (running) {
@@ -639,9 +666,9 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
                 auto rb = hough->right_border();
                 auto mr = hough->marking_rect();
 
-                //markings.emplace_back(hough->getMarkingRect());
-                //left_borders.emplace_back(hough->getLeftBorder());
-                //right_borders.emplace_back(hough->getRightBorder());
+                //markings.emplace_back(mr);
+                //left_borders.emplace_back(lb);
+                //right_borders.emplace_back(rb);
 
                 if (validate::validate_rect(mr))
                     markings.emplace_back(mr);
@@ -694,6 +721,8 @@ cv::Rect2d ThicknessGauge::compute_marking_rectangle(shared_ptr<HoughLinesR>& ho
 
     if (show_windows_)
         draw::removeWindow(window_name);
+
+    output.height = image_height;
 
     log_ok << __FUNCTION__ << " : " << output << std::endl;
     //    if (validate::validate_rect(output)) {

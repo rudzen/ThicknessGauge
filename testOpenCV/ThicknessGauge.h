@@ -117,8 +117,6 @@ private:
 
 private: /* helper functions */
 
-    static double compute_houghP_min_line(double minLen, cv::Rect2d& rect);
-
     void glob_load(std::string& globName);
 
     void capture_frames(unsigned int frame_index, unsigned int capture_count, unsigned long long int exposure);

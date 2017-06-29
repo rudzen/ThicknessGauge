@@ -2,6 +2,7 @@
 #include "CV/HoughLinesR.h"
 #include "namespaces/filters.h"
 #include "CV/HoughLinesPR.h"
+#include "namespaces/draw.h"
 
 Seeker::Seeker()
     : current_phase_(Phase::ONE)
@@ -143,7 +144,7 @@ void Seeker::phase_one() {
     auto phase = frameset(current_phase_);
 
     // configure hough for this phase.. the int cast is only used for UI purpose.
-    auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, false);
+    auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, true);
     hough_vertical->angle_limit(30);
 
     pfilter->kernel(filters::kernel_line_left_to_right);
@@ -159,7 +160,6 @@ void Seeker::phase_one() {
     cv::Vec4d left_border_result(0.0, 0.0, 0.0, 0.0);
     cv::Vec4d right_border_result(0.0, 0.0, 0.0, 0.0);
 
-
     cv::Mat single_target;
     std::vector<cv::Mat> targets;
     targets.reserve(1); // lel
@@ -171,13 +171,8 @@ void Seeker::phase_one() {
     pcapture->region(pcapture->default_roi);
 
     std::vector<ulong> exposures;
-    exposures.emplace_back(exposure_levels->exposure_start / 2); //<- lel
     for (auto i = exposure_levels->exposure_start; i <= exposure_levels->exposure_end; i += exposure_levels->exposure_increment)
         exposures.emplace_back(i);
-
-    // BUG :: hack for camera exposure
-    pcapture->exposure(rand() % (10 - 1 + 1) + 1);
-    auto first_cap = true;
 
     auto const frames_to_capture = 3;
 
@@ -189,12 +184,6 @@ void Seeker::phase_one() {
         try {
 
             for (const auto e : exposures) {
-
-                // BUG :: hack for camera exposure
-                if (first_cap) {
-                    first_cap = false;
-                    continue;
-                }
 
                 markings.clear();
                 left_borders.clear();
@@ -209,20 +198,22 @@ void Seeker::phase_one() {
                 pcapture->cap(frames_to_capture, targets);
 
                 auto current_frame = targets.back();
+                cv::imwrite("exposure" + std::to_string(e) + "_1.png", current_frame);
 
                 log_time << __FUNCTION__ << " filter processing..\n";
 
                 pfilter->image(current_frame);
                 pfilter->do_filter();
 
-                log_time << __FUNCTION__ << " canny processing..\n";
+                cv::imwrite("exposure" + std::to_string(e) + "_2.png", pfilter->result());
 
-                cv::imwrite("exposure" + std::to_string(e) + ".png", pfilter->result());
+                log_time << __FUNCTION__ << " canny processing..\n";
 
                 pcanny->image(pfilter->result());
                 pcanny->do_canny();
 
                 auto t = pcanny->result();
+                cv::imwrite("exposure" + std::to_string(e) + "_3.png", t);
 
                 auto tmp = t.clone();
                 hough_vertical->original(tmp);
@@ -231,6 +222,9 @@ void Seeker::phase_one() {
                 log_time << __FUNCTION__ << " houghline processing..\n";
 
                 auto hough_result = hough_vertical->hough_vertical();
+                auto all = hough_vertical->all_lines();
+                hough_vertical->draw_lines(all, cv::Scalar(255, 255, 255));
+                cv::imwrite("exposure" + std::to_string(e) + "_4.png", hough_vertical->output());
 
                 switch (hough_result) {
                 case 0:

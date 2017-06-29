@@ -69,21 +69,21 @@ int main(int argc, char** argv) {
 
             auto seeker = std::make_shared<Seeker>();
 
-            // determin camera or file storage
-            if (glob_name == "camera") {
+            //// determin camera or file storage
+            //if (glob_name == "camera") {
 
-                while (true) {
-                    auto ok = seeker->compute();
-                    if (ok)
-                        break;
+            //    while (true) {
+            //        auto ok = seeker->compute();
+            //        if (ok)
+            //            break;
 
-                    log_err << cv::format("Unable to initialize....\n");
-                    log_err << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
-                    tg::sleep(500);
+            //        log_err << cv::format("Unable to initialize....\n");
+            //        log_err << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
+            //        tg::sleep(500);
 
-                }
+            //    }
 
-            } else {
+            //} else {
 
                 thickness_gauge->glob_add_nulls();
 
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
                     tg::sleep(500);
                 }
 
-            }
+            //}
 
 
             thickness_gauge->compute_marking_height();

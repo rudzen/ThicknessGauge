@@ -85,6 +85,13 @@ private:
     // the output for visual display ONLY!
     cv::Mat output_;
 
+
+public:
+    const cv::Mat& output() const {
+        return output_;
+    }
+
+private:
     // the line output for the houghlines algorithm
     vector<cv::Vec2f> lines_;
 
@@ -152,6 +159,8 @@ public:
 
     bool is_lines_intersecting(Side side);
 
+    void draw_lines(vector<LineV>& linePairs, cv::Scalar colour);
+
 private:
     void create_window() {
         namedWindow(window_name_, cv::WINDOW_KEEPRATIO);
@@ -161,8 +170,6 @@ private:
     }
 
     line_pair<float> compute_point_pair(cv::Vec2f& line) const;
-
-    void draw_lines(vector<LineV>& linePairs, cv::Scalar colour);
 
     void draw_line(cv::Vec4d& line);
 
@@ -280,25 +287,28 @@ inline void HoughLinesR::compute_borders() {
 
     compute_rect_from_lines(left_lines_, left_roi);
     if (!validate::validate_rect(left_roi)) {
-        //for (int i = 0; i < left_lines_.size(); i++) {
-        //    cv::Rect2f t = cv::boundingRect(left_lines_[i].elements);
-        //    log_time << __FUNCTION__ << " bounding rect for line : " << t << std::endl;
-        //}
+        for (int i = 0; i < left_lines_.size(); i++) {
+            cv::Rect2f t = cv::boundingRect(left_lines_[i].elements);
+            log_time << __FUNCTION__ << " bounding rect for line : " << t << std::endl;
+        }
         log_time << __FUNCTION__ << " leftRoi : " << left_roi << std::endl;
         throw_assert(!validate::validate_rect(left_roi), "Left ROI rect failed validation!!!");
     }
 
     compute_rect_from_lines(right_lines_, right_roi);
     if (!validate::validate_rect(right_roi)) {
-        //for (auto i = 0; i < right_lines_.size(); i++) {
-        //    cv::Rect2f t = cv::boundingRect(right_lines_[i].elements);
-        //    log_time << __FUNCTION__ << " bounding rect for right line : " << t << std::endl;
-        //}
+        for (auto i = 0; i < right_lines_.size(); i++) {
+            cv::Rect2f t = cv::boundingRect(right_lines_[i].elements);
+            log_time << __FUNCTION__ << " bounding rect for right line : " << t << std::endl;
+        }
         log_time << __FUNCTION__ << " rightRoi : " << left_roi << std::endl;
         throw_assert(!validate::validate_rect(right_roi), "Right ROI rect failed validation!!!");
     }
 
     auto img_height = static_cast<double>(image_.rows);
+
+    log_time << __FUNCTION__ << " left_roi: " << left_roi << '\n';
+    log_time << __FUNCTION__ << " right_roi: " << right_roi << '\n';
 
     marking_rect_.x = left_roi.x;
     marking_rect_.y = left_roi.y;

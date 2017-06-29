@@ -9,7 +9,7 @@ class ThicknessGaugeData {
 
 protected:
 
-    std::array<unsigned long, 3> exposures_ = {5000, 20000, 40000};
+    std::array<unsigned long, 3> exposures_ = {4000, 10000, 20000};
 
     std::array<std::string, 3> exposures_short_ = {"_5k", "_20k", "_40k"};
 

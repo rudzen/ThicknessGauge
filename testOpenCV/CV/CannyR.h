@@ -60,14 +60,6 @@ class CannyR : public BaseR {
 
     static void gradientcb(int value, void* userData);
 
-    void threshold_1(int threshold1) {
-        threshold_1_ = threshold1;
-    }
-
-    void threshold_2(int threshold2) {
-        threshold_2_ = threshold2;
-    }
-
     void aperture_size(int new_aperture_size) {
         auto new_size = new_aperture_size;
         if (new_size < APER_MIN)
@@ -76,10 +68,6 @@ class CannyR : public BaseR {
             new_size++;
 
         aperture_size_ = new_size;
-    }
-
-    void gradient(int gradient) {
-        this->gradient_ = gradient;
     }
 
 public:
@@ -93,6 +81,18 @@ public:
           , remove_pepper_noise_(remove_pepper_noise) {
         if (show_windows)
             createWindow();
+    }
+
+    void threshold_1(int threshold1) {
+        threshold_1_ = threshold1;
+    }
+
+    void threshold_2(int threshold2) {
+        threshold_2_ = threshold2;
+    }
+
+    void gradient(int gradient) {
+        this->gradient_ = gradient;
     }
 
     void do_canny();
