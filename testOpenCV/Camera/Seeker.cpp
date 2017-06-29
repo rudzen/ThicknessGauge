@@ -71,7 +71,7 @@ bool Seeker::initialize() {
 
     pcapture->reset_binning();
 
-    pcapture->packet_size(8228);
+    pcapture->packet_size(9014);
 
     auto def_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
 
@@ -137,7 +137,7 @@ void Seeker::switch_phase() {
 
 }
 
-void Seeker::phase_one() {
+bool Seeker::phase_one() {
 
     log_time << "Configuring phase one.\n";
 
@@ -287,6 +287,8 @@ void Seeker::phase_one() {
             left_border_result[1] = static_cast<double>(phase_roi_[phase].height);
             left_border_result[3] = 0.0;
 
+            log_time << __FUNCTION__ " avg calc..\n";
+
             // TODO : adjust the heights to match the current ROI
 
             for (const auto& lb : left_borders) {
@@ -295,6 +297,8 @@ void Seeker::phase_one() {
                     log_time << __FUNCTION__ << " left_borders validation fail for " << lb << std::endl;
                 }
             }
+
+            log_time << __FUNCTION__ " avg calc..\n";
 
             for (const auto& lb : right_borders) {
                 if (!validate::valid_vec(lb)) {
@@ -316,18 +320,42 @@ void Seeker::phase_one() {
 
     }
 
-    // save the result
-    pdata->marking_rect = hough_vertical->marking_rect();
+    log_time << __FUNCTION__ "  phase one finalize failures : " << failures << '\n';
 
-    log_time << __FUNCTION__ << " marking rect found : " << pdata->marking_rect << '\n';
+    try {
+        // save the result
+        pdata->marking_rect = hough_vertical->marking_rect();
+
+    } catch (std::exception& e) {
+        log_err << __FUNCTION__ " exception.. " << e.what();
+    }
+
+
+    log_time << __FUNCTION__ << " marking rect found : " << hough_vertical->marking_rect() << '\n';
+
+    // set phase two roi right away.
+
+    auto quarter = phase_roi_[0].height / 4;
+    phase_roi_[1].x = ceil(hough_vertical->marking_rect().x) / 2;
+    phase_roi_[1].y = phase_roi_[0].y + 3 * quarter;
+    phase_roi_[1].width = phase_roi_[1].x;
+    phase_roi_[1].height = quarter;
+
+    log_time << "phase two left region configured : " << phase_roi_[1] << '\n';
+
+    return true;
 
 }
 
-void Seeker::phase_two() {
+bool Seeker::phase_two_left() {
 
     log_time << "Phase two configuration started..\n";
 
     switch_phase();
+
+
+    // prep for next phase
+    pcapture->region(phase_roi_[1]);
 
     auto phase = frameset(current_phase_);
 
@@ -354,93 +382,76 @@ void Seeker::phase_two() {
 
     if (!pcapture->region_add_def_offset(left_baseline)) {
         log_err << __FUNCTION__ << " Warning, left_baseline failed validation.\n";
+        return false;
     }
 
-    capture_roi right_baseline;
-    right_baseline.x = marking.x + marking.width;
-    right_baseline.y = base_line_y;
-    right_baseline.width = phase_roi_[0].height - right_baseline.x;
-    right_baseline.height = quarter;
-
-    if (!pcapture->region_add_def_offset(right_baseline)) {
-        log_err << __FUNCTION__ << " Warning, right_baseline failed validation.\n";
-    }
-
-    pcapture->region(left_baseline);
+    //pcapture->region(left_baseline);
 
     std::vector<cv::Mat> left_frames;
-    std::vector<cv::Mat> right_frames;
 
     auto left_size = cv::Size(left_baseline.width, left_baseline.height);
     auto left_cutoff = left_size.width / 2.0;
-    auto right_size = cv::Size(right_baseline.width, right_baseline.height);
-    auto right_cutoff = right_size.width / 2.0;
 
     auto left_y = 0.0;
-    auto right_y = 0.0;
 
     std::vector<cv::Point2f> left_elements(left_size.area());
-    std::vector<cv::Point2f> right_elements(right_size.area());
 
     auto offset_y = phase_roi_[0].height - quarter;
 
     auto left_avg = 0.0;
-    auto right_avg = 0.0;
 
-    phase_two_exposure = 30000 - exposure_levels->exposure_increment;
+    phase_two_base_exposure_ = phase_one_exposure * 4;
+
+    std::vector<unsigned long> p2_exposures;
+    p2_exposures.reserve(25);
+    for (ulong i = 0; i < 25; i++)
+        p2_exposures.push_back(phase_two_base_exposure_ + (exposure_levels->exposure_increment * i));
 
     auto running = true;
 
-    cv::Mat exposure_test;
-
     cv::Mat org;
 
-    log_time << "Phase two begun..\n";
+    log_time << "Phase two left begun..\n";
 
-    auto exposure_retry_count = 3;
-
-    // ************  LEFT SIDE **************
+    // ************  LEFT SIDE ONLY **************
 
     // attempt to find a good exposure for this phase
     while (running) {
 
-        if (exposure_retry_count == 0) {
-            log_err << __FUNCTION__ << " failed to alter exposure.. aborting process..\n";
-            exit(-201);
+        left_frames.clear();
+
+        for (const auto exp : p2_exposures) {
+
+            pcapture->exposure(exp);
+
+            pcapture->cap(3, left_frames);
+
+            org = left_frames.back().clone();
+            auto h = org.clone();
+            hough_horizontal->original(h);
+
+            process_mat_for_line(org, hough_horizontal, pmorph.get());
+
+            const auto& lines = hough_horizontal->right_lines(); // inner most side
+            for (auto& line : lines)
+                if (line.entry_[0] > left_cutoff)
+                    stl::copy_vector(line.elements_, left_elements);
+
+            if (left_elements.size() > 4) {
+                phase_two_base_exposure_ = exp;
+                running = false;
+                break;
+            }
+
+            if (exp > 100'000) {
+                log_err << "left side failed to produce valid lines.";
+                return false;
+            }
+
+
         }
 
-        phase_two_exposure += exposure_levels->exposure_increment;
-
-        log_time << __FUNCTION__ << " phase two exposure level now at " << phase_two_exposure << '\n';
-
-        auto exposure_ok = pcapture->exposure(phase_two_exposure);
-
-        if (!exposure_ok) {
-            log_err << __FUNCTION__ << " failed to update the exposure level to " << phase_two_exposure << '\n';
-            exposure_retry_count--;
-            tg::sleep(150);
-            continue;
-        }
-
-        pcapture->cap_single(exposure_test);
-
-        org = exposure_test.clone();
-        auto h = exposure_test.clone();
-        hough_horizontal->original(h);
-
-        process_mat_for_line(org, hough_horizontal, pmorph.get());
-
-        const auto& lines = hough_horizontal->right_lines(); // inner most side
-        for (auto& line : lines)
-            if (line.entry_[0] > left_cutoff)
-                stl::copy_vector(line.elements_, left_elements);
-
-        if (left_elements.size() > 4)
-            break;
-
-        if (phase_two_exposure > 100'000) {
-            log_err << "left side failed to produce valid lines.";
-        }
+        log_time << "Phase two exposure detected.. " << phase_two_base_exposure_ << '\n';
 
     }
 
@@ -451,11 +462,9 @@ void Seeker::phase_two() {
     // update the phase roi for left side
     phase_roi<int, 1>(left_boundry_rect);
 
-    if (!pcapture->region_add_def_offset(right_baseline)) {
-        log_time << __FUNCTION__ << " Warning, left_boundry failed validation.\n";
-    }
-
     pcapture->region(left_boundry_rect);
+
+    left_frames.clear();
 
     // capture left frames for real
     while (running) {
@@ -470,7 +479,7 @@ void Seeker::phase_two() {
             process_mat_for_line(org, hough_horizontal, pmorph.get());
 
             const auto& lines = hough_horizontal->right_lines(); // inner most side
-            for (auto& line : lines)
+            for (const auto& line : lines)
                 if (line.entry_[0] > left_cutoff)
                     stl::copy_vector(line.elements_, left_elements);
 
@@ -492,6 +501,8 @@ void Seeker::phase_two() {
         log_time << "left baseline: " << left_y << endl;
 
     }
+
+    return true;
 
     // ************  RIGHT SIDE **************
 
@@ -522,7 +533,24 @@ bool Seeker::compute() {
     if (!initialize())
         return false;
 
-    phase_one();
+    auto phase_complete = phase_one();
+
+    if (!phase_complete) {
+        log_err << __FUNCTION__ " phase one FAILED..\n";
+        return false;
+    }
+
+    log_time << __FUNCTION__ << " phase one completed ok..\n";
+
+    phase_complete = phase_two_left();
+
+    if (!phase_complete) {
+        log_err << __FUNCTION__ " phase two left FAILED..\n";
+        return false;
+    }
+
+    log_time << __FUNCTION__ << " phase two left completed ok..\n";
+
 
     pcapture->aquisition_end();
 

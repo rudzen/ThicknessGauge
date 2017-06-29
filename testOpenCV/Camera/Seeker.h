@@ -137,7 +137,7 @@ private:
 
     ulong phase_one_exposure = exposure_levels->exposure_start;
 
-    ulong phase_two_exposure = 0;
+    ulong phase_two_base_exposure_ = 0;
 
     std::shared_ptr<CapturePvApi> pcapture = std::make_shared<CapturePvApi>();
 
@@ -150,7 +150,7 @@ private:
     // morph for phase two and three
     std::unique_ptr<MorphR> pmorph = std::make_unique<MorphR>(cv::MORPH_GRADIENT, 1, false);
 
-    std::shared_ptr<Data<double>> pdata;
+    std::shared_ptr<Data<double>> pdata = std::make_shared<Data<double>>();
 
 public: // data return point
     template <typename T>
@@ -213,10 +213,10 @@ private: // internal functions
     void process_mat_for_line(cv::Mat& org, std::shared_ptr<HoughLinesPR>& hough, MorphR* morph) const;
 
     void switch_phase();
+    
+    bool phase_one();
 
-    void phase_one();
-
-    void phase_two();
+    bool phase_two_left();
 
     void phase_three();
 

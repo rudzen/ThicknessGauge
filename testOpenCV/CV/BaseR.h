@@ -63,7 +63,7 @@ public:
         image_ = image;
     }
 
-    const cv::Rect2d& marking_rect() const {
+    cv::Rect2d marking_rect() const {
         return marking_rect_;
     }
 
