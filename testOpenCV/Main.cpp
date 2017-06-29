@@ -32,13 +32,6 @@ using namespace tg;
 
 int main(int argc, char** argv) {
 
-    auto seeker = std::make_shared<Seeker>();
-
-    seeker->compute();
-
-    return 99999;
-
-
     // jump directly into vimba testing for now!
     //return testCPP(argc, argv);
 
@@ -73,17 +66,39 @@ int main(int argc, char** argv) {
 
             auto glob_name = options->glob_folder();
 
-            thickness_gauge->glob_add_nulls();
 
-            while (true) {
-                auto initialized_ok = thickness_gauge->initialize(glob_name);
-                if (initialized_ok)
-                    break;
+            auto seeker = std::make_shared<Seeker>();
 
-                log_err << cv::format("Unable to initialize....\n");
-                log_err << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
-                tg::sleep(500);
+            // determin camera or file storage
+            if (glob_name == "camera") {
+
+                while (true) {
+                    auto ok = seeker->compute();
+                    if (ok)
+                        break;
+
+                    log_err << cv::format("Unable to initialize....\n");
+                    log_err << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
+                    tg::sleep(500);
+
+                }
+
+            } else {
+
+                thickness_gauge->glob_add_nulls();
+
+                while (true) {
+                    auto initialized_ok = thickness_gauge->initialize(glob_name);
+                    if (initialized_ok)
+                        break;
+
+                    log_err << cv::format("Unable to initialize....\n");
+                    log_err << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
+                    tg::sleep(500);
+                }
+
             }
+
 
             thickness_gauge->compute_marking_height();
 
@@ -129,5 +144,3 @@ int main(int argc, char** argv) {
     return return_value;
 
 }
-
-

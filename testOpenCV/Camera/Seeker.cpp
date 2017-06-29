@@ -179,7 +179,6 @@ void Seeker::phase_one() {
     pcapture->exposure(rand() % (10 - 1 + 1) + 1);
     auto first_cap = true;
 
-
     auto const frames_to_capture = 3;
 
     log_time << "Running phase one.\n";
@@ -323,9 +322,10 @@ void Seeker::phase_one() {
 
     }
 
+    // save the result
     pdata->marking_rect = hough_vertical->marking_rect();
 
-    log_time << __FUNCTION__ << " marking rect found : " << markings.front() << '\n';
+    log_time << __FUNCTION__ << " marking rect found : " << pdata->marking_rect << '\n';
 
 }
 
@@ -523,9 +523,10 @@ int Seeker::frameset(Phase phase) {
     }
 }
 
-void Seeker::compute() {
+bool Seeker::compute() {
 
-    initialize();
+    if (!initialize())
+        return false;
 
     phase_one();
 
@@ -537,5 +538,5 @@ void Seeker::compute() {
 
     pcapture->uninitialize();
 
-
+    return true;
 }
