@@ -8,6 +8,7 @@ Seeker::Seeker()
     : current_phase_(Phase::ONE)
       , current_frameset_(nullptr) {
     phase_roi_[0] = def_phase_one_roi_;
+
 }
 
 Seeker::Seeker(capture_roi phase_one_roi)
@@ -363,42 +364,39 @@ bool Seeker::phase_two_left() {
     auto min_line_len = calc::line::compute_houghp_min_line(10.0, pdata->marking_rect);
 
     // horizontal houghline extension class
-    auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), false);
+    auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), true);
 
     hough_horizontal->max_line_gab(12);
-    hough_horizontal->marking_rect(pdata->marking_rect);
 
-    auto quarter = static_cast<double>(phase_roi_[0].height) / 4.0;
-    auto base_line_y = phase_roi_[0].height - quarter;
+    hough_horizontal->marking_rect(cv::Rect2d(phase_roi_[1].x, phase_roi_[1].y, phase_roi_[1].width, phase_roi_[1].height));
 
-    auto marking = pdata->marking_rect;
-    log_time << marking << std::endl;
+    //auto quarter = static_cast<double>(phase_roi_[0].height) / 4.0;
+    //auto base_line_y = phase_roi_[0].height - quarter;
 
-    capture_roi left_baseline;
-    left_baseline.x = 0;
-    left_baseline.y = floor(base_line_y);
-    left_baseline.width = marking.x;
-    left_baseline.height = quarter;
+    //auto marking = pdata->marking_rect;
+    //log_time << marking << std::endl;
 
-    if (!pcapture->region_add_def_offset(left_baseline)) {
-        log_err << __FUNCTION__ << " Warning, left_baseline failed validation.\n";
-        return false;
-    }
+    //capture_roi left_baseline;
+    //left_baseline.x = 0;
+    //left_baseline.y = floor(base_line_y);
+    //left_baseline.width = marking.x;
+    //left_baseline.height = quarter;
+
+    //if (!pcapture->region_add_def_offset(left_baseline)) {
+    //    log_err << __FUNCTION__ << " Warning, left_baseline failed validation.\n";
+    //    return false;
+    //}
 
     //pcapture->region(left_baseline);
 
     std::vector<cv::Mat> left_frames;
 
-    auto left_size = cv::Size(left_baseline.width, left_baseline.height);
-    auto left_cutoff = left_size.width / 2.0;
+    //auto left_size = cv::Size(left_baseline.width, left_baseline.height);
+    auto left_cutoff = phase_roi_[1].width / 2.0;
 
     auto left_y = 0.0;
 
-    std::vector<cv::Point2f> left_elements(left_size.area());
-
-    auto offset_y = phase_roi_[0].height - quarter;
-
-    auto left_avg = 0.0;
+    std::vector<cv::Point2f> left_elements;
 
     phase_two_base_exposure_ = phase_one_exposure * 4;
 
@@ -414,6 +412,8 @@ bool Seeker::phase_two_left() {
     log_time << "Phase two left begun..\n";
 
     // ************  LEFT SIDE ONLY **************
+
+    const std::string win = "what";
 
     // attempt to find a good exposure for this phase
     while (running) {
@@ -432,10 +432,19 @@ bool Seeker::phase_two_left() {
 
             process_mat_for_line(org, hough_horizontal, pmorph.get());
 
+
             const auto& lines = hough_horizontal->right_lines(); // inner most side
             for (auto& line : lines)
                 if (line.entry_[0] > left_cutoff)
                     stl::copy_vector(line.elements_, left_elements);
+
+
+            
+
+            if (draw::is_escape_pressed(30))
+                continue;
+
+            log_time << __FUNCTION__ << "left_elements.size() : " << left_elements.size() << '\n';
 
             if (left_elements.size() > 4) {
                 phase_two_base_exposure_ = exp;
@@ -455,14 +464,28 @@ bool Seeker::phase_two_left() {
 
     }
 
-    // adjust capture ROI based on found lines. ?
+    // adjust capture ROI based on found lines.
     auto left_boundry = cv::minAreaRect(left_elements);
     auto left_boundry_rect = left_boundry.boundingRect();
 
-    // update the phase roi for left side
-    phase_roi<int, 1>(left_boundry_rect);
+    capture_roi new_roi;
+    
+    new_roi.x = phase_roi_[0].x + phase_roi_[1].x + (phase_roi_[1].width - left_boundry_rect.x);
+    //new_roi.y = phase_roi_y<1>();
+    new_roi.y = phase_roi_[0].y + phase_roi_[0].height + left_boundry_rect.y;
+    new_roi.width = left_boundry_rect.width;
+    new_roi.height = left_boundry_rect.height;
 
-    pcapture->region(left_boundry_rect);
+    phase_roi_[1] = new_roi;
+
+    pcapture->region(new_roi);
+
+    exit(-20000);
+
+    // update the phase roi for left side
+    //phase_roi<int, 1>(left_boundry_rect);
+
+    //pcapture->region(left_boundry_rect);
 
     left_frames.clear();
 
@@ -495,7 +518,7 @@ bool Seeker::phase_two_left() {
 
         auto t = org(left_boundry_rect);
         left_y = static_cast<double>(left_boundry_rect.y);
-        left_y += offset_y;
+        //        left_y += offset_y;
         left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
 
         log_time << "left baseline: " << left_y << endl;
@@ -550,7 +573,6 @@ bool Seeker::compute() {
     }
 
     log_time << __FUNCTION__ << " phase two left completed ok..\n";
-
 
     pcapture->aquisition_end();
 

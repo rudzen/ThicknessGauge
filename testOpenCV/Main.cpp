@@ -97,17 +97,17 @@ int main(int argc, char** argv) {
                     tg::sleep(500);
                 }
 
+                thickness_gauge->compute_marking_height();
+
+                auto data = thickness_gauge->pdata; // virker :-)
+
+                thickness_gauge->save_data("output_mufmuf");
+
+                log_ok << cv::format("difference: %f\n", data->difference);
+                log_err << cv::format("done..\n");
+
             }
 
-
-            thickness_gauge->compute_marking_height();
-
-            auto data = thickness_gauge->pdata; // virker :-)
-
-            thickness_gauge->save_data("output_mufmuf");
-
-            log_ok << cv::format("difference: %f\n", data->difference);
-            log_err << cv::format("done..\n");
 
         } else if (options->calibration_mode()) {
             Calib calib;

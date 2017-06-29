@@ -195,6 +195,15 @@ private:
 
 private: // internal functions
 
+    template <int upper>
+    ulong phase_roi_y() {
+        ulong return_value = 0;
+        std::for_each(phase_roi_.begin(), phase_roi_.begin() + upper, [&] (const capture_roi& roi) {
+            return_value += roi.y + roi.height;
+        });
+        return return_value;
+    }
+
     template <typename T, int index>
     bool phase_roi(cv::Rect_<T> roi) {
         phase_roi_[index].x = static_cast<unsigned long>(ceil(roi.x));
@@ -213,7 +222,7 @@ private: // internal functions
     void process_mat_for_line(cv::Mat& org, std::shared_ptr<HoughLinesPR>& hough, MorphR* morph) const;
 
     void switch_phase();
-    
+
     bool phase_one();
 
     bool phase_two_left();
