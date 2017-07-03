@@ -192,6 +192,8 @@ private:
 
 public:
 
+    void clear();
+
     void hough_horizontal();
 
     void draw_line(std::vector<line_pair<float>>& linePairs, cv::Scalar colour);
@@ -273,6 +275,12 @@ inline void HoughLinesPR::minLineLencb(int value, void* userData) {
     auto that = static_cast<HoughLinesPR*>(userData);
     that->min_line_len(value);
     log_time << cv::format("%s minLineLen : %i\n", that->window_name_, value);
+}
+
+inline void HoughLinesPR::clear() {
+    all_lines_.clear();
+    left_lines_.clear();
+    right_lines_.clear();
 }
 
 inline void HoughLinesPR::hough_horizontal() {

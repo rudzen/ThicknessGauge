@@ -337,7 +337,7 @@ bool Seeker::phase_one() {
     // set phase two roi right away.
 
     auto quarter = phase_roi_[0].height / 4;
-    phase_roi_[1].x = ceil(hough_vertical->marking_rect().x) / 2;
+    phase_roi_[1].x = static_cast<unsigned long>(ceil(hough_vertical->marking_rect().x) / 2);
     phase_roi_[1].y = phase_roi_[0].y + 3 * quarter;
     phase_roi_[1].width = phase_roi_[1].x;
     phase_roi_[1].height = quarter;
@@ -370,31 +370,10 @@ bool Seeker::phase_two_left() {
 
     hough_horizontal->marking_rect(cv::Rect2d(phase_roi_[1].x, phase_roi_[1].y, phase_roi_[1].width, phase_roi_[1].height));
 
-    //auto quarter = static_cast<double>(phase_roi_[0].height) / 4.0;
-    //auto base_line_y = phase_roi_[0].height - quarter;
-
-    //auto marking = pdata->marking_rect;
-    //log_time << marking << std::endl;
-
-    //capture_roi left_baseline;
-    //left_baseline.x = 0;
-    //left_baseline.y = floor(base_line_y);
-    //left_baseline.width = marking.x;
-    //left_baseline.height = quarter;
-
-    //if (!pcapture->region_add_def_offset(left_baseline)) {
-    //    log_err << __FUNCTION__ << " Warning, left_baseline failed validation.\n";
-    //    return false;
-    //}
-
-    //pcapture->region(left_baseline);
-
     std::vector<cv::Mat> left_frames;
 
     //auto left_size = cv::Size(left_baseline.width, left_baseline.height);
     auto left_cutoff = phase_roi_[1].width / 2.0;
-
-    auto left_y = 0.0;
 
     std::vector<cv::Point2f> left_elements;
 
@@ -439,14 +418,12 @@ bool Seeker::phase_two_left() {
                     stl::copy_vector(line.elements_, left_elements);
 
 
-            
-
             if (draw::is_escape_pressed(30))
                 continue;
 
-            log_time << __FUNCTION__ << "left_elements.size() : " << left_elements.size() << '\n';
+            log_time << __FUNCTION__ << " left_elements.size() : " << left_elements.size() << '\n';
 
-            if (left_elements.size() > 4) {
+            if (left_elements.size() > 4 && left_elements.front().y != left_elements.back().y) {
                 phase_two_base_exposure_ = exp;
                 running = false;
                 break;
@@ -469,34 +446,56 @@ bool Seeker::phase_two_left() {
     auto left_boundry = cv::minAreaRect(left_elements);
     auto left_boundry_rect = left_boundry.boundingRect();
 
+    log_time << __FUNCTION__ " left boundry detected : " << left_boundry_rect << '\n';
+
+    capture_roi old_roi = pcapture->region();
+
     capture_roi new_roi;
-    
-    new_roi.x = phase_roi_[0].x + phase_roi_[1].x + (phase_roi_[1].width - left_boundry_rect.x);
+
+    // adjust the new roi according to findings
+    new_roi.x = old_roi.x + static_cast<unsigned long>(floor(left_boundry_rect.x));
+    new_roi.y = old_roi.y + static_cast<unsigned long>(floor(left_boundry_rect.y));
+    new_roi.width = static_cast<unsigned long>(ceil(left_boundry_rect.width));
+    new_roi.height = static_cast<unsigned long>(ceil(left_boundry_rect.height));
 
     //new_roi.y = phase_roi_y<1>();
-    new_roi.y = phase_roi_[0].y + phase_roi_[0].height + left_boundry_rect.y;
-    new_roi.width = left_boundry_rect.width;
-    new_roi.height = left_boundry_rect.height;
+
+    //new_roi.y = phase_roi_[0].y + phase_roi_[1].y + left_boundry_rect.y;
+    //new_roi.width = left_boundry_rect.width;
+    //new_roi.height = left_boundry_rect.height;
+
+    log_time << __FUNCTION__ << " new_roi changed to " << new_roi << '\n';
 
     phase_roi_[1] = new_roi;
 
     // only update region, exposure should be at desired level at this point
     pcapture->region(new_roi);
 
-    left_frames.clear();
-
     auto tmp_count = 1;
+
+    running = true;
+
+    auto left_y = 0.0;
+
+    cv::namedWindow("morph");
 
     // capture left frames for real
     while (running) {
 
+        left_y = 0.0;
+        left_frames.clear();
+        left_elements.clear();
+        hough_horizontal->clear();
+
         pcapture->cap(25, left_frames);
+
+        if (left_frames.empty()) {
+            log_err << __FUNCTION__ << " fatal error, no frames were captured!\n";
+            continue;
+        }
 
         // iterate through the captured frames, don't skip any as the buffer should be alright.
         for (const auto& left : left_frames) {
-
-            // write current frame to check it out visualy
-            cv::imwrite("left_baseline_" + std::to_string(tmp_count++) + ".png", left);
 
             org = left.clone();
             auto h = left.clone();
@@ -504,24 +503,52 @@ bool Seeker::phase_two_left() {
 
             process_mat_for_line(org, hough_horizontal, pmorph.get());
 
-            const auto& lines = hough_horizontal->right_lines(); // inner most side
-            for (const auto& line : lines)
-                if (line.entry_[0] > left_cutoff)
-                    stl::copy_vector(line.elements_, left_elements);
+            cv::imshow("morph", pmorph->result());
 
+            // grab everything, since we already have defined the roi earlier
+            const auto& lines = hough_horizontal->right_lines();
+
+            log_time << __FUNCTION__ << " hough right_lines count : " << lines.size() << '\n';
+
+            for (const auto& line : lines)
+                stl::copy_vector(line.elements_, left_elements);
+
+            log_time << __FUNCTION__ << " left_elements : " << left_elements.size() << '\n';
+
+            //if (line.entry_[0] > left_cutoff)
+
+            if (draw::is_escape_pressed(30))
+                exit(38219);
+                
         }
 
-        // adjust to reduce crap
+        if (left_elements.empty()) {
+            log_err << __FUNCTION__ " fatal error, left elements are empty!\n";
+            return false;
+        }
 
-        left_boundry_rect.width -= 40;
+        left_boundry = cv::minAreaRect(left_elements);
+        left_boundry_rect = left_boundry.boundingRect();
+
+        // adjust to reduce crap
+        //left_boundry_rect.width -= 40;
 
         auto t = org(left_boundry_rect);
         left_y = static_cast<double>(new_roi.y);
-        left_y += calc::real_intensity_line(t, pdata->left_points);
+        try {
+            left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
+        } catch (cv::Exception& e) {
+            log_err << __FUNCTION__ << " " << e.what() << '\n';
+            continue;
+        }
 
-        log_time << "left baseline: " << left_y << endl;
+        running = false;
 
     }
+
+    pdata->base_lines[1] = old_roi.y + left_y / static_cast<double>(left_elements.size());
+
+    log_time << "left baseline: " << pdata->base_lines[1] << endl;
 
     return true;
 
@@ -531,6 +558,14 @@ bool Seeker::phase_two_left() {
     // update the phase roi for left side
     phase_roi<int, 1>(left_boundry_rect);
 
+
+}
+
+bool Seeker::phase_two_right() {
+
+    pdata->base_lines[3] = pdata->base_lines[1];
+
+    return true;
 
 }
 

@@ -227,6 +227,8 @@ private: // internal functions
 
     bool phase_two_left();
 
+    bool phase_two_right();
+
     void phase_three();
 
     void phase_finalize();
