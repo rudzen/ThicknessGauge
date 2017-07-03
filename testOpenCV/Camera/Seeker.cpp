@@ -465,12 +465,14 @@ bool Seeker::phase_two_left() {
     }
 
     // adjust capture ROI based on found lines.
+
     auto left_boundry = cv::minAreaRect(left_elements);
     auto left_boundry_rect = left_boundry.boundingRect();
 
     capture_roi new_roi;
     
     new_roi.x = phase_roi_[0].x + phase_roi_[1].x + (phase_roi_[1].width - left_boundry_rect.x);
+
     //new_roi.y = phase_roi_y<1>();
     new_roi.y = phase_roi_[0].y + phase_roi_[0].height + left_boundry_rect.y;
     new_roi.width = left_boundry_rect.width;
@@ -478,23 +480,24 @@ bool Seeker::phase_two_left() {
 
     phase_roi_[1] = new_roi;
 
+    // only update region, exposure should be at desired level at this point
     pcapture->region(new_roi);
 
-    exit(-20000);
-
-    // update the phase roi for left side
-    //phase_roi<int, 1>(left_boundry_rect);
-
-    //pcapture->region(left_boundry_rect);
-
     left_frames.clear();
+
+    auto tmp_count = 1;
 
     // capture left frames for real
     while (running) {
 
         pcapture->cap(25, left_frames);
 
+        // iterate through the captured frames, don't skip any as the buffer should be alright.
         for (const auto& left : left_frames) {
+
+            // write current frame to check it out visualy
+            cv::imwrite("left_baseline_" + std::to_string(tmp_count++) + ".png", left);
+
             org = left.clone();
             auto h = left.clone();
             hough_horizontal->original(h);
@@ -508,18 +511,13 @@ bool Seeker::phase_two_left() {
 
         }
 
-        // generate real boundry
-        left_boundry = cv::minAreaRect(left_elements);
-        left_boundry_rect = left_boundry.boundingRect();
-
-        log_time << "left_boundry_rect: " << left_boundry_rect.y << endl;
+        // adjust to reduce crap
 
         left_boundry_rect.width -= 40;
 
         auto t = org(left_boundry_rect);
-        left_y = static_cast<double>(left_boundry_rect.y);
-        //        left_y += offset_y;
-        left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
+        left_y = static_cast<double>(new_roi.y);
+        left_y += calc::real_intensity_line(t, pdata->left_points);
 
         log_time << "left baseline: " << left_y << endl;
 

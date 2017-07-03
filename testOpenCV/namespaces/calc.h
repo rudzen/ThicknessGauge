@@ -835,6 +835,47 @@ namespace calc {
     }
 
     /**
+     * \brief 
+     * \tparam T 
+     * \param image 
+     * \param output 
+     * \return 
+     */
+    template <typename T>
+    double real_intensity_line(cv::Mat& image, std::vector<cv::Point_<T>>& output) {
+        
+        auto cols = image.cols;
+
+        cv::Rect_<T> cut_rect(0.0, 0.0, 1.0, image.rows);
+
+        stl::populate_x(output, cols);
+
+        for (auto& v : output) {
+            
+            cut_rect.x = v.x;
+
+            auto B = cv::Mat(image, cut_rect);
+
+            auto m = cv::moments(B, false);
+
+            auto y = m.m01 / m.m00;
+
+            if (y > 0.0)
+                v.y = y;
+
+        }
+
+        auto avg = avg_y(output);
+
+        if (avg == 0.0) {
+            log_err << __FUNCTION__ << " got 0 avg value.\n";
+        }
+
+        return avg;
+
+    }
+
+    /**
      * \brief Computes the avg mass weigth position based on intensity
      * \tparam T Point type
      * \param image The image, a good idea to narrow it for the area in question
