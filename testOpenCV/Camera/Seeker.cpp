@@ -663,7 +663,7 @@ bool Seeker::phase_three() {
         pdata->center_points.clear();
         stl::copy_vector(results, pdata->center_points);
 
-        auto highest_total = phase_3_roi.y + frames.front().rows;
+        auto highest_total = phase_3_roi.y;
         highest_total -= avg_height / static_cast<unsigned int>(frame_count);
 
         avg_height = 0.0;
