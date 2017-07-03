@@ -572,26 +572,116 @@ bool Seeker::phase_two_right() {
 
 }
 
-void Seeker::phase_three() {
+bool Seeker::phase_three() {
 
     // gogo.. find the laser!
 
     // the exposure is set, no need to alter it from phase two, since the desired area should be lit enough already! (might even be neccesary to lower it!)
 
+    log_time << __FUNCTION__ << " configuration started.\n";
+
     capture_roi phase_3_roi;
 
-    phase_3_roi.x = floor(pdata->marking_rect.x);
-    phase_3_roi.y = 0;
-    phase_3_roi.width = ceil(pdata->marking_rect.width);
+    phase_3_roi.x = static_cast<ulong>(floor(pdata->marking_rect.x));
+    phase_3_roi.y = phase_roi_[0].y;
+    phase_3_roi.width = static_cast<ulong>(ceil(pdata->marking_rect.width));
     phase_3_roi.height = phase_roi_[0].height;
 
     phase_roi_[2] = phase_3_roi;
 
+    std::vector<cv::Mat> frames;
+    std::vector<cv::Point2d> results(phase_3_roi.width);
+    stl::populate_x(results, phase_3_roi.width);
+
+    pcapture->region(cv::Rect_<unsigned long>(1, 1, 1, 1));
+
+    // capture 3 frames quickly to empty the buffer
+    pcapture->cap(3, frames);
+    frames.clear();
+
     pcapture->region(phase_3_roi);
 
+    const auto frame_count = 25;
 
+    const auto binary_threshold = 100;
 
+    auto running = true;
 
+    auto failures = 0;
+
+    log_time << __FUNCTION__ << " configuration done.. capturing.\n";
+
+    pcapture->cap(frame_count, frames);
+
+    while (running) {
+
+        auto avg_height = 0.0;
+
+        stl::reset_point_y(results);
+
+        for (auto i = frame_count; i--;) {
+
+            try {
+
+                cv::Mat base_frame;
+
+                // TODO : replace with custom filter if needed
+                cv::bilateralFilter(frames[i], base_frame, 3, 20, 10);
+
+                threshold(base_frame, base_frame, binary_threshold, 255, CV_THRESH_BINARY);
+
+                GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
+
+                cv::imwrite("_laser_" + std::to_string(i) + ".png", base_frame);
+
+                /* RECT CUT METHOD */
+                avg_height += calc::weighted_avg(base_frame, pdata->center_points);
+
+                throw_assert(validate::valid_pix_vec(pdata->center_points), "Centerpoints failed validation!!!");
+
+                for (auto& centerpoint : pdata->center_points)
+                    results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
+
+            } catch (std::exception& e) {
+                log_err << e.what() << std::endl;
+                failures++;
+            }
+
+        }
+
+        log_time << cv::format("Center point data gathering failures : %i\n", failures);
+
+        pdata->points_start[1] = pdata->center_points.front().x + phase_3_roi.x;
+
+        for (auto& centerpoint : pdata->center_points) {
+            results[static_cast<int>(centerpoint.x)].y /= frame_count;
+            if (centerpoint.x + pdata->marking_rect.x < pdata->points_start[1])
+                pdata->points_start[1] = centerpoint.x + pdata->marking_rect.x;
+        }
+
+        // since theres some issues with using results vector, this works just as fine.
+        pdata->center_points.clear();
+        stl::copy_vector(results, pdata->center_points);
+
+        auto highest_total = phase_3_roi.y + frames.front().rows;
+        highest_total -= avg_height / static_cast<unsigned int>(frame_count);
+
+        avg_height = 0.0;
+
+        log_time << cv::format("base: %f\n", pdata->base_lines[1]);
+        log_time << cv::format("highestPixelTotal: %f\n", highest_total);
+
+        pdata->difference = abs(pdata->base_lines[1] - highest_total);
+        log_time << cv::format("diff from baseline: %f\n", pdata->difference);
+
+        running = false;
+
+        for (auto& p : pdata->center_points)
+            std::cout << p << " -- ";
+
+    }
+
+    return true;
 
 }
 
@@ -633,6 +723,12 @@ bool Seeker::compute() {
 
     log_time << __FUNCTION__ << " phase two left completed ok..\n";
 
+    phase_complete = phase_three();
+
+    if (!phase_complete) {
+        log_err << __FUNCTION__ " phase three FAILED..\n";
+    }
+
     pcapture->aquisition_end();
 
     pcapture->cap_end();
@@ -641,5 +737,5 @@ bool Seeker::compute() {
 
     pcapture->uninitialize();
 
-    return true;
+    return phase_complete;
 }

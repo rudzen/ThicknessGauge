@@ -120,11 +120,15 @@ private:
 
     using capture_roi = cv::Rect_<ulong>;
 
+    /**
+     * \brief Exposure seek configuration.
+     * Start is the initial value set.
+     * End is the upper limit
+     * Increment is the amount to increment with for each "try"
+     */
     using phase_one_exp = struct phase_exp {
         const ulong exposure_start = 1000;
-
         const ulong exposure_end = 30000;
-
         const ulong exposure_increment = 500;
     };
 
@@ -229,7 +233,7 @@ private: // internal functions
 
     bool phase_two_right();
 
-    void phase_three();
+    bool phase_three();
 
     void phase_finalize();
 
