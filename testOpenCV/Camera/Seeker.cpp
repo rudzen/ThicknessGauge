@@ -536,7 +536,8 @@ bool Seeker::phase_two_left() {
         auto t = org(left_boundry_rect);
         left_y = static_cast<double>(new_roi.y);
         try {
-            left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
+            left_y += calc::real_intensity_line(t, pdata->left_points);
+            //left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
         } catch (cv::Exception& e) {
             log_err << __FUNCTION__ << " " << e.what() << '\n';
             continue;
