@@ -145,7 +145,7 @@ bool Seeker::phase_one() {
     auto phase = frameset(current_phase_);
 
     // configure hough for this phase.. the int cast is only used for UI purpose.
-    auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, true);
+    auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, false);
     hough_vertical->angle_limit(30);
 
     pfilter->kernel(filters::kernel_line_left_to_right);
@@ -199,14 +199,14 @@ bool Seeker::phase_one() {
                 pcapture->cap(frames_to_capture, targets);
 
                 auto current_frame = targets.back();
-                cv::imwrite("exposure" + std::to_string(e) + "_1.png", current_frame);
+                //cv::imwrite("exposure" + std::to_string(e) + "_1.png", current_frame);
 
                 log_time << __FUNCTION__ << " filter processing..\n";
 
                 pfilter->image(current_frame);
                 pfilter->do_filter();
 
-                cv::imwrite("exposure" + std::to_string(e) + "_2.png", pfilter->result());
+                //cv::imwrite("exposure" + std::to_string(e) + "_2.png", pfilter->result());
 
                 log_time << __FUNCTION__ << " canny processing..\n";
 
@@ -214,7 +214,7 @@ bool Seeker::phase_one() {
                 pcanny->do_canny();
 
                 auto t = pcanny->result();
-                cv::imwrite("exposure" + std::to_string(e) + "_3.png", t);
+                //cv::imwrite("exposure" + std::to_string(e) + "_3.png", t);
 
                 auto tmp = t.clone();
                 hough_vertical->original(tmp);
@@ -225,7 +225,7 @@ bool Seeker::phase_one() {
                 auto hough_result = hough_vertical->hough_vertical();
                 auto all = hough_vertical->all_lines();
                 hough_vertical->draw_lines(all, cv::Scalar(255, 255, 255));
-                cv::imwrite("exposure" + std::to_string(e) + "_4.png", hough_vertical->output());
+                //cv::imwrite("exposure" + std::to_string(e) + "_4.png", hough_vertical->output());
 
                 switch (hough_result) {
                 case 0:
@@ -364,7 +364,7 @@ bool Seeker::phase_two_left() {
     auto min_line_len = calc::line::compute_houghp_min_line(10.0, pdata->marking_rect);
 
     // horizontal houghline extension class
-    auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), true);
+    auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), false);
 
     hough_horizontal->max_line_gab(12);
 
@@ -375,14 +375,14 @@ bool Seeker::phase_two_left() {
     //auto left_size = cv::Size(left_baseline.width, left_baseline.height);
     auto left_cutoff = phase_roi_[1].width / 2.0;
 
-    std::vector<cv::Point2f> left_elements;
+    std::vector<cv::Point2f> elements;
 
     phase_two_base_exposure_ = phase_one_exposure * 4;
 
     std::vector<unsigned long> p2_exposures;
     p2_exposures.reserve(25);
     for (ulong i = 0; i < 25; i++)
-        p2_exposures.push_back(phase_two_base_exposure_ + (exposure_levels->exposure_increment * i));
+        p2_exposures.push_back(phase_two_base_exposure_ + exposure_levels->exposure_increment * i);
 
     auto running = true;
 
@@ -411,19 +411,17 @@ bool Seeker::phase_two_left() {
 
             process_mat_for_line(org, hough_horizontal, pmorph.get());
 
-
             const auto& lines = hough_horizontal->right_lines(); // inner most side
             for (auto& line : lines)
                 if (line.entry_[0] > left_cutoff)
-                    stl::copy_vector(line.elements_, left_elements);
+                    stl::copy_vector(line.elements_, elements);
 
+            //if (draw::is_escape_pressed(30))
+            //    continue;
 
-            if (draw::is_escape_pressed(30))
-                continue;
+            log_time << __FUNCTION__ << " left_elements.size() : " << elements.size() << '\n';
 
-            log_time << __FUNCTION__ << " left_elements.size() : " << left_elements.size() << '\n';
-
-            if (left_elements.size() > 4 && left_elements.front().y != left_elements.back().y) {
+            if (elements.size() > 6 && elements.front().y != elements.back().y) {
                 phase_two_base_exposure_ = exp;
                 running = false;
                 break;
@@ -434,7 +432,6 @@ bool Seeker::phase_two_left() {
                 return false;
             }
 
-
         }
 
         log_time << "Phase two exposure detected.. " << phase_two_base_exposure_ << '\n';
@@ -443,20 +440,20 @@ bool Seeker::phase_two_left() {
 
     // adjust capture ROI based on found lines.
 
-    auto left_boundry = cv::minAreaRect(left_elements);
-    auto left_boundry_rect = left_boundry.boundingRect();
+    auto boundry = cv::minAreaRect(elements);
+    auto boundry_rect = boundry.boundingRect();
 
-    log_time << __FUNCTION__ " left boundry detected : " << left_boundry_rect << '\n';
+    log_time << __FUNCTION__ " left boundry detected : " << boundry_rect << '\n';
 
     capture_roi old_roi = pcapture->region();
 
     capture_roi new_roi;
 
     // adjust the new roi according to findings
-    new_roi.x = old_roi.x + static_cast<unsigned long>(floor(left_boundry_rect.x));
-    new_roi.y = old_roi.y + static_cast<unsigned long>(floor(left_boundry_rect.y));
-    new_roi.width = static_cast<unsigned long>(ceil(left_boundry_rect.width));
-    new_roi.height = static_cast<unsigned long>(ceil(left_boundry_rect.height));
+    new_roi.x = old_roi.x + static_cast<unsigned long>(floor(boundry_rect.x));
+    new_roi.y = old_roi.y + static_cast<unsigned long>(floor(boundry_rect.y));
+    new_roi.width = static_cast<unsigned long>(ceil(boundry_rect.width));
+    new_roi.height = static_cast<unsigned long>(ceil(boundry_rect.height));
 
     //new_roi.y = phase_roi_y<1>();
 
@@ -477,14 +474,14 @@ bool Seeker::phase_two_left() {
 
     auto left_y = 0.0;
 
-    cv::namedWindow("morph");
+    //cv::namedWindow("morph");
 
     // capture left frames for real
     while (running) {
 
         left_y = 0.0;
         left_frames.clear();
-        left_elements.clear();
+        elements.clear();
         hough_horizontal->clear();
 
         pcapture->cap(25, left_frames);
@@ -503,41 +500,42 @@ bool Seeker::phase_two_left() {
 
             process_mat_for_line(org, hough_horizontal, pmorph.get());
 
-            cv::imshow("morph", pmorph->result());
+            //cv::imshow("morph", pmorph->result());
 
             // grab everything, since we already have defined the roi earlier
-            const auto& lines = hough_horizontal->right_lines();
+            const auto& lines = hough_horizontal->all_lines();
+            //const auto& llines = hough_horizontal->left_lines();
 
-            log_time << __FUNCTION__ << " hough right_lines count : " << lines.size() << '\n';
+            //log_time << __FUNCTION__ << " hough lines count : " << lines.size() << '\n';
 
             for (const auto& line : lines)
-                stl::copy_vector(line.elements_, left_elements);
+                stl::copy_vector(line.elements_, elements);
 
-            log_time << __FUNCTION__ << " left_elements : " << left_elements.size() << '\n';
+            //log_time << __FUNCTION__ << " elements : " << elements.size() << '\n';
 
             //if (line.entry_[0] > left_cutoff)
 
-            if (draw::is_escape_pressed(30))
-                exit(38219);
-                
+            //if (draw::is_escape_pressed(30))
+            //    exit(38219);
+
         }
 
-        if (left_elements.empty()) {
+        if (elements.empty()) {
             log_err << __FUNCTION__ " fatal error, left elements are empty!\n";
             return false;
         }
 
-        left_boundry = cv::minAreaRect(left_elements);
-        left_boundry_rect = left_boundry.boundingRect();
+        boundry = cv::minAreaRect(elements);
+        boundry_rect = boundry.boundingRect();
 
         // adjust to reduce crap
         //left_boundry_rect.width -= 40;
 
-        auto t = org(left_boundry_rect);
+        auto t = org(boundry_rect);
         left_y = static_cast<double>(new_roi.y);
         try {
-            left_y += calc::real_intensity_line(t, pdata->left_points);
-            //left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
+            //left_y += calc::real_intensity_line(t, pdata->left_points);
+            left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
         } catch (cv::Exception& e) {
             log_err << __FUNCTION__ << " " << e.what() << '\n';
             continue;
@@ -547,7 +545,7 @@ bool Seeker::phase_two_left() {
 
     }
 
-    pdata->base_lines[1] = old_roi.y + left_y / static_cast<double>(left_elements.size());
+    pdata->base_lines[1] = old_roi.y + left_y / static_cast<double>(elements.size());
 
     // align points the match the real location in the image.
     for (auto& p : pdata->left_points)
@@ -561,7 +559,7 @@ bool Seeker::phase_two_left() {
 
 
     // update the phase roi for left side
-    phase_roi<int, 1>(left_boundry_rect);
+    phase_roi<int, 1>(boundry_rect);
 
 
 }
@@ -571,6 +569,29 @@ bool Seeker::phase_two_right() {
     pdata->base_lines[3] = pdata->base_lines[1];
 
     return true;
+
+}
+
+void Seeker::phase_three() {
+
+    // gogo.. find the laser!
+
+    // the exposure is set, no need to alter it from phase two, since the desired area should be lit enough already! (might even be neccesary to lower it!)
+
+    capture_roi phase_3_roi;
+
+    phase_3_roi.x = floor(pdata->marking_rect.x);
+    phase_3_roi.y = 0;
+    phase_3_roi.width = ceil(pdata->marking_rect.width);
+    phase_3_roi.height = phase_roi_[0].height;
+
+    phase_roi_[2] = phase_3_roi;
+
+    pcapture->region(phase_3_roi);
+
+
+
+
 
 }
 

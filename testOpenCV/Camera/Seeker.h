@@ -142,7 +142,7 @@ private:
     std::shared_ptr<CapturePvApi> pcapture = std::make_shared<CapturePvApi>();
 
     // common canny with default settings for detecting marking borders
-    std::unique_ptr<CannyR> pcanny = std::make_unique<CannyR>(130, 200, 3, true, false, false);;
+    std::unique_ptr<CannyR> pcanny = std::make_unique<CannyR>(130, 200, 3, true, false, false);
 
     // filter used for base line detection
     std::unique_ptr<FilterR> pfilter = std::make_unique<FilterR>("Baseline filter");
@@ -199,15 +199,15 @@ private: // internal functions
     ulong phase_roi_y() {
         ulong return_value = 0;
         std::for_each(phase_roi_.begin(), phase_roi_.begin() + upper, [&] (const capture_roi& roi) {
-            return_value += roi.y + roi.height;
+            return_value += roi.y;
         });
         return return_value;
     }
 
     template <typename T, int index>
     bool phase_roi(cv::Rect_<T> roi) {
-        phase_roi_[index].x = static_cast<unsigned long>(ceil(roi.x));
-        phase_roi_[index].y = static_cast<unsigned long>(ceil(roi.y));
+        phase_roi_[index].x = static_cast<unsigned long>(floor(roi.x));
+        phase_roi_[index].y = static_cast<unsigned long>(floor(roi.y));
         phase_roi_[index].width = static_cast<unsigned long>(ceil(roi.width));
         phase_roi_[index].height = static_cast<unsigned long>(ceil(roi.height));
         return validate::validate_rect(phase_roi_[index]);

@@ -342,6 +342,15 @@ inline void HoughLinesPR::bresenham() {
             right_lines_.emplace_back(line);
     }
 
+    // TESTING FOR ALL LINES (not required?)
+    for (auto& line : all_lines_) {
+        cv::LineIterator it(image_, line.points_.p1, line.points_.p2, 8);
+        line.elements_.reserve(it.count);
+        for (auto i = 0; i < it.count; i++ , ++it)
+            line.elements_.emplace_back(it.pos());
+    }
+
+
     auto left_size = left_lines_.size();
     auto right_size = right_lines_.size(); // not wrong
 
