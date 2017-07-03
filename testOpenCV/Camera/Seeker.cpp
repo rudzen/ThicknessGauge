@@ -548,6 +548,10 @@ bool Seeker::phase_two_left() {
 
     pdata->base_lines[1] = old_roi.y + left_y / static_cast<double>(left_elements.size());
 
+    // align points the match the real location in the image.
+    for (auto& p : pdata->left_points)
+        p.y += old_roi.y;
+
     log_time << "left baseline: " << pdata->base_lines[1] << endl;
 
     return true;
