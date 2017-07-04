@@ -440,20 +440,23 @@ bool Seeker::phase_two_left() {
 
     // adjust capture ROI based on found lines.
 
-    auto boundry = cv::minAreaRect(elements);
-    auto boundry_rect = boundry.boundingRect();
+    auto line_area = cv::minAreaRect(elements);
+    auto line_area_rect = line_area.boundingRect();
 
-    log_time << __FUNCTION__ " left boundry detected : " << boundry_rect << '\n';
+    cv::RotatedRect boundry_area;
+    cv::Rect boundry_area_rect;
+
+    log_time << __FUNCTION__ " left boundry detected : " << line_area_rect << '\n';
 
     capture_roi old_roi = pcapture->region();
 
     capture_roi new_roi;
 
     // adjust the new roi according to findings
-    new_roi.x = old_roi.x + static_cast<unsigned long>(floor(boundry_rect.x));
-    new_roi.y = old_roi.y + static_cast<unsigned long>(floor(boundry_rect.y));
-    new_roi.width = static_cast<unsigned long>(ceil(boundry_rect.width));
-    new_roi.height = static_cast<unsigned long>(ceil(boundry_rect.height));
+    new_roi.x = old_roi.x + static_cast<unsigned long>(floor(line_area_rect.x));
+    new_roi.y = old_roi.y + static_cast<unsigned long>(floor(line_area_rect.y));
+    new_roi.width = static_cast<unsigned long>(ceil(line_area_rect.width));
+    new_roi.height = static_cast<unsigned long>(ceil(line_area_rect.height));
 
     log_time << __FUNCTION__ << " new_roi changed to " << new_roi << '\n';
 
@@ -512,13 +515,13 @@ bool Seeker::phase_two_left() {
             return false;
         }
 
-        boundry = cv::minAreaRect(elements);
-        boundry_rect = boundry.boundingRect();
+        auto boundry_area = cv::minAreaRect(elements);
+        auto boundry_area_rect = boundry_area.boundingRect();
 
         // adjust to reduce crap
         //left_boundry_rect.width -= 40;
 
-        auto t = org(boundry_rect);
+        auto t = org(boundry_area_rect);
         left_y = static_cast<double>(new_roi.y);
         try {
             //left_y += calc::real_intensity_line(t, pdata->left_points);
@@ -532,13 +535,21 @@ bool Seeker::phase_two_left() {
 
     }
 
-    log_time << __FUNCTION__ " + left_y / static_cast<double>(elements.size()) : " << left_y / static_cast<double>(elements.size());
-
     pdata->base_lines[1] = left_y / static_cast<double>(elements.size());
 
-    log_time << __FUNCTION__ " + new_roi.y : " << new_roi.y;
+    log_time << __FUNCTION__ " + left_y / static_cast<double>(elements.size()) : " << pdata->base_lines[1] << '\n';
+
+    //pdata->base_lines[1] += old_roi.y;
+
+    //log_time << __FUNCTION__ " + old_roi.y : " << pdata->base_lines[1] << '\n';
 
     pdata->base_lines[1] += new_roi.y;
+
+    log_time << __FUNCTION__ " - new_roi.y : " << pdata->base_lines[1] << '\n';
+
+    pdata->base_lines[1] += boundry_area_rect.y;
+
+    log_time << __FUNCTION__ " + boundry_rect.y : " << pdata->base_lines[1] << '\n';
 
     // align points the match the real location in the image.
     for (auto& p : pdata->left_points)
@@ -555,7 +566,7 @@ bool Seeker::phase_two_left() {
 
 
     // update the phase roi for left side
-    phase_roi<int, 1>(boundry_rect);
+    phase_roi<int, 1>(line_area_rect);
 
 
 }
