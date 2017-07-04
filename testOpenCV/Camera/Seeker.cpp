@@ -416,7 +416,7 @@ bool Seeker::phase_two_left() {
                 if (line.entry_[0] > left_cutoff)
                     stl::copy_vector(line.elements_, elements);
 
-            log_time << __FUNCTION__ << " left_elements.size() : " << elements.size() << '\n';
+            //log_time << __FUNCTION__ << " left_elements.size() : " << elements.size() << '\n';
 
             if (elements.size() > 6 && elements.front().y != elements.back().y) {
                 phase_two_base_exposure_ = exp;
@@ -465,12 +465,13 @@ bool Seeker::phase_two_left() {
 
     phase_roi_[1] = new_roi;
 
-    // only update region, exposure should be at desired level at this point
-    pcapture->region(new_roi);
-
+    pcapture->region(capture_roi(1, 1, 1, 1));
     // empty the buffer
     std::vector<cv::Mat> temps;
     pcapture->cap(3, temps);
+
+    // only update region, exposure should be at desired level at this point
+    pcapture->region(new_roi);
 
     // double to exposure
     pcapture->exposure_mul(2);
@@ -527,7 +528,6 @@ bool Seeker::phase_two_left() {
         //left_boundry_rect.width -= 40;
 
         auto t = org(boundry_area_rect);
-        //left_y = static_cast<double>(new_roi.y);
         try {
             left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
         } catch (cv::Exception& e) {
@@ -539,31 +539,13 @@ bool Seeker::phase_two_left() {
 
     }
 
+    //offset_y -= boundry_area_rect.y;
 
-    //offset_y += boundry_area_rect.height;
-
-    //log_time << __FUNCTION__ " offset_y + boundry_area_rect.height : " << offset_y << '\n';
+    //log_time << __FUNCTION__ " offset_y - boundry_area_rect.y : " << offset_y << '\n';
 
     offset_y += left_y;
 
     log_time << __FUNCTION__ " offset_y + left_y : " << offset_y << '\n';
-
-
-    //pdata->base_lines[1] = left_y / static_cast<double>(elements.size());
-
-    //log_time << __FUNCTION__ " + left_y / static_cast<double>(elements.size()) : " << pdata->base_lines[1] << '\n';
-
-    ////pdata->base_lines[1] += old_roi.y;
-
-    ////log_time << __FUNCTION__ " + old_roi.y : " << pdata->base_lines[1] << '\n';
-
-    //pdata->base_lines[1] += new_roi.y;
-
-    //log_time << __FUNCTION__ " - new_roi.y : " << pdata->base_lines[1] << '\n';
-
-    //pdata->base_lines[1] += boundry_area_rect.y;
-
-    //log_time << __FUNCTION__ " + boundry_rect.y : " << pdata->base_lines[1] << '\n';
 
     pdata->base_lines[1] = offset_y;
 
@@ -671,7 +653,7 @@ bool Seeker::phase_three() {
 
                 laser_rects_y.emplace_back(std::move(laser_rect_y));
 
-                log_time << __FUNCTION__ << " laser rect Y : " << laser_rect_y << '\n';
+                //log_time << __FUNCTION__ << " laser rect Y : " << laser_rect_y << '\n';
 
                 throw_assert(validate::valid_pix_vec(pdata->center_points), "Centerpoints failed validation!!!");
 
