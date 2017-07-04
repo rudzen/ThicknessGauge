@@ -785,6 +785,10 @@ void CapturePvApi::exposure_sub(unsigned long value) const {
     exposure(exposure() - value);
 }
 
+void CapturePvApi::exposure_div(unsigned long value) const {
+    exposure(exposure() / value);
+}
+
 void CapturePvApi::exposure_mul(unsigned long value) const {
     exposure(exposure() * value);
 }

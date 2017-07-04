@@ -455,12 +455,6 @@ bool Seeker::phase_two_left() {
     new_roi.width = static_cast<unsigned long>(ceil(boundry_rect.width));
     new_roi.height = static_cast<unsigned long>(ceil(boundry_rect.height));
 
-    //new_roi.y = phase_roi_y<1>();
-
-    //new_roi.y = phase_roi_[0].y + phase_roi_[1].y + left_boundry_rect.y;
-    //new_roi.width = left_boundry_rect.width;
-    //new_roi.height = left_boundry_rect.height;
-
     log_time << __FUNCTION__ << " new_roi changed to " << new_roi << '\n';
 
     phase_roi_[1] = new_roi;
@@ -468,7 +462,12 @@ bool Seeker::phase_two_left() {
     // only update region, exposure should be at desired level at this point
     pcapture->region(new_roi);
 
-    auto tmp_count = 1;
+    // empty the buffer
+    std::vector<cv::Mat> temps;
+    pcapture->cap(3, temps);
+
+    // double to exposure
+    pcapture->exposure_mul(2);
 
     running = true;
 
@@ -521,7 +520,7 @@ bool Seeker::phase_two_left() {
         }
 
         if (elements.empty()) {
-            log_err << __FUNCTION__ " fatal error, left elements are empty!\n";
+            log_err << __FUNCTION__ " fatal error, elements are empty!\n";
             return false;
         }
 
@@ -553,6 +552,9 @@ bool Seeker::phase_two_left() {
 
     log_time << "left baseline: " << pdata->base_lines[1] << endl;
 
+    // return exposure to "normal"
+    pcapture->exposure_div(2);
+
     return true;
 
     // ************  RIGHT SIDE **************
@@ -574,9 +576,10 @@ bool Seeker::phase_two_right() {
 
 bool Seeker::phase_three() {
 
-    // gogo.. find the laser!
+    // gogo!
 
-    // the exposure is set, no need to alter it from phase two, since the desired area should be lit enough already! (might even be neccesary to lower it!)
+    // lower the exposure to 50%
+    pcapture->exposure(pcapture->exposure() / 2);
 
     log_time << __FUNCTION__ << " configuration started.\n";
 
@@ -588,6 +591,8 @@ bool Seeker::phase_three() {
     phase_3_roi.height = phase_roi_[0].height;
 
     phase_roi_[2] = phase_3_roi;
+
+    auto def_y = phase_3_roi.y;// +phase_3_roi.height;
 
     std::vector<cv::Mat> frames;
     std::vector<cv::Point2d> results(phase_3_roi.width);
@@ -602,6 +607,9 @@ bool Seeker::phase_three() {
     pcapture->region(phase_3_roi);
 
     const auto frame_count = 25;
+
+    std::vector<cv::Rect> laser_rects_y;
+    laser_rects_y.reserve(frame_count);
 
     const auto binary_threshold = 100;
 
@@ -619,6 +627,9 @@ bool Seeker::phase_three() {
 
         stl::reset_point_y(results);
 
+        cv::Rect laser_rect_y;
+        laser_rects_y.clear();
+
         for (auto i = frame_count; i--;) {
 
             try {
@@ -635,7 +646,11 @@ bool Seeker::phase_three() {
                 cv::imwrite("_laser_" + std::to_string(i) + ".png", base_frame);
 
                 /* RECT CUT METHOD */
-                avg_height += calc::weighted_avg(base_frame, pdata->center_points);
+                avg_height += calc::weighted_avg(base_frame, pdata->center_points, laser_rect_y);
+
+                laser_rects_y.emplace_back(std::move(laser_rect_y));
+
+                log_time << __FUNCTION__ << " laser rect Y : " << laser_rect_y << '\n';
 
                 throw_assert(validate::valid_pix_vec(pdata->center_points), "Centerpoints failed validation!!!");
 
@@ -663,21 +678,28 @@ bool Seeker::phase_three() {
         pdata->center_points.clear();
         stl::copy_vector(results, pdata->center_points);
 
-        auto highest_total = phase_3_roi.y;
-        highest_total -= avg_height / static_cast<unsigned int>(frame_count);
+        auto avg_laser_rect = calc::avg(laser_rects_y);
+
+        log_time << __FUNCTION__ " laser rectangles avg : " << avg_laser_rect << '\n';
+
+        auto highest_total = static_cast<double>(def_y);
+        highest_total += avg_height / static_cast<unsigned int>(frame_count);
+        highest_total -= avg_laser_rect.y + avg_laser_rect.height;
 
         avg_height = 0.0;
 
-        log_time << cv::format("base: %f\n", pdata->base_lines[1]);
-        log_time << cv::format("highestPixelTotal: %f\n", highest_total);
+        log_time << cv::format("pdata->base_lines[1]: %f\n", pdata->base_lines[1]);
+        log_time << cv::format("highest_total: %f\n", highest_total);
 
         pdata->difference = abs(pdata->base_lines[1] - highest_total);
         log_time << cv::format("diff from baseline: %f\n", pdata->difference);
 
         running = false;
 
-        for (auto& p : pdata->center_points)
-            std::cout << p << " -- ";
+        for (auto& p : pdata->center_points) {
+            p.y += def_y;
+            std::cout << p << " - ";
+        }
 
     }
 

@@ -129,7 +129,7 @@ private:
     using phase_one_exp = struct phase_exp {
         const ulong exposure_start = 1000;
         const ulong exposure_end = 30000;
-        const ulong exposure_increment = 500;
+        const ulong exposure_increment = 1000;
     };
 
     std::unique_ptr<phase_one_exp> exposure_levels = std::make_unique<phase_one_exp>();

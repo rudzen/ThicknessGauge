@@ -219,6 +219,7 @@ public:
     void exposure_add(unsigned long value_to_add) const;
 
     void exposure_sub(unsigned long value_to_sub) const;
+    void exposure_div(unsigned long value) const;
 
     void exposure_mul(unsigned long value_to_mul) const;
 

@@ -681,6 +681,58 @@ namespace calc {
         return cv::Vec<T, 2>(40.0, 40.0);
     }
 
+    template <typename T>
+    double avg(std::vector<T>& vec) {
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
+
+        auto sum = 0.0;
+        if (vec.empty())
+            return sum;
+
+        if (vec.size() == 1)
+            return vec.front();
+
+        for (const auto v : vec)
+            sum += v;
+
+        return sum / static_cast<double>(vec.size());
+    }
+
+
+    /**
+     * \brief Computes a avg rectangle
+     * \tparam T The type of input rectangle
+     * \param vec_rects The vector containing the rectangles to compute avg of
+     * \return Rectangle (double type) with the avg values
+     */
+    template <typename T>
+    cv::Rect2d avg(std::vector<cv::Rect_<T>>& vec_rects) {
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
+
+        if (vec_rects.empty())
+            return cv::Rect_<T>(0, 0, 0, 0);
+
+        if (vec_rects.size() == 1)
+            return cv::Rect_<T>(vec_rects.front());
+
+        cv::Rect2d tmp;
+
+        for (const auto& r : vec_rects) {
+            tmp.x += r.x;
+            tmp.y += r.y;
+            tmp.width += r.width;
+            tmp.height += r.height;
+        }
+
+        tmp.x /= vec_rects.size();
+        tmp.y /= vec_rects.size();
+        tmp.width /= vec_rects.size();
+        tmp.height /= vec_rects.size();
+
+        return cv::Rect2d(tmp);
+    }
+
+
     /**
      * \brief Calculates the avg of all the Y values in the vector of points
      * \tparam T The type of the points
@@ -700,6 +752,30 @@ namespace calc {
             sum += v.y;
 
         return sum / static_cast<double>(vec.size());
+    }
+
+    /**
+     * \brief Computes the average Y values of a vector containing rectangle types
+     * \tparam T The type of rectangle
+     * \param vec_rects The vector containing the rectangles
+     * \return The avg value of all Y values
+     */
+    template <typename T>
+    double avg_y(std::vector<cv::Rect_<T>>& vec_rects) {
+        static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
+        
+        auto sum = 0.0;
+
+        if (vec_rects.empty())
+            return sum;
+
+        if (vec_rects.size() == 1)
+            return vec_rects.front().y;
+
+        for (const auto& r : vec_rects)
+            sum += r.y;
+
+        return sum / static_cast<double>(vec_rects.size());
     }
 
     /**
@@ -883,13 +959,13 @@ namespace calc {
      * \return The avg of the whole result based on the values in the target vector
      */
     template <typename T>
-    double weighted_avg(cv::Mat& image, std::vector<cv::Point_<T>>& target_vector) {
+    double weighted_avg(cv::Mat& image, std::vector<cv::Point_<T>>& target_vector, cv::Rect& laser_rect_out) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         std::vector<cv::Point> non_zero_elements(image.rows * image.cols);
         findNonZero(image, non_zero_elements);
-        auto laser_area = boundingRect(non_zero_elements);
-        auto t = image(laser_area);
-        return real_intensity_line(t, target_vector, t.rows, 0) + laser_area.y;
+        laser_rect_out = boundingRect(non_zero_elements);
+        auto t = image(laser_rect_out);
+        return real_intensity_line(t, target_vector, t.rows, 0);
     }
 
 #else

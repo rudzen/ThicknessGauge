@@ -783,6 +783,8 @@ void ThicknessGauge::compute_laser_locations(shared_ptr<LaserR>& laser, shared_p
 
         stl::reset_point_y(results);
 
+        cv::Rect laser_y_out;
+
         for (auto i = frame_count_; i--;) {
 
             try {
@@ -800,7 +802,8 @@ void ThicknessGauge::compute_laser_locations(shared_ptr<LaserR>& laser, shared_p
                 GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
                 /* RECT CUT METHOD */
-                avg_height += calc::weighted_avg(base_frame, pdata->center_points);
+                avg_height += calc::weighted_avg(base_frame, pdata->center_points, laser_y_out);
+                avg_height += laser_y_out.y;
 
                 throw_assert(validate::valid_pix_vec(pdata->center_points), "Centerpoints failed validation!!!");
 
