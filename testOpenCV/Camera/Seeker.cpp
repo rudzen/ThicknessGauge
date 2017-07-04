@@ -416,9 +416,6 @@ bool Seeker::phase_two_left() {
                 if (line.entry_[0] > left_cutoff)
                     stl::copy_vector(line.elements_, elements);
 
-            //if (draw::is_escape_pressed(30))
-            //    continue;
-
             log_time << __FUNCTION__ << " left_elements.size() : " << elements.size() << '\n';
 
             if (elements.size() > 6 && elements.front().y != elements.back().y) {
@@ -443,12 +440,12 @@ bool Seeker::phase_two_left() {
     auto line_area = cv::minAreaRect(elements);
     auto line_area_rect = line_area.boundingRect();
 
+    log_time << __FUNCTION__ " left boundry detected : " << line_area_rect << '\n';
+
     cv::RotatedRect boundry_area;
     cv::Rect boundry_area_rect;
 
-    log_time << __FUNCTION__ " left boundry detected : " << line_area_rect << '\n';
-
-    capture_roi old_roi = pcapture->region();
+    auto old_roi = pcapture->region();
 
     capture_roi new_roi;
 
@@ -459,6 +456,12 @@ bool Seeker::phase_two_left() {
     new_roi.height = static_cast<unsigned long>(ceil(line_area_rect.height));
 
     log_time << __FUNCTION__ << " new_roi changed to " << new_roi << '\n';
+
+    // the offset calculation begins with setting the base roi y value
+    auto offset_y = static_cast<double>(new_roi.y);
+    //auto offset_y = static_cast<double>(phase_roi_[1].y);
+
+    log_time << __FUNCTION__ " init offset_y + new_roi.y : " << offset_y << '\n';
 
     phase_roi_[1] = new_roi;
 
@@ -474,6 +477,8 @@ bool Seeker::phase_two_left() {
 
     running = true;
 
+    auto const frame_count = 25;
+
     auto left_y = 0.0;
 
     //cv::namedWindow("morph");
@@ -486,7 +491,7 @@ bool Seeker::phase_two_left() {
         elements.clear();
         hough_horizontal->clear();
 
-        pcapture->cap(25, left_frames);
+        pcapture->cap(frame_count, left_frames);
 
         if (left_frames.empty()) {
             log_err << __FUNCTION__ << " fatal error, no frames were captured!\n";
@@ -515,16 +520,15 @@ bool Seeker::phase_two_left() {
             return false;
         }
 
-        auto boundry_area = cv::minAreaRect(elements);
-        auto boundry_area_rect = boundry_area.boundingRect();
+        boundry_area = cv::minAreaRect(elements);
+        boundry_area_rect = boundry_area.boundingRect();
 
         // adjust to reduce crap
         //left_boundry_rect.width -= 40;
 
         auto t = org(boundry_area_rect);
-        left_y = static_cast<double>(new_roi.y);
+        //left_y = static_cast<double>(new_roi.y);
         try {
-            //left_y += calc::real_intensity_line(t, pdata->left_points);
             left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
         } catch (cv::Exception& e) {
             log_err << __FUNCTION__ << " " << e.what() << '\n';
@@ -535,21 +539,33 @@ bool Seeker::phase_two_left() {
 
     }
 
-    pdata->base_lines[1] = left_y / static_cast<double>(elements.size());
 
-    log_time << __FUNCTION__ " + left_y / static_cast<double>(elements.size()) : " << pdata->base_lines[1] << '\n';
+    //offset_y += boundry_area_rect.height;
 
-    //pdata->base_lines[1] += old_roi.y;
+    //log_time << __FUNCTION__ " offset_y + boundry_area_rect.height : " << offset_y << '\n';
 
-    //log_time << __FUNCTION__ " + old_roi.y : " << pdata->base_lines[1] << '\n';
+    offset_y += left_y;
 
-    pdata->base_lines[1] += new_roi.y;
+    log_time << __FUNCTION__ " offset_y + left_y : " << offset_y << '\n';
 
-    log_time << __FUNCTION__ " - new_roi.y : " << pdata->base_lines[1] << '\n';
 
-    pdata->base_lines[1] += boundry_area_rect.y;
+    //pdata->base_lines[1] = left_y / static_cast<double>(elements.size());
 
-    log_time << __FUNCTION__ " + boundry_rect.y : " << pdata->base_lines[1] << '\n';
+    //log_time << __FUNCTION__ " + left_y / static_cast<double>(elements.size()) : " << pdata->base_lines[1] << '\n';
+
+    ////pdata->base_lines[1] += old_roi.y;
+
+    ////log_time << __FUNCTION__ " + old_roi.y : " << pdata->base_lines[1] << '\n';
+
+    //pdata->base_lines[1] += new_roi.y;
+
+    //log_time << __FUNCTION__ " - new_roi.y : " << pdata->base_lines[1] << '\n';
+
+    //pdata->base_lines[1] += boundry_area_rect.y;
+
+    //log_time << __FUNCTION__ " + boundry_rect.y : " << pdata->base_lines[1] << '\n';
+
+    pdata->base_lines[1] = offset_y;
 
     // align points the match the real location in the image.
     for (auto& p : pdata->left_points)
@@ -703,8 +719,6 @@ bool Seeker::phase_three() {
         //highest_total -= avg_laser_rect.height;
 
         //log_time << __FUNCTION__ " - avg_laser_rect.height : " << highest_total << '\n';
-
-        
 
 
         avg_height = 0.0;
