@@ -499,23 +499,11 @@ bool Seeker::phase_two_left() {
 
             process_mat_for_line(org, hough_horizontal, pmorph.get());
 
-            //cv::imshow("morph", pmorph->result());
-
             // grab everything, since we already have defined the roi earlier
             const auto& lines = hough_horizontal->all_lines();
-            //const auto& llines = hough_horizontal->left_lines();
-
-            //log_time << __FUNCTION__ << " hough lines count : " << lines.size() << '\n';
 
             for (const auto& line : lines)
                 stl::copy_vector(line.elements_, elements);
-
-            //log_time << __FUNCTION__ << " elements : " << elements.size() << '\n';
-
-            //if (line.entry_[0] > left_cutoff)
-
-            //if (draw::is_escape_pressed(30))
-            //    exit(38219);
 
         }
 
@@ -544,11 +532,17 @@ bool Seeker::phase_two_left() {
 
     }
 
-    pdata->base_lines[1] = old_roi.y + left_y / static_cast<double>(elements.size());
+    log_time << __FUNCTION__ " + left_y / static_cast<double>(elements.size()) : " << left_y / static_cast<double>(elements.size());
+
+    pdata->base_lines[1] = left_y / static_cast<double>(elements.size());
+
+    log_time << __FUNCTION__ " + new_roi.y : " << new_roi.y;
+
+    pdata->base_lines[1] += new_roi.y;
 
     // align points the match the real location in the image.
     for (auto& p : pdata->left_points)
-        p.y += old_roi.y;
+        p.y += new_roi.y;
 
     log_time << "left baseline: " << pdata->base_lines[1] << endl;
 
@@ -682,24 +676,40 @@ bool Seeker::phase_three() {
 
         log_time << __FUNCTION__ " laser rectangles avg : " << avg_laser_rect << '\n';
 
-        auto highest_total = static_cast<double>(def_y);
-        highest_total += avg_height / static_cast<unsigned int>(frame_count);
-        highest_total -= avg_laser_rect.y + avg_laser_rect.height;
+        auto highest_total = avg_height / static_cast<unsigned int>(frame_count);
+
+        log_time << __FUNCTION__ " raw laser avg from contained rect : " << highest_total << '\n';
+
+        // correct the offsets, so the location is correct in the full camera roi
+        highest_total += def_phase_one_roi_.y;
+
+        log_time << __FUNCTION__ " + def_phase_one_roi_.y : " << highest_total << '\n';
+
+        highest_total += avg_laser_rect.y;
+
+        log_time << __FUNCTION__ " + avg_laser_rect.y : " << highest_total << '\n';
+
+        //highest_total -= avg_laser_rect.height;
+
+        //log_time << __FUNCTION__ " - avg_laser_rect.height : " << highest_total << '\n';
+
+        
+
 
         avg_height = 0.0;
 
         log_time << cv::format("pdata->base_lines[1]: %f\n", pdata->base_lines[1]);
         log_time << cv::format("highest_total: %f\n", highest_total);
 
-        pdata->difference = abs(pdata->base_lines[1] - highest_total);
+        pdata->difference = pdata->base_lines[1] - highest_total;
         log_time << cv::format("diff from baseline: %f\n", pdata->difference);
 
         running = false;
 
-        for (auto& p : pdata->center_points) {
-            p.y += def_y;
-            std::cout << p << " - ";
-        }
+        //for (auto& p : pdata->center_points) {
+        //    p.y += def_y;
+        //    std::cout << p << " - ";
+        //}
 
     }
 
