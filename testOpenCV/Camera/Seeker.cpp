@@ -466,9 +466,10 @@ bool Seeker::phase_two_left() {
     phase_roi_[1] = new_roi;
 
     pcapture->region(capture_roi(1, 1, 1, 1));
+
     // empty the buffer
-    std::vector<cv::Mat> temps;
-    pcapture->cap(3, temps);
+    pcapture->cap(3, left_frames);
+    left_frames.clear();
 
     // only update region, exposure should be at desired level at this point
     pcapture->region(new_roi);
@@ -621,6 +622,8 @@ bool Seeker::phase_three() {
     auto failures = 0;
 
     log_time << __FUNCTION__ << " configuration done.. capturing.\n";
+
+    frames.clear();
 
     pcapture->cap(frame_count, frames);
 
