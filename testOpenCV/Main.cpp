@@ -73,14 +73,17 @@ int main(int argc, char** argv) {
             if (glob_name == "camera") {
 
                 while (true) {
-                    auto ok = seeker->compute();
-                    if (ok)
-                        break;
+                    try {
+                        auto ok = seeker->compute();
+                        if (ok)
+                            break;
 
-                    log_err << cv::format("Unable to initialize....\n");
-                    log_err << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
-                    tg::sleep(500);
-
+                        log_err << cv::format("Unable to initialize....\n");
+                        log_err << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
+                        tg::sleep(500);
+                    } catch (cv::Exception& e) {
+                        log_err << cv::format("cv::Exception caught in main\n", e.msg.c_str());
+                    }
                 }
 
             } else {
@@ -116,27 +119,29 @@ int main(int argc, char** argv) {
             //c.initVideoCapture();
             //c.testAggressive();
         }
-    } catch (TCLAP::ArgException& ae) {
+    } catch
+    (TCLAP::ArgException& ae) {
         string what = ae.what();
         log_err << "ArgException suddenly happend (but what?)\n" + what << std::endl;
         return -1;
     }
-    catch (CaptureFailException& cfe) {
+    catch
+    (CaptureFailException& cfe) {
         string what = cfe.what();
         log_err << "CaptureFailException suddenly happend (but what?)\n" + what << std::endl;
         return -2;
     }
-    catch (CalibrationException& cale) {
+    catch
+    (CalibrationException& cale) {
         string what = cale.what();
         log_err << "CalibrationException suddenly happend (but what?)\n" + what << std::endl;
         return -3;
     }
-    catch (TestException& te) {
+    catch
+    (TestException& te) {
         string what = te.what();
         log_err << "TestException suddenly happend (but what?)\n" + what << std::endl;
         return -4;
-    } catch (cv::Exception& e) {
-        log_err << cv::format("cv::Exception caught in main\n", e.msg.c_str());
     }
 
     log_time << cv::format("Smooth operator >> %i\n", return_value);

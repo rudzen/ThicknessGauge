@@ -247,6 +247,7 @@
     <ClInclude Include="namespaces\sort.h" />
     <ClInclude Include="namespaces\stl.h" />
     <ClInclude Include="namespaces\str.h" />
+    <ClInclude Include="namespaces\temp.h" />
     <ClInclude Include="namespaces\validate.h" />
     <ClInclude Include="UI\ProgressBar.h" />
     <ClInclude Include="Testing\TestConfig.h" />
@@ -283,6 +284,7 @@
     <Text Include="GC2450M_attributes.txt" />
     <Text Include="Intersection bug.txt" />
     <Text Include="LICENSE_1_0.txt" />
+    <Text Include="StaticMeasurements.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Vimba_Exposure_Control.PNG" />

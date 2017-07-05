@@ -170,6 +170,7 @@ bool Seeker::phase_one() {
     auto failures = 0;
 
     // clear any buffer
+    log_time << __FUNCTION__ << " clearing the buffer.\n";
     pcapture->region(buffer_clear_roi);
     pcapture->cap(3, targets);
     targets.clear();
@@ -389,11 +390,12 @@ bool Seeker::phase_two_left() {
     phase_two_base_exposure_ = phase_one_exposure * 4;
 
     std::vector<unsigned long> p2_exposures;
-    p2_exposures.reserve(25);
-    for (ulong i = 0; i < 25; i++)
+    p2_exposures.reserve(50);
+    for (ulong i = 0; i < 50; i++)
         p2_exposures.push_back(phase_two_base_exposure_ + exposure_levels->exposure_increment * i);
 
     auto running = true;
+    auto found = false;
 
     cv::Mat org;
 
@@ -408,6 +410,8 @@ bool Seeker::phase_two_left() {
 
         left_frames.clear();
 
+        found = false;
+
         for (const auto exp : p2_exposures) {
 
             pcapture->exposure(exp);
@@ -421,15 +425,22 @@ bool Seeker::phase_two_left() {
             process_mat_for_line(org, hough_horizontal, pmorph.get());
 
             const auto& lines = hough_horizontal->right_lines(); // inner most side
-            for (auto& line : lines)
-                if (line.entry_[0] > left_cutoff)
-                    stl::copy_vector(line.elements_, elements);
 
-            //log_time << __FUNCTION__ << " left_elements.size() : " << elements.size() << '\n';
+            //log_time << __FUNCTION__ << " lines.size() : " << lines.size() << '\n';
 
-            if (elements.size() > 6 && elements.front().y != elements.back().y) {
+            if (lines.size() < 3)
+                continue;
+
+            for (auto& line : lines) {
+                //if (line.entry_[0] > left_cutoff)                
+                stl::copy_vector(line.elements_, elements);
+            }
+
+
+            if (elements.size() > 3) { // && elements.front().y != elements.back().y) {
                 phase_two_base_exposure_ = exp;
                 running = false;
+                found = true;
                 break;
             }
 
@@ -440,7 +451,10 @@ bool Seeker::phase_two_left() {
 
         }
 
-        log_time << "Phase two exposure detected.. " << phase_two_base_exposure_ << '\n';
+        if (found) {
+            log_time << "Phase two exposure detected.. " << phase_two_base_exposure_ << '\n';
+            break;
+        }
 
     }
 
@@ -474,9 +488,9 @@ bool Seeker::phase_two_left() {
 
     phase_roi_[1] = new_roi;
 
-    pcapture->region(capture_roi(1, 1, 1, 1));
-
     // empty the buffer
+    log_time << __FUNCTION__ << " clearing buffer..\n";
+    pcapture->region(capture_roi(1, 1, 1, 1));
     pcapture->cap(3, left_frames);
     left_frames.clear();
 
@@ -484,7 +498,7 @@ bool Seeker::phase_two_left() {
     pcapture->region(new_roi);
 
     // double to exposure
-    pcapture->exposure_mul(2);
+    pcapture->exposure_mul(3);
 
     running = true;
 
@@ -561,12 +575,12 @@ bool Seeker::phase_two_left() {
 
     // align points the match the real location in the image.
     for (auto& p : pdata->left_points)
-        p.y += new_roi.y;
+        p.y += offset_y;
 
     log_time << "left baseline: " << pdata->base_lines[1] << endl;
 
     // return exposure to "normal"
-    pcapture->exposure_div(2);
+    pcapture->exposure_div(3);
 
     return true;
 
@@ -612,6 +626,7 @@ bool Seeker::phase_three() {
     stl::populate_x(results, phase_3_roi.width);
 
     // capture 3 frames quickly to empty the buffer
+    log_time << __FUNCTION__ << " clearing buffer..\n";
     pcapture->region(buffer_clear_roi);
     pcapture->cap(3, frames);
     frames.clear();
@@ -657,7 +672,7 @@ bool Seeker::phase_three() {
 
                 GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
 
-                cv::imwrite("_laser_" + std::to_string(i) + ".png", base_frame);
+                //cv::imwrite("_laser_" + std::to_string(i) + ".png", base_frame);
 
                 /* RECT CUT METHOD */
                 avg_height += calc::weighted_avg(base_frame, pdata->center_points, laser_rect_y);
