@@ -163,11 +163,16 @@ bool Seeker::phase_one() {
 
     cv::Mat single_target;
     std::vector<cv::Mat> targets;
-    targets.reserve(1); // lel
+    targets.reserve(3); // lel
 
     auto running = true;
 
     auto failures = 0;
+
+    // clear any buffer
+    pcapture->region(buffer_clear_roi);
+    pcapture->cap(3, targets);
+    targets.clear();
 
     pcapture->region(pcapture->default_roi);
 
@@ -354,6 +359,12 @@ bool Seeker::phase_two_left() {
 
     switch_phase();
 
+    std::vector<cv::Mat> left_frames;
+
+    // clear any buffer
+    pcapture->region(buffer_clear_roi);
+    pcapture->cap(3, left_frames);
+    left_frames.clear();
 
     // prep for next phase
     pcapture->region(phase_roi_[1]);
@@ -369,8 +380,6 @@ bool Seeker::phase_two_left() {
     hough_horizontal->max_line_gab(12);
 
     hough_horizontal->marking_rect(cv::Rect2d(phase_roi_[1].x, phase_roi_[1].y, phase_roi_[1].width, phase_roi_[1].height));
-
-    std::vector<cv::Mat> left_frames;
 
     //auto left_size = cv::Size(left_baseline.width, left_baseline.height);
     auto left_cutoff = phase_roi_[1].width / 2.0;
@@ -602,9 +611,8 @@ bool Seeker::phase_three() {
     std::vector<cv::Point2d> results(phase_3_roi.width);
     stl::populate_x(results, phase_3_roi.width);
 
-    pcapture->region(cv::Rect_<unsigned long>(1, 1, 1, 1));
-
     // capture 3 frames quickly to empty the buffer
+    pcapture->region(buffer_clear_roi);
     pcapture->cap(3, frames);
     frames.clear();
 

@@ -168,9 +168,11 @@ public: // data return point
 
 private:
 
-    const capture_roi def_phase_one_roi_ = capture_roi(0UL, 1006, 2448, 256);
+    const capture_roi def_phase_one_roi_ = capture_roi(0UL, 1006UL, 2448UL, 256UL);
 
     const capture_roi phase_roi_null_ = capture_roi(0UL, 0UL, 0UL, 0UL);
+
+    const capture_roi buffer_clear_roi = capture_roi(1UL, 1UL, 1UL, 1UL);
 
     Phase current_phase_;
 
