@@ -388,7 +388,10 @@ bool Seeker::phase_two_left() {
     std::vector<cv::Point2f> elements;
     elements.reserve(512);
 
-    phase_two_base_exposure_ = phase_one_exposure * 4;
+    // update base exposure for this phase if it hasnt been configured earlier.
+    if (phase_two_base_exposure_ == 0) {
+        phase_two_base_exposure_ = phase_one_exposure * 4;
+    }
 
     std::vector<unsigned long> p2_exposures;
     p2_exposures.reserve(50);
@@ -469,9 +472,6 @@ bool Seeker::phase_two_left() {
 
     log_time << __FUNCTION__ " left boundry detected : " << line_area_rect << '\n';
 
-    cv::RotatedRect boundry_area;
-    cv::Rect boundry_area_rect;
-
     auto old_roi = pcapture->region();
 
     capture_roi new_roi;
@@ -549,13 +549,21 @@ bool Seeker::phase_two_left() {
             return false;
         }
 
-        boundry_area = cv::minAreaRect(elements);
-        boundry_area_rect = boundry_area.boundingRect();
+        auto boundry_area = cv::minAreaRect(elements);
+        auto boundry_area_rect = boundry_area.boundingRect2f();
 
         // adjust to reduce crap
         //left_boundry_rect.width -= 40;
 
+        cvr::rect_force_align_xy<float, 0>(boundry_area_rect);
+
+        if (!validate::validate_rect(boundry_area_rect)) {
+            log_err << __FUNCTION__ << " invalid rect in phase two, restarting phase two.\n";
+            continue;
+        }
+
         auto t = org(boundry_area_rect);
+
         try {
             left_y += calc::real_intensity_line(t, pdata->left_points, t.rows, 0);
         } catch (cv::Exception& e) {
@@ -738,7 +746,7 @@ bool Seeker::phase_three() {
         log_time << cv::format("pdata->base_lines[1]: %f\n", pdata->base_lines[1]);
         log_time << cv::format("highest_total: %f\n", highest_total);
 
-        pdata->difference = pdata->base_lines[1] - highest_total;
+        pdata->difference = abs(pdata->base_lines[1] - highest_total);
         log_time << cv::format("diff from baseline: %f\n", pdata->difference);
 
         running = false;
@@ -769,7 +777,7 @@ int Seeker::frameset(Phase phase) {
     }
 }
 
-bool Seeker::compute(bool do_null, capture_roi& marking_rect) {
+bool Seeker::compute(bool do_null, cv::Rect_<unsigned long>& marking_rect, unsigned long p2_base_exposure) {
 
     if (!initialize())
         return false;
@@ -783,17 +791,19 @@ bool Seeker::compute(bool do_null, capture_roi& marking_rect) {
         }
 
         // skip the entirety of phase_one, just feed the marking_rect directly
-        pdata->marking_rect = marking_rect;
+        pdata->marking_rect = cvr::rect_any_to_double(marking_rect);
 
-        log_time << __FUNCTION__ << " marking rect found : " << marking_rect << '\n';
+        log_time << __FUNCTION__ << " marking rect found : " << pdata->marking_rect << '\n';
 
         // set phase two roi right away.
 
         auto quarter = phase_roi_[0].height / 4;
-        phase_roi_[1].x = static_cast<unsigned long>(ceil(marking_rect.x) / 2);
+        phase_roi_[1].x = static_cast<unsigned long>(ceil(pdata->marking_rect.x) / 2);
         phase_roi_[1].y = phase_roi_[0].y + 3 * quarter;
         phase_roi_[1].width = phase_roi_[1].x;
         phase_roi_[1].height = quarter;
+
+        phase_two_base_exposure_ = p2_base_exposure;
 
         log_time << "phase two left region configured : " << phase_roi_[1] << '\n';
 

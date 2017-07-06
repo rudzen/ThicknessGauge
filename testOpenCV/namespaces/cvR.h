@@ -326,6 +326,37 @@ namespace cvr {
     }
 
     /**
+     * \brief Converts any type of rect to double type rect
+     * \tparam T The type of rect
+     * \param rect The rect to convert
+     * \return The newly created double type rect
+     */
+    template <typename T>
+    cv::Rect2d rect_any_to_double(cv::Rect_<T>& rect) {
+        auto x = static_cast<double>(rect.x);
+        auto y = static_cast<double>(rect.y);
+        auto w = static_cast<double>(rect.width);
+        auto h = static_cast<double>(rect.height);
+        return cv::Rect2d(x, y, w, h);
+    }
+
+    /**
+     * \brief Forcefully aligns a rectangle x and y values
+     * Values can be negative because of float roundings.
+     * \tparam T The type of rectangle
+     * \tparam min_val The minimum value it should be
+     * \param rect 
+     */
+    template <typename T, int min_val>
+    void rect_force_align_xy(cv::Rect_<T>& rect) {
+        static_assert(std::is_arithmetic<T>::value, "Unsupported type.");
+        if (rect.x < min_val)
+            rect.x = min_val;
+        if (rect.y < min_val)
+            rect.y = min_val;
+    }
+
+    /**
      * \brief Split the original frames into two vectors based on the center of the matrix size in X.
      * Note that the resulting vectors only contains references to the original frames.
      * \param frames The frames to be split in half (verticaly)

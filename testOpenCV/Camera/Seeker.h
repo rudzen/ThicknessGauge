@@ -114,11 +114,11 @@ public:
         ONE, TWO_RIGHT, TWO_LEFT, THREE, DONE, NONE, FAIL
     };
 
+private:
+
     using ulong = unsigned long;
 
     using capture_roi = cv::Rect_<ulong>;
-
-private:
 
     /**
      * \brief Exposure seek configuration.
@@ -205,8 +205,8 @@ private: // internal functions
     ulong phase_roi_y() {
         ulong return_value = 0;
         std::for_each(phase_roi_.begin(), phase_roi_.begin() + upper, [&] (const capture_roi& roi) {
-            return_value += roi.y;
-        });
+                      return_value += roi.y;
+                  });
         return return_value;
     }
 
@@ -249,7 +249,7 @@ public:
 
     explicit Seeker(capture_roi phase_one_roi);
 
-    bool compute(bool do_null, capture_roi& marking_rect);
+    bool compute(bool do_null, cv::Rect_<unsigned long>& marking_rect, unsigned long p2_base_exposure);
 
     /**
  * \brief Initializes all sekker class data members

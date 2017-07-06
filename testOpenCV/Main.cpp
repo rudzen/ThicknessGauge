@@ -69,9 +69,20 @@ int main(int argc, char** argv) {
 
             auto seeker = std::make_shared<Seeker>();
 
-            auto do_zero = false;
+            auto do_zero = true;
 
-            Seeker::capture_roi zero_measure_mr(0UL, 0UL, 0UL, 0UL);
+
+            /* **********************************************************
+             * To measure zero height, perform a regular height measure,
+             * remove the thing that was measured, then input the resulting
+             * marking rectangle in the zero_measure_mr rectangle.
+             * ALWAYS use the ceiling values, as they are more likely to be "correct"
+             */
+
+            //1173.33 x 256 from (695, 0)
+            //e: 44000
+            cv::Rect_<unsigned long> zero_measure_mr(695UL, 0UL, 1174UL, 256UL);
+            unsigned long phase_two_exposure = 44000;
 
             //// determin camera or file storage
             if (glob_name == "camera") {
@@ -81,9 +92,9 @@ int main(int argc, char** argv) {
                         bool ok;
 
                         if (!do_zero)
-                            ok = seeker->compute(false , zero_measure_mr); // default
+                            ok = seeker->compute(false , zero_measure_mr, phase_two_exposure); // default
                         else
-                            ok = seeker->compute(true , zero_measure_mr); // force feed the bastard
+                            ok = seeker->compute(true , zero_measure_mr, phase_two_exposure); // force feed the bastard
 
                         if (ok)
                             break;
