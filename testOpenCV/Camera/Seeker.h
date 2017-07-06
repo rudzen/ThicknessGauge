@@ -114,11 +114,11 @@ public:
         ONE, TWO_RIGHT, TWO_LEFT, THREE, DONE, NONE, FAIL
     };
 
-private:
-
     using ulong = unsigned long;
 
     using capture_roi = cv::Rect_<ulong>;
+
+private:
 
     /**
      * \brief Exposure seek configuration.
@@ -249,7 +249,7 @@ public:
 
     explicit Seeker(capture_roi phase_one_roi);
 
-    bool compute(bool do_null, capture_roi marking_rect);
+    bool compute(bool do_null, capture_roi& marking_rect);
 
     /**
  * \brief Initializes all sekker class data members

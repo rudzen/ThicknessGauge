@@ -769,7 +769,7 @@ int Seeker::frameset(Phase phase) {
     }
 }
 
-bool Seeker::compute(bool do_null, capture_roi marking_rect) {
+bool Seeker::compute(bool do_null, capture_roi& marking_rect) {
 
     if (!initialize())
         return false;

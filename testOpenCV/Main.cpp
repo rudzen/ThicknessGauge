@@ -69,12 +69,21 @@ int main(int argc, char** argv) {
 
             auto seeker = std::make_shared<Seeker>();
 
+            auto do_zero = false;
+
+            Seeker::capture_roi zero_measure_mr(0UL, 0UL, 0UL, 0UL);
+
             //// determin camera or file storage
             if (glob_name == "camera") {
 
                 while (true) {
                     try {
-                        auto ok = seeker->compute();
+                        bool ok;
+
+                        if (!do_zero)
+                            ok = seeker->compute(false , zero_measure_mr); // default
+                        else
+                            ok = seeker->compute(true , zero_measure_mr); // force feed 
                         if (ok)
                             break;
 
