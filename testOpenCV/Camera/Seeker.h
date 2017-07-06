@@ -249,7 +249,7 @@ public:
 
     explicit Seeker(capture_roi phase_one_roi);
 
-    bool compute();
+    bool compute(bool do_null, capture_roi marking_rect);
 
     /**
  * \brief Initializes all sekker class data members

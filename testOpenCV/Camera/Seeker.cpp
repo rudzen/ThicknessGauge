@@ -769,17 +769,44 @@ int Seeker::frameset(Phase phase) {
     }
 }
 
-bool Seeker::compute() {
+bool Seeker::compute(bool do_null, capture_roi marking_rect) {
 
     if (!initialize())
         return false;
 
-    auto phase_complete = phase_one();
+    auto phase_complete = false;
+    if (do_null) {
 
-    if (!phase_complete) {
-        log_err << __FUNCTION__ " phase one FAILED..\n";
-        return false;
+        if (!validate::validate_rect(marking_rect)) {
+            log_err << __FUNCTION__ << " is unable to perform zero height measurement, rectangle is invalid.\n";
+            return false;
+        }
+
+        // skip the entirety of phase_one, just feed the marking_rect directly
+        pdata->marking_rect = marking_rect;
+
+        log_time << __FUNCTION__ << " marking rect found : " << marking_rect << '\n';
+
+        // set phase two roi right away.
+
+        auto quarter = phase_roi_[0].height / 4;
+        phase_roi_[1].x = static_cast<unsigned long>(ceil(marking_rect.x) / 2);
+        phase_roi_[1].y = phase_roi_[0].y + 3 * quarter;
+        phase_roi_[1].width = phase_roi_[1].x;
+        phase_roi_[1].height = quarter;
+
+        log_time << "phase two left region configured : " << phase_roi_[1] << '\n';
+
+
+    } else {
+        phase_complete = phase_one();
+
+        if (!phase_complete) {
+            log_err << __FUNCTION__ " phase one FAILED..\n";
+            return false;
+        }
     }
+
 
     log_time << __FUNCTION__ << " phase one completed ok..\n";
 
