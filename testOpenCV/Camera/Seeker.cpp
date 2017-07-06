@@ -386,6 +386,7 @@ bool Seeker::phase_two_left() {
     auto left_cutoff = phase_roi_[1].width / 2.0;
 
     std::vector<cv::Point2f> elements;
+    elements.reserve(512);
 
     phase_two_base_exposure_ = phase_one_exposure * 4;
 
@@ -416,7 +417,7 @@ bool Seeker::phase_two_left() {
 
             pcapture->exposure(exp);
 
-            pcapture->cap(3, left_frames);
+            pcapture->cap(2, left_frames);
 
             org = left_frames.back().clone();
             auto h = org.clone();
@@ -424,11 +425,11 @@ bool Seeker::phase_two_left() {
 
             process_mat_for_line(org, hough_horizontal, pmorph.get());
 
-            const auto& lines = hough_horizontal->right_lines(); // inner most side
+            const auto& lines = hough_horizontal->all_lines(); // inner most side
 
             //log_time << __FUNCTION__ << " lines.size() : " << lines.size() << '\n';
 
-            if (lines.size() < 3)
+            if (lines.size() < 2)
                 continue;
 
             for (auto& line : lines) {
@@ -455,6 +456,9 @@ bool Seeker::phase_two_left() {
             log_time << "Phase two exposure detected.. " << phase_two_base_exposure_ << '\n';
             break;
         }
+
+        log_err << __FUNCTION__ << " unable to detect correct exposure :(\n";
+        return false;
 
     }
 
