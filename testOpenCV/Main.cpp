@@ -83,7 +83,8 @@ int main(int argc, char** argv) {
                         if (!do_zero)
                             ok = seeker->compute(false , zero_measure_mr); // default
                         else
-                            ok = seeker->compute(true , zero_measure_mr); // force feed 
+                            ok = seeker->compute(true , zero_measure_mr); // force feed the bastard
+
                         if (ok)
                             break;
 
