@@ -1,17 +1,18 @@
 #pragma once
 #include <ostream>
-#include <vector>
+#include <opencv2/core/types.hpp>
 
 class CommandLineOptions {
 
 public:
 
-    CommandLineOptions(const bool buildInfoMode, const bool testMode, const bool demoMode, const bool calibrationMode, const bool globMode, const bool showWindows, const bool recordVideo, const std::string cameraFile, const std::string calibrationOutput, const int frames, const int testMax, const int testInterval, const int numOpenCVThreads)
+    CommandLineOptions(const bool buildInfoMode, const bool testMode, const bool demoMode, const bool calibrationMode, const bool globMode, const bool zero_measuring,  const bool showWindows, const bool recordVideo, const std::string cameraFile, const std::string calibrationOutput, const int frames, const int testMax, const int testInterval, const int numOpenCVThreads)
         : build_info_mode_(buildInfoMode),
           test_mode_(testMode),
           demo_mode_(demoMode),
           calibration_mode_(calibrationMode),
           glob_mode_(globMode),
+          zero_measurering_(zero_measuring),
           show_windows_(showWindows),
           record_video_(recordVideo),
           camera_file_(cameraFile),
@@ -22,7 +23,7 @@ public:
           num_open_cv_threads_(numOpenCVThreads) { }
 
     CommandLineOptions()
-        : build_info_mode_(false), test_mode_(false), demo_mode_(true), calibration_mode_(false), glob_mode_(false), show_windows_(true), record_video_(false), frames_(25), test_max_(0), test_interval_(0), num_open_cv_threads_(4) { }
+        : build_info_mode_(false), test_mode_(false), demo_mode_(true), calibration_mode_(false), glob_mode_(false), zero_measurering_(false), show_windows_(true), record_video_(false), frames_(25), test_max_(0), test_interval_(0), num_open_cv_threads_(4) { }
 
     friend bool operator==(const CommandLineOptions& lhs, const CommandLineOptions& rhs) {
         return lhs.build_info_mode_ == rhs.build_info_mode_
@@ -66,7 +67,7 @@ public:
 
 private:
 
-    std::vector<unsigned long> zero_marking_values_;
+    cv::Rect_<unsigned long> zero_marking_values_;
 
     bool build_info_mode_;
     bool test_mode_;
@@ -100,8 +101,12 @@ public:
         zero_measurering_ = zero_measurering;
     }
 
-    const std::vector<unsigned long>& zero_marking_values() const {
+    cv::Rect_<unsigned long> zero_marking_values() const {
         return zero_marking_values_;
+    }
+
+    void zero_marking_values(cv::Rect_<unsigned long> zero_marking_values) {
+        zero_marking_values_ = zero_marking_values;
     }
 
     const int& num_open_cv_threads() const {

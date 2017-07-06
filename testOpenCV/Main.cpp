@@ -69,8 +69,7 @@ int main(int argc, char** argv) {
 
             auto seeker = std::make_shared<Seeker>();
 
-            auto do_zero = true;
-
+            auto do_zero = options->zero_measurering();
 
             /* **********************************************************
              * To measure zero height, perform a regular height measure,
@@ -81,6 +80,8 @@ int main(int argc, char** argv) {
 
             //1173.33 x 256 from (695, 0)
             //e: 44000
+
+
             cv::Rect_<unsigned long> zero_measure_mr(695UL, 0UL, 1174UL, 256UL);
             unsigned long phase_two_exposure = 44000;
 
