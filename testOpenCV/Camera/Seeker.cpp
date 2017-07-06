@@ -555,7 +555,7 @@ bool Seeker::phase_two_left() {
         // adjust to reduce crap
         //left_boundry_rect.width -= 40;
 
-        cvr::rect_force_align_xy<float, 0>(boundry_area_rect);
+        cvr::rect_force_align_boundries<float, 0>(boundry_area_rect, left_frames.front().cols, left_frames.front().rows);
 
         if (!validate::validate_rect(boundry_area_rect)) {
             log_err << __FUNCTION__ << " invalid rect in phase two, restarting phase two.\n";

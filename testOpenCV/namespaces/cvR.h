@@ -348,12 +348,17 @@ namespace cvr {
      * \param rect 
      */
     template <typename T, int min_val>
-    void rect_force_align_xy(cv::Rect_<T>& rect) {
+    void rect_force_align_boundries(cv::Rect_<T>& rect, T max_width, T max_height) {
         static_assert(std::is_arithmetic<T>::value, "Unsupported type.");
         if (rect.x < min_val)
             rect.x = min_val;
         if (rect.y < min_val)
             rect.y = min_val;
+
+        if (rect.width > max_width)
+            rect.width = max_width;
+        if (rect.height > max_height)
+            rect.height = max_height;
     }
 
     /**
