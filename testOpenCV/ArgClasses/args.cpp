@@ -70,6 +70,14 @@ namespace args {
         TCLAP::ValueArg<std::string> arg_glob_name("", "glob_name", "Name to save glob as", false, "camera", "Valid folder name.");
         cmd.add(arg_glob_name);
 
+        TCLAP::ValueArg<bool> arg_zero_measurement("z", "zero_measurement", "Measure zero height (illusive marking rectangle values must be appended too!)", false, false, "Zero measurement");
+        cmd.add(arg_zero_measurement);
+
+        /* only for when measuring zero height values !!!! */
+
+        TCLAP::UnlabeledMultiArg<unsigned long> zero_marking_rect("zero_marking", "ONLY Four values, containing the X, Y, WIDTH and HEIGHT of the illusive marking rect.", false, "Only unsigned longs, x, y, width and height.", true);
+        cmd.add(zero_marking_rect);
+
         cmd.parse(argc, argv);
 
         // read all parsed command line arguments
@@ -108,6 +116,11 @@ namespace args {
 
         bval = arg_record_video.getValue();
         options->record_video(bval);
+
+        bval = arg_zero_measurement.getValue();
+        options->zero_measurering(bval);
+
+        // fetch any potential 
 
         return false;
     } catch (TCLAP::ArgException& e) {

@@ -1,5 +1,6 @@
 #pragma once
 #include <ostream>
+#include <vector>
 
 class CommandLineOptions {
 
@@ -44,28 +45,6 @@ public:
         return !(lhs == rhs);
     }
 
-
-    friend std::size_t hash_value(const CommandLineOptions& obj) {
-        std::size_t seed = 0x1C34AD51;
-        seed ^= (seed << 6) + (seed >> 2) + 0x7BEF55B5 + static_cast<std::size_t>(obj.build_info_mode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x374B74F9 + static_cast<std::size_t>(obj.test_mode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x776E5645 + static_cast<std::size_t>(obj.demo_mode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x766D5625 + static_cast<std::size_t>(obj.glob_mode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x3552D071 + static_cast<std::size_t>(obj.calibration_mode_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x72B298C4 + static_cast<std::size_t>(obj.show_windows_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x1B22BAF2 + static_cast<std::size_t>(obj.record_video_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x2AD90237 + obj.camera_file_.size();
-        seed ^= (seed << 6) + (seed >> 2) + 0x5BF7AD8C + obj.calibration_output_.size();
-        seed ^= (seed << 6) + (seed >> 2) + 0x7B8590B3 + obj.test_suite_.size();
-        seed ^= (seed << 6) + (seed >> 2) + 0x2A8590B3 + obj.glob_folder_.size();
-        seed ^= (seed << 6) + (seed >> 2) + 0x35795544 + static_cast<std::size_t>(obj.frames_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x096C9A55 + static_cast<std::size_t>(obj.test_max_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x734629BD + static_cast<std::size_t>(obj.test_interval_);
-        seed ^= (seed << 6) + (seed >> 2) + 0x734629BD + static_cast<std::size_t>(obj.num_open_cv_threads_);
-        return seed;
-    }
-
-
     friend std::ostream& operator<<(std::ostream& os, const CommandLineOptions& obj) {
         return os
             << " demoMode_: " << obj.demo_mode_
@@ -86,12 +65,16 @@ public:
     }
 
 private:
+
+    std::vector<unsigned long> zero_marking_values_;
+
     bool build_info_mode_;
     bool test_mode_;
     bool demo_mode_;
     bool calibration_mode_;
     bool glob_mode_;
 
+    bool zero_measurering_;
     bool show_windows_;
     bool record_video_;
 
@@ -107,6 +90,19 @@ private:
     int num_open_cv_threads_;
 
 public:
+
+
+    bool zero_measurering() const {
+        return zero_measurering_;
+    }
+
+    void zero_measurering(bool zero_measurering) {
+        zero_measurering_ = zero_measurering;
+    }
+
+    const std::vector<unsigned long>& zero_marking_values() const {
+        return zero_marking_values_;
+    }
 
     const int& num_open_cv_threads() const {
         return num_open_cv_threads_;
