@@ -152,6 +152,43 @@ namespace cvr {
     }
 
     /**
+     * \brief Extracts points from a given direction with a specificed boundry to a new list of points
+     * \tparam ascending true if the direction of the boundry is from lowest point ->
+     * \tparam force_clear_output if true, the output will be cleared before adding points
+     * \tparam T Type of points being extracted
+     * \tparam T2 Type of boundry
+     * \param all_points The points to extract from
+     * \param output The output vector to hold the extracted points
+     * \param boundry The boundry, must be a regular integral value
+     */
+    template <bool ascending, bool force_clear_output, typename T, typename T2>
+    void extract_near(std::vector<cv::Point_<T>>& all_points, std::vector<cv::Point_<T>>& output, T2 boundry) {
+        static_assert(std::is_arithmetic<T>::value, "Wrong type.");
+        static_assert(std::is_integral<T2>::value, "Wrong type.");
+
+        if (force_clear_output)
+            output.clear();
+
+        // guard for invalid boundry
+        if (boundry >= all_points.size()) {
+            stl::copy_vector(all_points, output);
+            return;
+        }
+
+        output.resize(boundry);
+
+        if (ascending)
+            sorter::sort_pixels_x_ascending(all_points);
+        else
+            sorter::sort_pixels_x_descending(all_points);
+
+        std::for_each(all_points.begin(), all_points.begin() + boundry, [&] (cv::Point_<T>& p) {
+            output.emplace_back(p);
+        });
+
+    }
+
+    /**
      * \brief Computes the gabs in a vector of points and populates them in target vector
      * \param elements The elements to fill gabs in
      * \param target The target vector of points
