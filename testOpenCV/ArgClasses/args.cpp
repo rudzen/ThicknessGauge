@@ -74,6 +74,9 @@ namespace args {
             TCLAP::ValueArg<bool> arg_zero_measurement("z", "zero_measurement", "Measure zero height (illusive marking rectangle values must be appended too!)", false, false, "Zero measurement");
             cmd.add(arg_zero_measurement);
 
+            TCLAP::ValueArg<unsigned long> arg_phase_two_exposure("", "phase_two_exp", "Phase two exposure setting (for zero height computation", false, 0, "phase_two_exposure");
+            cmd.add(arg_phase_two_exposure);
+
             /* only for when measuring zero height values !!!! */
 
             TCLAP::UnlabeledMultiArg<unsigned long> zero_marking_rect("zero_marking", "ONLY Four values, containing the X, Y, WIDTH and HEIGHT of the illusive marking rect.", false, "Only unsigned longs, x, y, width and height.", true);

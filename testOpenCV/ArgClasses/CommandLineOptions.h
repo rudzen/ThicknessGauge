@@ -6,24 +6,24 @@ class CommandLineOptions {
 
 public:
 
-    CommandLineOptions(const bool buildInfoMode, const bool testMode, const bool demoMode, const bool calibrationMode, const bool globMode, const bool zero_measuring,  const bool showWindows, const bool recordVideo, const std::string cameraFile, const std::string calibrationOutput, const int frames, const int testMax, const int testInterval, const int numOpenCVThreads)
-        : build_info_mode_(buildInfoMode),
+    CommandLineOptions(const bool buildInfoMode, const bool testMode, const bool demoMode, const bool calibrationMode, const bool globMode, const bool zero_measuring, const bool showWindows, const bool recordVideo, const std::string cameraFile, const std::string calibrationOutput, const int frames, const int testMax, const int testInterval, const int numOpenCVThreads)
+        : camera_file_(cameraFile),
+          calibration_output_(calibrationOutput),
+          frames_(frames),
+          test_max_(testMax),
+          test_interval_(testInterval),
+          num_open_cv_threads_(numOpenCVThreads),
+          build_info_mode_(buildInfoMode),
           test_mode_(testMode),
           demo_mode_(demoMode),
           calibration_mode_(calibrationMode),
           glob_mode_(globMode),
           zero_measurering_(zero_measuring),
           show_windows_(showWindows),
-          record_video_(recordVideo),
-          camera_file_(cameraFile),
-          calibration_output_(calibrationOutput),
-          frames_(frames),
-          test_max_(testMax),
-          test_interval_(testInterval),
-          num_open_cv_threads_(numOpenCVThreads) { }
+          record_video_(recordVideo) { }
 
     CommandLineOptions()
-        : build_info_mode_(false), test_mode_(false), demo_mode_(true), calibration_mode_(false), glob_mode_(false), zero_measurering_(false), show_windows_(true), record_video_(false), frames_(25), test_max_(0), test_interval_(0), num_open_cv_threads_(4) { }
+        : frames_(25), test_max_(0), test_interval_(0), num_open_cv_threads_(4), build_info_mode_(false), test_mode_(false), demo_mode_(true), calibration_mode_(false), glob_mode_(false), zero_measurering_(false), show_windows_(true), record_video_(false) { }
 
     friend bool operator==(const CommandLineOptions& lhs, const CommandLineOptions& rhs) {
         return lhs.build_info_mode_ == rhs.build_info_mode_
@@ -69,6 +69,19 @@ private:
 
     cv::Rect_<unsigned long> zero_marking_values_;
 
+    std::string camera_file_;
+    std::string calibration_output_;
+    std::string test_suite_;
+    std::string glob_folder_;
+
+    unsigned long phase_two_exposure_;
+
+    int frames_;
+    int test_max_;
+    int test_interval_;
+
+    int num_open_cv_threads_;
+
     bool build_info_mode_;
     bool test_mode_;
     bool demo_mode_;
@@ -79,19 +92,15 @@ private:
     bool show_windows_;
     bool record_video_;
 
-    std::string camera_file_;
-    std::string calibration_output_;
-    std::string test_suite_;
-    std::string glob_folder_;
-
-    int frames_;
-    int test_max_;
-    int test_interval_;
-
-    int num_open_cv_threads_;
-
 public:
 
+    unsigned long phase_two_exposure() const {
+        return phase_two_exposure_;
+    }
+
+    void phase_two_exposure(unsigned long phase_two_exposure) {
+        phase_two_exposure_ = phase_two_exposure;
+    }
 
     bool zero_measurering() const {
         return zero_measurering_;
