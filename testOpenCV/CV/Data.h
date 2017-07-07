@@ -6,6 +6,37 @@ template <class T>
 class Data {
 public:
 
+    Data() { };
+
+    Data(const Data& other) = delete;
+
+    Data(Data&& other) noexcept
+        : center_points{std::move(other.center_points)},
+          left_points{std::move(other.left_points)},
+          right_points{std::move(other.right_points)},
+          points_start{std::move(other.points_start)},
+          glob_name{std::move(other.glob_name)},
+          marking_rect{std::move(other.marking_rect)},
+          left_border{std::move(other.left_border)},
+          right_border{std::move(other.right_border)},
+          base_lines{std::move(other.base_lines)},
+          intersections{std::move(other.intersections)},
+          center_line{std::move(other.center_line)},
+          intersection_cuts{std::move(other.intersection_cuts)},
+          middle_pieces{std::move(other.middle_pieces)},
+          left_avg{std::move(other.left_avg)},
+          left_mid_avg{std::move(other.left_mid_avg)},
+          center_avg{std::move(other.center_avg)},
+          right_mid_avg{std::move(other.right_mid_avg)},
+          right_avg{std::move(other.right_avg)},
+          difference{std::move(other.difference)} {}
+
+    Data& operator=(Data other) {
+        using std::swap;
+        swap(*this, other);
+        return *this;
+    }
+
     // the points of the laser on the marking
     std::vector<cv::Point_<T>> center_points;
 

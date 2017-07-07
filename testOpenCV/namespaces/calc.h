@@ -763,7 +763,7 @@ namespace calc {
     template <typename T>
     double avg_y(std::vector<cv::Rect_<T>>& vec_rects) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
-        
+
         auto sum = 0.0;
 
         if (vec_rects.empty())
@@ -919,7 +919,7 @@ namespace calc {
      */
     template <typename T>
     double real_intensity_line(cv::Mat& image, std::vector<cv::Point_<T>>& output) {
-        
+
         auto cols = image.cols;
 
         cv::Rect_<T> cut_rect(0.0, 0.0, 1.0, image.rows);
@@ -927,7 +927,7 @@ namespace calc {
         stl::populate_x(output, cols);
 
         for (auto& v : output) {
-            
+
             cut_rect.x = v.x;
 
             auto B = cv::Mat(image, cut_rect);
@@ -1047,7 +1047,8 @@ namespace calc {
     template <typename T>
     T maxval(T a, T b) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
-        return max(a, b);
+        return a ^ ((a ^ b) & -(a < b)); // max(x, y)
+        //return max(a, b);
     }
 
     /** Brief Determines the highest of three values
@@ -1066,7 +1067,8 @@ namespace calc {
     template <typename T>
     double minval(T a, T b) {
         static_assert(std::is_compound<T>::value, "Wrong type.");
-        return a < b ? a : b;
+        return b ^ ((a ^ b) & -(a < b)); // min(x, y)
+        //return a < b ? a : b;
     }
 
     template <typename T1, typename T2, typename T3>
@@ -1095,4 +1097,29 @@ namespace calc {
         return s / mean * 100.0;
     }
 
+    template <typename T>
+    constexpr bool is_pow_2(T v) noexcept {
+        statis_assert(std::is_unsigned<T>::value, "Wrong type.");
+        return v && !(v & (v - 1));
+    }
+
+    template <typename T>
+    void swap(T& first, T& second) noexcept {
+        first ^= second;
+        second ^= first;
+        first ^= second;
+    }
+
+    template <typename T>
+    uint_fast64_t swap_bits(uint_fast64_t first_pos, uint_fast64_t second_pos, T bit_amount, uint_fast64_t bits) {
+        static_assert(std::is_unsigned<T>::value, "Wrong type.");
+        unsigned long x = ((bits >> first_pos) ^ (bits >> second_pos)) & ((1U << bit_amount) - 1); // XOR temporary
+        return bits ^ ((x << first_pos) | (x << second_pos));
+    }
+
+    template <typename T>
+    T abs(T v) {
+        int const mask = v >> sizeof(int) * CHAR_BIT - 1;
+        return (v ^ mask) - mask;
+    }
 }

@@ -15,6 +15,23 @@ class Frames {
 
 public:
 
+    Frames(const Frames& other) = delete;
+
+    Frames(Frames&& other) noexcept
+        : frames_(std::move(other.frames_)),
+          means_(std::move(other.means_)),
+          stddevs_(std::move(other.stddevs_)),
+          exp_ext_(std::move(other.exp_ext_)),
+          frame_size_(std::move(other.frame_size_)),
+          index_(other.index_),
+          exp_ms_(other.exp_ms_) {}
+
+    Frames& operator=(Frames other) {
+        using std::swap;
+        swap(*this, other);
+        return *this;
+    }
+
     // the captured frames
     std::vector<cv::Mat> frames_;
 
