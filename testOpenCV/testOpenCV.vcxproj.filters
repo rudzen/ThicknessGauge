@@ -402,6 +402,7 @@
     <Text Include="GC2450M_attributes.txt" />
     <Text Include="CV\Doc_Simple.txt" />
     <Text Include="StaticMeasurements.txt" />
+    <Text Include="SeekerV1_25mm_measurements.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Vimba_Exposure_Control.PNG">
