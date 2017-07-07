@@ -1,0 +1,49 @@
+
+---------- MM_1_RUNS_15_.TXT
+[15:07:03]: diff from baseline: 9.536691
+[15:07:08]: diff from baseline: 6.291257
+[15:07:13]: diff from baseline: 10.473257
+[15:07:54]: diff from baseline: 9.198881
+[15:08:33]: diff from baseline: 9.180349
+[15:08:38]: diff from baseline: 10.442763
+[15:08:43]: diff from baseline: 10.401856
+[15:08:49]: diff from baseline: 9.648667
+[15:08:58]: diff from baseline: 9.670129
+[15:09:03]: diff from baseline: 9.163038
+[15:09:20]: diff from baseline: 9.053623
+[15:09:30]: diff from baseline: 9.041394
+[15:09:47]: diff from baseline: 8.228892
+[15:10:09]: diff from baseline: 9.362303
+[15:10:26]: diff from baseline: 9.008830
+
+---------- MM_1_RUNS_15_.TXT
+[15:07:03]: diff from baseline: 9.536691
+[15:07:08]: diff from baseline: 6.291257
+[15:07:13]: diff from baseline: 10.473257
+[15:07:54]: diff from baseline: 9.198881
+[15:08:33]: diff from baseline: 9.180349
+[15:08:38]: diff from baseline: 10.442763
+[15:08:43]: diff from baseline: 10.401856
+[15:08:49]: diff from baseline: 9.648667
+[15:08:58]: diff from baseline: 9.670129
+[15:09:03]: diff from baseline: 9.163038
+[15:09:20]: diff from baseline: 9.053623
+[15:09:30]: diff from baseline: 9.041394
+[15:09:47]: diff from baseline: 8.228892
+[15:10:09]: diff from baseline: 9.362303
+[15:10:26]: diff from baseline: 9.008830
+[15:52:33]: diff from baseline: 11.264757
+[15:52:39]: diff from baseline: 8.792780
+[15:52:45]: diff from baseline: 8.950831
+[15:52:51]: diff from baseline: 8.945926
+[15:53:01]: diff from baseline: 9.573717
+[15:53:11]: diff from baseline: 8.913859
+[15:53:26]: diff from baseline: 8.996851
+[15:53:31]: diff from baseline: 9.010875
+[15:53:37]: diff from baseline: 8.993828
+[15:53:43]: diff from baseline: 9.024649
+[15:53:49]: diff from baseline: 8.947552
+[15:53:54]: diff from baseline: 9.024831
+[15:54:01]: diff from baseline: 8.940188
+[15:54:06]: diff from baseline: 9.024306
+[15:54:12]: diff from baseline: 9.720626

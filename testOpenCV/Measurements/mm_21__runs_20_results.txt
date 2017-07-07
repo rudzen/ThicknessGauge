@@ -1,0 +1,22 @@
+
+---------- MM_21__RUNS_20_.TXT
+[10:49:54]: diff from baseline: 161.573331
+[10:49:58]: diff from baseline: 161.515291
+[10:50:01]: diff from baseline: 161.589083
+[10:50:04]: diff from baseline: 161.567994
+[10:50:07]: diff from baseline: 160.530515
+[10:50:11]: diff from baseline: 156.526201
+[10:50:14]: diff from baseline: 156.118686
+[10:50:18]: diff from baseline: 161.533816
+[10:50:21]: diff from baseline: 161.305592
+[10:50:24]: diff from baseline: 161.556166
+[10:50:28]: diff from baseline: 161.570567
+[10:50:31]: diff from baseline: 161.492762
+[10:50:34]: diff from baseline: 157.436198
+[10:50:38]: diff from baseline: 161.327968
+[10:50:41]: diff from baseline: 161.544404
+[10:50:44]: diff from baseline: 161.554162
+[10:50:48]: diff from baseline: 155.686953
+[10:50:51]: diff from baseline: 161.563410
+[10:50:55]: diff from baseline: 156.130707
+[10:50:58]: diff from baseline: 161.541344

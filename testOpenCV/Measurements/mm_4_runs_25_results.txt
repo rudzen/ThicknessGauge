@@ -1,0 +1,27 @@
+
+---------- MM_4_RUNS_25_.TXT
+[13:32:37]: diff from baseline: 30.431061
+[13:32:49]: diff from baseline: 30.622274
+[13:32:56]: diff from baseline: 28.726419
+[13:33:01]: diff from baseline: 30.850844
+[13:33:14]: diff from baseline: 30.453949
+[13:33:20]: diff from baseline: 30.609359
+[13:33:26]: diff from baseline: 30.588002
+[13:33:32]: diff from baseline: 30.509694
+[13:33:49]: diff from baseline: 30.509910
+[13:33:55]: diff from baseline: 30.547490
+[13:34:19]: diff from baseline: 28.996726
+[13:34:29]: diff from baseline: 30.021645
+[13:34:36]: diff from baseline: 30.370420
+[13:35:04]: diff from baseline: 30.497407
+[13:35:21]: diff from baseline: 29.060654
+[13:35:31]: diff from baseline: 30.011486
+[13:35:41]: diff from baseline: 29.933940
+[13:35:48]: diff from baseline: 30.463060
+[13:35:55]: diff from baseline: 30.510888
+[13:36:01]: diff from baseline: 30.546637
+[13:36:07]: diff from baseline: 30.512491
+[13:36:13]: diff from baseline: 30.547273
+[13:36:21]: diff from baseline: 30.498071
+[13:36:27]: diff from baseline: 30.626061
+[13:36:35]: diff from baseline: 30.465083

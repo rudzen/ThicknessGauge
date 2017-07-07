@@ -1,0 +1,12 @@
+
+---------- MM_20__RUNS_10_.TXT
+[10:46:46]: diff from baseline: 153.464215
+[10:46:49]: diff from baseline: 153.435529
+[10:46:52]: diff from baseline: 151.597151
+[10:46:55]: diff from baseline: 152.604269
+[10:46:58]: diff from baseline: 153.353928
+[10:47:01]: diff from baseline: 153.504131
+[10:47:04]: diff from baseline: 151.570777
+[10:47:07]: diff from baseline: 153.385541
+[10:47:10]: diff from baseline: 153.397754
+[10:47:13]: diff from baseline: 151.635187

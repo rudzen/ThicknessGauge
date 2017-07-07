@@ -1,0 +1,1460 @@
+[13:46:57]: Demo mode set.
+[13:46:57]: Getting basic camera information....
+[13:46:57]: Found 1 camera(s).
+[13:46:58]: Camera opened ok.
+[13:46:58]: Pixel format : Mono8
+[13:46:58]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:46:58]: Seeker initialize complete, took 1928724502 ns.
+[13:46:58]: Configuring phase one.
+[13:46:58]: Seeker::phase_one clearing the buffer.
+[13:46:58]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:46:59]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:46:59]: Running phase one.
+[13:46:59]: Exposure changed to 1000
+[13:46:59]: Seeker::phase_one filter processing..
+[13:46:59]: Seeker::phase_one canny processing..
+[13:46:59]: Seeker::phase_one houghline processing..
+[13:46:59]: Exposure changed to 2000
+[13:46:59]: Seeker::phase_one filter processing..
+[13:46:59]: Seeker::phase_one canny processing..
+[13:46:59]: Seeker::phase_one houghline processing..
+[13:46:59]: Exposure changed to 3000
+[13:46:59]: Seeker::phase_one filter processing..
+[13:46:59]: Seeker::phase_one canny processing..
+[13:46:59]: Seeker::phase_one houghline processing..
+[13:46:59]: Exposure changed to 4000
+[13:46:59]: Seeker::phase_one filter processing..
+[13:46:59]: Seeker::phase_one canny processing..
+[13:46:59]: Seeker::phase_one houghline processing..
+[13:46:59]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175, 0)]
+[13:46:59]: HoughLinesR::compute_borders right_roi: [26.25 x 256 from (1416.75, 0)]
+[13:46:59]: Scan complete.. took 302 ms.
+[13:46:59]: Seeker::phase_one avg calc..
+[13:46:59]: Seeker::phase_one avg calc..
+[13:46:59]: Seeker::phase_one  phase one finalize failures : 0
+[13:46:59]: Seeker::phase_one marking rect found : [268 x 256 from (1175, 0)]
+[13:46:59]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:46:59]: Seeker::compute phase one completed ok..
+[13:46:59]: Phase two configuration started..
+[13:46:59]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:46:59]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:46:59]: Phase two left begun..
+[13:46:59]: Exposure changed to 16000
+[13:46:59]: Phase two exposure detected.. 16000
+[13:46:59]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:46:59]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:46:59]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:46:59]: Seeker::phase_two_left clearing buffer..
+[13:46:59]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:46:59]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:46:59]: Exposure fetched 16000
+[13:46:59]: Exposure changed to 48000
+[13:47:00]: Seeker::phase_two_left offset_y + left_y : 1229.47
+[13:47:00]: left baseline: 1229.47
+[13:47:00]: Exposure fetched 48000
+[13:47:00]: Exposure changed to 16000
+[13:47:00]: Seeker::compute phase two left completed ok..
+[13:47:00]: Exposure fetched 16000
+[13:47:00]: Exposure changed to 8000
+[13:47:00]: Seeker::phase_three configuration started.
+[13:47:00]: Seeker::phase_three clearing buffer..
+[13:47:00]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:00]: Capture roi changed to [268 x 256 from (1175, 1006)]
+[13:47:00]: Seeker::phase_three configuration done.. capturing.
+[13:47:01]: Center point data gathering failures : 0
+[13:47:01]: Seeker::phase_three laser rectangles avg : [262.28 x 164.04 from (1.16, 20.72)]
+[13:47:01]: Seeker::phase_three raw laser avg from contained rect : 18.0252
+[13:47:01]: Seeker::phase_three + def_phase_one_roi_.y : 1024.03
+[13:47:01]: Seeker::phase_three + avg_laser_rect.y : 1044.75
+[13:47:01]: pdata->base_lines[1]: 1229.465323
+[13:47:01]: highest_total: 1044.745204
+[13:47:01]: diff from baseline: 184.720118
+[13:47:01]: Camera closed.
+[13:47:01]: Smooth operator >> 0
+[13:47:01]: Demo mode set.
+[13:47:01]: Getting basic camera information....
+[13:47:01]: Found 1 camera(s).
+[13:47:02]: Camera opened ok.
+[13:47:02]: Pixel format : Mono8
+[13:47:03]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:03]: Seeker initialize complete, took -2142673125 ns.
+[13:47:03]: Configuring phase one.
+[13:47:03]: Seeker::phase_one clearing the buffer.
+[13:47:03]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:03]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:03]: Running phase one.
+[13:47:03]: Exposure changed to 1000
+[13:47:03]: Seeker::phase_one filter processing..
+[13:47:03]: Seeker::phase_one canny processing..
+[13:47:03]: Seeker::phase_one houghline processing..
+[13:47:03]: Exposure changed to 2000
+[13:47:03]: Seeker::phase_one filter processing..
+[13:47:03]: Seeker::phase_one canny processing..
+[13:47:03]: Seeker::phase_one houghline processing..
+[13:47:03]: Exposure changed to 3000
+[13:47:03]: Seeker::phase_one filter processing..
+[13:47:03]: Seeker::phase_one canny processing..
+[13:47:03]: Seeker::phase_one houghline processing..
+[13:47:03]: Exposure changed to 4000
+[13:47:03]: Seeker::phase_one filter processing..
+[13:47:03]: Seeker::phase_one canny processing..
+[13:47:03]: Seeker::phase_one houghline processing..
+[13:47:03]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175, 0)]
+[13:47:03]: HoughLinesR::compute_borders right_roi: [26.25 x 256 from (1417, 0)]
+[13:47:03]: Scan complete.. took 316 ms.
+[13:47:03]: Seeker::phase_one avg calc..
+[13:47:03]: Seeker::phase_one avg calc..
+[13:47:03]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:03]: Seeker::phase_one marking rect found : [268.25 x 256 from (1175, 0)]
+[13:47:03]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:47:03]: Seeker::compute phase one completed ok..
+[13:47:03]: Phase two configuration started..
+[13:47:03]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:03]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:47:03]: Phase two left begun..
+[13:47:03]: Exposure changed to 16000
+[13:47:03]: Phase two exposure detected.. 16000
+[13:47:03]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:47:03]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:47:03]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:03]: Seeker::phase_two_left clearing buffer..
+[13:47:03]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:03]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:47:03]: Exposure fetched 16000
+[13:47:03]: Exposure changed to 48000
+[13:47:04]: Seeker::phase_two_left offset_y + left_y : 1229.44
+[13:47:04]: left baseline: 1229.44
+[13:47:04]: Exposure fetched 48000
+[13:47:04]: Exposure changed to 16000
+[13:47:04]: Seeker::compute phase two left completed ok..
+[13:47:04]: Exposure fetched 16000
+[13:47:04]: Exposure changed to 8000
+[13:47:04]: Seeker::phase_three configuration started.
+[13:47:04]: Seeker::phase_three clearing buffer..
+[13:47:04]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:04]: Capture roi changed to [269 x 256 from (1175, 1006)]
+[13:47:04]: Seeker::phase_three configuration done.. capturing.
+[13:47:05]: Center point data gathering failures : 0
+[13:47:05]: Seeker::phase_three laser rectangles avg : [259.32 x 136.12 from (1.08, 21.32)]
+[13:47:05]: Seeker::phase_three raw laser avg from contained rect : 17.0042
+[13:47:05]: Seeker::phase_three + def_phase_one_roi_.y : 1023
+[13:47:05]: Seeker::phase_three + avg_laser_rect.y : 1044.32
+[13:47:05]: pdata->base_lines[1]: 1229.443425
+[13:47:05]: highest_total: 1044.324233
+[13:47:05]: diff from baseline: 185.119193
+[13:47:05]: Camera closed.
+[13:47:05]: Smooth operator >> 0
+[13:47:05]: Demo mode set.
+[13:47:05]: Getting basic camera information....
+[13:47:05]: Found 1 camera(s).
+[13:47:06]: Camera opened ok.
+[13:47:06]: Pixel format : Mono8
+[13:47:07]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:07]: Seeker initialize complete, took -1922335135 ns.
+[13:47:07]: Configuring phase one.
+[13:47:07]: Seeker::phase_one clearing the buffer.
+[13:47:07]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:07]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:07]: Running phase one.
+[13:47:07]: Exposure changed to 1000
+[13:47:07]: Seeker::phase_one filter processing..
+[13:47:07]: Seeker::phase_one canny processing..
+[13:47:07]: Seeker::phase_one houghline processing..
+[13:47:07]: Exposure changed to 2000
+[13:47:07]: Seeker::phase_one filter processing..
+[13:47:07]: Seeker::phase_one canny processing..
+[13:47:07]: Seeker::phase_one houghline processing..
+[13:47:07]: Exposure changed to 3000
+[13:47:07]: Seeker::phase_one filter processing..
+[13:47:07]: Seeker::phase_one canny processing..
+[13:47:07]: Seeker::phase_one houghline processing..
+[13:47:07]: Exposure changed to 4000
+[13:47:07]: Seeker::phase_one filter processing..
+[13:47:07]: Seeker::phase_one canny processing..
+[13:47:07]: Seeker::phase_one houghline processing..
+[13:47:07]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175.33, 0)]
+[13:47:07]: HoughLinesR::compute_borders right_roi: [27.6 x 256 from (1416.4, 0)]
+[13:47:07]: Scan complete.. took 355 ms.
+[13:47:07]: Seeker::phase_one avg calc..
+[13:47:07]: Seeker::phase_one avg calc..
+[13:47:07]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:07]: Seeker::phase_one marking rect found : [268.667 x 256 from (1175.33, 0)]
+[13:47:07]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:47:07]: Seeker::compute phase one completed ok..
+[13:47:07]: Phase two configuration started..
+[13:47:07]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:07]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:47:07]: Phase two left begun..
+[13:47:07]: Exposure changed to 16000
+[13:47:07]: Phase two exposure detected.. 16000
+[13:47:07]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:47:07]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:47:07]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:07]: Seeker::phase_two_left clearing buffer..
+[13:47:07]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:07]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:47:07]: Exposure fetched 16000
+[13:47:07]: Exposure changed to 48000
+[13:47:08]: Seeker::phase_two_left offset_y + left_y : 1229.43
+[13:47:08]: left baseline: 1229.43
+[13:47:08]: Exposure fetched 48000
+[13:47:08]: Exposure changed to 16000
+[13:47:08]: Seeker::compute phase two left completed ok..
+[13:47:08]: Exposure fetched 16000
+[13:47:08]: Exposure changed to 8000
+[13:47:08]: Seeker::phase_three configuration started.
+[13:47:08]: Seeker::phase_three clearing buffer..
+[13:47:08]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:08]: Capture roi changed to [269 x 256 from (1175, 1006)]
+[13:47:08]: Seeker::phase_three configuration done.. capturing.
+[13:47:09]: Center point data gathering failures : 0
+[13:47:09]: Seeker::phase_three laser rectangles avg : [249.8 x 56.16 from (1.48, 20.08)]
+[13:47:09]: Seeker::phase_three raw laser avg from contained rect : 16.9695
+[13:47:09]: Seeker::phase_three + def_phase_one_roi_.y : 1022.97
+[13:47:09]: Seeker::phase_three + avg_laser_rect.y : 1043.05
+[13:47:09]: pdata->base_lines[1]: 1229.426885
+[13:47:09]: highest_total: 1043.049454
+[13:47:09]: diff from baseline: 186.377432
+[13:47:09]: Camera closed.
+[13:47:09]: Smooth operator >> 0
+[13:47:09]: Demo mode set.
+[13:47:09]: Getting basic camera information....
+[13:47:10]: Found 1 camera(s).
+[13:47:10]: Camera opened ok.
+[13:47:10]: Pixel format : Mono8
+[13:47:11]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:11]: Seeker initialize complete, took -1728652924 ns.
+[13:47:11]: Configuring phase one.
+[13:47:11]: Seeker::phase_one clearing the buffer.
+[13:47:11]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:11]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:11]: Running phase one.
+[13:47:11]: Exposure changed to 1000
+[13:47:11]: Seeker::phase_one filter processing..
+[13:47:11]: Seeker::phase_one canny processing..
+[13:47:11]: Seeker::phase_one houghline processing..
+[13:47:11]: Exposure changed to 2000
+[13:47:11]: Seeker::phase_one filter processing..
+[13:47:11]: Seeker::phase_one canny processing..
+[13:47:11]: Seeker::phase_one houghline processing..
+[13:47:11]: Exposure changed to 3000
+[13:47:11]: Seeker::phase_one filter processing..
+[13:47:11]: Seeker::phase_one canny processing..
+[13:47:11]: Seeker::phase_one houghline processing..
+[13:47:11]: Exposure changed to 4000
+[13:47:11]: Seeker::phase_one filter processing..
+[13:47:11]: Seeker::phase_one canny processing..
+[13:47:11]: Seeker::phase_one houghline processing..
+[13:47:11]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175.33, 0)]
+[13:47:11]: HoughLinesR::compute_borders right_roi: [26.25 x 256 from (1416.75, 0)]
+[13:47:11]: Scan complete.. took 302 ms.
+[13:47:11]: Seeker::phase_one avg calc..
+[13:47:11]: Seeker::phase_one avg calc..
+[13:47:11]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:11]: Seeker::phase_one marking rect found : [267.667 x 256 from (1175.33, 0)]
+[13:47:11]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:47:11]: Seeker::compute phase one completed ok..
+[13:47:11]: Phase two configuration started..
+[13:47:11]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:11]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:47:11]: Phase two left begun..
+[13:47:11]: Exposure changed to 16000
+[13:47:11]: Phase two exposure detected.. 16000
+[13:47:11]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:47:11]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:47:11]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:11]: Seeker::phase_two_left clearing buffer..
+[13:47:11]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:11]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:47:11]: Exposure fetched 16000
+[13:47:11]: Exposure changed to 48000
+[13:47:13]: Seeker::phase_two_left offset_y + left_y : 1229.45
+[13:47:13]: left baseline: 1229.45
+[13:47:13]: Exposure fetched 48000
+[13:47:13]: Exposure changed to 16000
+[13:47:13]: Seeker::compute phase two left completed ok..
+[13:47:13]: Exposure fetched 16000
+[13:47:13]: Exposure changed to 8000
+[13:47:13]: Seeker::phase_three configuration started.
+[13:47:13]: Seeker::phase_three clearing buffer..
+[13:47:13]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:13]: Capture roi changed to [268 x 256 from (1175, 1006)]
+[13:47:13]: Seeker::phase_three configuration done.. capturing.
+[13:47:13]: Center point data gathering failures : 0
+[13:47:13]: Seeker::phase_three laser rectangles avg : [252.08 x 77 from (1.48, 19.6)]
+[13:47:13]: Seeker::phase_three raw laser avg from contained rect : 17.7805
+[13:47:13]: Seeker::phase_three + def_phase_one_roi_.y : 1023.78
+[13:47:13]: Seeker::phase_three + avg_laser_rect.y : 1043.38
+[13:47:13]: pdata->base_lines[1]: 1229.446420
+[13:47:13]: highest_total: 1043.380471
+[13:47:13]: diff from baseline: 186.065949
+[13:47:13]: Camera closed.
+[13:47:13]: Smooth operator >> 0
+[13:47:13]: Demo mode set.
+[13:47:13]: Getting basic camera information....
+[13:47:14]: Found 1 camera(s).
+[13:47:14]: Camera opened ok.
+[13:47:14]: Pixel format : Mono8
+[13:47:15]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:15]: Seeker initialize complete, took -1536294049 ns.
+[13:47:15]: Configuring phase one.
+[13:47:15]: Seeker::phase_one clearing the buffer.
+[13:47:15]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:15]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:15]: Running phase one.
+[13:47:15]: Exposure changed to 1000
+[13:47:15]: Seeker::phase_one filter processing..
+[13:47:15]: Seeker::phase_one canny processing..
+[13:47:15]: Seeker::phase_one houghline processing..
+[13:47:15]: Exposure changed to 2000
+[13:47:15]: Seeker::phase_one filter processing..
+[13:47:15]: Seeker::phase_one canny processing..
+[13:47:15]: Seeker::phase_one houghline processing..
+[13:47:15]: Exposure changed to 3000
+[13:47:15]: Seeker::phase_one filter processing..
+[13:47:15]: Seeker::phase_one canny processing..
+[13:47:15]: Seeker::phase_one houghline processing..
+[13:47:15]: Exposure changed to 4000
+[13:47:15]: Seeker::phase_one filter processing..
+[13:47:15]: Seeker::phase_one canny processing..
+[13:47:15]: Seeker::phase_one houghline processing..
+[13:47:15]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175, 0)]
+[13:47:15]: HoughLinesR::compute_borders right_roi: [28.6667 x 256 from (1416.67, 0)]
+[13:47:15]: Scan complete.. took 302 ms.
+[13:47:15]: Seeker::phase_one avg calc..
+[13:47:15]: Seeker::phase_one avg calc..
+[13:47:15]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:15]: Seeker::phase_one marking rect found : [270.333 x 256 from (1175, 0)]
+[13:47:15]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:47:15]: Seeker::compute phase one completed ok..
+[13:47:15]: Phase two configuration started..
+[13:47:15]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:15]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:47:15]: Phase two left begun..
+[13:47:15]: Exposure changed to 16000
+[13:47:15]: Phase two exposure detected.. 16000
+[13:47:15]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:47:15]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:47:15]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:15]: Seeker::phase_two_left clearing buffer..
+[13:47:15]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:15]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:47:15]: Exposure fetched 16000
+[13:47:15]: Exposure changed to 48000
+[13:47:17]: Seeker::phase_two_left offset_y + left_y : 1229.43
+[13:47:17]: left baseline: 1229.43
+[13:47:17]: Exposure fetched 48000
+[13:47:17]: Exposure changed to 16000
+[13:47:17]: Seeker::compute phase two left completed ok..
+[13:47:17]: Exposure fetched 16000
+[13:47:17]: Exposure changed to 8000
+[13:47:17]: Seeker::phase_three configuration started.
+[13:47:17]: Seeker::phase_three clearing buffer..
+[13:47:17]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:17]: Capture roi changed to [271 x 256 from (1175, 1006)]
+[13:47:17]: Seeker::phase_three configuration done.. capturing.
+[13:47:17]: Center point data gathering failures : 0
+[13:47:17]: Seeker::phase_three laser rectangles avg : [250.92 x 64.04 from (1.12, 19)]
+[13:47:17]: Seeker::phase_three raw laser avg from contained rect : 18.1762
+[13:47:17]: Seeker::phase_three + def_phase_one_roi_.y : 1024.18
+[13:47:17]: Seeker::phase_three + avg_laser_rect.y : 1043.18
+[13:47:17]: pdata->base_lines[1]: 1229.428066
+[13:47:17]: highest_total: 1043.176245
+[13:47:17]: diff from baseline: 186.251820
+[13:47:17]: Camera closed.
+[13:47:17]: Smooth operator >> 0
+[13:47:17]: Demo mode set.
+[13:47:17]: Getting basic camera information....
+[13:47:18]: Found 1 camera(s).
+[13:47:18]: Camera opened ok.
+[13:47:18]: Pixel format : Mono8
+[13:47:19]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:19]: Seeker initialize complete, took -1332454890 ns.
+[13:47:19]: Configuring phase one.
+[13:47:19]: Seeker::phase_one clearing the buffer.
+[13:47:19]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:19]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:19]: Running phase one.
+[13:47:19]: Exposure changed to 1000
+[13:47:19]: Seeker::phase_one filter processing..
+[13:47:19]: Seeker::phase_one canny processing..
+[13:47:19]: Seeker::phase_one houghline processing..
+[13:47:19]: Exposure changed to 2000
+[13:47:19]: Seeker::phase_one filter processing..
+[13:47:19]: Seeker::phase_one canny processing..
+[13:47:19]: Seeker::phase_one houghline processing..
+[13:47:19]: Exposure changed to 3000
+[13:47:19]: Seeker::phase_one filter processing..
+[13:47:19]: Seeker::phase_one canny processing..
+[13:47:19]: Seeker::phase_one houghline processing..
+[13:47:19]: Exposure changed to 4000
+[13:47:19]: Seeker::phase_one filter processing..
+[13:47:19]: Seeker::phase_one canny processing..
+[13:47:19]: Seeker::phase_one houghline processing..
+[13:47:19]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175.33, 0)]
+[13:47:19]: HoughLinesR::compute_borders right_roi: [27.6 x 256 from (1416.4, 0)]
+[13:47:19]: Scan complete.. took 325 ms.
+[13:47:19]: Seeker::phase_one avg calc..
+[13:47:19]: Seeker::phase_one avg calc..
+[13:47:19]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:19]: Seeker::phase_one marking rect found : [268.667 x 256 from (1175.33, 0)]
+[13:47:19]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:47:19]: Seeker::compute phase one completed ok..
+[13:47:19]: Phase two configuration started..
+[13:47:19]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:19]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:47:19]: Phase two left begun..
+[13:47:19]: Exposure changed to 16000
+[13:47:19]: Phase two exposure detected.. 16000
+[13:47:19]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:47:19]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:47:19]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:19]: Seeker::phase_two_left clearing buffer..
+[13:47:19]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:19]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:47:19]: Exposure fetched 16000
+[13:47:19]: Exposure changed to 48000
+[13:47:21]: Seeker::phase_two_left offset_y + left_y : 1229.41
+[13:47:21]: left baseline: 1229.41
+[13:47:21]: Exposure fetched 48000
+[13:47:21]: Exposure changed to 16000
+[13:47:21]: Seeker::compute phase two left completed ok..
+[13:47:21]: Exposure fetched 16000
+[13:47:21]: Exposure changed to 8000
+[13:47:21]: Seeker::phase_three configuration started.
+[13:47:21]: Seeker::phase_three clearing buffer..
+[13:47:21]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:21]: Capture roi changed to [269 x 256 from (1175, 1006)]
+[13:47:21]: Seeker::phase_three configuration done.. capturing.
+[13:47:21]: Center point data gathering failures : 0
+[13:47:21]: Seeker::phase_three laser rectangles avg : [253.04 x 83.8 from (1.28, 19.36)]
+[13:47:21]: Seeker::phase_three raw laser avg from contained rect : 18.1052
+[13:47:21]: Seeker::phase_three + def_phase_one_roi_.y : 1024.11
+[13:47:21]: Seeker::phase_three + avg_laser_rect.y : 1043.47
+[13:47:21]: pdata->base_lines[1]: 1229.410012
+[13:47:21]: highest_total: 1043.465231
+[13:47:21]: diff from baseline: 185.944781
+[13:47:21]: Camera closed.
+[13:47:21]: Smooth operator >> 0
+[13:47:22]: Demo mode set.
+[13:47:22]: Getting basic camera information....
+[13:47:22]: Found 1 camera(s).
+[13:47:22]: Camera opened ok.
+[13:47:22]: Pixel format : Mono8
+[13:47:23]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:23]: Seeker initialize complete, took -1115631439 ns.
+[13:47:23]: Configuring phase one.
+[13:47:23]: Seeker::phase_one clearing the buffer.
+[13:47:23]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:23]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:23]: Running phase one.
+[13:47:23]: Exposure changed to 1000
+[13:47:23]: Seeker::phase_one filter processing..
+[13:47:23]: Seeker::phase_one canny processing..
+[13:47:23]: Seeker::phase_one houghline processing..
+[13:47:23]: Exposure changed to 2000
+[13:47:23]: Seeker::phase_one filter processing..
+[13:47:23]: Seeker::phase_one canny processing..
+[13:47:23]: Seeker::phase_one houghline processing..
+[13:47:23]: Exposure changed to 3000
+[13:47:23]: Seeker::phase_one filter processing..
+[13:47:23]: Seeker::phase_one canny processing..
+[13:47:23]: Seeker::phase_one houghline processing..
+[13:47:23]: Exposure changed to 4000
+[13:47:23]: Seeker::phase_one filter processing..
+[13:47:23]: Seeker::phase_one canny processing..
+[13:47:23]: Seeker::phase_one houghline processing..
+[13:47:23]: HoughLinesR::compute_borders left_roi: [8.25 x 256 from (1174.25, 0)]
+[13:47:23]: HoughLinesR::compute_borders right_roi: [28.6667 x 256 from (1416.33, 0)]
+[13:47:23]: Scan complete.. took 326 ms.
+[13:47:23]: Seeker::phase_one avg calc..
+[13:47:23]: Seeker::phase_one avg calc..
+[13:47:23]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:23]: Seeker::phase_one marking rect found : [270.75 x 256 from (1174.25, 0)]
+[13:47:23]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:47:23]: Seeker::compute phase one completed ok..
+[13:47:23]: Phase two configuration started..
+[13:47:23]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:23]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:47:23]: Phase two left begun..
+[13:47:23]: Exposure changed to 16000
+[13:47:23]: Phase two exposure detected.. 16000
+[13:47:23]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:47:23]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:47:23]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:23]: Seeker::phase_two_left clearing buffer..
+[13:47:23]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:24]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:47:24]: Exposure fetched 16000
+[13:47:24]: Exposure changed to 48000
+[13:47:25]: Seeker::phase_two_left offset_y + left_y : 1229.45
+[13:47:25]: left baseline: 1229.45
+[13:47:25]: Exposure fetched 48000
+[13:47:25]: Exposure changed to 16000
+[13:47:25]: Seeker::compute phase two left completed ok..
+[13:47:25]: Exposure fetched 16000
+[13:47:25]: Exposure changed to 8000
+[13:47:25]: Seeker::phase_three configuration started.
+[13:47:25]: Seeker::phase_three clearing buffer..
+[13:47:25]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:25]: Capture roi changed to [271 x 256 from (1174, 1006)]
+[13:47:25]: Seeker::phase_three configuration done.. capturing.
+[13:47:25]: Center point data gathering failures : 0
+[13:47:25]: Seeker::phase_three laser rectangles avg : [248.4 x 42.84 from (2.36, 19.92)]
+[13:47:25]: Seeker::phase_three raw laser avg from contained rect : 16.8779
+[13:47:25]: Seeker::phase_three + def_phase_one_roi_.y : 1022.88
+[13:47:25]: Seeker::phase_three + avg_laser_rect.y : 1042.8
+[13:47:25]: pdata->base_lines[1]: 1229.449439
+[13:47:25]: highest_total: 1042.797890
+[13:47:25]: diff from baseline: 186.651549
+[13:47:26]: Camera closed.
+[13:47:26]: Smooth operator >> 0
+[13:47:26]: Demo mode set.
+[13:47:26]: Getting basic camera information....
+[13:47:26]: Found 1 camera(s).
+[13:47:26]: Camera opened ok.
+[13:47:26]: Pixel format : Mono8
+[13:47:27]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:27]: Seeker initialize complete, took -859914219 ns.
+[13:47:27]: Configuring phase one.
+[13:47:27]: Seeker::phase_one clearing the buffer.
+[13:47:27]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:27]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:27]: Running phase one.
+[13:47:27]: Exposure changed to 1000
+[13:47:27]: Seeker::phase_one filter processing..
+[13:47:27]: Seeker::phase_one canny processing..
+[13:47:27]: Seeker::phase_one houghline processing..
+[13:47:27]: Exposure changed to 2000
+[13:47:27]: Seeker::phase_one filter processing..
+[13:47:27]: Seeker::phase_one canny processing..
+[13:47:27]: Seeker::phase_one houghline processing..
+[13:47:27]: Exposure changed to 3000
+[13:47:27]: Seeker::phase_one filter processing..
+[13:47:27]: Seeker::phase_one canny processing..
+[13:47:27]: Seeker::phase_one houghline processing..
+[13:47:27]: Exposure changed to 4000
+[13:47:27]: Seeker::phase_one filter processing..
+[13:47:27]: Seeker::phase_one canny processing..
+[13:47:27]: Seeker::phase_one houghline processing..
+[13:47:27]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175, 0)]
+[13:47:27]: HoughLinesR::compute_borders right_roi: [28.6667 x 256 from (1416.33, 0)]
+[13:47:27]: Scan complete.. took 321 ms.
+[13:47:27]: Seeker::phase_one avg calc..
+[13:47:27]: Seeker::phase_one avg calc..
+[13:47:27]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:27]: Seeker::phase_one marking rect found : [270 x 256 from (1175, 0)]
+[13:47:27]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:47:27]: Seeker::compute phase one completed ok..
+[13:47:27]: Phase two configuration started..
+[13:47:27]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:27]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:47:27]: Phase two left begun..
+[13:47:27]: Exposure changed to 16000
+[13:47:28]: Phase two exposure detected.. 16000
+[13:47:28]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:47:28]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:47:28]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:28]: Seeker::phase_two_left clearing buffer..
+[13:47:28]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:28]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:47:28]: Exposure fetched 16000
+[13:47:28]: Exposure changed to 48000
+[13:47:29]: Seeker::phase_two_left offset_y + left_y : 1229.44
+[13:47:29]: left baseline: 1229.44
+[13:47:29]: Exposure fetched 48000
+[13:47:29]: Exposure changed to 16000
+[13:47:29]: Seeker::compute phase two left completed ok..
+[13:47:29]: Exposure fetched 16000
+[13:47:29]: Exposure changed to 8000
+[13:47:29]: Seeker::phase_three configuration started.
+[13:47:29]: Seeker::phase_three clearing buffer..
+[13:47:29]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:29]: Capture roi changed to [270 x 256 from (1175, 1006)]
+[13:47:29]: Seeker::phase_three configuration done.. capturing.
+[13:47:29]: Center point data gathering failures : 0
+[13:47:29]: Seeker::phase_three laser rectangles avg : [249.88 x 57.24 from (1.4, 19.08)]
+[13:47:29]: Seeker::phase_three raw laser avg from contained rect : 17.9
+[13:47:29]: Seeker::phase_three + def_phase_one_roi_.y : 1023.9
+[13:47:29]: Seeker::phase_three + avg_laser_rect.y : 1042.98
+[13:47:29]: pdata->base_lines[1]: 1229.437443
+[13:47:29]: highest_total: 1042.979969
+[13:47:29]: diff from baseline: 186.457474
+[13:47:30]: Camera closed.
+[13:47:30]: Smooth operator >> 0
+[13:47:30]: Demo mode set.
+[13:47:30]: Getting basic camera information....
+[13:47:30]: Found 1 camera(s).
+[13:47:30]: Camera opened ok.
+[13:47:30]: Pixel format : Mono8
+[13:47:31]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:31]: Seeker initialize complete, took -630107533 ns.
+[13:47:31]: Configuring phase one.
+[13:47:31]: Seeker::phase_one clearing the buffer.
+[13:47:31]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:31]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:31]: Running phase one.
+[13:47:31]: Exposure changed to 1000
+[13:47:31]: Seeker::phase_one filter processing..
+[13:47:31]: Seeker::phase_one canny processing..
+[13:47:31]: Seeker::phase_one houghline processing..
+[13:47:31]: Exposure changed to 2000
+[13:47:31]: Seeker::phase_one filter processing..
+[13:47:31]: Seeker::phase_one canny processing..
+[13:47:31]: Seeker::phase_one houghline processing..
+[13:47:31]: Exposure changed to 3000
+[13:47:31]: Seeker::phase_one filter processing..
+[13:47:31]: Seeker::phase_one canny processing..
+[13:47:31]: Seeker::phase_one houghline processing..
+[13:47:31]: Exposure changed to 4000
+[13:47:31]: Seeker::phase_one filter processing..
+[13:47:31]: Seeker::phase_one canny processing..
+[13:47:31]: Seeker::phase_one houghline processing..
+[13:47:31]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175.33, 0)]
+[13:47:31]: HoughLinesR::compute_borders right_roi: [26.25 x 256 from (1417, 0)]
+[13:47:31]: Scan complete.. took 320 ms.
+[13:47:31]: Seeker::phase_one avg calc..
+[13:47:31]: Seeker::phase_one avg calc..
+[13:47:31]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:31]: Seeker::phase_one marking rect found : [267.917 x 256 from (1175.33, 0)]
+[13:47:31]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:47:31]: Seeker::compute phase one completed ok..
+[13:47:31]: Phase two configuration started..
+[13:47:31]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:32]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:47:32]: Phase two left begun..
+[13:47:32]: Exposure changed to 16000
+[13:47:32]: Phase two exposure detected.. 16000
+[13:47:32]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:47:32]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:47:32]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:32]: Seeker::phase_two_left clearing buffer..
+[13:47:32]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:32]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:47:32]: Exposure fetched 16000
+[13:47:32]: Exposure changed to 48000
+[13:47:33]: Seeker::phase_two_left offset_y + left_y : 1229.42
+[13:47:33]: left baseline: 1229.42
+[13:47:33]: Exposure fetched 48000
+[13:47:33]: Exposure changed to 16000
+[13:47:33]: Seeker::compute phase two left completed ok..
+[13:47:33]: Exposure fetched 16000
+[13:47:33]: Exposure changed to 8000
+[13:47:33]: Seeker::phase_three configuration started.
+[13:47:33]: Seeker::phase_three clearing buffer..
+[13:47:33]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:33]: Capture roi changed to [268 x 256 from (1175, 1006)]
+[13:47:33]: Seeker::phase_three configuration done.. capturing.
+[13:47:33]: Center point data gathering failures : 0
+[13:47:33]: Seeker::phase_three laser rectangles avg : [248.96 x 50.4 from (1.56, 19.12)]
+[13:47:33]: Seeker::phase_three raw laser avg from contained rect : 17.7415
+[13:47:33]: Seeker::phase_three + def_phase_one_roi_.y : 1023.74
+[13:47:33]: Seeker::phase_three + avg_laser_rect.y : 1042.86
+[13:47:33]: pdata->base_lines[1]: 1229.422378
+[13:47:33]: highest_total: 1042.861453
+[13:47:33]: diff from baseline: 186.560925
+[13:47:34]: Camera closed.
+[13:47:34]: Smooth operator >> 0
+[13:47:34]: Demo mode set.
+[13:47:34]: Getting basic camera information....
+[13:47:34]: Found 1 camera(s).
+[13:47:34]: Camera opened ok.
+[13:47:34]: Pixel format : Mono8
+[13:47:35]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:35]: Seeker initialize complete, took -388995050 ns.
+[13:47:35]: Configuring phase one.
+[13:47:35]: Seeker::phase_one clearing the buffer.
+[13:47:35]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:35]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:35]: Running phase one.
+[13:47:35]: Exposure changed to 1000
+[13:47:35]: Seeker::phase_one filter processing..
+[13:47:35]: Seeker::phase_one canny processing..
+[13:47:35]: Seeker::phase_one houghline processing..
+[13:47:35]: Exposure changed to 2000
+[13:47:35]: Seeker::phase_one filter processing..
+[13:47:35]: Seeker::phase_one canny processing..
+[13:47:35]: Seeker::phase_one houghline processing..
+[13:47:35]: Exposure changed to 3000
+[13:47:35]: Seeker::phase_one filter processing..
+[13:47:35]: Seeker::phase_one canny processing..
+[13:47:35]: Seeker::phase_one houghline processing..
+[13:47:35]: Exposure changed to 4000
+[13:47:36]: Seeker::phase_one filter processing..
+[13:47:36]: Seeker::phase_one canny processing..
+[13:47:36]: Seeker::phase_one houghline processing..
+[13:47:36]: HoughLinesR::compute_borders left_roi: [8.25 x 256 from (1174.25, 0)]
+[13:47:36]: HoughLinesR::compute_borders right_roi: [26.25 x 256 from (1417, 0)]
+[13:47:36]: Scan complete.. took 322 ms.
+[13:47:36]: Seeker::phase_one avg calc..
+[13:47:36]: Seeker::phase_one avg calc..
+[13:47:36]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:36]: Seeker::phase_one marking rect found : [269 x 256 from (1174.25, 0)]
+[13:47:36]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:47:36]: Seeker::compute phase one completed ok..
+[13:47:36]: Phase two configuration started..
+[13:47:36]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:36]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:47:36]: Phase two left begun..
+[13:47:36]: Exposure changed to 16000
+[13:47:36]: Phase two exposure detected.. 16000
+[13:47:36]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:47:36]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:47:36]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:36]: Seeker::phase_two_left clearing buffer..
+[13:47:36]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:36]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:47:36]: Exposure fetched 16000
+[13:47:36]: Exposure changed to 48000
+[13:47:37]: Seeker::phase_two_left offset_y + left_y : 1229.44
+[13:47:37]: left baseline: 1229.44
+[13:47:37]: Exposure fetched 48000
+[13:47:37]: Exposure changed to 16000
+[13:47:37]: Seeker::compute phase two left completed ok..
+[13:47:37]: Exposure fetched 16000
+[13:47:37]: Exposure changed to 8000
+[13:47:37]: Seeker::phase_three configuration started.
+[13:47:37]: Seeker::phase_three clearing buffer..
+[13:47:37]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:37]: Capture roi changed to [269 x 256 from (1174, 1006)]
+[13:47:37]: Seeker::phase_three configuration done.. capturing.
+[13:47:37]: Center point data gathering failures : 0
+[13:47:37]: Seeker::phase_three laser rectangles avg : [247.84 x 42.44 from (2.92, 20)]
+[13:47:37]: Seeker::phase_three raw laser avg from contained rect : 16.8026
+[13:47:37]: Seeker::phase_three + def_phase_one_roi_.y : 1022.8
+[13:47:37]: Seeker::phase_three + avg_laser_rect.y : 1042.8
+[13:47:37]: pdata->base_lines[1]: 1229.440405
+[13:47:37]: highest_total: 1042.802575
+[13:47:37]: diff from baseline: 186.637830
+[13:47:38]: Camera closed.
+[13:47:38]: Smooth operator >> 0
+[13:47:38]: Demo mode set.
+[13:47:38]: Getting basic camera information....
+[13:47:38]: Found 1 camera(s).
+[13:47:38]: Camera opened ok.
+[13:47:38]: Pixel format : Mono8
+[13:47:39]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:39]: Seeker initialize complete, took -146769755 ns.
+[13:47:39]: Configuring phase one.
+[13:47:39]: Seeker::phase_one clearing the buffer.
+[13:47:39]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:39]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:39]: Running phase one.
+[13:47:39]: Exposure changed to 1000
+[13:47:39]: Seeker::phase_one filter processing..
+[13:47:39]: Seeker::phase_one canny processing..
+[13:47:39]: Seeker::phase_one houghline processing..
+[13:47:39]: Exposure changed to 2000
+[13:47:39]: Seeker::phase_one filter processing..
+[13:47:39]: Seeker::phase_one canny processing..
+[13:47:39]: Seeker::phase_one houghline processing..
+[13:47:39]: Exposure changed to 3000
+[13:47:39]: Seeker::phase_one filter processing..
+[13:47:39]: Seeker::phase_one canny processing..
+[13:47:39]: Seeker::phase_one houghline processing..
+[13:47:39]: Exposure changed to 4000
+[13:47:40]: Seeker::phase_one filter processing..
+[13:47:40]: Seeker::phase_one canny processing..
+[13:47:40]: Seeker::phase_one houghline processing..
+[13:47:40]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175.33, 0)]
+[13:47:40]: HoughLinesR::compute_borders right_roi: [27.6 x 256 from (1416.6, 0)]
+[13:47:40]: Scan complete.. took 304 ms.
+[13:47:40]: Seeker::phase_one avg calc..
+[13:47:40]: Seeker::phase_one avg calc..
+[13:47:40]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:40]: Seeker::phase_one marking rect found : [268.867 x 256 from (1175.33, 0)]
+[13:47:40]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:47:40]: Seeker::compute phase one completed ok..
+[13:47:40]: Phase two configuration started..
+[13:47:40]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:40]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:47:40]: Phase two left begun..
+[13:47:40]: Exposure changed to 16000
+[13:47:40]: Phase two exposure detected.. 16000
+[13:47:40]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:47:40]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:47:40]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:40]: Seeker::phase_two_left clearing buffer..
+[13:47:40]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:40]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:47:40]: Exposure fetched 16000
+[13:47:40]: Exposure changed to 48000
+[13:47:41]: Seeker::phase_two_left offset_y + left_y : 1229.44
+[13:47:41]: left baseline: 1229.44
+[13:47:41]: Exposure fetched 48000
+[13:47:41]: Exposure changed to 16000
+[13:47:41]: Seeker::compute phase two left completed ok..
+[13:47:41]: Exposure fetched 16000
+[13:47:41]: Exposure changed to 8000
+[13:47:41]: Seeker::phase_three configuration started.
+[13:47:41]: Seeker::phase_three clearing buffer..
+[13:47:41]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:41]: Capture roi changed to [269 x 256 from (1175, 1006)]
+[13:47:41]: Seeker::phase_three configuration done.. capturing.
+[13:47:42]: Center point data gathering failures : 0
+[13:47:42]: Seeker::phase_three laser rectangles avg : [249.52 x 55.68 from (1.76, 20)]
+[13:47:42]: Seeker::phase_three raw laser avg from contained rect : 17.0185
+[13:47:42]: Seeker::phase_three + def_phase_one_roi_.y : 1023.02
+[13:47:42]: Seeker::phase_three + avg_laser_rect.y : 1043.02
+[13:47:42]: pdata->base_lines[1]: 1229.438716
+[13:47:42]: highest_total: 1043.018460
+[13:47:42]: diff from baseline: 186.420256
+[13:47:42]: Camera closed.
+[13:47:42]: Smooth operator >> 0
+[13:47:42]: Demo mode set.
+[13:47:42]: Getting basic camera information....
+[13:47:42]: Found 1 camera(s).
+[13:47:42]: Camera opened ok.
+[13:47:42]: Pixel format : Mono8
+[13:47:43]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:43]: Seeker initialize complete, took 102875722 ns.
+[13:47:43]: Configuring phase one.
+[13:47:43]: Seeker::phase_one clearing the buffer.
+[13:47:43]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:43]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:43]: Running phase one.
+[13:47:43]: Exposure changed to 1000
+[13:47:43]: Seeker::phase_one filter processing..
+[13:47:43]: Seeker::phase_one canny processing..
+[13:47:43]: Seeker::phase_one houghline processing..
+[13:47:43]: Exposure changed to 2000
+[13:47:43]: Seeker::phase_one filter processing..
+[13:47:43]: Seeker::phase_one canny processing..
+[13:47:43]: Seeker::phase_one houghline processing..
+[13:47:43]: Exposure changed to 3000
+[13:47:44]: Seeker::phase_one filter processing..
+[13:47:44]: Seeker::phase_one canny processing..
+[13:47:44]: Seeker::phase_one houghline processing..
+[13:47:44]: Exposure changed to 4000
+[13:47:44]: Seeker::phase_one filter processing..
+[13:47:44]: Seeker::phase_one canny processing..
+[13:47:44]: Seeker::phase_one houghline processing..
+[13:47:44]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1174.25, 0)]
+[13:47:44]: HoughLinesR::compute_borders right_roi: [26.25 x 256 from (1416.75, 0)]
+[13:47:44]: Scan complete.. took 323 ms.
+[13:47:44]: Seeker::phase_one avg calc..
+[13:47:44]: Seeker::phase_one avg calc..
+[13:47:44]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:44]: Seeker::phase_one marking rect found : [268.75 x 256 from (1174.25, 0)]
+[13:47:44]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:47:44]: Seeker::compute phase one completed ok..
+[13:47:44]: Phase two configuration started..
+[13:47:44]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:44]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:47:44]: Phase two left begun..
+[13:47:44]: Exposure changed to 16000
+[13:47:44]: Phase two exposure detected.. 16000
+[13:47:44]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:47:44]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:47:44]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:44]: Seeker::phase_two_left clearing buffer..
+[13:47:44]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:44]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:47:44]: Exposure fetched 16000
+[13:47:44]: Exposure changed to 48000
+[13:47:45]: Seeker::phase_two_left offset_y + left_y : 1229.43
+[13:47:45]: left baseline: 1229.43
+[13:47:45]: Exposure fetched 48000
+[13:47:45]: Exposure changed to 16000
+[13:47:45]: Seeker::compute phase two left completed ok..
+[13:47:45]: Exposure fetched 16000
+[13:47:45]: Exposure changed to 8000
+[13:47:45]: Seeker::phase_three configuration started.
+[13:47:45]: Seeker::phase_three clearing buffer..
+[13:47:45]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:45]: Capture roi changed to [269 x 256 from (1174, 1006)]
+[13:47:45]: Seeker::phase_three configuration done.. capturing.
+[13:47:46]: Center point data gathering failures : 0
+[13:47:46]: Seeker::phase_three laser rectangles avg : [247.12 x 35 from (2.88, 20)]
+[13:47:46]: Seeker::phase_three raw laser avg from contained rect : 16.7165
+[13:47:46]: Seeker::phase_three + def_phase_one_roi_.y : 1022.72
+[13:47:46]: Seeker::phase_three + avg_laser_rect.y : 1042.72
+[13:47:46]: pdata->base_lines[1]: 1229.430747
+[13:47:46]: highest_total: 1042.716519
+[13:47:46]: diff from baseline: 186.714228
+[13:47:46]: Camera closed.
+[13:47:46]: Smooth operator >> 0
+[13:47:46]: Demo mode set.
+[13:47:46]: Getting basic camera information....
+[13:47:46]: Found 1 camera(s).
+[13:47:46]: Camera opened ok.
+[13:47:46]: Pixel format : Mono8
+[13:47:47]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:47]: Seeker initialize complete, took 346778465 ns.
+[13:47:47]: Configuring phase one.
+[13:47:47]: Seeker::phase_one clearing the buffer.
+[13:47:47]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:47]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:47]: Running phase one.
+[13:47:47]: Exposure changed to 1000
+[13:47:47]: Seeker::phase_one filter processing..
+[13:47:47]: Seeker::phase_one canny processing..
+[13:47:47]: Seeker::phase_one houghline processing..
+[13:47:47]: Exposure changed to 2000
+[13:47:47]: Seeker::phase_one filter processing..
+[13:47:47]: Seeker::phase_one canny processing..
+[13:47:47]: Seeker::phase_one houghline processing..
+[13:47:48]: Exposure changed to 3000
+[13:47:48]: Seeker::phase_one filter processing..
+[13:47:48]: Seeker::phase_one canny processing..
+[13:47:48]: Seeker::phase_one houghline processing..
+[13:47:48]: Exposure changed to 4000
+[13:47:48]: Seeker::phase_one filter processing..
+[13:47:48]: Seeker::phase_one canny processing..
+[13:47:48]: Seeker::phase_one houghline processing..
+[13:47:48]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175, 0)]
+[13:47:48]: HoughLinesR::compute_borders right_roi: [29.75 x 256 from (1415.75, 0)]
+[13:47:48]: Scan complete.. took 301 ms.
+[13:47:48]: Seeker::phase_one avg calc..
+[13:47:48]: Seeker::phase_one avg calc..
+[13:47:48]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:48]: Seeker::phase_one marking rect found : [270.5 x 256 from (1175, 0)]
+[13:47:48]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:47:48]: Seeker::compute phase one completed ok..
+[13:47:48]: Phase two configuration started..
+[13:47:48]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:48]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:47:48]: Phase two left begun..
+[13:47:48]: Exposure changed to 16000
+[13:47:48]: Phase two exposure detected.. 16000
+[13:47:48]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:47:48]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:47:48]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:48]: Seeker::phase_two_left clearing buffer..
+[13:47:48]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:48]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:47:48]: Exposure fetched 16000
+[13:47:48]: Exposure changed to 48000
+[13:47:49]: Seeker::phase_two_left offset_y + left_y : 1229.45
+[13:47:49]: left baseline: 1229.45
+[13:47:49]: Exposure fetched 48000
+[13:47:49]: Exposure changed to 16000
+[13:47:49]: Seeker::compute phase two left completed ok..
+[13:47:49]: Exposure fetched 16000
+[13:47:49]: Exposure changed to 8000
+[13:47:49]: Seeker::phase_three configuration started.
+[13:47:49]: Seeker::phase_three clearing buffer..
+[13:47:49]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:49]: Capture roi changed to [271 x 256 from (1175, 1006)]
+[13:47:49]: Seeker::phase_three configuration done.. capturing.
+[13:47:50]: Center point data gathering failures : 0
+[13:47:50]: Seeker::phase_three laser rectangles avg : [247 x 35 from (2, 20)]
+[13:47:50]: Seeker::phase_three raw laser avg from contained rect : 16.7237
+[13:47:50]: Seeker::phase_three + def_phase_one_roi_.y : 1022.72
+[13:47:50]: Seeker::phase_three + avg_laser_rect.y : 1042.72
+[13:47:50]: pdata->base_lines[1]: 1229.445399
+[13:47:50]: highest_total: 1042.723731
+[13:47:50]: diff from baseline: 186.721668
+[13:47:50]: Camera closed.
+[13:47:50]: Smooth operator >> 0
+[13:47:50]: Demo mode set.
+[13:47:50]: Getting basic camera information....
+[13:47:50]: Found 1 camera(s).
+[13:47:51]: Camera opened ok.
+[13:47:51]: Pixel format : Mono8
+[13:47:51]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:51]: Seeker initialize complete, took 614678691 ns.
+[13:47:51]: Configuring phase one.
+[13:47:51]: Seeker::phase_one clearing the buffer.
+[13:47:51]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:51]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:51]: Running phase one.
+[13:47:51]: Exposure changed to 1000
+[13:47:51]: Seeker::phase_one filter processing..
+[13:47:51]: Seeker::phase_one canny processing..
+[13:47:51]: Seeker::phase_one houghline processing..
+[13:47:51]: Exposure changed to 2000
+[13:47:52]: Seeker::phase_one filter processing..
+[13:47:52]: Seeker::phase_one canny processing..
+[13:47:52]: Seeker::phase_one houghline processing..
+[13:47:52]: Exposure changed to 3000
+[13:47:52]: Seeker::phase_one filter processing..
+[13:47:52]: Seeker::phase_one canny processing..
+[13:47:52]: Seeker::phase_one houghline processing..
+[13:47:52]: Exposure changed to 4000
+[13:47:52]: Seeker::phase_one filter processing..
+[13:47:52]: Seeker::phase_one canny processing..
+[13:47:52]: Seeker::phase_one houghline processing..
+[13:47:52]: HoughLinesR::compute_borders left_roi: [5.16667 x 256 from (1175.33, 0)]
+[13:47:52]: HoughLinesR::compute_borders right_roi: [29.75 x 256 from (1415.75, 0)]
+[13:47:52]: Scan complete.. took 307 ms.
+[13:47:52]: Seeker::phase_one avg calc..
+[13:47:52]: Seeker::phase_one avg calc..
+[13:47:52]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:52]: Seeker::phase_one marking rect found : [270.167 x 256 from (1175.33, 0)]
+[13:47:52]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:47:52]: Seeker::compute phase one completed ok..
+[13:47:52]: Phase two configuration started..
+[13:47:52]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:52]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:47:52]: Phase two left begun..
+[13:47:52]: Exposure changed to 16000
+[13:47:52]: Phase two exposure detected.. 16000
+[13:47:52]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:47:52]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:47:52]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:52]: Seeker::phase_two_left clearing buffer..
+[13:47:52]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:52]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:47:52]: Exposure fetched 16000
+[13:47:52]: Exposure changed to 48000
+[13:47:53]: Seeker::phase_two_left offset_y + left_y : 1229.45
+[13:47:53]: left baseline: 1229.45
+[13:47:53]: Exposure fetched 48000
+[13:47:53]: Exposure changed to 16000
+[13:47:53]: Seeker::compute phase two left completed ok..
+[13:47:53]: Exposure fetched 16000
+[13:47:53]: Exposure changed to 8000
+[13:47:53]: Seeker::phase_three configuration started.
+[13:47:53]: Seeker::phase_three clearing buffer..
+[13:47:53]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:53]: Capture roi changed to [271 x 256 from (1175, 1006)]
+[13:47:53]: Seeker::phase_three configuration done.. capturing.
+[13:47:54]: Center point data gathering failures : 0
+[13:47:54]: Seeker::phase_three laser rectangles avg : [247 x 34.96 from (2, 20.04)]
+[13:47:54]: Seeker::phase_three raw laser avg from contained rect : 16.6873
+[13:47:54]: Seeker::phase_three + def_phase_one_roi_.y : 1022.69
+[13:47:54]: Seeker::phase_three + avg_laser_rect.y : 1042.73
+[13:47:54]: pdata->base_lines[1]: 1229.445211
+[13:47:54]: highest_total: 1042.727265
+[13:47:54]: diff from baseline: 186.717946
+[13:47:54]: Camera closed.
+[13:47:54]: Smooth operator >> 0
+[13:47:54]: Demo mode set.
+[13:47:54]: Getting basic camera information....
+[13:47:54]: Found 1 camera(s).
+[13:47:55]: Camera opened ok.
+[13:47:55]: Pixel format : Mono8
+[13:47:55]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:55]: Seeker initialize complete, took 867584085 ns.
+[13:47:55]: Configuring phase one.
+[13:47:55]: Seeker::phase_one clearing the buffer.
+[13:47:55]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:55]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:55]: Running phase one.
+[13:47:55]: Exposure changed to 1000
+[13:47:55]: Seeker::phase_one filter processing..
+[13:47:55]: Seeker::phase_one canny processing..
+[13:47:55]: Seeker::phase_one houghline processing..
+[13:47:56]: Exposure changed to 2000
+[13:47:56]: Seeker::phase_one filter processing..
+[13:47:56]: Seeker::phase_one canny processing..
+[13:47:56]: Seeker::phase_one houghline processing..
+[13:47:56]: Exposure changed to 3000
+[13:47:56]: Seeker::phase_one filter processing..
+[13:47:56]: Seeker::phase_one canny processing..
+[13:47:56]: Seeker::phase_one houghline processing..
+[13:47:56]: Exposure changed to 4000
+[13:47:56]: Seeker::phase_one filter processing..
+[13:47:56]: Seeker::phase_one canny processing..
+[13:47:56]: Seeker::phase_one houghline processing..
+[13:47:56]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175.25, 0)]
+[13:47:56]: HoughLinesR::compute_borders right_roi: [29.75 x 256 from (1415.75, 0)]
+[13:47:56]: Scan complete.. took 300 ms.
+[13:47:56]: Seeker::phase_one avg calc..
+[13:47:56]: Seeker::phase_one avg calc..
+[13:47:56]: Seeker::phase_one  phase one finalize failures : 0
+[13:47:56]: Seeker::phase_one marking rect found : [270.25 x 256 from (1175.25, 0)]
+[13:47:56]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:47:56]: Seeker::compute phase one completed ok..
+[13:47:56]: Phase two configuration started..
+[13:47:56]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:56]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:47:56]: Phase two left begun..
+[13:47:56]: Exposure changed to 16000
+[13:47:56]: Phase two exposure detected.. 16000
+[13:47:56]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:47:56]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:47:56]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:47:56]: Seeker::phase_two_left clearing buffer..
+[13:47:56]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:56]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:47:56]: Exposure fetched 16000
+[13:47:56]: Exposure changed to 48000
+[13:47:57]: Seeker::phase_two_left offset_y + left_y : 1229.46
+[13:47:57]: left baseline: 1229.46
+[13:47:57]: Exposure fetched 48000
+[13:47:57]: Exposure changed to 16000
+[13:47:57]: Seeker::compute phase two left completed ok..
+[13:47:57]: Exposure fetched 16000
+[13:47:57]: Exposure changed to 8000
+[13:47:57]: Seeker::phase_three configuration started.
+[13:47:57]: Seeker::phase_three clearing buffer..
+[13:47:57]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:57]: Capture roi changed to [271 x 256 from (1175, 1006)]
+[13:47:57]: Seeker::phase_three configuration done.. capturing.
+[13:47:58]: Center point data gathering failures : 0
+[13:47:58]: Seeker::phase_three laser rectangles avg : [247 x 34.36 from (2, 20.64)]
+[13:47:58]: Seeker::phase_three raw laser avg from contained rect : 16.0996
+[13:47:58]: Seeker::phase_three + def_phase_one_roi_.y : 1022.1
+[13:47:58]: Seeker::phase_three + avg_laser_rect.y : 1042.74
+[13:47:58]: pdata->base_lines[1]: 1229.459251
+[13:47:58]: highest_total: 1042.739569
+[13:47:58]: diff from baseline: 186.719683
+[13:47:58]: Camera closed.
+[13:47:58]: Smooth operator >> 0
+[13:47:58]: Demo mode set.
+[13:47:58]: Getting basic camera information....
+[13:47:58]: Found 1 camera(s).
+[13:47:59]: Camera opened ok.
+[13:47:59]: Pixel format : Mono8
+[13:47:59]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:59]: Seeker initialize complete, took 1130000300 ns.
+[13:47:59]: Configuring phase one.
+[13:47:59]: Seeker::phase_one clearing the buffer.
+[13:47:59]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:47:59]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:47:59]: Running phase one.
+[13:47:59]: Exposure changed to 1000
+[13:48:00]: Seeker::phase_one filter processing..
+[13:48:00]: Seeker::phase_one canny processing..
+[13:48:00]: Seeker::phase_one houghline processing..
+[13:48:00]: Exposure changed to 2000
+[13:48:00]: Seeker::phase_one filter processing..
+[13:48:00]: Seeker::phase_one canny processing..
+[13:48:00]: Seeker::phase_one houghline processing..
+[13:48:00]: Exposure changed to 3000
+[13:48:00]: Seeker::phase_one filter processing..
+[13:48:00]: Seeker::phase_one canny processing..
+[13:48:00]: Seeker::phase_one houghline processing..
+[13:48:00]: Exposure changed to 4000
+[13:48:00]: Seeker::phase_one filter processing..
+[13:48:00]: Seeker::phase_one canny processing..
+[13:48:00]: Seeker::phase_one houghline processing..
+[13:48:00]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175.5, 0)]
+[13:48:00]: HoughLinesR::compute_borders right_roi: [27.6 x 256 from (1416.6, 0)]
+[13:48:00]: Scan complete.. took 320 ms.
+[13:48:00]: Seeker::phase_one avg calc..
+[13:48:00]: Seeker::phase_one avg calc..
+[13:48:00]: Seeker::phase_one  phase one finalize failures : 0
+[13:48:00]: Seeker::phase_one marking rect found : [268.7 x 256 from (1175.5, 0)]
+[13:48:00]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:48:00]: Seeker::compute phase one completed ok..
+[13:48:00]: Phase two configuration started..
+[13:48:00]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:00]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:48:00]: Phase two left begun..
+[13:48:00]: Exposure changed to 16000
+[13:48:00]: Phase two exposure detected.. 16000
+[13:48:00]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:48:00]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:48:00]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:48:00]: Seeker::phase_two_left clearing buffer..
+[13:48:00]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:00]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:48:00]: Exposure fetched 16000
+[13:48:00]: Exposure changed to 48000
+[13:48:01]: Seeker::phase_two_left offset_y + left_y : 1229.44
+[13:48:01]: left baseline: 1229.44
+[13:48:01]: Exposure fetched 48000
+[13:48:01]: Exposure changed to 16000
+[13:48:01]: Seeker::compute phase two left completed ok..
+[13:48:01]: Exposure fetched 16000
+[13:48:01]: Exposure changed to 8000
+[13:48:01]: Seeker::phase_three configuration started.
+[13:48:01]: Seeker::phase_three clearing buffer..
+[13:48:01]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:01]: Capture roi changed to [269 x 256 from (1175, 1006)]
+[13:48:01]: Seeker::phase_three configuration done.. capturing.
+[13:48:02]: Center point data gathering failures : 0
+[13:48:02]: Seeker::phase_three laser rectangles avg : [247 x 34.12 from (2, 20.96)]
+[13:48:02]: Seeker::phase_three raw laser avg from contained rect : 15.7775
+[13:48:02]: Seeker::phase_three + def_phase_one_roi_.y : 1021.78
+[13:48:02]: Seeker::phase_three + avg_laser_rect.y : 1042.74
+[13:48:02]: pdata->base_lines[1]: 1229.436574
+[13:48:02]: highest_total: 1042.737474
+[13:48:02]: diff from baseline: 186.699100
+[13:48:02]: Camera closed.
+[13:48:02]: Smooth operator >> 0
+[13:48:02]: Demo mode set.
+[13:48:02]: Getting basic camera information....
+[13:48:02]: Found 1 camera(s).
+[13:48:03]: Camera opened ok.
+[13:48:03]: Pixel format : Mono8
+[13:48:03]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:48:04]: Seeker initialize complete, took 1357988398 ns.
+[13:48:04]: Configuring phase one.
+[13:48:04]: Seeker::phase_one clearing the buffer.
+[13:48:04]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:04]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:48:04]: Running phase one.
+[13:48:04]: Exposure changed to 1000
+[13:48:04]: Seeker::phase_one filter processing..
+[13:48:04]: Seeker::phase_one canny processing..
+[13:48:04]: Seeker::phase_one houghline processing..
+[13:48:04]: Exposure changed to 2000
+[13:48:04]: Seeker::phase_one filter processing..
+[13:48:04]: Seeker::phase_one canny processing..
+[13:48:04]: Seeker::phase_one houghline processing..
+[13:48:04]: Exposure changed to 3000
+[13:48:04]: Seeker::phase_one filter processing..
+[13:48:04]: Seeker::phase_one canny processing..
+[13:48:04]: Seeker::phase_one houghline processing..
+[13:48:04]: Exposure changed to 4000
+[13:48:04]: Seeker::phase_one filter processing..
+[13:48:04]: Seeker::phase_one canny processing..
+[13:48:04]: Seeker::phase_one houghline processing..
+[13:48:04]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175.5, 0)]
+[13:48:04]: HoughLinesR::compute_borders right_roi: [27.6 x 256 from (1416.4, 0)]
+[13:48:04]: Scan complete.. took 321 ms.
+[13:48:04]: Seeker::phase_one avg calc..
+[13:48:04]: Seeker::phase_one avg calc..
+[13:48:04]: Seeker::phase_one  phase one finalize failures : 0
+[13:48:04]: Seeker::phase_one marking rect found : [268.5 x 256 from (1175.5, 0)]
+[13:48:04]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:48:04]: Seeker::compute phase one completed ok..
+[13:48:04]: Phase two configuration started..
+[13:48:04]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:04]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:48:04]: Phase two left begun..
+[13:48:04]: Exposure changed to 16000
+[13:48:04]: Phase two exposure detected.. 16000
+[13:48:04]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:48:04]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:48:04]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:48:04]: Seeker::phase_two_left clearing buffer..
+[13:48:04]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:04]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:48:04]: Exposure fetched 16000
+[13:48:04]: Exposure changed to 48000
+[13:48:05]: Seeker::phase_two_left offset_y + left_y : 1229.43
+[13:48:05]: left baseline: 1229.43
+[13:48:05]: Exposure fetched 48000
+[13:48:05]: Exposure changed to 16000
+[13:48:05]: Seeker::compute phase two left completed ok..
+[13:48:05]: Exposure fetched 16000
+[13:48:05]: Exposure changed to 8000
+[13:48:05]: Seeker::phase_three configuration started.
+[13:48:05]: Seeker::phase_three clearing buffer..
+[13:48:05]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:05]: Capture roi changed to [269 x 256 from (1175, 1006)]
+[13:48:05]: Seeker::phase_three configuration done.. capturing.
+[13:48:06]: Center point data gathering failures : 0
+[13:48:06]: Seeker::phase_three laser rectangles avg : [247.76 x 41.44 from (2, 20.88)]
+[13:48:06]: Seeker::phase_three raw laser avg from contained rect : 15.9546
+[13:48:06]: Seeker::phase_three + def_phase_one_roi_.y : 1021.95
+[13:48:06]: Seeker::phase_three + avg_laser_rect.y : 1042.83
+[13:48:06]: pdata->base_lines[1]: 1229.433818
+[13:48:06]: highest_total: 1042.834630
+[13:48:06]: diff from baseline: 186.599188
+[13:48:06]: Camera closed.
+[13:48:06]: Smooth operator >> 0
+[13:48:06]: Demo mode set.
+[13:48:06]: Getting basic camera information....
+[13:48:06]: Found 1 camera(s).
+[13:48:07]: Camera opened ok.
+[13:48:07]: Pixel format : Mono8
+[13:48:08]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:48:08]: Seeker initialize complete, took 1586100713 ns.
+[13:48:08]: Configuring phase one.
+[13:48:08]: Seeker::phase_one clearing the buffer.
+[13:48:08]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:08]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:48:08]: Running phase one.
+[13:48:08]: Exposure changed to 1000
+[13:48:08]: Seeker::phase_one filter processing..
+[13:48:08]: Seeker::phase_one canny processing..
+[13:48:08]: Seeker::phase_one houghline processing..
+[13:48:08]: Exposure changed to 2000
+[13:48:08]: Seeker::phase_one filter processing..
+[13:48:08]: Seeker::phase_one canny processing..
+[13:48:08]: Seeker::phase_one houghline processing..
+[13:48:08]: Exposure changed to 3000
+[13:48:08]: Seeker::phase_one filter processing..
+[13:48:08]: Seeker::phase_one canny processing..
+[13:48:08]: Seeker::phase_one houghline processing..
+[13:48:08]: Exposure changed to 4000
+[13:48:08]: Seeker::phase_one filter processing..
+[13:48:08]: Seeker::phase_one canny processing..
+[13:48:08]: Seeker::phase_one houghline processing..
+[13:48:08]: HoughLinesR::compute_borders left_roi: [7.8 x 256 from (1174.6, 0)]
+[13:48:08]: HoughLinesR::compute_borders right_roi: [28.6667 x 256 from (1416.67, 0)]
+[13:48:08]: Scan complete.. took 303 ms.
+[13:48:08]: Seeker::phase_one avg calc..
+[13:48:08]: Seeker::phase_one avg calc..
+[13:48:08]: Seeker::phase_one  phase one finalize failures : 0
+[13:48:08]: Seeker::phase_one marking rect found : [270.733 x 256 from (1174.6, 0)]
+[13:48:08]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:48:08]: Seeker::compute phase one completed ok..
+[13:48:08]: Phase two configuration started..
+[13:48:08]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:08]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:48:08]: Phase two left begun..
+[13:48:08]: Exposure changed to 16000
+[13:48:08]: Phase two exposure detected.. 16000
+[13:48:08]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:48:08]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:48:08]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:48:08]: Seeker::phase_two_left clearing buffer..
+[13:48:08]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:08]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:48:08]: Exposure fetched 16000
+[13:48:08]: Exposure changed to 48000
+[13:48:09]: Seeker::phase_two_left offset_y + left_y : 1229.44
+[13:48:09]: left baseline: 1229.44
+[13:48:09]: Exposure fetched 48000
+[13:48:09]: Exposure changed to 16000
+[13:48:09]: Seeker::compute phase two left completed ok..
+[13:48:09]: Exposure fetched 16000
+[13:48:09]: Exposure changed to 8000
+[13:48:09]: Seeker::phase_three configuration started.
+[13:48:09]: Seeker::phase_three clearing buffer..
+[13:48:09]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:09]: Capture roi changed to [271 x 256 from (1174, 1006)]
+[13:48:09]: Seeker::phase_three configuration done.. capturing.
+[13:48:10]: Center point data gathering failures : 0
+[13:48:10]: Seeker::phase_three laser rectangles avg : [247 x 37.08 from (3, 19.92)]
+[13:48:10]: Seeker::phase_three raw laser avg from contained rect : 16.7409
+[13:48:10]: Seeker::phase_three + def_phase_one_roi_.y : 1022.74
+[13:48:10]: Seeker::phase_three + avg_laser_rect.y : 1042.66
+[13:48:10]: pdata->base_lines[1]: 1229.438907
+[13:48:10]: highest_total: 1042.660880
+[13:48:10]: diff from baseline: 186.778027
+[13:48:10]: Camera closed.
+[13:48:10]: Smooth operator >> 0
+[13:48:10]: Demo mode set.
+[13:48:10]: Getting basic camera information....
+[13:48:10]: Found 1 camera(s).
+[13:48:11]: Camera opened ok.
+[13:48:11]: Pixel format : Mono8
+[13:48:12]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:48:12]: Seeker initialize complete, took 1849659497 ns.
+[13:48:12]: Configuring phase one.
+[13:48:12]: Seeker::phase_one clearing the buffer.
+[13:48:12]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:12]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:48:12]: Running phase one.
+[13:48:12]: Exposure changed to 1000
+[13:48:12]: Seeker::phase_one filter processing..
+[13:48:12]: Seeker::phase_one canny processing..
+[13:48:12]: Seeker::phase_one houghline processing..
+[13:48:12]: Exposure changed to 2000
+[13:48:12]: Seeker::phase_one filter processing..
+[13:48:12]: Seeker::phase_one canny processing..
+[13:48:12]: Seeker::phase_one houghline processing..
+[13:48:12]: Exposure changed to 3000
+[13:48:12]: Seeker::phase_one filter processing..
+[13:48:12]: Seeker::phase_one canny processing..
+[13:48:12]: Seeker::phase_one houghline processing..
+[13:48:12]: Exposure changed to 4000
+[13:48:12]: Seeker::phase_one filter processing..
+[13:48:12]: Seeker::phase_one canny processing..
+[13:48:12]: Seeker::phase_one houghline processing..
+[13:48:12]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175.25, 0)]
+[13:48:12]: HoughLinesR::compute_borders right_roi: [27.6 x 256 from (1416.6, 0)]
+[13:48:12]: Scan complete.. took 306 ms.
+[13:48:12]: Seeker::phase_one avg calc..
+[13:48:12]: Seeker::phase_one avg calc..
+[13:48:12]: Seeker::phase_one  phase one finalize failures : 0
+[13:48:12]: Seeker::phase_one marking rect found : [268.95 x 256 from (1175.25, 0)]
+[13:48:12]: phase two left region configured : [588 x 64 from (588, 1198)]
+[13:48:12]: Seeker::compute phase one completed ok..
+[13:48:12]: Phase two configuration started..
+[13:48:12]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:12]: Capture roi changed to [588 x 64 from (588, 1198)]
+[13:48:12]: Phase two left begun..
+[13:48:12]: Exposure changed to 16000
+[13:48:12]: Phase two exposure detected.. 16000
+[13:48:12]: Seeker::phase_two_left left boundry detected : [578 x 11 from (0, 27)]
+[13:48:12]: Seeker::phase_two_left new_roi changed to [578 x 11 from (588, 1225)]
+[13:48:12]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:48:12]: Seeker::phase_two_left clearing buffer..
+[13:48:12]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:12]: Capture roi changed to [578 x 11 from (588, 1225)]
+[13:48:12]: Exposure fetched 16000
+[13:48:12]: Exposure changed to 48000
+[13:48:13]: Seeker::phase_two_left offset_y + left_y : 1229.43
+[13:48:13]: left baseline: 1229.43
+[13:48:13]: Exposure fetched 48000
+[13:48:13]: Exposure changed to 16000
+[13:48:13]: Seeker::compute phase two left completed ok..
+[13:48:13]: Exposure fetched 16000
+[13:48:13]: Exposure changed to 8000
+[13:48:13]: Seeker::phase_three configuration started.
+[13:48:13]: Seeker::phase_three clearing buffer..
+[13:48:13]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:13]: Capture roi changed to [269 x 256 from (1175, 1006)]
+[13:48:13]: Seeker::phase_three configuration done.. capturing.
+[13:48:14]: Center point data gathering failures : 0
+[13:48:14]: Seeker::phase_three laser rectangles avg : [247 x 35 from (2, 21)]
+[13:48:14]: Seeker::phase_three raw laser avg from contained rect : 15.6862
+[13:48:14]: Seeker::phase_three + def_phase_one_roi_.y : 1021.69
+[13:48:14]: Seeker::phase_three + avg_laser_rect.y : 1042.69
+[13:48:14]: pdata->base_lines[1]: 1229.430226
+[13:48:14]: highest_total: 1042.686226
+[13:48:14]: diff from baseline: 186.744000
+[13:48:14]: Camera closed.
+[13:48:14]: Smooth operator >> 0
+[13:48:14]: Demo mode set.
+[13:48:14]: Getting basic camera information....
+[13:48:14]: Found 1 camera(s).
+[13:48:15]: Camera opened ok.
+[13:48:15]: Pixel format : Mono8
+[13:48:16]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:48:16]: Seeker initialize complete, took 2097501766 ns.
+[13:48:16]: Configuring phase one.
+[13:48:16]: Seeker::phase_one clearing the buffer.
+[13:48:16]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:16]: Capture roi changed to [2448 x 256 from (0, 1006)]
+[13:48:16]: Running phase one.
+[13:48:16]: Exposure changed to 1000
+[13:48:16]: Seeker::phase_one filter processing..
+[13:48:16]: Seeker::phase_one canny processing..
+[13:48:16]: Seeker::phase_one houghline processing..
+[13:48:16]: Exposure changed to 2000
+[13:48:16]: Seeker::phase_one filter processing..
+[13:48:16]: Seeker::phase_one canny processing..
+[13:48:16]: Seeker::phase_one houghline processing..
+[13:48:16]: Exposure changed to 3000
+[13:48:16]: Seeker::phase_one filter processing..
+[13:48:16]: Seeker::phase_one canny processing..
+[13:48:16]: Seeker::phase_one houghline processing..
+[13:48:16]: Exposure changed to 4000
+[13:48:16]: Seeker::phase_one filter processing..
+[13:48:16]: Seeker::phase_one canny processing..
+[13:48:16]: Seeker::phase_one houghline processing..
+[13:48:16]: HoughLinesR::compute_borders left_roi: [6 x 256 from (1175, 0)]
+[13:48:16]: HoughLinesR::compute_borders right_roi: [27.6 x 256 from (1416.4, 0)]
+[13:48:16]: Scan complete.. took 323 ms.
+[13:48:16]: Seeker::phase_one avg calc..
+[13:48:16]: Seeker::phase_one avg calc..
+[13:48:16]: Seeker::phase_one  phase one finalize failures : 0
+[13:48:16]: Seeker::phase_one marking rect found : [269 x 256 from (1175, 0)]
+[13:48:16]: phase two left region configured : [587 x 64 from (587, 1198)]
+[13:48:16]: Seeker::compute phase one completed ok..
+[13:48:16]: Phase two configuration started..
+[13:48:16]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:16]: Capture roi changed to [587 x 64 from (587, 1198)]
+[13:48:16]: Phase two left begun..
+[13:48:16]: Exposure changed to 16000
+[13:48:16]: Phase two exposure detected.. 16000
+[13:48:16]: Seeker::phase_two_left left boundry detected : [579 x 11 from (0, 27)]
+[13:48:16]: Seeker::phase_two_left new_roi changed to [579 x 11 from (587, 1225)]
+[13:48:16]: Seeker::phase_two_left init offset_y + new_roi.y : 1225
+[13:48:16]: Seeker::phase_two_left clearing buffer..
+[13:48:16]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:16]: Capture roi changed to [579 x 11 from (587, 1225)]
+[13:48:16]: Exposure fetched 16000
+[13:48:16]: Exposure changed to 48000
+[13:48:17]: Seeker::phase_two_left offset_y + left_y : 1229.44
+[13:48:17]: left baseline: 1229.44
+[13:48:17]: Exposure fetched 48000
+[13:48:17]: Exposure changed to 16000
+[13:48:17]: Seeker::compute phase two left completed ok..
+[13:48:17]: Exposure fetched 16000
+[13:48:17]: Exposure changed to 8000
+[13:48:17]: Seeker::phase_three configuration started.
+[13:48:17]: Seeker::phase_three clearing buffer..
+[13:48:17]: Capture roi changed to [1 x 1 from (1, 1)]
+[13:48:17]: Capture roi changed to [270 x 256 from (1175, 1006)]
+[13:48:17]: Seeker::phase_three configuration done.. capturing.
+[13:48:18]: Center point data gathering failures : 0
+[13:48:18]: Seeker::phase_three laser rectangles avg : [247 x 34.68 from (2, 21)]
+[13:48:18]: Seeker::phase_three raw laser avg from contained rect : 15.7148
+[13:48:18]: Seeker::phase_three + def_phase_one_roi_.y : 1021.71
+[13:48:18]: Seeker::phase_three + avg_laser_rect.y : 1042.71
+[13:48:18]: pdata->base_lines[1]: 1229.435112
+[13:48:18]: highest_total: 1042.714846
+[13:48:18]: diff from baseline: 186.720266
+[13:48:18]: Camera closed.
+[13:48:18]: Smooth operator >> 0

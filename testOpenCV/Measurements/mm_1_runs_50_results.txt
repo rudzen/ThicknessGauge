@@ -1,0 +1,6 @@
+
+---------- MM_1_RUNS_50_.TXT
+[10:48:56]: diff from baseline: 7.016942
+[10:51:01]: diff from baseline: 6.698218
+[10:54:34]: diff from baseline: 7.066481
+[11:01:16]: diff from baseline: 48.295565
