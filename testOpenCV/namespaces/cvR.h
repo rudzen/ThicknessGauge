@@ -341,8 +341,8 @@ namespace cvr {
     }
 
     /**
-     * \brief Forcefully aligns a rectangle x and y values
-     * Values can be negative because of float roundings.
+     * \brief Forcefully aligns a rectangle x and y values.
+     * Very useful for cv::minAreaRect which can produce negative values when elements are close to the edge.
      * \tparam T The type of rectangle
      * \tparam min_val The minimum value it should be
      * \param rect 

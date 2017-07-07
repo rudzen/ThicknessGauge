@@ -1066,7 +1066,7 @@ namespace calc {
 
     template <typename T>
     double minval(T a, T b) {
-        static_assert(std::is_compound<T>::value, "Wrong type.");
+        static_assert(std::is_integral<T>::value, "Wrong type.");
         return b ^ ((a ^ b) & -(a < b)); // min(x, y)
         //return a < b ? a : b;
     }
@@ -1090,6 +1090,14 @@ namespace calc {
         return (static_cast<unsigned int>(value) - static_cast<unsigned int>(lower) < static_cast<unsigned int>(upper) - static_cast<unsigned int>(lower));
     }
 
+    /**
+     * \brief Computer the variance coefficient
+     * \tparam T1 Type for s
+     * \tparam T2 Type for mean
+     * \param s s
+     * \param mean mean
+     * \return the variance coefficnent
+     */
     template <typename T1, typename T2>
     constexpr double variance_coeff(T1 s, T2 mean) {
         static_assert(std::is_same<T1, double>::value, "s must be double floating point.");
@@ -1097,19 +1105,41 @@ namespace calc {
         return s / mean * 100.0;
     }
 
+    /**
+     * \brief Determine if the parsed value is a power of two or not (v^2)
+     * \tparam T The type, only unsigned allowed
+     * \param v The value to check
+     * \return true if the value is a power of 2, otherwise false
+     */
     template <typename T>
     constexpr bool is_pow_2(T v) noexcept {
         statis_assert(std::is_unsigned<T>::value, "Wrong type.");
         return v && !(v & (v - 1));
     }
 
+    /**
+     * \brief Directly swaps two values in place.
+     * \tparam T Type of values to swap
+     * \param first The first value
+     * \param second The second value
+     */
     template <typename T>
     void swap(T& first, T& second) noexcept {
+        static_assert(std::is_integral<T>::value, "Wrong type.");
         first ^= second;
         second ^= first;
         first ^= second;
     }
 
+    /**
+     * \brief Swaps N amount of bits at specified locations
+     * \tparam T Type of how many bits to swap
+     * \param first_pos The first position
+     * \param second_pos The second position
+     * \param bit_amount The amount of bits to swap
+     * \param bits The word that contains the bits to be swapped
+     * \return Newly created word where the bits are swapped
+     */
     template <typename T>
     uint_fast64_t swap_bits(uint_fast64_t first_pos, uint_fast64_t second_pos, T bit_amount, uint_fast64_t bits) {
         static_assert(std::is_unsigned<T>::value, "Wrong type.");
@@ -1117,9 +1147,58 @@ namespace calc {
         return bits ^ ((x << first_pos) | (x << second_pos));
     }
 
+    /**
+     * \brief Computes the absolute value
+     * \tparam T Type of value, must be integral
+     * \param v The value
+     * \return The absolute value of v
+     */
     template <typename T>
     T abs(T v) {
+        static_assert(std::is_integral<T>::value, "Wrong type.");
         int const mask = v >> sizeof(int) * CHAR_BIT - 1;
         return (v ^ mask) - mask;
     }
+
+    /**
+     * \brief Sets or clears bits from a mask in a given word.
+     * \tparam T Type of mask
+     * \param condition if true, the bit(s) are set, otherwise cleared
+     * \param mask The mask to set or clear
+     * \param word The word where the bits should be set or cleared
+     * \return Newly formed word with indicated bit either set or cleared in
+     */
+    template <typename T>
+    uint_fast64_t set_or_clear(const bool condition, T mask, uint_fast64_t word) {
+        static_assert(std::is_integral<T>::value, "Wrong type.");
+        return word ^= (-condition ^ word) & mask;
+    }
+
+    /**
+     * \brief Negates an integral type
+     * \tparam T The type of value, must be integral
+     * \param value The value to negate
+     * \param condition If true, value is negated, otherwise it's not
+     * \return The value negated or not depending on condition
+     */
+    template <typename T>
+    T negate(T value, bool condition) {
+        static_assert(std::is_integral<T>::value, "Wrong type.");
+        return (value ^ -condition) + condition;
+    }
+
+    /**
+     * \brief Counts the number of bits set in a given bit word
+     * \tparam T Type of bit word
+     * \param v The bit word to count
+     * \return The number of bits counted
+     */
+    template <typename T>
+    int count_bits(T v) {
+        v = v - ((v >> 1) & static_cast<T>(~static_cast<T>(0)) / 3); // temp
+        v = (v & static_cast<T>(~static_cast<T>(0)) / 15 * 3) + ((v >> 2) & static_cast<T>(~static_cast<T>(0)) / 15 * 3); // temp
+        v = (v + (v >> 4)) & static_cast<T>(~static_cast<T>(0)) / 255 * 15; // temp
+        return static_cast<T>(v * (static_cast<T>(~static_cast<T>(0)) / 255)) >> (sizeof(T) - 1) * CHAR_BIT; // count
+    }
+
 }
