@@ -166,8 +166,10 @@ namespace cvr {
         static_assert(std::is_arithmetic<T>::value, "Wrong type.");
         static_assert(std::is_integral<T2>::value, "Wrong type.");
 
-        if (force_clear_output)
+        if (force_clear_output) {
             output.clear();
+            output.resize(boundry);
+        }
 
         // guard for invalid boundry
         if (boundry >= all_points.size()) {
@@ -175,7 +177,6 @@ namespace cvr {
             return;
         }
 
-        output.resize(boundry);
 
         if (ascending)
             sorter::sort_pixels_x_ascending(all_points);
@@ -183,8 +184,8 @@ namespace cvr {
             sorter::sort_pixels_x_descending(all_points);
 
         std::for_each(all_points.begin(), all_points.begin() + boundry, [&] (cv::Point_<T>& p) {
-            output.emplace_back(p);
-        });
+                      output.emplace_back(p);
+                  });
 
     }
 
