@@ -177,6 +177,7 @@ namespace cvr {
             return;
         }
 
+        //auto sor = ascending ? sorter::sort_pixels_x_ascending(all_points) : sorter::sort_pixels_x_descending(all_points);
 
         if (ascending)
             sorter::sort_pixels_x_ascending(all_points);
