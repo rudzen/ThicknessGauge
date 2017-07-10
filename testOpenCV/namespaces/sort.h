@@ -73,6 +73,11 @@ namespace sorter {
           });
     }
 
+    /**
+     * \brief Sorts a list of vectors in ascending order based on their angle
+     * \tparam T Type of vec
+     * \param vec_vecs The vector containing the vectors
+     */
     template <typename T>
     void sort_vec_by_angle_ascending(std::vector<cv::Vec<T, 4>>& vec_vecs) {
         static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
@@ -80,5 +85,19 @@ namespace sorter {
             return calc::angle_between_lines(v1[0], v1[2], v1[1], v1[3]) < calc::angle_between_lines(v2[0], v2[2], v2[1], v2[3]);
         });
     }
+
+    /**
+     * \brief Sorts a list of vectors in decending order based on their angle
+     * \tparam T Type of vec
+     * \param vec_vecs The vector containing the vectors
+     */
+    template <typename T>
+    void sort_vec_by_angle_descending(std::vector<cv::Vec<T, 4>>& vec_vecs) {
+        static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
+        std::sort(vec_vecs.begin(), vec_vecs.end(), [](const cv::Vec<T, 4>& v1, const cv::Vec<T, 4>& v2) {
+            return calc::angle_between_lines(v1[0], v1[2], v1[1], v1[3]) > calc::angle_between_lines(v2[0], v2[2], v2[1], v2[3]);
+        });
+    }
+
 
 }
