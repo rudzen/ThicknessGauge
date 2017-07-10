@@ -113,7 +113,19 @@ namespace ThicknessGaugeTest {
 
         }
 
+        TEST_METHOD(AngleBetweenPoints) {
+            
+            cv::Vec4d points(0.0, 2.0, 4.0, 4.0);
 
+            auto angle = calc::angle(points);
+
+            auto tolerance = calc::deg_to_rad(0.5);
+
+            auto expected = calc::deg_to_rad(45.0);
+
+            Assert::AreEqual(expected, angle, tolerance);
+
+        }
 
     };
 }

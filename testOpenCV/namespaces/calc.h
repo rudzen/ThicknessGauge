@@ -540,6 +540,44 @@ namespace calc {
     }
 
     /**
+     * \brief Computes the angle between two points (from OREGO)
+     * \tparam T Type of vector
+     * \param v1 The vector containing the two points
+     * \return The angle in RADIANS
+     */
+    template <typename T>
+    double angle(cv::Vec<T, 4>& v1) {
+        static_assert(std::is_arithmetic<T>::value, "Wrong type.");
+
+        double len_1 = sqrt(v1[0] * v1[0] + v1[1] * v1[1]);
+        double len_2 = sqrt(v1[2] * v1[2] + v1[3] * v1[3]);
+
+        double dot = v1[0] * v1[2] + v1[1] * v1[3];
+
+        auto a = dot / (len_1 * len_2);
+
+        if (a >= 1.0)
+            return 0.0;
+
+        if (a <= -1.0)
+            return PI;
+
+        return acos(a); // 0..PI
+    }
+
+    /**
+     * \brief Computes the angle between two points (from OREGO)
+     * \tparam T Type of points
+     * \param p1 The first point
+     * \param p2 The second point
+     * \return The angle between the points in RADIANS
+     */
+    template <typename T>
+    double angle(cv::Point_<T>& p1, cv::Point_<T>& p2) {
+        return angle(cv::Vec<T, 4>(p1.x, p1.y, p2.x, p2.y));
+    }
+
+    /**
      * @overload
      * \tparam T1 Type of line point one
      * \tparam T2 Type of line point two
@@ -590,6 +628,11 @@ namespace calc {
     double angle_inner_points(const cv::Point_<T>& p1, const cv::Point_<T>& p2, const cv::Point_<T>& c) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return angle_inner_points(p1.x, p2.x, c.x, p1.y, p2.y, c.y);
+    }
+
+    inline bool is_withing_margin(double angle_a, double angle_b, double acceptance_margin = 0.5) {
+        auto angle_deg = abs(rad_to_deg(angle_a) - rad_to_deg(angle_b));
+        return angle_deg <= acceptance_margin;
     }
 
     /**

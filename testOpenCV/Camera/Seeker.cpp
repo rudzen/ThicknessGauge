@@ -555,7 +555,7 @@ bool Seeker::phase_two_left() {
         // adjust to reduce crap
         //left_boundry_rect.width -= 40;
 
-        cvr::rect_force_align_boundries<float, 0>(boundry_area_rect, left_frames.front().cols, left_frames.front().rows);
+        cvr::rect_force_align_boundries<float, 0>(boundry_area_rect, static_cast<float>(left_frames.front().cols), static_cast<float>(left_frames.front().rows));
 
         if (!validate::validate_rect(boundry_area_rect)) {
             log_err << __FUNCTION__ << " invalid rect in phase two, restarting phase two.\n";
@@ -622,7 +622,7 @@ bool Seeker::phase_two_line() {
     // this results in this function being completly useless.
 
 
-    /* (left side illustration)
+    /* (left side illustration, very rough)
       
                     (height)
                     <->     
@@ -632,6 +632,37 @@ bool Seeker::phase_two_line() {
     -(ground)---/- /
                /  /
      */
+
+    /*
+     *  Outline of the process
+     *  ----------------------
+     *  
+     *  - The ground line is determined, and all the points are fitted to a line (a).
+     *  - The corresponding half of the line which represents the laser location is also fitted to a line (b).
+     *  - Line a and b are compared through log2 of last checked length, this will continue until either:
+     *      1) Line angles match
+     *      2) Line "distance" is five or less pixels in X, in which case the result is to unreliable
+     *  - If 1) is fulfilled, the height is measured from the different between the two lines. *
+     *  
+     *    
+     *     if the angles match, the height of the marking will be set to the distance from a to b.
+     *  - 
+     *
+     *  Line stuff references
+     *  ---------------------
+     *  - http://mathworld.wolfram.com/Line-LineAngle.html
+     *
+     * Issues:
+     *      
+     *  *) The angle measurement might not be good enough to get this.. so a slight margin of error set to .5 degrees
+     *      is accepted (see calc.h is_angle_good() function).
+     *      This also catches any rounding errors which occoured internaly in one of the many computations in the process.
+     *      The build-in angle measurement in opencv promises a error margin of not more than 0.3 degrees.
+     *
+     */
+
+    const double FUTILE_ACCEPTENCE = 0.5;
+
 
     log_time << __FUNCTION__ " started..\n";
 
@@ -663,7 +694,9 @@ bool Seeker::phase_two_line() {
     auto left_cutoff = phase_roi_[1].width / 2.0;
 
 
-    
+
+
+    return true;
 }
 
 
