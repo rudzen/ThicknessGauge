@@ -234,6 +234,7 @@ private: // internal functions
     bool phase_two_left();
 
     bool phase_two_right();
+    bool phase_two_line();
 
     bool phase_three();
 

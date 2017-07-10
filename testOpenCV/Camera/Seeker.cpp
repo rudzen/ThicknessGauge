@@ -613,6 +613,60 @@ bool Seeker::phase_two_right() {
 
 }
 
+bool Seeker::phase_two_line() {
+
+    // alternate version for phase two, contains computation for both sides.
+    // uses closest parallel match to counter misbehaviour of laser.
+
+    // note.. the angle detection might not be fine grained enough to detect < 0.3 degrees,
+    // this results in this function being completly useless.
+
+
+    /* (left side illustration)
+      
+                    (height)
+                    <->     
+                   /  /
+                  / -/-----(marking)----------------
+                 /  /
+    -(ground)---/- /
+               /  /
+     */
+
+    log_time << __FUNCTION__ " started..\n";
+
+    switch_phase();
+
+    std::vector<cv::Mat> left_frames;
+
+    // clear any buffer
+    pcapture->region(buffer_clear_roi);
+    pcapture->cap(3, left_frames);
+    left_frames.clear();
+
+    // prep for next phase
+    pcapture->region(phase_roi_[1]);
+
+    auto phase = frameset(current_phase_);
+
+    // make sure the minimum is at least 10 pixels.
+    auto min_line_len = calc::line::compute_houghp_min_line(10.0, pdata->marking_rect);
+
+    // horizontal houghline extension class
+    auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), false);
+
+    hough_horizontal->max_line_gab(12);
+
+    hough_horizontal->marking_rect(cv::Rect2d(phase_roi_[1].x, phase_roi_[1].y, phase_roi_[1].width, phase_roi_[1].height));
+
+    //auto left_size = cv::Size(left_baseline.width, left_baseline.height);
+    auto left_cutoff = phase_roi_[1].width / 2.0;
+
+
+    
+}
+
+
 bool Seeker::phase_three() {
 
     // gogo!
@@ -673,16 +727,17 @@ bool Seeker::phase_three() {
 
         for (auto i = frame_count; i--;) {
 
+            cv::Mat base_frame;
+
             try {
 
-                cv::Mat base_frame;
-
-                // TODO : replace with custom filter if needed
-                cv::bilateralFilter(frames[i], base_frame, 3, 20, 10);
-
-                threshold(base_frame, base_frame, binary_threshold, 255, CV_THRESH_BINARY);
-
-                GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
+                {
+                    // Highly experimental, could be improved?
+                    // TODO : replace with custom filter if needed
+                    cv::bilateralFilter(frames[i], base_frame, 3, 20, 10);
+                    threshold(base_frame, base_frame, binary_threshold, 255, CV_THRESH_BINARY);
+                    GaussianBlur(base_frame, base_frame, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
+                }
 
                 //cv::imwrite("_laser_" + std::to_string(i) + ".png", base_frame);
 

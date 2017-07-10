@@ -4,6 +4,7 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
+#include "CV/HoughLinesPR.h"
 
 namespace sorter {
 
@@ -70,6 +71,14 @@ namespace sorter {
         std::sort(vector.begin(), vector.end(), [](const cv::Point_<T> p1, const cv::Point_<T>& p2) {
               return p1.y > & p2.y;
           });
+    }
+
+    template <typename T>
+    void sort_vec_by_angle_ascending(std::vector<cv::Vec<T, 4>>& vec_vecs) {
+        static_assert(std::is_arithmetic<T>::value, "Incompatible type.");
+        std::sort(vec_vecs.begin(), vec_vecs.end(), [](const cv::Vec<T, 4>& v1, const cv::Vec<T, 4>& v2) {
+            return calc::angle_between_lines(v1[0], v1[2], v1[1], v1[3]) < calc::angle_between_lines(v2[0], v2[2], v2[1], v2[3]);
+        });
     }
 
 }

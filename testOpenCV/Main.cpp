@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
             //1173.33 x 256 from (695, 0)
             //e: 44000
 
-            auto do_zero = true;
+            auto do_zero = false;
 
             //[237 x 256 from (1168.25, 0) - 1 keramik
             cv::Rect_<unsigned long> zero_measure_mr(1169UL, 0UL, 237UL, 256UL);
