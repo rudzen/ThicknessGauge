@@ -1153,12 +1153,12 @@ namespace calc {
      * \param v The value
      * \return The absolute value of v
      */
-    template <typename T>
-    T abs(T v) {
-        static_assert(std::is_integral<T>::value, "Wrong type.");
-        int const mask = v >> sizeof(int) * CHAR_BIT - 1;
-        return (v ^ mask) - mask;
-    }
+    //template <typename T>
+    //T abs(T v) {
+    //    static_assert(std::is_integral<T>::value, "Wrong type.");
+    //    int const mask = v >> sizeof(int) * (CHAR_BIT - 1);
+    //    return (v ^ mask) - mask;
+    //}
 
     /**
      * \brief Sets or clears bits from a mask in a given word.

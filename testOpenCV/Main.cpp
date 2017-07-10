@@ -68,8 +68,6 @@ int main(int argc, char** argv) {
 
             auto seeker = std::make_shared<Seeker>();
 
-            auto do_zero = false;
-
             /* **********************************************************
              * To measure zero height, perform a regular height measure,
              * remove the thing that was measured, then input the resulting
@@ -80,8 +78,18 @@ int main(int argc, char** argv) {
             //1173.33 x 256 from (695, 0)
             //e: 44000
 
-            cv::Rect_<unsigned long> zero_measure_mr(695UL, 0UL, 1174UL, 256UL);
-            unsigned long phase_two_exposure = 44000;
+            auto do_zero = true;
+
+            //[237 x 256 from (1168.25, 0) - 1 keramik
+            cv::Rect_<unsigned long> zero_measure_mr(1169UL, 0UL, 237UL, 256UL);
+
+            // 5 vertikale keramik
+            //cv::Rect_<unsigned long> zero_measure_mr(695UL, 0UL, 1174UL, 256UL);
+
+            // must be defined from "recent" search as it could easily change!
+            unsigned long phase_two_exposure = 12000;
+
+
 
             //// determin camera or file storage
             if (glob_name == "camera") {
