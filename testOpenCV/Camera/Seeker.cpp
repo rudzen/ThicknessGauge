@@ -665,10 +665,6 @@ bool Seeker::phase_two_left() {
 
     }
 
-    //offset_y -= boundry_area_rect.y;
-
-    //log_time << __FUNCTION__ " offset_y - boundry_area_rect.y : " << offset_y << '\n';
-
     offset_y += left_y;
 
     log_time << __FUNCTION__ " offset_y + left_y : " << offset_y << '\n';
@@ -676,21 +672,25 @@ bool Seeker::phase_two_left() {
     pdata->base_lines[1] = offset_y;
 
     // align points the match the real location in the image.
-    for (auto& p : pdata->left_points)
+    for (auto& p : pdata->left_points) {
         p.y += offset_y;
+        std::cout << p << " - ";
+    }
+    std::cout << '\n';
 
-    log_time << "left baseline: " << pdata->base_lines[1] << endl;
+    log_time << "left baseline: " << pdata->base_lines[1] << '\n';
 
     // return exposure to "normal"
     pcapture->exposure_div(3);
 
+    // update the phase roi for left side
+    //phase_roi<int, 1>(line_area_rect);
+
     return true;
+
 
     // ************  RIGHT SIDE **************
 
-
-    // update the phase roi for left side
-    phase_roi<int, 1>(line_area_rect);
 
 
 }
@@ -869,7 +869,6 @@ bool Seeker::phase_three() {
 
         //log_time << __FUNCTION__ " - avg_laser_rect.height : " << highest_total << '\n';
 
-
         avg_height = 0.0;
 
         log_time << cv::format("pdata->base_lines[1]: %f\n", pdata->base_lines[1]);
@@ -881,9 +880,11 @@ bool Seeker::phase_three() {
         running = false;
 
         for (auto& p : pdata->center_points) {
-            p.y += avg_laser_rect.y;
-        //    std::cout << p << " - ";
+            p.y += avg_laser_rect.y + phase_3_roi.y; // should be correct
+            std::cout << p << " - ";
         }
+
+        std::cout << '\n';
 
     }
 

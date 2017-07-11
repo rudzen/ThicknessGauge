@@ -833,12 +833,24 @@ namespace calc {
         return (vec[1] + vec[3]) / 2.0;
     }
 
+    /**
+     * \brief Computes the average Y value of parsed 6-length vector
+     * \tparam T Type of vector
+     * \param vec The vector to compute average Y values from
+     * \return The average Y value
+     */
     template <typename T>
     double avg_y(cv::Vec<T, 6>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         return (vec[1] + vec[3] + vec[5]) * (1.0 / 3.0);
     }
 
+    /**
+     * \brief Computes the average X values of vectors within parsed vector
+     * \tparam T The type
+     * \param vec The vector containing the vectors to compute average X from
+     * \return The average of all vector X values
+     */
     template <typename T>
     double avg_x(std::vector<cv::Point_<T>>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");

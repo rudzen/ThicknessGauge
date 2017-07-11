@@ -108,7 +108,7 @@
  */
 
 
-constexpr int DEF_NEAR_EXTRACT = 20;
+constexpr int DEF_NEAR_EXTRACT = 5;
 
 class Seeker : public std::enable_shared_from_this<Seeker> {
 
@@ -246,6 +246,9 @@ private: // internal functions
 
     static int frameset(Phase phase);
 
+    /**
+    * \brief Initializes all sekker class data members
+    */
     bool initialize();
 
 
@@ -256,10 +259,5 @@ public:
     explicit Seeker(capture_roi phase_one_roi);
 
     bool compute(bool do_null, cv::Rect_<unsigned long>& marking_rect, unsigned long p2_base_exposure);
-
-    /**
- * \brief Initializes all sekker class data members
- */
-
 
 };
