@@ -36,14 +36,34 @@ class LineConfig {
     /**
      * \brief Sufficient accuracy for the angle. 0.01 would be a good default value for reps and aeps.
      */
-    double aepa_;
+    double aeps_;
 
 public:
     LineConfig(const cv::DistanceTypes distType, const double params, const double reps, const double aepa)
         : dist_type_(distType)
           , params_(params)
           , reps_(reps)
-          , aepa_(aepa) { }
+          , aeps_(aepa) { }
+
+    LineConfig(const LineConfig& other)
+        : dist_type_{other.dist_type_},
+          params_{other.params_},
+          reps_{other.reps_},
+          aeps_{other.aeps_} {}
+
+    LineConfig(LineConfig&& other) = delete;
+
+    LineConfig& operator=(const LineConfig& other) {
+        if (this == &other)
+            return *this;
+        dist_type_ = other.dist_type_;
+        params_ = other.params_;
+        reps_ = other.reps_;
+        aeps_ = other.aeps_;
+        return *this;
+    }
+
+    LineConfig& operator=(LineConfig&& other) = delete;
 
     /**
      * \brief Default configuration
@@ -52,7 +72,7 @@ public:
         : dist_type_(cv::DIST_L12)
           , params_(0.0)
           , reps_(0.01)
-          , aepa_(0.01) { }
+          , aeps_(0.01) { }
 
     cv::DistanceTypes dist_type() const {
         return dist_type_;
@@ -78,11 +98,11 @@ public:
         reps_ = reps;
     }
 
-    double aepa() const {
-        return aepa_;
+    double aeps() const {
+        return aeps_;
     }
 
-    void aepa(double aepa) {
-        aepa_ = aepa;
+    void aeps(double aepa) {
+        aeps_ = aepa;
     }
 };

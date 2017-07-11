@@ -250,6 +250,13 @@ namespace cvr {
         return cv::Vec<T, 2>(sum);
     }
 
+
+    template <typename T>
+    void fit_line(std::vector<cv::Point_<T>>& input, cv::Vec<float, 4>& output, LineConfig &config) {
+        cv::fitLine(input, output, config.dist_type(), config.params(), config.reps(), config.aeps());
+    }
+
+
     /**
      * \brief Gather all elements in vector of points that matches a specific X position
      * \tparam T1 Type of input points and X value

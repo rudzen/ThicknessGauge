@@ -121,7 +121,7 @@ namespace calc {
         template <typename T>
         bool compute_line_fitting(std::vector<cv::Point_<T>>& pixels, cv::Vec4f& result, LineConfig& config) {
             cv::Vec4f results;
-            cv::fitLine(pixels, results, config.dist_type(), config.params(), config.reps(), config.aepa());
+            cv::fitLine(pixels, results, config.dist_type(), config.params(), config.reps(), config.aeps());
             if (!validate::valid_vec<float, 4>(results))
                 return false;
             result = results;

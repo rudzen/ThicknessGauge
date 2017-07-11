@@ -106,6 +106,10 @@
  * - If a phase fails, the next phase will not proceed with failed attempts, since the roi is invalid.
  * 
  */
+
+
+constexpr int DEF_NEAR_EXTRACT = 20;
+
 class Seeker : public std::enable_shared_from_this<Seeker> {
 
 public:
@@ -238,11 +242,12 @@ private: // internal functions
 
     bool phase_three();
 
-    void phase_finalize();
+    double phase_finalize();
 
     static int frameset(Phase phase);
 
     bool initialize();
+
 
 public:
 

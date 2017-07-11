@@ -90,6 +90,85 @@ bool Seeker::initialize() {
 
 }
 
+double Seeker::phase_finalize() {
+
+
+    // alternate version for phase two, contains computation for both sides.
+    // uses closest parallel match to counter misbehaviour of laser.
+
+    // note.. the angle detection might not be fine grained enough to detect < 0.3 degrees,
+    // this results in this function being completly useless.
+
+
+    /* (left side illustration, very rough)
+      
+                    (height)
+                    <->     
+                   /  /
+                  / -/-----(marking)----------------
+                 /  /
+    -(ground)---/- /
+               /  /
+     */
+
+    /*
+     *  Outline of the process
+     *  ----------------------
+     *  
+     *  - The ground line is determined, and all the points are fitted to a line (a).
+     *  - The corresponding half of the line which represents the laser location is also fitted to a line (b).
+     *  - Line a and b are compared through log2 of last checked length, this will continue until either:
+     *      1) Line angles match
+     *      2) Line "distance" is five or less pixels in X, in which case the result is to unreliable
+     *  - If 1) is fulfilled, the height is measured from the different between the two lines. *
+     *  
+     *    
+     *     if the angles match, the height of the marking will be set to the distance from a to b.
+     *  - 
+     *
+     *  Line stuff references
+     *  ---------------------
+     *  - http://mathworld.wolfram.com/Line-LineAngle.html
+     *
+     * Issues:
+     *      
+     *  *) The angle measurement might not be good enough to get this.. so a slight margin of error set to .5 degrees
+     *      is accepted (see calc.h is_angle_good() function).
+     *      This also catches any rounding errors which occoured internaly in one of the many computations in the process.
+     *      The build-in angle measurement in opencv promises a error margin of not more than 0.3 degrees.
+     *
+     */
+
+    // line fitting outputs
+    cv::Vec4f line_ground;
+    cv::Vec4f line_marking;
+
+    // the point snips
+    std::vector<cv::Point2d> points_ground;
+    std::vector<cv::Point2d> points_marking;
+
+    points_ground.reserve(DEF_NEAR_EXTRACT);
+    points_marking.reserve(DEF_NEAR_EXTRACT);
+
+    cvr::extract_near<false, false>(pdata->center_points, points_marking, DEF_NEAR_EXTRACT);
+    cvr::extract_near<true, false>(pdata->left_points, points_ground, DEF_NEAR_EXTRACT);
+
+    LineConfig line_config;
+
+    line_config.dist_type(cv::DIST_L2);
+
+    cvr::fit_line(points_ground, line_ground, line_config);
+    cvr::fit_line(points_marking, line_marking, line_config);
+
+    // add offsets
+
+    auto avg_ground = calc::avg_y(line_ground);
+    auto avg_marking = calc::avg_y(line_marking);
+
+    return abs(avg_marking - avg_ground);
+
+}
+
 bool Seeker::shut_down() const {
     pcapture->aquisition_end();
     pcapture->cap_end();
@@ -615,51 +694,6 @@ bool Seeker::phase_two_right() {
 
 bool Seeker::phase_two_line() {
 
-    // alternate version for phase two, contains computation for both sides.
-    // uses closest parallel match to counter misbehaviour of laser.
-
-    // note.. the angle detection might not be fine grained enough to detect < 0.3 degrees,
-    // this results in this function being completly useless.
-
-
-    /* (left side illustration, very rough)
-      
-                    (height)
-                    <->     
-                   /  /
-                  / -/-----(marking)----------------
-                 /  /
-    -(ground)---/- /
-               /  /
-     */
-
-    /*
-     *  Outline of the process
-     *  ----------------------
-     *  
-     *  - The ground line is determined, and all the points are fitted to a line (a).
-     *  - The corresponding half of the line which represents the laser location is also fitted to a line (b).
-     *  - Line a and b are compared through log2 of last checked length, this will continue until either:
-     *      1) Line angles match
-     *      2) Line "distance" is five or less pixels in X, in which case the result is to unreliable
-     *  - If 1) is fulfilled, the height is measured from the different between the two lines. *
-     *  
-     *    
-     *     if the angles match, the height of the marking will be set to the distance from a to b.
-     *  - 
-     *
-     *  Line stuff references
-     *  ---------------------
-     *  - http://mathworld.wolfram.com/Line-LineAngle.html
-     *
-     * Issues:
-     *      
-     *  *) The angle measurement might not be good enough to get this.. so a slight margin of error set to .5 degrees
-     *      is accepted (see calc.h is_angle_good() function).
-     *      This also catches any rounding errors which occoured internaly in one of the many computations in the process.
-     *      The build-in angle measurement in opencv promises a error margin of not more than 0.3 degrees.
-     *
-     */
 
     const double FUTILE_ACCEPTENCE = 0.5;
 
@@ -692,8 +726,6 @@ bool Seeker::phase_two_line() {
 
     //auto left_size = cv::Size(left_baseline.width, left_baseline.height);
     auto left_cutoff = phase_roi_[1].width / 2.0;
-
-
 
 
     return true;
@@ -762,9 +794,7 @@ bool Seeker::phase_three() {
 
             cv::Mat base_frame;
 
-            try {
-
-                {
+            try { {
                     // Highly experimental, could be improved?
                     // TODO : replace with custom filter if needed
                     cv::bilateralFilter(frames[i], base_frame, 3, 20, 10);
