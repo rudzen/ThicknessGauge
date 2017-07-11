@@ -880,10 +880,10 @@ bool Seeker::phase_three() {
 
         running = false;
 
-        //for (auto& p : pdata->center_points) {
-        //    p.y += def_y;
+        for (auto& p : pdata->center_points) {
+            p.y += avg_laser_rect.y;
         //    std::cout << p << " - ";
-        //}
+        }
 
     }
 

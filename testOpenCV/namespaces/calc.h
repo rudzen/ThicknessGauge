@@ -775,7 +775,6 @@ namespace calc {
         return cv::Rect2d(tmp);
     }
 
-
     /**
      * \brief Calculates the avg of all the Y values in the vector of points
      * \tparam T The type of the points
