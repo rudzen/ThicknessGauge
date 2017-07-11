@@ -159,7 +159,7 @@ double Seeker::phase_finalize() {
 
     // set up the configuration for the line fitting
     LineConfig line_config;
-    line_config.dist_type(cv::DIST_L2);
+    line_config.dist_type(cv::DIST_HUBER);
 
     log_time << __FUNCTION__ << " fitting lines..\n";
 
@@ -167,17 +167,32 @@ double Seeker::phase_finalize() {
     cvr::fit_line(points_ground, line_ground, line_config);
     cvr::fit_line(points_marking, line_marking, line_config);
 
+    log_time << __FUNCTION__ << " angle of line_ground  : " << calc::rad_to_deg(calc::angle(line_ground)) << '\n';
+    log_time << __FUNCTION__ << " angle of line_marking : " << calc::rad_to_deg(calc::angle(line_marking)) << '\n';
+
     log_time << __FUNCTION__ << " computing difference: ";
+
+
+    auto diff = 0.0;
+
+    // doesn't work
+    //for (auto i = 0; i < DEF_NEAR_EXTRACT; i++) {
+    //    auto& g = points_ground[i];
+    //    auto& m = points_marking[i];
+    //    diff += g.y;
+    //    diff -= m.y;
+    //}
+    //diff /= DEF_NEAR_EXTRACT;
 
     // avg stuff
     auto avg_ground = calc::avg_y(line_ground);
     auto avg_marking = calc::avg_y(line_marking);
 
-    auto dif = abs(avg_marking - avg_ground);
+    diff = abs(avg_marking - avg_ground);
 
-    std::cout << dif << '\n';
+    std::cout << diff << '\n';
 
-    return dif;
+    return diff;
 }
 
 bool Seeker::shut_down() const {
@@ -592,7 +607,7 @@ bool Seeker::phase_two_left() {
     pcapture->region(new_roi);
 
     // double to exposure
-    pcapture->exposure_mul(3);
+    pcapture->exposure_mul(DEF_PHASE_TWO_MULTIPLIER);
 
     running = true;
 
@@ -674,14 +689,19 @@ bool Seeker::phase_two_left() {
     // align points the match the real location in the image.
     for (auto& p : pdata->left_points) {
         p.y += offset_y;
-        std::cout << p << " - ";
+        //std::cout << p << " - ";
     }
+
     std::cout << '\n';
+
+    const std::string ko = "_phase2_left.png";
+    // snap the freaking image
+    cv::imwrite(ko, left_frames.front());
 
     log_time << "left baseline: " << pdata->base_lines[1] << '\n';
 
     // return exposure to "normal"
-    pcapture->exposure_div(3);
+    pcapture->exposure_div(DEF_PHASE_TWO_MULTIPLIER);
 
     // update the phase roi for left side
     //phase_roi<int, 1>(line_area_rect);
@@ -741,7 +761,6 @@ bool Seeker::phase_two_line() {
 
     return true;
 }
-
 
 bool Seeker::phase_three() {
 
@@ -875,16 +894,22 @@ bool Seeker::phase_three() {
         log_time << cv::format("highest_total: %f\n", highest_total);
 
         pdata->difference = abs(pdata->base_lines[1] - highest_total);
-        log_time << cv::format("diff from baseline: %f\n", pdata->difference);
+        std::string dif = cv::format("diff from baseline: %f\n", pdata->difference);
+        log_err << dif;
+        std::cout << dif;
 
         running = false;
 
         for (auto& p : pdata->center_points) {
             p.y += avg_laser_rect.y + phase_3_roi.y; // should be correct
-            std::cout << p << " - ";
+            //std::cout << p << " - ";
         }
 
-        std::cout << '\n';
+        //std::cout << '\n';
+
+        const std::string ko = "_phase3_muhko.png";
+        // snap the freaking image
+        cv::imwrite(ko, frames.front());
 
     }
 
@@ -977,7 +1002,8 @@ bool Seeker::compute(bool do_null, cv::Rect_<unsigned long>& marking_rect, unsig
 
     auto near_height = phase_finalize();
 
-    log_time << __FUNCTION__ << " near_height : " << near_height << '\n';
+    std::cout << "near_height : " << near_height << '\n';
+    log_err << "near_height : " << near_height << '\n';
 
     return phase_complete;
 }

@@ -15,5 +15,6 @@ if %x% leq %fram% (
 )
 
 find "diff from baseline" mm_%mm%_runs_%fram%_.txt >> mm_%mm%_runs_%fram%_results.txt
+find "near_height" mm_%mm%_runs_%fram%_.txt >> mm_%mm%_runs_%fram%_results.txt
 
 endlocal

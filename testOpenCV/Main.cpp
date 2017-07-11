@@ -81,15 +81,13 @@ int main(int argc, char** argv) {
             auto do_zero = false;
 
             //[237 x 256 from (1168.25, 0) - 1 keramik
-            cv::Rect_<unsigned long> zero_measure_mr(1169UL, 0UL, 237UL, 256UL);
+            cv::Rect_<unsigned long> zero_measure_mr(1172UL, 0UL, 236UL, 256UL);
 
             // 5 vertikale keramik
             //cv::Rect_<unsigned long> zero_measure_mr(695UL, 0UL, 1174UL, 256UL);
 
             // must be defined from "recent" search as it could easily change!
-            unsigned long phase_two_exposure = 12000;
-
-
+            unsigned long phase_two_exposure = 10000;
 
             //// determin camera or file storage
             if (glob_name == "camera") {

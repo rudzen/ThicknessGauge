@@ -108,7 +108,14 @@
  */
 
 
-constexpr int DEF_NEAR_EXTRACT = 5;
+using ulong = unsigned long;
+
+using capture_roi = cv::Rect_<ulong>;
+
+constexpr int DEF_NEAR_EXTRACT = 20;
+
+constexpr ulong DEF_PHASE_TWO_MULTIPLIER = 3;
+
 
 class Seeker : public std::enable_shared_from_this<Seeker> {
 
@@ -120,9 +127,7 @@ public:
 
 private:
 
-    using ulong = unsigned long;
-
-    using capture_roi = cv::Rect_<ulong>;
+    using phase_t = Phase;
 
     /**
      * \brief Exposure seek configuration.
@@ -238,6 +243,7 @@ private: // internal functions
     bool phase_two_left();
 
     bool phase_two_right();
+
     bool phase_two_line();
 
     bool phase_three();
@@ -250,7 +256,6 @@ private: // internal functions
     * \brief Initializes all sekker class data members
     */
     bool initialize();
-
 
 public:
 
