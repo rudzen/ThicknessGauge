@@ -432,11 +432,14 @@ inline void CmdLine::add( Arg* a )
 
 inline void CmdLine::parse(int argc, const char * const * argv)
 {
-		// this step is necessary so that we have easy access to
-		// mutable strings.
+		// this step is necessary so that we have easy access to mutable strings.
 		std::vector<std::string> args;
+        args.reserve(argc);
 		for (int i = 0; i < argc; i++)
-			args.push_back(argv[i]);
+			args.emplace_back(argv[i]);
+
+        // convert the whole bejazz to lowercase
+        //std::transform(args.begin(), args.end(), args.begin(), std::tolower);
 
 		parse(args);
 }
