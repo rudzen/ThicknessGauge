@@ -831,7 +831,7 @@ namespace calc {
     double avg_y(cv::Vec<T, cn>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         static_assert(cn == 4, "avg_y only supports Vec<T, 4>");
-        return (vec[1] + vec[3]) * (1.0 / 2.0);
+        return (vec[1] + vec[3]) / 2.0;
     }
 
     template <typename T>
@@ -906,6 +906,19 @@ namespace calc {
         sum[1] /= vec.size();
 
         return cv::Vec2d(sum);
+    }
+
+    /**
+     * \brief Generates a simple random number (pseudo)
+     * \tparam T Type of value to produce
+     * \param min The min value
+     * \param max The max value
+     * \return Random number between min and max
+     */
+    template <typename T>
+    T rngeezuz(T min, T max) {
+        auto f = static_cast<T>(rand()) / RAND_MAX;
+        return min + f * (max - min);
     }
 
     /**

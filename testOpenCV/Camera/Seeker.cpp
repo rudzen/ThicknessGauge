@@ -146,27 +146,38 @@ double Seeker::phase_finalize() {
     // the point snips
     std::vector<cv::Point2d> points_ground;
     std::vector<cv::Point2d> points_marking;
-
     points_ground.reserve(DEF_NEAR_EXTRACT);
     points_marking.reserve(DEF_NEAR_EXTRACT);
 
+    log_time << __FUNCTION__ << " begin..\n";
+
+    // extract the values which are near the boundries to optain a very small sample.
     cvr::extract_near<false, false>(pdata->center_points, points_marking, DEF_NEAR_EXTRACT);
     cvr::extract_near<true, false>(pdata->left_points, points_ground, DEF_NEAR_EXTRACT);
 
-    LineConfig line_config;
+    log_time << __FUNCTION__ << cv::format(" points sizes extracted [ground:%i] [marking:%i]\n", points_ground.size(), points_marking.size());
 
+    // set up the configuration for the line fitting
+    LineConfig line_config;
     line_config.dist_type(cv::DIST_L2);
 
+    log_time << __FUNCTION__ << " fitting lines..\n";
+
+    // fit'em and git'em
     cvr::fit_line(points_ground, line_ground, line_config);
     cvr::fit_line(points_marking, line_marking, line_config);
 
-    // add offsets
+    log_time << __FUNCTION__ << " computing difference: ";
 
+    // avg stuff
     auto avg_ground = calc::avg_y(line_ground);
     auto avg_marking = calc::avg_y(line_marking);
 
-    return abs(avg_marking - avg_ground);
+    auto dif = abs(avg_marking - avg_ground);
 
+    std::cout << dif << '\n';
+
+    return dif;
 }
 
 bool Seeker::shut_down() const {
@@ -901,6 +912,8 @@ bool Seeker::compute(bool do_null, cv::Rect_<unsigned long>& marking_rect, unsig
         return false;
 
     auto phase_complete = false;
+
+    // check if its a null computation, if so apply stuff
     if (do_null) {
 
         if (!validate::validate_rect(marking_rect)) {
@@ -960,6 +973,10 @@ bool Seeker::compute(bool do_null, cv::Rect_<unsigned long>& marking_rect, unsig
     pcapture->close();
 
     pcapture->uninitialize();
+
+    auto near_height = phase_finalize();
+
+    log_time << __FUNCTION__ << " near_height : " << near_height << '\n';
 
     return phase_complete;
 }
