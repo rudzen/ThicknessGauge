@@ -72,16 +72,20 @@ int main(int argc, char** argv) {
              * To measure zero height, perform a regular height measure,
              * remove the thing that was measured, then input the resulting
              * marking rectangle in the zero_measure_mr rectangle.
-             * ALWAYS use the ceiling values, as they are more likely to be "correct"
+             * ALWAYS use the ceiling values, as they are more likely to be more "correct".
+             * 
+             * The current version of this software leaves the camera ROI where it last set it.
+             * Open up the camera software to check the current ROI, this should be the correct one.
              */
 
             //1173.33 x 256 from (695, 0)
             //e: 44000
 
+            // set to true if doing null-measurements
             auto do_zero = false;
 
-            //[237 x 256 from (1168.25, 0) - 1 keramik
-            cv::Rect_<unsigned long> zero_measure_mr(1172UL, 0UL, 236UL, 256UL);
+            // fx: [237 x 256 from (1168.25, 0) - 1 keramik
+            cv::Rect_<unsigned long> zero_measure_mr(1167UL, 0UL, 235UL, 256UL);
 
             // 5 vertikale keramik
             //cv::Rect_<unsigned long> zero_measure_mr(695UL, 0UL, 1174UL, 256UL);
