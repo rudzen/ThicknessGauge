@@ -83,9 +83,7 @@ class ZshCompletionOutput : public CmdLineOutput
 		char theDelimiter;
 };
 
-ZshCompletionOutput::ZshCompletionOutput()
-: common(std::map<std::string, std::string>()),
-  theDelimiter('=')
+ZshCompletionOutput::ZshCompletionOutput() : common(std::map<std::string, std::string>()), theDelimiter('=')
 {
 	common["host"] = "_hosts";
 	common["hostname"] = "_hosts";
@@ -118,9 +116,9 @@ inline void ZshCompletionOutput::usage(CmdLineInterface& _cmd )
 	for (ArgListIterator it = argList.begin(); it != argList.end(); it++)
 	{
 		if ( (*it)->shortID().at(0) == '<' )
-			printArg((*it));
+			printArg(*it);
 		else if ( (*it)->getFlag() != "-" )
-			printOption((*it), getMutexList(_cmd, *it));
+			printOption(*it, getMutexList(_cmd, *it));
 	}
 
 	std::cout << std::endl;
@@ -288,15 +286,15 @@ inline std::string ZshCompletionOutput::getMutexList( CmdLineInterface& _cmd, Ar
 	{
 		for ( ArgVectorIterator it = xorList[i].begin();
 			it != xorList[i].end();
-			it++)
-		if ( a == (*it) )
+			++it)
+		if ( a == *it )
 		{
 			list << '(';
 			for ( ArgVectorIterator iu = xorList[i].begin();
 				iu != xorList[i].end();
-				iu++ )
+				++iu )
 			{
-				bool notCur = (*iu) != a;
+				bool notCur = *iu != a;
 				bool hasFlag = !(*iu)->getFlag().empty();
 				if ( iu != xorList[i].begin() && (notCur || hasFlag) )
 					list << ' ';

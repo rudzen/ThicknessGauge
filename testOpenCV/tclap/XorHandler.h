@@ -112,30 +112,28 @@ inline int XorHandler::check( const Arg* a )
 			for ( ArgVectorIterator it = _orList[i].begin(); 
 				  it != _orList[i].end(); 
 				  it++ )
-				if ( a != (*it) && (*it)->isSet() )
-					throw(CmdLineParseException(
-					      "Mutually exclusive argument already set!",
-					      (*it)->toString()));
+				if ( a != *it && (*it)->isSet() )
+					throw CmdLineParseException(
+					        "Mutually exclusive argument already set!",
+					        (*it)->toString());
 
 			// go through and set each arg that is not a
 			for ( ArgVectorIterator it = _orList[i].begin(); 
 				  it != _orList[i].end(); 
 				  it++ )
-				if ( a != (*it) )
+				if ( a != *it )
 					(*it)->xorSet();
 
 			// return the number of required args that have now been set
 			if ( (*ait)->allowMore() )
 				return 0;
-			else
-				return static_cast<int>(_orList[i].size());
+		    return static_cast<int>(_orList[i].size());
 		}
 	}
 
 	if ( a->isRequired() )
 		return 1;
-	else
-		return 0;
+    return 0;
 }
 
 inline bool XorHandler::contains( const Arg* a )
@@ -144,7 +142,7 @@ inline bool XorHandler::contains( const Arg* a )
 		for ( ArgVectorIterator it = _orList[i].begin(); 
 			  it != _orList[i].end(); 
 			  it++ )	
-			if ( a == (*it) )
+			if ( a == *it )
 				return true;
 
 	return false;

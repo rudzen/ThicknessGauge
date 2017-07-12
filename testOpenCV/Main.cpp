@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
             auto do_zero = false;
 
             // fx: [237 x 256 from (1168.25, 0) - 1 keramik
-            cv::Rect_<unsigned long> zero_measure_mr(1167UL, 0UL, 235UL, 256UL);
+            cv::Rect_<unsigned long> zero_measure_mr(1161UL, 0UL, 234UL, 256UL);
 
             // 5 vertikale keramik
             //cv::Rect_<unsigned long> zero_measure_mr(695UL, 0UL, 1174UL, 256UL);

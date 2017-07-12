@@ -97,7 +97,7 @@ public:
                   const std::string& desc,
                   bool req,
                   const std::string& typeDesc,
-                  Visitor* v = NULL);
+                  Visitor* v = nullptr);
 
 	/**
 	 * Constructor.
@@ -123,7 +123,7 @@ public:
                   bool req,
                   const std::string& typeDesc,
                   CmdLineInterface& parser,
-                  Visitor* v = NULL );
+                  Visitor* v = nullptr );
 
 	/**
 	 * Constructor.
@@ -145,7 +145,7 @@ public:
                   const std::string& desc,
                   bool req,
                   Constraint<T>* constraint,
-                  Visitor* v = NULL );
+                  Visitor* v = nullptr );
 		  
 	/**
 	 * Constructor.
@@ -169,7 +169,7 @@ public:
                   bool req,
                   Constraint<T>* constraint,
                   CmdLineInterface& parser,
-                  Visitor* v = NULL );
+                  Visitor* v = nullptr );
 		  
 	/**
 	 * Handles the processing of the argument.
@@ -240,7 +240,7 @@ MultiArg<T>::MultiArg(const std::string& flag,
    Arg( flag, name, desc, req, true, v ),
   _values(std::vector<T>()),
   _typeDesc( typeDesc ),
-  _constraint( NULL ),
+  _constraint(nullptr ),
   _allowMore(false)
 { 
 	_acceptsMultipleValues = true;
@@ -257,7 +257,7 @@ MultiArg<T>::MultiArg(const std::string& flag,
 : Arg( flag, name, desc, req, true, v ),
   _values(std::vector<T>()),
   _typeDesc( typeDesc ),
-  _constraint( NULL ),
+  _constraint(nullptr ),
   _allowMore(false)
 { 
 	parser.add( this );
@@ -321,9 +321,9 @@ bool MultiArg<T>::processArg(int *i, std::vector<std::string>& args)
    	if ( argMatches( flag ) )
    	{
    		if ( Arg::delimiter() != ' ' && value == "" )
-			throw( ArgParseException( 
-			           "Couldn't find delimiter for this argument!",
-					   toString() ) );
+			throw ArgParseException( 
+			        "Couldn't find delimiter for this argument!",
+			        toString() );
 
 		// always take the first one, regardless of start string
 		if ( value == "" )
@@ -332,8 +332,8 @@ bool MultiArg<T>::processArg(int *i, std::vector<std::string>& args)
 			if ( static_cast<unsigned int>(*i) < args.size() )
 				_extractValue( args[*i] );
 			else
-				throw( ArgParseException("Missing a value for this argument!",
-                                         toString() ) );
+				throw ArgParseException("Missing a value for this argument!",
+				                       toString() );
 		} 
 		else
 			_extractValue( value );
@@ -351,8 +351,7 @@ bool MultiArg<T>::processArg(int *i, std::vector<std::string>& args)
 
 		return true;
 	}
-	else
-		return false;
+    return false;
 }
 
 /**
@@ -386,11 +385,9 @@ bool MultiArg<T>::isRequired() const
 	{
 		if ( _values.size() > 1 )
 			return false;
-		else
-			return true;
-   	}
-   	else
-		return false;
+	    return true;
+	}
+    return false;
 
 }
 
@@ -405,12 +402,12 @@ void MultiArg<T>::_extractValue( const std::string& val )
 	throw ArgParseException(e.error(), toString());
     }
 
-    if ( _constraint != NULL )
+    if ( _constraint != nullptr )
 	if ( ! _constraint->check( _values.back() ) )
-	    throw( CmdLineParseException( "Value '" + val +
-					  "' does not meet constraint: " +
-					  _constraint->description(), 
-					  toString() ) );
+	    throw CmdLineParseException( "Value '" + val +
+	                                "' does not meet constraint: " +
+	                                _constraint->description(), 
+	                                toString() );
 }
 		
 template<class T>

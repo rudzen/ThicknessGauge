@@ -126,8 +126,7 @@ bool ValuesConstraint<T>::check( const T& val ) const
 {
 	if ( std::find(_allowed.begin(),_allowed.end(),val) == _allowed.end() )
 		return false;
-	else 
-		return true;
+    return true;
 }
 
 template<class T>

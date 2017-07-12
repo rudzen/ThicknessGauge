@@ -176,7 +176,7 @@ StdOutput::_shortUsage( CmdLineInterface& _cmd,
 
 	// then the rest
 	for (ArgListIterator it = argList.begin(); it != argList.end(); it++)
-		if ( !xorHandler.contains( (*it) ) )
+		if ( !xorHandler.contains( *it ) )
 			s += " " + (*it)->shortID();
 
 	// if the program name is too long, then adjust the second line offset 
@@ -214,7 +214,7 @@ StdOutput::_longUsage( CmdLineInterface& _cmd,
 
 	// then the rest
 	for (ArgListIterator it = argList.begin(); it != argList.end(); it++)
-		if ( !xorHandler.contains( (*it) ) )
+		if ( !xorHandler.contains( *it ) )
 			{
 				spacePrint( os, (*it)->longID(), 75, 3, 3 ); 
 				spacePrint( os, (*it)->getDescription(), 75, 5, 0 ); 
@@ -234,7 +234,7 @@ inline void StdOutput::spacePrint( std::ostream& os,
 {
 	int len = static_cast<int>(s.length());
 
-	if ( (len + indentSpaces > maxWidth) && maxWidth > 0 )
+	if ( len + indentSpaces > maxWidth && maxWidth > 0 )
 		{
 			int allowedLen = maxWidth - indentSpaces;
 			int start = 0;

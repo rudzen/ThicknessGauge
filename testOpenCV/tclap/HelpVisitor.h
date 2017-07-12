@@ -39,7 +39,7 @@ class HelpVisitor: public Visitor
 		 * Prevent accidental copying.
 		 */
 		HelpVisitor(const HelpVisitor& rhs);
-		HelpVisitor& operator=(const HelpVisitor& rhs);
+		HelpVisitor& operator=(const HelpVisitor& rhs) = delete;
 
 	protected:
 
@@ -67,7 +67,7 @@ class HelpVisitor: public Visitor
 		 * Calls the usage method of the CmdLineOutput for the 
 		 * specified CmdLine.
 		 */
-		void visit() { (*_out)->usage(*_cmd); throw ExitException(0); }
+		void visit() override { (*_out)->usage(*_cmd); throw ExitException(0); }
 		
 };
 

@@ -124,20 +124,19 @@ inline void DocBookOutput::usage(CmdLineInterface& _cmd )
 	std::cout << "<command>" << progName << "</command>" << std::endl;
 
 	// xor
-	for ( int i = 0; (unsigned int)i < xorList.size(); i++ )
+	for ( int i = 0; static_cast<unsigned int>(i) < xorList.size(); i++ )
 	{
 		std::cout << "<group choice='req'>" << std::endl;
-		for ( ArgVectorIterator it = xorList[i].begin(); 
-						it != xorList[i].end(); it++ )
-			printShortArg((*it));
+		for ( ArgVectorIterator it = xorList[i].begin(); it != xorList[i].end(); ++it )
+			printShortArg(*it);
 
 		std::cout << "</group>" << std::endl;
 	}
 	
 	// rest of args
 	for (ArgListIterator it = argList.begin(); it != argList.end(); it++)
-		if ( !xorHandler.contains( (*it) ) )
-			printShortArg((*it));
+		if ( !xorHandler.contains( *it ) )
+			printShortArg(*it);
 
  	std::cout << "</cmdsynopsis>" << std::endl;
 	std::cout << "</refsynopsisdiv>" << std::endl;
@@ -154,8 +153,8 @@ inline void DocBookOutput::usage(CmdLineInterface& _cmd )
 
 	std::cout << "<variablelist>" << std::endl;
 	
-	for (ArgListIterator it = argList.begin(); it != argList.end(); it++)
-		printLongArg((*it));
+	for (ArgListIterator it = argList.begin(); it != argList.end(); ++it)
+		printLongArg(*it);
 
 	std::cout << "</variablelist>" << std::endl;
 	std::cout << "</refsect1>" << std::endl;

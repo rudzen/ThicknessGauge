@@ -110,7 +110,7 @@ class ValueArg : public Arg
                   bool req, 
                   T value,
                   const std::string& typeDesc,
-                  Visitor* v = NULL);
+                  Visitor* v = nullptr);
 				 
 				 
         /**
@@ -144,7 +144,7 @@ class ValueArg : public Arg
                   T value,
                   const std::string& typeDesc,
                   CmdLineInterface& parser,
-                  Visitor* v = NULL );
+                  Visitor* v = nullptr );
  
         /**
          * Labeled ValueArg constructor.
@@ -175,7 +175,7 @@ class ValueArg : public Arg
                   T value,
                   Constraint<T>* constraint,
                   CmdLineInterface& parser,
-                  Visitor* v = NULL );
+                  Visitor* v = nullptr );
 	  
         /**
          * Labeled ValueArg constructor.
@@ -204,7 +204,7 @@ class ValueArg : public Arg
                   bool req, 
                   T value,
                   Constraint<T>* constraint,
-                  Visitor* v = NULL );
+                  Visitor* v = nullptr );
 
         /**
          * Handles the processing of the argument.
@@ -260,7 +260,7 @@ ValueArg<T>::ValueArg(const std::string& flag,
   _value( val ),
   _default( val ),
   _typeDesc( typeDesc ),
-  _constraint( NULL )
+  _constraint(nullptr )
 { }
 
 template<class T>
@@ -276,7 +276,7 @@ ValueArg<T>::ValueArg(const std::string& flag,
   _value( val ),
   _default( val ),
   _typeDesc( typeDesc ),
-  _constraint( NULL )
+  _constraint(nullptr )
 { 
     parser.add( this );
 }
@@ -343,18 +343,17 @@ bool ValueArg<T>::processArg(int *i, std::vector<std::string>& args)
         if ( _alreadySet )
 		{
 			if ( _xorSet )
-				throw( CmdLineParseException(
-				       "Mutually exclusive argument already set!", 
-				                             toString()) );
-			else
-				throw( CmdLineParseException("Argument already set!", 
-				                             toString()) );
+				throw CmdLineParseException(
+				        "Mutually exclusive argument already set!", 
+				        toString());
+		    throw CmdLineParseException("Argument already set!", 
+		                                toString());
 		}
 
         if ( Arg::delimiter() != ' ' && value == "" )
-			throw( ArgParseException( 
-							"Couldn't find delimiter for this argument!",
-                             toString() ) );
+			throw ArgParseException( 
+			        "Couldn't find delimiter for this argument!",
+			        toString() );
 
         if ( value == "" )
         {
@@ -362,8 +361,8 @@ bool ValueArg<T>::processArg(int *i, std::vector<std::string>& args)
             if ( static_cast<unsigned int>(*i) < args.size() ) 
 				_extractValue( args[*i] );
             else
-				throw( ArgParseException("Missing a value for this argument!",
-                                                    toString() ) );
+				throw ArgParseException("Missing a value for this argument!",
+				                       toString() );
         }
         else
 			_extractValue( value );
@@ -371,9 +370,8 @@ bool ValueArg<T>::processArg(int *i, std::vector<std::string>& args)
         _alreadySet = true;
         _checkWithVisitor();
         return true;
-    }	
-    else
-		return false;
+    }
+    return false;
 }
 
 /**
@@ -405,12 +403,12 @@ void ValueArg<T>::_extractValue( const std::string& val )
 	throw ArgParseException(e.error(), toString());
     }
     
-    if ( _constraint != NULL )
+    if ( _constraint != nullptr )
 	if ( ! _constraint->check( _value ) )
-	    throw( CmdLineParseException( "Value '" + val + 
-					  + "' does not meet constraint: " 
-					  + _constraint->description(),
-					  toString() ) );
+	    throw CmdLineParseException( "Value '" + val + 
+	                                + "' does not meet constraint: " 
+	                                + _constraint->description(),
+	                                toString() );
 }
 
 template<class T>

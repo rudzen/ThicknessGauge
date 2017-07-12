@@ -70,7 +70,7 @@ class MultiSwitchArg : public SwitchArg
 				const std::string& name,
 				const std::string& desc,
 				int init = 0,
-				Visitor* v = NULL);
+				Visitor* v = nullptr);
 
 
 		/**
@@ -92,7 +92,7 @@ class MultiSwitchArg : public SwitchArg
 				const std::string& desc,
 				CmdLineInterface& parser,
 				int init = 0,
-				Visitor* v = NULL);
+				Visitor* v = nullptr);
 
 
 		/**
@@ -169,24 +169,23 @@ inline bool MultiSwitchArg::processArg(int *i, std::vector<std::string>& args)
 
 		return true;
 	}
-	else if ( combinedSwitchesMatch( args[*i] ) )
-	{
-		// so the isSet() method will work
-		_alreadySet = true;
+    if ( combinedSwitchesMatch( args[*i] ) )
+    {
+        // so the isSet() method will work
+        _alreadySet = true;
 
-		// Matched argument: increment value.
-		++_value;
+        // Matched argument: increment value.
+        ++_value;
 
-		// Check for more in argument and increment value.
-		while ( combinedSwitchesMatch( args[*i] ) ) 
-			++_value;
+        // Check for more in argument and increment value.
+        while ( combinedSwitchesMatch( args[*i] ) ) 
+            ++_value;
 
-		_checkWithVisitor();
+        _checkWithVisitor();
 
-		return false;
-	}
-	else
-		return false;
+        return false;
+    }
+    return false;
 }
 
 inline std::string 

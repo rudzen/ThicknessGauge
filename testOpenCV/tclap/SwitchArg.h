@@ -69,7 +69,7 @@ class SwitchArg : public Arg
 			      const std::string& name, 
 			      const std::string& desc,
 			      bool def = false,
-				  Visitor* v = NULL);
+				  Visitor* v = nullptr);
 
 				  
 		/**
@@ -90,7 +90,7 @@ class SwitchArg : public Arg
 			      const std::string& desc,
 				  CmdLineInterface& parser,
 			      bool def = false,
-				  Visitor* v = NULL);
+				  Visitor* v = nullptr);
 				  
 				  
         /**
@@ -204,11 +204,11 @@ inline bool SwitchArg::combinedSwitchesMatch(std::string& combinedSwitches )
 inline void SwitchArg::commonProcessing()
 {
 	if ( _xorSet )
-		throw(CmdLineParseException(
-		      "Mutually exclusive argument already set!", toString()));
+		throw CmdLineParseException(
+		        "Mutually exclusive argument already set!", toString());
 
 	if ( _alreadySet ) 
-		throw(CmdLineParseException("Argument already set!", toString()));
+		throw CmdLineParseException("Argument already set!", toString());
 
 	_alreadySet = true;
 
@@ -233,23 +233,22 @@ inline bool SwitchArg::processArg(int *i, std::vector<std::string>& args)
 		return true;
 	}
 	// if a substring matches the flag as part of a combination
-	else if ( combinedSwitchesMatch( args[*i] ) )
-	{
-		// check again to ensure we don't misinterpret 
-		// this as a MultiSwitchArg 
-		if ( combinedSwitchesMatch( args[*i] ) )
-			throw(CmdLineParseException("Argument already set!", 
-			                            toString()));
+    if ( combinedSwitchesMatch( args[*i] ) )
+    {
+        // check again to ensure we don't misinterpret 
+        // this as a MultiSwitchArg 
+        if ( combinedSwitchesMatch( args[*i] ) )
+            throw CmdLineParseException("Argument already set!", 
+                                        toString());
 
-		commonProcessing();
+        commonProcessing();
 
-		// We only want to return true if we've found the last combined
-		// match in the string, otherwise we return true so that other 
-		// switches in the combination will have a chance to match.
-		return lastCombined( args[*i] );
-	}
-	else
-		return false;
+        // We only want to return true if we've found the last combined
+        // match in the string, otherwise we return true so that other 
+        // switches in the combination will have a chance to match.
+        return lastCombined( args[*i] );
+    }
+    return false;
 }
 
 inline void SwitchArg::reset()

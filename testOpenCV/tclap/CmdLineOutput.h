@@ -65,8 +65,7 @@ class CmdLineOutput
 		 * \param c - The CmdLine object the output is generated for. 
 		 * \param e - The ArgException that caused the failure. 
 		 */
-		virtual void failure( CmdLineInterface& c, 
-						      ArgException& e )=0;
+		virtual void failure( CmdLineInterface& c, ArgException& e )=0;
 
 };
 

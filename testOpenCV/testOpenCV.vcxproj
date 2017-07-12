@@ -249,6 +249,30 @@
     <ClInclude Include="namespaces\str.h" />
     <ClInclude Include="namespaces\temp.h" />
     <ClInclude Include="namespaces\validate.h" />
+    <ClInclude Include="tclap\Arg.h" />
+    <ClInclude Include="tclap\ArgException.h" />
+    <ClInclude Include="tclap\ArgTraits.h" />
+    <ClInclude Include="tclap\CmdLine.h" />
+    <ClInclude Include="tclap\CmdLineInterface.h" />
+    <ClInclude Include="tclap\CmdLineOutput.h" />
+    <ClInclude Include="tclap\Constraint.h" />
+    <ClInclude Include="tclap\DocBookOutput.h" />
+    <ClInclude Include="tclap\HelpVisitor.h" />
+    <ClInclude Include="tclap\IgnoreRestVisitor.h" />
+    <ClInclude Include="tclap\MultiArg.h" />
+    <ClInclude Include="tclap\MultiSwitchArg.h" />
+    <ClInclude Include="tclap\OptionalUnlabeledTracker.h" />
+    <ClInclude Include="tclap\StandardTraits.h" />
+    <ClInclude Include="tclap\StdOutput.h" />
+    <ClInclude Include="tclap\SwitchArg.h" />
+    <ClInclude Include="tclap\UnlabeledMultiArg.h" />
+    <ClInclude Include="tclap\UnlabeledValueArg.h" />
+    <ClInclude Include="tclap\ValueArg.h" />
+    <ClInclude Include="tclap\ValuesConstraint.h" />
+    <ClInclude Include="tclap\VersionVisitor.h" />
+    <ClInclude Include="tclap\Visitor.h" />
+    <ClInclude Include="tclap\XorHandler.h" />
+    <ClInclude Include="tclap\ZshCompletionOutput.h" />
     <ClInclude Include="UI\ProgressBar.h" />
     <ClInclude Include="Testing\TestConfig.h" />
     <ClInclude Include="Exceptions\TestException.h" />
@@ -277,6 +301,8 @@
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
     <None Include="Doxyfile" />
+    <None Include="tclap\Makefile.am" />
+    <None Include="tclap\Makefile.in" />
     <None Include="_run_test.bat" />
   </ItemGroup>
   <ItemGroup>
