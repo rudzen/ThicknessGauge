@@ -442,6 +442,9 @@ namespace calc {
      */
     template <typename T>
     double angle_inner_points(const T p1_x, const T p2_x, const T c_x, const T p1_y, const T p2_y, const T c_y) {
+
+        // this function seems to be WRONG!.. (somebody shoot me!)
+
         static_assert(std::is_arithmetic<T>::value, "angle_inner_points is only possible for arithmetic types.");
         auto dist1 = cv::sqrt((p1_x - c_x) * (p1_x - c_x) + (p1_y - c_y) * (p1_y - c_y));
         auto dist2 = cv::sqrt((p2_x - c_x) * (p2_x - c_x) + (p2_y - c_y) * (p2_y - c_y));
@@ -889,7 +892,7 @@ namespace calc {
 
     template <typename T, int C>
     cv::Vec<T, 2> avg_xy(cv::Vec<T, C>& vec) {
-        static_assert(std::is_floating_point<T>::value, "avg_x is only possible for arithmetic types.");
+        static_assert(std::is_floating_point<T>::value, "avg_xy is only possible for arithmetic types.");
         auto sumX = 0.0;
         auto sumY = 0.0;
         for (auto i = 0; i < C; i += 2) {
@@ -944,6 +947,11 @@ namespace calc {
     template <typename T>
     double real_intensity_line(cv::Mat& image, std::vector<cv::Point_<T>>& output, int upper_limit, int lower_limit) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
+
+        /*
+         * NEVER CHANGE ANYTHING IN HERE
+         * ---> WORK ON CHANGES IN A COPY OF IT!
+         */
 
         // grab sizes
         auto cols = image.cols;
@@ -1215,7 +1223,7 @@ namespace calc {
     }
 
     /**
-     * \brief Computes the absolute value
+     * \brief Computes the absolute value (DONT ACTIVATE, MSC DONT LIKE IT!)
      * \tparam T Type of value, must be integral
      * \param v The value
      * \return The absolute value of v
