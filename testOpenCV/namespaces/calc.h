@@ -1112,12 +1112,14 @@ namespace calc {
      * \return The avg of the whole result based on the values in the target vector
      */
     template <typename T>
-    double weighted_avg(cv::Mat& image, std::vector<cv::Point_<T>>& target_vector, cv::Rect& laser_rect_out) {
+    double weighted_avg(cv::Mat& original, cv::Mat& image, std::vector<cv::Point_<T>>& target_vector, cv::Rect& laser_rect_out) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         std::vector<cv::Point> non_zero_elements(image.rows * image.cols);
         findNonZero(image, non_zero_elements);
         laser_rect_out = boundingRect(non_zero_elements);
-        auto t = image(laser_rect_out);
+        // the argument for "original" image is stricly not required as is.
+        // but does allow for easy future expansion and modifications
+        auto t = original(laser_rect_out);
         return real_intensity_line(t, target_vector, t.rows, 0);
     }
 

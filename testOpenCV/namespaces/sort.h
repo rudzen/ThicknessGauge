@@ -100,5 +100,19 @@ namespace sorter {
         });
     }
 
+    template <typename T>
+    bool search_x(std::vector<cv::Point_<T>>& vec, T x) {
+        return std::binary_search(vec.begin(), vec.end(), [&](cv::Point_<T>& p1) {
+            return p1.x == x;
+        });
+    }
+
+    template <typename T>
+    bool search_y(std::vector<cv::Point_<T>>& vec, T y) {
+        return std::binary_search(vec.begin(), vec.end(), [&](cv::Point_<T>& p1) {
+            return p1.y == y;
+        });
+    }
+
 
 }

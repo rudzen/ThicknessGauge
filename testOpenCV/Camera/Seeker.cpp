@@ -30,9 +30,8 @@ bool Seeker::initialize() {
         pcapture = std::make_unique<CapturePvApi>();
     } else {
         // double check for weirdness
-        if (pcapture->is_open()) {
+        if (pcapture->is_open())
             pcapture->close();
-        }
     }
 
     // always perform complete re-init.
@@ -42,9 +41,8 @@ bool Seeker::initialize() {
         pcapture = std::make_unique<CapturePvApi>();
     } else {
         // double check for weirdness
-        if (pcapture->is_open()) {
+        if (pcapture->is_open())
             pcapture->close();
-        }
     }
 
     // always perform complete re-init.
@@ -834,8 +832,8 @@ bool Seeker::phase_three() {
 
                 //cv::imwrite("_laser_" + std::to_string(i) + ".png", base_frame);
 
-                /* RECT CUT METHOD */
-                avg_height += calc::weighted_avg(base_frame, pdata->center_points, laser_rect_y);
+                /* RECT CUT METHOD - testing */
+                avg_height += calc::weighted_avg(base_frame, base_frame, pdata->center_points, laser_rect_y);
 
                 laser_rects_y.emplace_back(std::move(laser_rect_y));
 

@@ -11,6 +11,11 @@
 
 using namespace tg;
 
+/**
+ * \brief Contains validation function for various types and containers.
+ * All functions here returns true if something passed validation.
+ * There is plenty of room for adding more specific criteria of validation here.
+ */
 namespace validate {
 
     /**
