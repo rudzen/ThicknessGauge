@@ -169,6 +169,7 @@
     </ClCompile>
     <ClCompile Include="TestCalc.cpp" />
     <ClCompile Include="TestFileSystem.cpp" />
+    <ClCompile Include="TestSort.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
