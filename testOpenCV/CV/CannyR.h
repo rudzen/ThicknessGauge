@@ -3,7 +3,6 @@
 #include <opencv2/videostab/inpainting.hpp>
 #include <opencv2/highgui.hpp>
 #include <iostream>
-#include <memory>
 #include "BaseR.h"
 #include "../namespaces/pixel.h"
 #include "../namespaces/tg.h"
@@ -26,6 +25,9 @@
   ||||  |   ||
   `+.__._._+*/
 
+/**
+ * \brief Canny algorithm wrapper class
+ */
 class CannyR : public BaseR {
 
     cv::Mat edges_;
@@ -100,6 +102,8 @@ public:
     cv::Mat& result();
 
 };
+
+/* UI callback functions */
 
 inline void CannyR::threshold1cb(int value, void* user_data) {
     auto that = static_cast<CannyR*>(user_data);

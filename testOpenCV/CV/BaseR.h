@@ -19,6 +19,9 @@
 ||||  |   ||
 `+.__._._+*/
 
+/**
+ * \brief Basic class for algorithm wrapping.
+ */
 class BaseR {
 
 protected:
@@ -40,8 +43,6 @@ protected:
     std::string window_name_;
 
     bool show_windows_ = false;
-
-protected:
 
     BaseR(std::string windowName, bool showWindows)
         : window_name_(windowName)

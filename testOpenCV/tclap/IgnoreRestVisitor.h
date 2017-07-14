@@ -19,7 +19,6 @@
  *  
  *****************************************************************************/ 
 
-
 #ifndef TCLAP_IGNORE_REST_VISITOR_H
 #define TCLAP_IGNORE_REST_VISITOR_H
 

@@ -2,6 +2,10 @@
 
 #include <vector>
 
+/**
+ * \brief The main data container class.
+ * \tparam T Type to use (double = best option)
+ */
 template <class T>
 class Data {
 public:
