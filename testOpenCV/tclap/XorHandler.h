@@ -69,13 +69,13 @@ class XorHandler
 		/**
 		 * Returns the XOR specific short usage.
 		 */
-		std::string shortUsage();
+		std::string shortUsage() = delete;
 
 		/**
 		 * Prints the XOR specific long usage.
 		 * \param os - Stream to print to.
 		 */
-		void printLongUsage(std::ostream& os);
+		void printLongUsage(std::ostream& os) = delete;
 
 		/**
 		 * Simply checks whether the Arg is contained in one of the arg
@@ -100,36 +100,53 @@ inline void XorHandler::add( std::vector<Arg*>& ors )
 inline int XorHandler::check( const Arg* a ) 
 {
 	// iterate over each XOR list
-	for ( int i = 0; static_cast<unsigned int>(i) < _orList.size(); i++ )
-	{
-		// if the XOR list contains the arg..
-		ArgVectorIterator ait = std::find( _orList[i].begin(), 
-		                                   _orList[i].end(), a );
-		if ( ait != _orList[i].end() )
-		{
+
+    for (auto& list : _orList) {
+        auto ait = std::find( list.begin(), list.end(), a );
+		if ( ait != list.end() ) {
 			// first check to see if a mutually exclusive switch
 			// has not already been set
-			for ( ArgVectorIterator it = _orList[i].begin(); 
-				  it != _orList[i].end(); 
-				  it++ )
-				if ( a != *it && (*it)->isSet() )
-					throw CmdLineParseException(
-					        "Mutually exclusive argument already set!",
-					        (*it)->toString());
+            std::for_each(list.begin(), list.end(), [&](Arg* arg) {
+                if (a == arg)
+                    return;
 
-			// go through and set each arg that is not a
-			for ( ArgVectorIterator it = _orList[i].begin(); 
-				  it != _orList[i].end(); 
-				  it++ )
-				if ( a != *it )
-					(*it)->xorSet();
+                if (arg->isSet())
+					throw CmdLineParseException("Mutually exclusive argument already set!", arg->toString());
+
+                // safe to set arg as it's not a
+                arg->xorSet();
+            });
 
 			// return the number of required args that have now been set
 			if ( (*ait)->allowMore() )
 				return 0;
-		    return static_cast<int>(_orList[i].size());
+		    return static_cast<int>(list.size());
 		}
-	}
+    }
+
+	//for ( int i = 0; static_cast<unsigned int>(i) < _orList.size(); i++ )
+	//{
+	//	// if the XOR list contains the arg..
+	//	ArgVectorIterator ait = std::find( _orList[i].begin(), _orList[i].end(), a );
+	//	if ( ait != _orList[i].end() )
+	//	{
+	//		// first check to see if a mutually exclusive switch
+	//		// has not already been set
+	//		for ( ArgVectorIterator it = _orList[i].begin(); it != _orList[i].end(); ++it )
+	//			if ( a != *it && (*it)->isSet() )
+	//				throw CmdLineParseException("Mutually exclusive argument already set!", (*it)->toString());
+
+	//		// go through and set each arg that is not a
+	//		for ( ArgVectorIterator it = _orList[i].begin(); it != _orList[i].end(); ++it )
+	//			if ( a != *it )
+	//				(*it)->xorSet();
+
+	//		// return the number of required args that have now been set
+	//		if ( (*ait)->allowMore() )
+	//			return 0;
+	//	    return static_cast<int>(_orList[i].size());
+	//	}
+	//}
 
 	if ( a->isRequired() )
 		return 1;
@@ -138,12 +155,18 @@ inline int XorHandler::check( const Arg* a )
 
 inline bool XorHandler::contains( const Arg* a )
 {
-	for ( int i = 0; static_cast<unsigned int>(i) < _orList.size(); i++ )
-		for ( ArgVectorIterator it = _orList[i].begin(); 
-			  it != _orList[i].end(); 
-			  it++ )	
-			if ( a == *it )
-				return true;
+
+    for (const auto& list : _orList) {
+        for (const auto& arg : list) {
+            if (a == arg)
+                return true;
+        }
+    }
+
+	//for ( int i = 0; static_cast<unsigned int>(i) < _orList.size(); i++ )
+	//	for ( ArgVectorIterator it = _orList[i].begin(); it != _orList[i].end(); it++ )	
+	//		if ( a == *it )
+	//			return true;
 
 	return false;
 }

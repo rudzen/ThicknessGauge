@@ -179,7 +179,7 @@ public:
 	 * \param i - Pointer the the current argument in the list.
 	 * \param args - Mutable list of strings. Passed from main().
 	 */
-	virtual bool processArg(int* i, std::vector<std::string>& args); 
+    bool processArg(int* i, std::vector<std::string>& args) override; 
 
 	/**
 	 * Returns a vector of type T containing the values parsed from
@@ -203,30 +203,30 @@ public:
 	 * Returns the a short id string.  Used in the usage. 
 	 * \param val - value to be used.
 	 */
-	virtual std::string shortID(const std::string& val="val") const;
+    std::string shortID(const std::string& val="val") const override;
 
 	/**
 	 * Returns the a long id string.  Used in the usage. 
 	 * \param val - value to be used.
 	 */
-	virtual std::string longID(const std::string& val="val") const;
+    std::string longID(const std::string& val="val") const override;
 
 	/**
 	 * Once we've matched the first value, then the arg is no longer
 	 * required.
 	 */
-	virtual bool isRequired() const;
+    bool isRequired() const override;
 
-	virtual bool allowMore();
-	
-	virtual void reset();
+    bool allowMore() override;
+
+    void reset() override;
 
 private:
 	/**
 	 * Prevent accidental copying
 	 */
-	MultiArg<T>(const MultiArg<T>& rhs);
-	MultiArg<T>& operator=(const MultiArg<T>& rhs);
+	MultiArg<T>(const MultiArg<T>& rhs) = delete;
+	MultiArg<T>& operator=(const MultiArg<T>& rhs) = delete;
 
 };
 
@@ -307,7 +307,7 @@ const std::vector<T>& MultiArg<T>::getValue() { return _values; }
 template<class T>
 bool MultiArg<T>::processArg(int *i, std::vector<std::string>& args) 
 {
- 	if ( _ignoreable && Arg::ignoreRest() )
+ 	if ( _ignoreable && ignoreRest() )
 		return false;
 
 	if ( _hasBlanks( args[*i] ) )
@@ -318,27 +318,25 @@ bool MultiArg<T>::processArg(int *i, std::vector<std::string>& args)
 
    	trimFlag( flag, value );
 
-   	if ( argMatches( flag ) )
-   	{
-   		if ( Arg::delimiter() != ' ' && value == "" )
-			throw ArgParseException( 
-			        "Couldn't find delimiter for this argument!",
-			        toString() );
+   	if ( !argMatches( flag ) )
+        return false;
 
-		// always take the first one, regardless of start string
-		if ( value == "" )
-		{
-			(*i)++;
-			if ( static_cast<unsigned int>(*i) < args.size() )
-				_extractValue( args[*i] );
-			else
-				throw ArgParseException("Missing a value for this argument!",
-				                       toString() );
-		} 
-		else
-			_extractValue( value );
+    if ( delimiter() != ' ' && value == "" )
+        throw ArgParseException( "Couldn't find delimiter for this argument!", toString() );
 
-		/*
+    // always take the first one, regardless of start string
+    if ( value == "" )
+    {
+        (*i)++;
+        if ( static_cast<unsigned int>(*i) < args.size() )
+            _extractValue( args[*i] );
+        else
+            throw ArgParseException("Missing a value for this argument!", toString() );
+    } 
+    else
+        _extractValue( value );
+
+    /*
 		// continuing taking the args until we hit one with a start string 
 		while ( (unsigned int)(*i)+1 < args.size() &&
 				args[(*i)+1].find_first_of( Arg::flagStartString() ) != 0 &&
@@ -346,12 +344,10 @@ bool MultiArg<T>::processArg(int *i, std::vector<std::string>& args)
 				_extractValue( args[++(*i)] );
 		*/
 
-		_alreadySet = true;
-		_checkWithVisitor();
+    _alreadySet = true;
+    _checkWithVisitor();
 
-		return true;
-	}
-    return false;
+    return true;
 }
 
 /**
@@ -381,13 +377,11 @@ std::string MultiArg<T>::longID(const std::string& val) const
 template<class T>
 bool MultiArg<T>::isRequired() const
 {
-	if ( _required )
-	{
-		if ( _values.size() > 1 )
-			return false;
-	    return true;
-	}
-    return false;
+	if ( !_required )
+        return false;
+    if ( _values.size() > 1 )
+        return false;
+    return true;
 
 }
 
@@ -402,12 +396,11 @@ void MultiArg<T>::_extractValue( const std::string& val )
 	throw ArgParseException(e.error(), toString());
     }
 
-    if ( _constraint != nullptr )
-	if ( ! _constraint->check( _values.back() ) )
-	    throw CmdLineParseException( "Value '" + val +
-	                                "' does not meet constraint: " +
-	                                _constraint->description(), 
-	                                toString() );
+    if ( _constraint != nullptr && ! _constraint->check( _values.back() ) )
+	throw CmdLineParseException( "Value '" + val +
+	                             "' does not meet constraint: " +
+	                             _constraint->description(), 
+	                             toString() );
 }
 		
 template<class T>

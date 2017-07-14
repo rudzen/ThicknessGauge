@@ -500,10 +500,7 @@ namespace TCLAP {
             throw SpecificationException(
                 "Argument flag can only be one character long", Arg::toString());
 
-        if (_name != ignoreNameString() &&
-            (_flag == flagStartString() ||
-                _flag == nameStartString() ||
-                _flag == " "))
+        if (_name != ignoreNameString() && (_flag == flagStartString() || _flag == nameStartString() || _flag == " "))
             throw SpecificationException("Argument flag cannot be either '" +
                                         flagStartString() + "' or '" +
                                         nameStartString() + "' or a space.",
@@ -560,7 +557,7 @@ namespace TCLAP {
     }
 
     inline bool Arg::operator==(const Arg& a) const {
-        if (_flag != "" && _flag == a._flag || _name == a._name)
+        if (!_flag.empty() && _flag == a._flag || _name == a._name)
             return true;
         return false;
     }
@@ -634,11 +631,12 @@ namespace TCLAP {
      */
     inline void Arg::trimFlag(std::string& flag, std::string& value) const {
         int stop = 0;
-        for (int i = 0; static_cast<unsigned int>(i) < flag.length(); i++)
+        for (int i = 0; static_cast<unsigned int>(i) < flag.length(); i++) {
             if (flag[i] == delimiter()) {
                 stop = i;
                 break;
             }
+        }
 
         if (stop > 1) {
             value = flag.substr(stop + 1);

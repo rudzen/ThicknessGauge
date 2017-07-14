@@ -45,7 +45,7 @@ class Visitor
 		/**
 		 * Does nothing. Should be overridden by child.
 		 */
-		virtual void visit() { }
+        virtual void visit() = 0;
 };
 
 }

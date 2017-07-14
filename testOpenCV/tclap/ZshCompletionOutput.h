@@ -70,7 +70,7 @@ namespace TCLAP {
 
     protected:
 
-        void basename(std::string& s);
+        static void basename(std::string& s);
         static void quoteSpecialChars(std::string& s);
 
         static std::string getMutexList(CmdLineInterface& _cmd, Arg* a);

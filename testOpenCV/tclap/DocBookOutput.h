@@ -50,14 +50,14 @@ class DocBookOutput : public CmdLineOutput
 		 * produce alternative behavior.
 		 * \param c - The CmdLine object the output is generated for. 
 		 */
-		virtual void usage(CmdLineInterface& c);
+    void usage(CmdLineInterface& c) override;
 
 		/**
 		 * Prints the version to stdout. Can be overridden 
 		 * to produce alternative behavior.
 		 * \param c - The CmdLine object the output is generated for. 
 		 */
-		virtual void version(CmdLineInterface& c);
+    void version(CmdLineInterface& c) override;
 
 		/**
 		 * Prints (to stderr) an error message, short usage 
@@ -65,8 +65,7 @@ class DocBookOutput : public CmdLineOutput
 		 * \param c - The CmdLine object the output is generated for. 
 		 * \param e - The ArgException that caused the failure. 
 		 */
-		virtual void failure(CmdLineInterface& c, 
-						     ArgException& e );
+    void failure(CmdLineInterface& c, ArgException& e ) override;
 
 	protected:
 
@@ -76,12 +75,12 @@ class DocBookOutput : public CmdLineOutput
 		 * \param r - The char to replace. 
 		 * \param x - What to replace r with. 
 		 */
-		void substituteSpecialChars( std::string& s, char r, std::string& x );
-		void removeChar( std::string& s, char r);
-		void basename( std::string& s );
+    static void substituteSpecialChars( std::string& s, char r, std::string& x );
+    static void removeChar( std::string& s, char r);
+    static void basename( std::string& s );
 
-		void printShortArg(Arg* it);
-		void printLongArg(Arg* it);
+		void printShortArg(Arg* it) const;
+		void printLongArg(Arg* it) const;
 
 		char theDelimiter;
 };
@@ -208,8 +207,7 @@ inline void DocBookOutput::basename( std::string& s )
 	}
 }
 
-inline void DocBookOutput::printShortArg(Arg* a)
-{
+inline void DocBookOutput::printShortArg(Arg* a) const {
 	std::string lt = "&lt;"; 
 	std::string gt = "&gt;"; 
 
@@ -248,8 +246,7 @@ inline void DocBookOutput::printShortArg(Arg* a)
 
 }
 
-inline void DocBookOutput::printLongArg(Arg* a)
-{
+inline void DocBookOutput::printLongArg(Arg* a) const {
 	std::string lt = "&lt;"; 
 	std::string gt = "&gt;"; 
 

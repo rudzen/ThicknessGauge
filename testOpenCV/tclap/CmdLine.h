@@ -62,7 +62,6 @@ namespace TCLAP {
         c.clear();
     }
 
-
     /**
      * The base class that manages the command line definition and passes
      * along the parsing to the appropriate Arg classes.

@@ -36,12 +36,11 @@ namespace TCLAP {
  */
 class VersionVisitor: public Visitor
 {
-	private:
 		/**
 		 * Prevent accidental copying
 		 */
-		VersionVisitor(const VersionVisitor& rhs);
-		VersionVisitor& operator=(const VersionVisitor& rhs);
+		VersionVisitor(const VersionVisitor& rhs) = delete;
+		VersionVisitor& operator=(const VersionVisitor& rhs) = delete;
 
 	protected:
 
@@ -69,7 +68,7 @@ class VersionVisitor: public Visitor
 		 * Calls the version method of the output object using the
 		 * specified CmdLine.
 		 */
-		void visit() { 
+		void visit() override { 
 		    (*_out)->version(*_cmd); 
 		    throw ExitException(0); 
 		}
