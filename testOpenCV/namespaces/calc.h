@@ -39,7 +39,7 @@ namespace calc {
     constexpr double LOG2 = 0.69314718055994530941723212145818;
 
     /**
-     * Round to the nearest integer (stolen from opencv)
+     * Round to the nearest integer
      * @param value The value to round
      * @return Nearest integer as double
      */
@@ -132,10 +132,23 @@ namespace calc {
 
     namespace pixels {
 
-        /* Converts pixels from an image to a singular line vector in X, where Y is the mean of all pixels located at that given X in the image */
+        /**
+         * \brief Converts pixels from an image to a singular line vector in X, where Y is the mean of all pixels located at that given X in the image
+         * \tparam T1 Type of pixels
+         * \tparam T2 Type of gradient pixels
+         * \param input The input matrix
+         * \param output The output matrix
+         * \param pixels The pixels
+         * \param gradient_pixels The gradient pixels
+         * \return true if okay, otherwise false
+         */
         template <typename T1, typename T2>
         [[deprecated("not really used anymore, but could still prove useful in the future")]]
         bool generate_planar_pixels(cv::Mat& input, cv::Mat& output, std::vector<cv::Point_<T1>>& pixels, std::vector<cv::Point_<T2>>& gradient_pixels) {
+
+            static_assert(std::is_arithmetic<T1>::value, "Wrong type.");
+            static_assert(std::is_floating_point<T2>::value, "Wrong type.");
+
 
             std::vector<cv::Point> pix;
 
@@ -523,6 +536,14 @@ namespace calc {
 
 #ifdef CV_VERSION
 
+    /**
+     * @overload For opencv point types
+     * \tparam T1 Type of point one 
+     * \tparam T2 Type of point two
+     * \param p1 The first point
+     * \param p2 The second point
+     * \return The manhattan distance between the two points
+     */
     template <typename T1, typename T2>
     double dist_manhattan(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value, "dist_manhattan T1 is only possible for arithmetic types.");
@@ -555,7 +576,8 @@ namespace calc {
         double len_1 = sqrt(v1[0] * v1[0] + v1[1] * v1[1]);
         double len_2 = sqrt(v1[2] * v1[2] + v1[3] * v1[3]);
 
-        double dot = v1[0] * v1[2] + v1[1] * v1[3];
+        double dot = v1[0] * v1[2];
+        dot += v1[1] * v1[3];
 
         auto a = dot / (len_1 * len_2);
 
@@ -633,6 +655,13 @@ namespace calc {
         return angle_inner_points(p1.x, p2.x, c.x, p1.y, p2.y, c.y);
     }
 
+    /**
+     * \brief Simple function wrapping for checking if two angles are within a specific margin of each other
+     * \param angle_a The first angle
+     * \param angle_b The second angle
+     * \param acceptance_margin The margin that is allowed (defaults to 0.5)
+     * \return true if the angles are withing the specified margin, otherwise false
+     */
     inline bool is_withing_margin(double angle_a, double angle_b, double acceptance_margin = 0.5) {
         auto angle_deg = abs(rad_to_deg(angle_a) - rad_to_deg(angle_b));
         return angle_deg <= acceptance_margin;
@@ -719,6 +748,14 @@ namespace calc {
     */
     bool compute_intersection_points(cv::Vec4d& horizontal_line, const cv::Vec4d& left_border, const cv::Vec4d& right_border, cv::Vec4d& output);
 
+    /**
+     * \brief Computes the margin of offset from the borders. This is depending on (for now unspecified, set to 40) curcomstances
+     * for which the close are near the borders should NOT be considered.
+     * \tparam T Type of vectors
+     * \param left_border The left border area
+     * \param right_border The right border area
+     * \return The newly computed margin
+     */
     template <typename T>
     cv::Vec<T, 2> compute_intersection_cut(const cv::Vec<T, 4>& left_border, const cv::Vec<T, 4>& right_border) {
 
@@ -727,6 +764,12 @@ namespace calc {
         return cv::Vec<T, 2>(40.0, 40.0);
     }
 
+    /**
+     * \brief Computes the average of values in a vector, wrapped in safety
+     * \tparam T The type of value
+     * \param vec The vector containing the values
+     * \return The average as double precision floating point
+     */
     template <typename T>
     double avg(std::vector<T>& vec) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
@@ -743,7 +786,6 @@ namespace calc {
 
         return sum / static_cast<double>(vec.size());
     }
-
 
     /**
      * \brief Computes a avg rectangle
@@ -869,30 +911,58 @@ namespace calc {
         return sum / vec.size();
     }
 
+    /**
+     * \brief Computes the avg X of a 4 sized vector of arbitrary type
+     * \tparam T Type of vector
+     * \param vec The vector (4 sized) to get the X avg from
+     * \return The average X as double precision floating point
+     */
     template <typename T>
     double avg_x(cv::Vec<T, 4>& vec) {
         static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
         return (vec[0] + vec[2]) / 2;
     }
 
+    /**
+     * \brief Computes the avg X of a 6 sized vector of arbitrary type
+     * \tparam T The type
+     * \param vec The vector
+     * \return The average of X as double precision floating point
+     */
     template <typename T>
     double avg_x(cv::Vec<T, 6>& vec) {
         static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
         return (vec[0] + vec[2] + vec[4]) * (1 / 3);
     }
 
+    /**
+     * \brief Computes the avg X of an arbitraty vector
+     * \tparam T The type of the vector
+     * \tparam C The size of the vector, must be greater than zero
+     * \param vec The vector to compute X avg of
+     * \return The avg of X values as double precision floating point
+     */
     template <typename T, int C>
     double avg_x(cv::Vec<T, C>& vec) {
         static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
+        static_assert(C > 0, "Size must be greater than zero.");
         auto sum = 0.0;
         for (auto i = 0; i < C; i += 2)
             sum += vec[i];
         return sum * (1 / (C / 2));
     }
 
+    /**
+     * \brief Computes the avg of both X and Y values of a vector
+     * \tparam T The type of the vector
+     * \tparam C The size of the vector, must be greater than zero
+     * \param vec The vector to compute the avg of
+     * \return A single vector of size 2 with the average values of the same type as input vector
+     */
     template <typename T, int C>
     cv::Vec<T, 2> avg_xy(cv::Vec<T, C>& vec) {
-        static_assert(std::is_floating_point<T>::value, "avg_xy is only possible for arithmetic types.");
+        static_assert(std::is_floating_point<T>::value, "avg_xy is only possible for floats.");
+        static_assert(C > 0, "Size must be greater than zero.");
         auto sumX = 0.0;
         auto sumY = 0.0;
         for (auto i = 0; i < C; i += 2) {
@@ -902,6 +972,12 @@ namespace calc {
         return cv::Vec<T, C>(sumX, sumY);
     }
 
+    /**
+     * \brief Compute the avg X and Y of a vector of points
+     * \tparam T The type of points
+     * \param vec The vector containing the points
+     * \return A single vector of double precision floating point which holds the average X and Y values
+     */
     template <typename T>
     cv::Vec2d avg_xy(std::vector<cv::Point_<T>>& vec) {
         static_assert(std::is_arithmetic<T>::value, "avg_xy is only possible for arithmetic types.");
@@ -986,11 +1062,13 @@ namespace calc {
     }
 
     /**
-     * \brief 
-     * \tparam T 
-     * \param image 
-     * \param output 
-     * \return 
+     * \brief Computes the real intensity line (condensed version).
+     * Each column is sliced and the weigthed mass of the intensity levels are computed
+     * to a single Y value for each X value.
+     * \tparam T The type The type of points to put the line into
+     * \param image The image to be sliced
+     * \param output The resulting points
+     * \return The avg value of the entirety of the resulting new Y values
      */
     template <typename T>
     double real_intensity_line(cv::Mat& image, std::vector<cv::Point_<T>>& output) {
@@ -1139,6 +1217,13 @@ namespace calc {
         return maxval(maxval(a, b), c);
     }
 
+    /**
+     * \brief Branchless min() function for integrals
+     * \tparam T The type
+     * \param a The first value
+     * \param b The second value
+     * \return The lowest of the two values
+     */
     template <typename T>
     double minval(T a, T b) {
         static_assert(std::is_integral<T>::value, "Wrong type.");
@@ -1146,8 +1231,19 @@ namespace calc {
         //return a < b ? a : b;
     }
 
+    /**
+     * \brief Computes the minimum value of three values
+     * \tparam T1 The type of the first value
+     * \tparam T2 The type of the second value
+     * \tparam T3 The type of the third value
+     * \param a The first value
+     * \param b The second value
+     * \param c The third value
+     * \return The lowest of the three values
+     */
     template <typename T1, typename T2, typename T3>
     double minval(T1 a, T2 b, T3 c) {
+        static_assert(std::is_integral<T1>::value && std::is_integral<T2>::value && std::is_integral<T3>::value, "Incompatible types.");
         return minval(minval(a, b), c);
     }
 
