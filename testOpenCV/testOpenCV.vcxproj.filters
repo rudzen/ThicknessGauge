@@ -449,7 +449,7 @@
     <ClInclude Include="tclap\ZshCompletionOutput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="namespaces\cvr_.h">
+    <ClInclude Include="namespaces\cvr.h">
       <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
   </ItemGroup>

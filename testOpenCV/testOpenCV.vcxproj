@@ -240,7 +240,7 @@
     <ClInclude Include="Exceptions\InvalidFileException.h" />
     <ClInclude Include="CV\LineSparse.h" />
     <ClInclude Include="CV\LineConfig.h" />
-    <ClInclude Include="namespaces\cvr_.h" />
+    <ClInclude Include="namespaces\cvr.h" />
     <ClInclude Include="namespaces\draw.h" />
     <ClInclude Include="namespaces\filesystem.h" />
     <ClInclude Include="namespaces\pixel.h" />
