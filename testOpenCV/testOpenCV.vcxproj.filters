@@ -314,9 +314,6 @@
     <ClInclude Include="namespaces\filesystem.h">
       <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
-    <ClInclude Include="namespaces\cvR.h">
-      <Filter>Header Files\Namespaces</Filter>
-    </ClInclude>
     <ClInclude Include="namespaces\stl.h">
       <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
@@ -451,6 +448,9 @@
     </ClInclude>
     <ClInclude Include="tclap\ZshCompletionOutput.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="namespaces\cvr_.h">
+      <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,7 @@
 
 #include <array>
 #include <ostream>
-#include "namespaces/cvR.h"
+#include "namespaces/cvr.h"
 #include "CV/Frames.h"
 
 class ThicknessGaugeData {

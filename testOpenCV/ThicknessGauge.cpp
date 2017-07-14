@@ -30,7 +30,7 @@
 #include "namespaces/filters.h"
 #include "namespaces/sort.h"
 #include "namespaces/validate.h"
-#include "namespaces/cvR.h"
+#include "namespaces/cvr.h"
 #include "namespaces/draw.h"
 #include <future>
 

@@ -1366,6 +1366,7 @@ namespace calc {
      */
     template <typename T>
     int count_bits(T v) {
+        static_assert(std::is_integral<T>::value, "Wrong type.");
         v = v - ((v >> 1) & static_cast<T>(~static_cast<T>(0)) / 3); // temp
         v = (v & static_cast<T>(~static_cast<T>(0)) / 15 * 3) + ((v >> 2) & static_cast<T>(~static_cast<T>(0)) / 15 * 3); // temp
         v = (v + (v >> 4)) & static_cast<T>(~static_cast<T>(0)) / 255 * 15; // temp

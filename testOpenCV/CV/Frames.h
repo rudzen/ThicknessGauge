@@ -1,7 +1,7 @@
 #pragma once
 #include <opencv2/core/mat.hpp>
 #include <Camera/OpenCVCap.h>
-#include "namespaces/cvR.h"
+#include "namespaces/cvr.h"
 #include <ostream>
 
 /**
