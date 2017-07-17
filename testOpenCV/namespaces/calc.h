@@ -79,6 +79,9 @@ namespace calc {
 #endif
     }
 
+    /**
+     * \brief Contains line specific computational functions
+     */
     namespace line {
 
         /**
@@ -130,6 +133,9 @@ namespace calc {
 
     }
 
+    /**
+     * \brief Contains pixel specific computational functions
+     */
     namespace pixels {
 
         /**
@@ -201,6 +207,9 @@ namespace calc {
 
     } // namespace pixels
 
+    /**
+     * \brief Contains lens specific computational functions
+     */
     namespace lens {
 
         /**
@@ -444,6 +453,7 @@ namespace calc {
 
     /**
      * \brief Calculates the angle between two points with a specified central point
+     * NOT WORKING ATM!
      * \tparam T The type
      * \param p1_x X of point 1
      * \param p2_x X of point 2
@@ -551,12 +561,28 @@ namespace calc {
         return dist_manhattan(p1.x, p2.x, p1.y, p1.y);
     }
 
+    /**
+     * \brief OpenCV normalizations function wrapper
+     * \tparam T1 Type for point 1
+     * \tparam T2 Type for point 2
+     * \param p1 The first point
+     * \param p2 The second point
+     * \return The normalized dist
+     */
     template <typename T1, typename T2>
     double dist_norm(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "dist_real is only possible for arithmetic types.");
         return cv::norm(p2 - p1);
     }
 
+    /**
+     * @overload
+     * \tparam T1 Type of point 1
+     * \tparam T2 Type of point 2
+     * \param p1 The first point
+     * \param p2 The second point
+     * \return The slobe as double float
+     */
     template <typename T1, typename T2>
     double slope(cv::Point_<T1>& p1, cv::Point_<T2>& p2) {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "slope is only possible for arithmetic types.");
