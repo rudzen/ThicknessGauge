@@ -5,9 +5,11 @@
 
 #pragma once
 #include <opencv2/core/mat.hpp>
-#include "CV/LineConfig.h"
 #include "calc.h"
 
+/**
+ * \brief Contains direct pixel manipulation functionality
+ */
 namespace pixel {
 
     /**
@@ -29,11 +31,13 @@ namespace pixel {
      */
     template <typename T>
     bool is_pixel(cv::Mat& image, cv::Point_<T>& pixel) {
-        if (pixel.x > image.cols)
+        if (pixel.x > image.cols) {
             return false;
+        }
 
-        if (pixel.y > image.rows)
+        if (pixel.y > image.rows) {
             return false;
+        }
 
         return get_intensity(image, pixel) > 0;
     }
@@ -52,8 +56,9 @@ namespace pixel {
 
         cv::LineIterator it(image, cv::Point(calc::round(vector[0]), calc::round(vector[1])), cv::Point(calc::round(vector[2]), calc::round(vector[3])), connectivity, left_to_right);
 
-        if (it.count == 0)
+        if (it.count == 0) {
             return 0;
+        }
 
         auto sum = 0.0;
         for (auto i = 0; i < it.count; i++ , ++it) {

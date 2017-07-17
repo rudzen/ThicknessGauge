@@ -22,8 +22,9 @@ namespace file {
 
     bool create_directory(const std::string& pathname) {
 #ifdef __unix__
-        if (!is_name_legal(std::string(r.begin(), r.end())))
+        if (!is_name_legal(std::string(r.begin(), r.end()))) {
             return false;
+        }
 		mkdir(pathname.c_str());
         return true;
 #else
@@ -37,8 +38,9 @@ namespace file {
 
         auto done = is_name_legal(std::string(r.begin(), r.end()));
 
-        if (!done)
+        if (!done) {
             return false;
+        }
 
         done = CreateDirectory(r.c_str(), nullptr);
         return done;
@@ -47,10 +49,12 @@ namespace file {
 
     bool is_directory(const std::string& pathname) {
         struct stat info;
-        if (stat(pathname.c_str(), &info) != 0)
+        if (stat(pathname.c_str(), &info) != 0) {
             return false;
-        if (info.st_mode & S_IFDIR)
+        }
+        if (info.st_mode & S_IFDIR) {
             return true;
+        }
         return false;
     }
 
@@ -122,16 +126,18 @@ namespace file {
 
         token.reserve(output->org.size());
 
-        while (getline(ss, token, path_seperator))
+        while (getline(ss, token, path_seperator)) {
             output->complete_path.emplace_back(std::move(token));
+        }
 
         token.clear();
 
         for (const auto& p : output->complete_path) {
             token += p;
             token += path_seperator;
-            if (!is_directory(token))
+            if (!is_directory(token)) {
                 break;
+            }
             output->legal_part.emplace_back(token);
         }
 
@@ -142,9 +148,11 @@ namespace file {
 
     inline
     bool is_name_legal(const std::string& name) {
-        for (const auto& c : name)
-            if (illegal_chars.find(c) != std::string::npos)
+        for (const auto& c : name) {
+            if (illegal_chars.find(c) != std::string::npos) {
                 return false;
+            }
+        }
         return true;
     }
 }

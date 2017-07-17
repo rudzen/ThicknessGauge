@@ -7,6 +7,9 @@
 
 #include "calc.h"
 
+/**
+ * \brief Contains functionality to sort different structures
+ */
 namespace sorter {
 
     /**

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "../testOpenCV/namespaces/sort.h"
-#include "namespaces/cvr.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -13,26 +12,26 @@ namespace ThicknessGaugeTest {
 
         TEST_METHOD(TestBinarySearch) {
             
-            const int value = 42;
-            const int point_count = 2000;
-            const bool expected_false = false;
+            //const int value = 42;
+            //const int point_count = 2000;
+            //const bool expected_false = false;
 
-            std::vector<cv::Point> points;
-            points.reserve(point_count);
+            //std::vector<cv::Point> points;
+            //points.reserve(point_count);
 
-            for (auto i = 0; i < point_count; i++) {
-                points.emplace_back(cv::Point(i + 10, i));
-            }
+            //for (auto i = 0; i < point_count; i++) {
+            //    points.emplace_back(cv::Point(i + 10, i));
+            //}
 
-            bool exists = sorter::search_x(points, value);
+            //bool exists = sorter::search_x(points, value);
 
-            Assert::IsFalse(exists);
+            //Assert::IsFalse(exists);
 
-            points[4].x = value;
+            //points[4].x = value;
 
-            exists = sorter::search_x(points, value);
+            //exists = sorter::search_x(points, value);
 
-            Assert::IsTrue(exists);
+            //Assert::IsTrue(exists);
 
         }
 

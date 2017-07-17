@@ -7,6 +7,9 @@
 #include <opencv2/core/types.hpp>
 #include <opencv2/shape/hist_cost.hpp>
 
+/**
+ * \brief Contains STL helper functionality
+ */
 namespace stl {
 
     template <typename T1, typename T2>
@@ -36,8 +39,9 @@ namespace stl {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
         vec.clear();
         vec.reserve(limit);
-        for (auto i = 0; i < limit; i++)
+        for (auto i = 0; i < limit; i++) {
             vec.emplace_back(cv::Point_<T>(i, 0));
+        }
 
         vec.shrink_to_fit();
     }
