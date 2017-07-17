@@ -1,0 +1,10 @@
+
+=== Start: [2017/07/17 15:46:48] === 
+Analysis started...
+Result file: C:\ThicknessGauge\testOpenCV\My Inspector Results - ThicknessGauge\r000mi2\r000mi2.inspxe 
+Error: An internal error has occurred. Our apologies for this inconvenience. Please gather a description of the steps leading up to the problem and contact the Intel customer support team.
+Error: An internal error has occurred. Our apologies for this inconvenience. Please gather a description of the steps leading up to the problem and contact the Intel customer support team.
+Application exit code: -1 
+Result file: C:\ThicknessGauge\testOpenCV\My Inspector Results - ThicknessGauge\r000mi2\r000mi2.inspxe 
+Analysis terminated
+=== End: [2017/07/17 15:46:53] === 

@@ -6,14 +6,14 @@
 
 Seeker::Seeker()
     : current_phase_(Phase::ONE)
-      , current_frameset_(nullptr) {
+    , current_frameset_(nullptr) {
     phase_roi_[0] = def_phase_one_roi_;
 
 }
 
 Seeker::Seeker(capture_roi phase_one_roi)
     : current_phase_(Phase::ONE)
-      , current_frameset_(nullptr) {
+    , current_frameset_(nullptr) {
     phase_roi_[0] = phase_one_roi;
 }
 
@@ -92,13 +92,11 @@ bool Seeker::initialize() {
 
 double Seeker::phase_finalize() {
 
-
     // alternate version for phase two, contains computation for both sides.
     // uses closest parallel match to counter misbehaviour of laser.
 
     // note.. the angle detection might not be fine grained enough to detect < 0.3 degrees,
     // this results in this function being completly useless.
-
 
     /* (left side illustration, very rough)
       
@@ -172,7 +170,6 @@ double Seeker::phase_finalize() {
 
     log_time << __FUNCTION__ << " computing difference: ";
 
-
     auto diff = 0.0;
 
     // doesn't work
@@ -219,26 +216,26 @@ void Seeker::process_mat_for_line(cv::Mat& org, std::shared_ptr<HoughLinesPR>& h
 
 void Seeker::switch_phase() {
     switch (current_phase_) {
-    case Phase::NONE:
-        current_phase_ = Phase::ONE;
-        break;
-    case Phase::ONE:
-        current_phase_ = Phase::TWO_LEFT;
-        break;
-    case Phase::TWO_LEFT:
-        current_phase_ = Phase::TWO_RIGHT;
-        break;
-    case Phase::TWO_RIGHT:
-        current_phase_ = Phase::THREE;
-        break;
-    case Phase::THREE:
-        current_phase_ = Phase::DONE;
-        break;
-    case Phase::DONE:
-        current_phase_ = Phase::NONE;
-        break;
-    default:
-        current_phase_ = Phase::FAIL;
+        case Phase::NONE:
+            current_phase_ = Phase::ONE;
+            break;
+        case Phase::ONE:
+            current_phase_ = Phase::TWO_LEFT;
+            break;
+        case Phase::TWO_LEFT:
+            current_phase_ = Phase::TWO_RIGHT;
+            break;
+        case Phase::TWO_RIGHT:
+            current_phase_ = Phase::THREE;
+            break;
+        case Phase::THREE:
+            current_phase_ = Phase::DONE;
+            break;
+        case Phase::DONE:
+            current_phase_ = Phase::NONE;
+            break;
+        default:
+            current_phase_ = Phase::FAIL;
     }
 
 }
@@ -323,7 +320,6 @@ bool Seeker::phase_one() {
                 targets.clear();
                 pcapture->cap(frames_to_capture, targets);
 
-
                 auto current_frame = targets.back();
                 //cv::imwrite("exposure" + std::to_string(e) + "_1.png", current_frame);
 
@@ -358,18 +354,18 @@ bool Seeker::phase_one() {
                 //cv::imwrite("exposure" + std::to_string(e) + "_4.png", hough_vertical->output());
 
                 switch (hough_result) {
-                case 0:
-                    // everything ok
-                    break;
-                case -1:
-                    log_err << __FUNCTION__ << " No lines detect.\n";
-                    continue;
-                case -2:
-                    log_err << __FUNCTION__ << " No valid lines detected.\n";
-                    continue;
-                default:
-                    // nada
-                    break;
+                    case 0:
+                        // everything ok
+                        break;
+                    case -1:
+                        log_err << __FUNCTION__ << " No lines detect.\n";
+                        continue;
+                    case -2:
+                        log_err << __FUNCTION__ << " No valid lines detected.\n";
+                        continue;
+                    default:
+                        // nada
+                        break;
                 }
 
                 // perform intersection check for left side lines
@@ -386,7 +382,6 @@ bool Seeker::phase_one() {
 
                 // compute the border values from the lines
                 hough_vertical->compute_borders();
-
 
                 // validate the data for abnormalities
 
@@ -469,7 +464,6 @@ bool Seeker::phase_one() {
     } catch (std::exception& e) {
         log_err << __FUNCTION__ " exception.. " << e.what();
     }
-
 
     log_time << __FUNCTION__ << " marking rect found : " << hough_vertical->marking_rect() << '\n';
 
@@ -745,16 +739,264 @@ bool Seeker::phase_two_left() {
 
     return true;
 
-
-    // ************  RIGHT SIDE **************
-
-
-
 }
 
 bool Seeker::phase_two_right() {
 
-    pdata->base_lines[3] = pdata->base_lines[1];
+    log_time << "Phase two configuration started..\n";
+
+    switch_phase();
+
+    std::vector<cv::Mat> right_frames;
+
+    // clear any buffer
+    pcapture->region(buffer_clear_roi);
+    pcapture->cap(3, right_frames);
+    right_frames.clear();
+
+    // prep for next phase
+    // TODO : Adjust for right side!
+    pcapture->region(phase_roi_[1]);
+
+    auto phase = frameset(current_phase_);
+
+    // make sure the minimum is at least 10 pixels.
+    auto min_line_len = calc::line::compute_houghp_min_line(10.0, pdata->marking_rect);
+
+    // horizontal houghline extension class
+    auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), false);
+    hough_horizontal->max_line_gab(12);
+    hough_horizontal->marking_rect(cv::Rect2d(phase_roi_[1].x, phase_roi_[1].y, phase_roi_[1].width, phase_roi_[1].height));
+
+    //auto right_size = cv::Size(left_baseline.width, left_baseline.height);
+    auto right_cutoff = phase_roi_[1].width / 2.0;
+
+    // prepare target element structure
+    std::vector<cv::Point2f> elements;
+    elements.reserve(512);
+
+    // update base exposure for this phase if it hasnt been configured earlier.
+    if (phase_two_base_exposure_ == 0) {
+        phase_two_base_exposure_ = phase_one_exposure * 4;
+    }
+
+    // configure exposure values for phase two
+    std::vector<unsigned long> p2_exposures;
+    p2_exposures.reserve(50);
+    for (ulong i = 0; i < 50; i++) {
+        p2_exposures.push_back(phase_two_base_exposure_ + exposure_levels->exposure_increment * i);
+    }
+
+    auto running = true;
+    auto found = false;
+
+    cv::Mat org;
+
+    log_time << "Phase two right begun..\n";
+
+    // ************  RIGHT SIDE ONLY **************
+
+    const std::string win = "what";
+
+    // attempt to find a good exposure for this phase
+    while (running) {
+
+        right_frames.clear();
+
+        found = false;
+
+        for (const auto exp : p2_exposures) {
+
+            // adjust exposure and capture frames
+            pcapture->exposure(exp);
+            pcapture->cap(2, right_frames);
+
+            // configure structures
+            org = right_frames.back().clone();
+            auto h = org.clone();
+            hough_horizontal->original(h);
+
+            // process matrix for line detection
+            process_mat_for_line(org, hough_horizontal, pmorph.get());
+
+            // get results
+            const auto& lines = hough_horizontal->all_lines(); // inner most side
+
+            //log_time << __FUNCTION__ << " lines.size() : " << lines.size() << '\n';
+
+            // not enough lines, we are greedy
+            if (lines.size() < 2) {
+                continue;
+            }
+
+            // copy found lines to target structure
+            for (auto& line : lines) {
+                //if (line.entry_[0] > left_cutoff)                
+                stl::copy_vector(line.elements_, elements);
+            }
+
+            // check if there is enough to work with
+            if (elements.size() > 3) { // && elements.front().y != elements.back().y) {
+                phase_two_base_exposure_ = exp;
+                running = false;
+                found = true;
+                break;
+            }
+
+            // whoops
+            if (exp > 100'000) {
+                log_err << "left side failed to produce valid lines.";
+                return false;
+            }
+
+        }
+
+        if (found) {
+            log_time << "Phase two _right_ exposure detected.. " << phase_two_base_exposure_ << '\n';
+            break;
+        }
+
+        log_err << __FUNCTION__ << " unable to detect correct exposure :(\n";
+        return false;
+
+    }
+
+    // adjust capture ROI based on found lines.
+
+    auto line_area = cv::minAreaRect(elements);
+    auto line_area_rect = line_area.boundingRect();
+
+    log_time << __FUNCTION__ " right boundry detected : " << line_area_rect << '\n';
+
+    auto old_roi = pcapture->region();
+
+    capture_roi new_roi;
+
+    // adjust the new roi according to findings
+    new_roi.x = old_roi.x + static_cast<unsigned long>(floor(line_area_rect.x));
+    new_roi.y = old_roi.y + static_cast<unsigned long>(floor(line_area_rect.y));
+    new_roi.width = static_cast<unsigned long>(ceil(line_area_rect.width));
+    new_roi.height = static_cast<unsigned long>(ceil(line_area_rect.height));
+
+    log_time << __FUNCTION__ << " new_roi changed to " << new_roi << '\n';
+
+    // the offset calculation begins with setting the base roi y value
+    auto offset_y = static_cast<double>(new_roi.y);
+    //auto offset_y = static_cast<double>(phase_roi_[1].y);
+
+    log_time << __FUNCTION__ " init offset_y + new_roi.y : " << offset_y << '\n';
+
+    phase_roi_[1] = new_roi;
+
+    // empty the buffer
+    log_time << __FUNCTION__ << " clearing buffer..\n";
+    pcapture->region(capture_roi(1, 1, 1, 1));
+    pcapture->cap(3, right_frames);
+    right_frames.clear();
+
+    // only update region, exposure should be at desired level at this point
+    pcapture->region(new_roi);
+
+    // multiply the exposure because it's most likely pretty gloomy there
+    pcapture->exposure_mul(DEF_PHASE_TWO_MULTIPLIER);
+
+    running = true;
+
+    auto const frame_count = 25;
+
+    auto right_y = 0.0;
+
+    //cv::namedWindow("morph");
+
+    // capture right frames for real and process the result
+    while (running) {
+
+        right_y = 0.0;
+        right_frames.clear();
+        elements.clear();
+        hough_horizontal->clear();
+
+        pcapture->cap(frame_count, right_frames);
+
+        if (right_frames.empty()) {
+            log_err << __FUNCTION__ << " fatal error, no frames were captured!\n";
+            continue;
+        }
+
+        // iterate through the captured frames, don't skip any as the buffer should be alright.
+        for (const auto& right : right_frames) {
+
+            org = right.clone();
+            auto h = right.clone();
+            hough_horizontal->original(h);
+
+            process_mat_for_line(org, hough_horizontal, pmorph.get());
+
+            // grab everything, since we already have defined the roi earlier
+            const auto& lines = hough_horizontal->all_lines();
+
+            for (const auto& line : lines) {
+                stl::copy_vector(line.elements_, elements);
+            }
+
+        }
+
+        if (elements.empty()) {
+            log_err << __FUNCTION__ " fatal error, elements are empty!\n";
+            return false;
+        }
+
+        auto boundry_area = cv::minAreaRect(elements);
+        auto boundry_area_rect = boundry_area.boundingRect2f();
+
+        // adjust to reduce crap
+        //left_boundry_rect.width -= 40;
+
+        cvr::rect_force_align_boundries<float, 0>(boundry_area_rect, static_cast<float>(right_frames.front().cols), static_cast<float>(right_frames.front().rows));
+
+        if (!validate::validate_rect(boundry_area_rect)) {
+            log_err << __FUNCTION__ << " invalid rect in phase two [right], restarting phase two.\n";
+            continue;
+        }
+
+        auto t = org(boundry_area_rect);
+
+        try {
+            right_y += calc::real_intensity_line(t, pdata->right_points, t.rows, 0);
+        } catch (cv::Exception& e) {
+            log_err << __FUNCTION__ << " " << e.what() << '\n';
+            continue;
+        }
+
+        running = false;
+
+    }
+
+    offset_y += right_y;
+
+    log_time << __FUNCTION__ " offset_y + right_y : " << offset_y << '\n';
+
+    pdata->base_lines[3] = offset_y;
+
+    // align points the match the real location in the image.
+    for (auto& p : pdata->right_points) {
+        p.y += offset_y;
+        //std::cout << p << " - ";
+    }
+
+    std::cout << '\n';
+
+    const std::string ko = "_phase2_right.png";
+    // snap the freaking image
+    cv::imwrite(ko, right_frames.front());
+
+    log_time << "right baseline: " << pdata->base_lines[3] << '\n';
+
+    // return exposure to "normal"
+    pcapture->exposure_div(DEF_PHASE_TWO_MULTIPLIER);
+
+    // update the phase roi for right side
+    //phase_roi<int, 1>(line_area_rect);
 
     return true;
 
@@ -762,9 +1004,7 @@ bool Seeker::phase_two_right() {
 
 bool Seeker::phase_two_line() {
 
-
     const double FUTILE_ACCEPTENCE = 0.5;
-
 
     log_time << __FUNCTION__ " started..\n";
 
@@ -794,7 +1034,6 @@ bool Seeker::phase_two_line() {
 
     //auto left_size = cv::Size(left_baseline.width, left_baseline.height);
     auto left_cutoff = phase_roi_[1].width / 2.0;
-
 
     return true;
 }
@@ -958,16 +1197,16 @@ bool Seeker::phase_three() {
 
 int Seeker::frameset(Phase phase) {
     switch (phase) {
-    case Phase::ONE:
-        return 0;
-    case Phase::TWO_RIGHT:
-        return 1;
-    case Phase::TWO_LEFT:
-        return 2;
-    case Phase::THREE:
-        return 3;
-    default:
-        return -1;
+        case Phase::ONE:
+            return 0;
+        case Phase::TWO_RIGHT:
+            return 1;
+        case Phase::TWO_LEFT:
+            return 2;
+        case Phase::THREE:
+            return 3;
+        default:
+            return -1;
     }
 }
 
@@ -1003,7 +1242,6 @@ bool Seeker::compute(bool do_null, cv::Rect_<unsigned long>& marking_rect, unsig
 
         log_time << "phase two left region configured : " << phase_roi_[1] << '\n';
 
-
     } else {
         phase_complete = phase_one();
 
@@ -1012,7 +1250,6 @@ bool Seeker::compute(bool do_null, cv::Rect_<unsigned long>& marking_rect, unsig
             return false;
         }
     }
-
 
     log_time << __FUNCTION__ << " phase one completed ok..\n";
 

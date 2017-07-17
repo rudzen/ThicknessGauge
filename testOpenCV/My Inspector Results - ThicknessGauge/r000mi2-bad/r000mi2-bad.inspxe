@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+ <rdmgr>
+  <timestamp type="u64_t">1500299207</timestamp>
+  <hostname>DESKTOP-9J5N95Q</hostname>
+  <os>windows</os>
+  <product>Intel® Inspector 2017 Update 3</product>
+  <buildNumber type="s32_t">512010</buildNumber>
+  <logicalCPUCount type="s32_t">8</logicalCPUCount>
+  <CPUFrequency type="s64_t">4515000000</CPUFrequency>
+  <CPUFamily type="s32_t">21</CPUFamily>
+  <CPUModel type="s32_t">2</CPUModel>
+  <CPUStepping type="s32_t">0</CPUStepping>
+  <CPUBrandName>AMD FX(tm)-8350 Eight-Core Processor           </CPUBrandName>
+  <isa>avx</isa>
+  <collectionTimeBegin type="u64_t">1500299207</collectionTimeBegin>
+  <collectionTimeEnd type="u64_t">1500299213</collectionTimeEnd>
+  <variables>
+   <at>mi2</at>
+  </variables>
+ </rdmgr>
+</root>
