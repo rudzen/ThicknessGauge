@@ -125,8 +125,9 @@ namespace calc {
         bool compute_line_fitting(std::vector<cv::Point_<T>>& pixels, cv::Vec4f& result, LineConfig& config) {
             cv::Vec4f results;
             cv::fitLine(pixels, results, config.dist_type(), config.params(), config.reps(), config.aeps());
-            if (!validate::valid_vec<float, 4>(results))
+            if (!validate::valid_vec<float, 4>(results)) {
                 return false;
+            }
             result = results;
             return true;
         }
@@ -197,8 +198,9 @@ namespace calc {
                 count++;
             }
 
-            if (pixels.empty())
+            if (pixels.empty()) {
                 return false;
+            }
 
             y_mean /= pixels.size();
 
@@ -413,8 +415,9 @@ namespace calc {
         static_assert(std::is_arithmetic<T1>::value || std::is_arithmetic<T2>::value, "slope is only possible for arithmetic types.");
         static_assert(std::is_convertible<T1, T2>::value, "slope argument types must be convertible.");
         double dx = x2 - x1;
-        if (dx == 0.0)
+        if (dx == 0.0) {
             return 0.0;
+        }
         double dy = y2 - y1;
         return dy / dx;
     }
@@ -427,12 +430,15 @@ namespace calc {
     template <typename T>
     SlobeDirection slobe_direction(T slope) {
         static_assert(std::is_arithmetic<T>::value, "slobe_direction is only possible for arithmetic types.");
-        if (std::isinf(slope))
+        if (std::isinf(slope)) {
             return SlobeDirection::VERTICAL;
-        if (slope < 0.0)
+        }
+        if (slope < 0.0) {
             return SlobeDirection::DESCENDING;
-        if (slope > 0.0)
+        }
+        if (slope > 0.0) {
             return SlobeDirection::ASCENDING;
+        }
         return SlobeDirection::HORIZONTAL;
     }
 
@@ -607,11 +613,13 @@ namespace calc {
 
         auto a = dot / (len_1 * len_2);
 
-        if (a >= 1.0)
+        if (a >= 1.0) {
             return 0.0;
+        }
 
-        if (a <= -1.0)
+        if (a <= -1.0) {
             return PI;
+        }
 
         return acos(a); // 0..PI
     }
@@ -709,8 +717,9 @@ namespace calc {
         auto d2 = p2 - o2;
 
         auto cross = d1.x * d2.y - d1.y * d2.x;
-        if (abs(cross) < /*EPS*/1e-8)
+        if (abs(cross) < /*EPS*/1e-8) {
             return false;
+        }
 
         auto x = o2 - o1;
 
@@ -735,8 +744,9 @@ namespace calc {
         auto cross = d1.x * d2.y - d1.y * d2.x;
 
         // check for EPS boundry
-        if (abs(cross) < 1e-8)
+        if (abs(cross) < 1e-8) {
             return false;
+        }
         return true;
     }
 
@@ -801,14 +811,17 @@ namespace calc {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
 
         auto sum = 0.0;
-        if (vec.empty())
+        if (vec.empty()) {
             return sum;
+        }
 
-        if (vec.size() == 1)
+        if (vec.size() == 1) {
             return vec.front();
+        }
 
-        for (const auto v : vec)
+        for (const auto v : vec) {
             sum += v;
+        }
 
         return sum / static_cast<double>(vec.size());
     }
@@ -823,11 +836,13 @@ namespace calc {
     cv::Rect2d avg(std::vector<cv::Rect_<T>>& vec_rects) {
         static_assert(std::is_arithmetic<T>::value, "type is only possible for arithmetic types.");
 
-        if (vec_rects.empty())
+        if (vec_rects.empty()) {
             return cv::Rect_<T>(0, 0, 0, 0);
+        }
 
-        if (vec_rects.size() == 1)
+        if (vec_rects.size() == 1) {
             return cv::Rect_<T>(vec_rects.front());
+        }
 
         cv::Rect2d tmp;
 
@@ -858,11 +873,13 @@ namespace calc {
 
         auto sum = 0.0;
 
-        if (vec.empty())
+        if (vec.empty()) {
             return sum;
+        }
 
-        for (const auto& v : vec)
+        for (const auto& v : vec) {
             sum += v.y;
+        }
 
         return sum / static_cast<double>(vec.size());
     }
@@ -879,14 +896,17 @@ namespace calc {
 
         auto sum = 0.0;
 
-        if (vec_rects.empty())
+        if (vec_rects.empty()) {
             return sum;
+        }
 
-        if (vec_rects.size() == 1)
+        if (vec_rects.size() == 1) {
             return vec_rects.front().y;
+        }
 
-        for (const auto& r : vec_rects)
+        for (const auto& r : vec_rects) {
             sum += r.y;
+        }
 
         return sum / static_cast<double>(vec_rects.size());
     }
@@ -928,11 +948,13 @@ namespace calc {
 
         auto sum = 0.0;
 
-        if (vec.empty())
+        if (vec.empty()) {
             return sum;
+        }
 
-        for (const auto& v : vec)
+        for (const auto& v : vec) {
             sum += v.x;
+        }
 
         return sum / vec.size();
     }
@@ -973,8 +995,9 @@ namespace calc {
         static_assert(std::is_arithmetic<T>::value, "avg_x is only possible for arithmetic types.");
         static_assert(C > 0, "Size must be greater than zero.");
         auto sum = 0.0;
-        for (auto i = 0; i < C; i += 2)
+        for (auto i = 0; i < C; i += 2) {
             sum += vec[i];
+        }
         return sum * (1 / (C / 2));
     }
 
@@ -1010,8 +1033,9 @@ namespace calc {
 
         cv::Vec2d sum(0.0, 0.0);
 
-        if (vec.empty())
+        if (vec.empty()) {
             return sum;
+        }
 
         for (const auto& v : vec) {
             sum[0] += v.x;
@@ -1080,8 +1104,9 @@ namespace calc {
             auto y = m.m01 / m.m00;
 
             // only include values above 0.0 in y-pos
-            if (y > 0.0)
+            if (y > 0.0) {
                 v.y = y;
+            }
         }
 
         return avg_y(output);
@@ -1115,8 +1140,9 @@ namespace calc {
 
             auto y = m.m01 / m.m00;
 
-            if (y > 0.0)
+            if (y > 0.0) {
                 v.y = y;
+            }
 
         }
 
@@ -1206,8 +1232,9 @@ namespace calc {
 		auto d2 = p2 - o2;
 
 		auto cross = d1.x * d2.y - d1.y * d2.x;
-		if (abs(cross) < /*EPS*/1e-8)
+		if (abs(cross) < /*EPS*/1e-8) {
 			return false;
+		}
 
 		auto x = o2 - o1;
 

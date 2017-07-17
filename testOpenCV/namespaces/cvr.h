@@ -10,17 +10,22 @@
 #include "sort.h"
 #include "calc.h"
 
-// helper functions for open cv related stuff.
+/**
+ * \brief Generic helper functionality for OpenCV
+ */
 namespace cvr {
 
-    // helper functions to clear opencv structures without creating new objects
+    /**
+     * \brief Contains functions to allow object clearing without re-creating new ones
+     */
     namespace clear {
 
         template <typename T, int cn>
         void vec(cv::Vec<T, cn>& vec) {
             auto pos = cn;
-            while (pos)
+            while (pos) {
                 vec[pos--] = static_cast<T>(0);
+            }
         }
 
         template <typename T>
@@ -83,8 +88,9 @@ namespace cvr {
         out.width = 0.0;
         auto count = 0;
         for (const auto& r : vecrec) {
-            if (!validate::validate_rect(r))
+            if (!validate::validate_rect(r)) {
                 continue;
+            }
             out.x += r.x;
             out.width += r.width;
             count++;
@@ -179,14 +185,15 @@ namespace cvr {
 
         //auto sor = ascending ? sorter::sort_pixels_x_ascending(all_points) : sorter::sort_pixels_x_descending(all_points);
 
-        if (ascending)
+        if (ascending) {
             sorter::sort_pixels_x_ascending(all_points);
-        else
+        } else {
             sorter::sort_pixels_x_descending(all_points);
+        }
 
         std::for_each(all_points.begin(), all_points.begin() + boundry, [&] (cv::Point_<T>& p) {
-                      output.emplace_back(p);
-                  });
+                  output.emplace_back(p);
+              });
 
     }
 
@@ -219,10 +226,12 @@ namespace cvr {
         auto gab = false;
 
         for (auto i = first; i < size; ++i) {
-            if (elements[i].y > target.rows - barrier)
+            if (elements[i].y > target.rows - barrier) {
                 continue;
-            if (i + 1 == size)
+            }
+            if (i + 1 == size) {
                 break;
+            }
             auto x_pos = elements[i].x;
             auto x_next = elements[i + 1].x;
             auto dif = x_next - x_pos;
@@ -231,15 +240,17 @@ namespace cvr {
                 auto y_pos = elements[i].y;
                 auto y_next = elements[i + 1].y;
                 auto y_diff = y_next - y_pos;
-                if (y_diff < 4)
+                if (y_diff < 4) {
                     continue;
+                }
                 gab = true;
             }
             if (gab) {
                 // construct line and populate output vector
                 auto it = cv::LineIterator(cv::Mat(elements[i + 1].x - elements[i].x, calc::maxval(elements[i + 1].y, elements[i].y), CV_8U), elements[i], elements[i + 1], 8);
-                for (auto& p : it)
+                for (auto& p : it) {
                     target.emplace_back(p);
+                }
 
                 sum.x += abs(elements[i + 1].x - elements[i].x);
                 sum.y += abs(elements[i + 1].y - elements[i].y);
@@ -250,12 +261,10 @@ namespace cvr {
         return cv::Vec<T, 2>(sum);
     }
 
-
     template <typename T>
-    void fit_line(std::vector<cv::Point_<T>>& input, cv::Vec<float, 4>& output, LineConfig &config) {
+    void fit_line(std::vector<cv::Point_<T>>& input, cv::Vec<float, 4>& output, LineConfig& config) {
         cv::fitLine(input, output, config.dist_type(), config.params(), config.reps(), config.aeps());
     }
-
 
     /**
      * \brief Gather all elements in vector of points that matches a specific X position
@@ -267,9 +276,11 @@ namespace cvr {
      */
     template <typename T1, typename T2>
     void gather_elemenents_x(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 x) {
-        for (auto& e : input)
-            if (e.x == x)
+        for (auto& e : input) {
+            if (e.x == x) {
                 output.emplace_back(e);
+            }
+        }
     }
 
     /**
@@ -297,9 +308,11 @@ namespace cvr {
      */
     template <typename T1, typename T2>
     void gather_elemenents_y(std::vector<cv::Point_<T1>>& input, std::vector<cv::Point_<T2>>& output, T1 y) {
-        for (auto& e : input)
-            if (e.y == y)
+        for (auto& e : input) {
+            if (e.y == y) {
                 output.emplace_back(e);
+            }
+        }
     }
 
     /**
@@ -339,8 +352,9 @@ namespace cvr {
         cv::findNonZero(image, result);
         y_limit = abs(image.rows - y_limit);
         for (auto& p : result) {
-            if (p.y <= y_limit)
+            if (p.y <= y_limit) {
                 output.emplace_back(p);
+            }
         }
         return !output.empty();
     }
@@ -364,8 +378,9 @@ namespace cvr {
         target.reserve(calc::round(y_limit));
 
         for (auto& p : pixels) {
-            if (p.y <= y_limit)
+            if (p.y <= y_limit) {
                 target.emplace_back(p);
+            }
         }
 
         return !target.empty();
@@ -396,15 +411,19 @@ namespace cvr {
     template <typename T, int min_val>
     void rect_force_align_boundries(cv::Rect_<T>& rect, T max_width, T max_height) {
         static_assert(std::is_arithmetic<T>::value, "Unsupported type.");
-        if (rect.x < min_val)
+        if (rect.x < min_val) {
             rect.x = min_val;
-        if (rect.y < min_val)
+        }
+        if (rect.y < min_val) {
             rect.y = min_val;
+        }
 
-        if (rect.width > max_width)
+        if (rect.width > max_width) {
             rect.width = max_width;
-        if (rect.height > max_height)
+        }
+        if (rect.height > max_height) {
             rect.height = max_height;
+        }
     }
 
     /**
@@ -432,8 +451,9 @@ namespace cvr {
         for (auto col = 0; col < image.cols; ++col) {
             auto uc_pixel = image.data + x * image.step;
             T1 intensity = uc_pixel[0];
-            if (intensity == 0)
+            if (intensity == 0) {
                 continue;
+            }
             sum += intensity;
             count++;
         }
