@@ -236,6 +236,9 @@ private: // internal functions
      */
     void process_mat_for_line(cv::Mat& org, std::shared_ptr<HoughLinesPR>& hough, MorphR* morph) const;
 
+    /**
+     * \brief Switches phase (not used for anything atm)
+     */
     void switch_phase();
 
     bool phase_one();

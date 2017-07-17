@@ -2,6 +2,9 @@
 #include <tclap/Constraint.h>
 #include "FileConstraint.h"
 
+/**
+ * \brief Verify a folders validity
+ */
 class FolderConstraint : public TCLAP::Constraint<std::string> {
 
 public:

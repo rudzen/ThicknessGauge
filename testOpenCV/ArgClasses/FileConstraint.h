@@ -3,6 +3,9 @@
 
 #include "../namespaces/filesystem.h"
 
+/**
+ * \brief Verify a files validity
+ */
 class FileConstraint : public TCLAP::Constraint<std::string> {
 
 public:

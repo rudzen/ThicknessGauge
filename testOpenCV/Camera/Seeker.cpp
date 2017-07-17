@@ -30,8 +30,9 @@ bool Seeker::initialize() {
         pcapture = std::make_unique<CapturePvApi>();
     } else {
         // double check for weirdness
-        if (pcapture->is_open())
+        if (pcapture->is_open()) {
             pcapture->close();
+        }
     }
 
     // always perform complete re-init.
@@ -41,8 +42,9 @@ bool Seeker::initialize() {
         pcapture = std::make_unique<CapturePvApi>();
     } else {
         // double check for weirdness
-        if (pcapture->is_open())
+        if (pcapture->is_open()) {
             pcapture->close();
+        }
     }
 
     // always perform complete re-init.
@@ -278,40 +280,56 @@ bool Seeker::phase_one() {
     pcapture->cap(3, targets);
     targets.clear();
 
+    // set capture region at camera level
     pcapture->region(pcapture->default_roi);
 
+    // populate exposures to check
     std::vector<ulong> exposures;
-    for (auto i = exposure_levels->exposure_start; i <= exposure_levels->exposure_end; i += exposure_levels->exposure_increment)
+    for (auto i = exposure_levels->exposure_start; i <= exposure_levels->exposure_end; i += exposure_levels->exposure_increment) {
         exposures.emplace_back(i);
+    }
 
+    // default amount of frames to capture to make sure there isnt anything in the camera buffer
     auto const frames_to_capture = 3;
 
     log_time << "Running phase one.\n";
 
     auto now = tg::get_now_ms();
 
+    // keep going until stopped manually
     while (running) {
         try {
 
+            // iterate through all exposure values
             for (const auto e : exposures) {
 
+                // clear the data structures
                 markings.clear();
                 left_borders.clear();
                 right_borders.clear();
 
+                // set exposure beforehand
                 phase_one_exposure = e;
 
-                if (!pcapture->exposure(e))
+                // if there was an error while switching exposure
+                // wait 150ms before skipping
+                if (!pcapture->exposure(e)) {
+                    log_err << cv::format("%s .. exposure change failed, skipping exposure value %i\n", __FUNCTION__, e);
+                    tg::sleep(150);
                     continue;
+                }
 
+                // clear targets and capture the frames
                 targets.clear();
                 pcapture->cap(frames_to_capture, targets);
+
 
                 auto current_frame = targets.back();
                 //cv::imwrite("exposure" + std::to_string(e) + "_1.png", current_frame);
 
                 log_time << __FUNCTION__ << " filter processing..\n";
 
+                // filter the image
                 pfilter->image(current_frame);
                 pfilter->do_filter();
 
@@ -319,12 +337,14 @@ bool Seeker::phase_one() {
 
                 log_time << __FUNCTION__ << " canny processing..\n";
 
+                // perform edge detection
                 pcanny->image(pfilter->result());
                 pcanny->do_canny();
 
                 auto t = pcanny->result();
                 //cv::imwrite("exposure" + std::to_string(e) + "_3.png", t);
 
+                // process edge image with houghlines
                 auto tmp = t.clone();
                 hough_vertical->original(tmp);
                 hough_vertical->image(t);
@@ -333,7 +353,8 @@ bool Seeker::phase_one() {
 
                 auto hough_result = hough_vertical->hough_vertical();
                 auto all = hough_vertical->all_lines();
-                hough_vertical->draw_lines(all, cv::Scalar(255, 255, 255));
+
+                //hough_vertical->draw_lines(all, cv::Scalar(255, 255, 255));
                 //cv::imwrite("exposure" + std::to_string(e) + "_4.png", hough_vertical->output());
 
                 switch (hough_result) {
@@ -351,37 +372,45 @@ bool Seeker::phase_one() {
                     break;
                 }
 
+                // perform intersection check for left side lines
                 if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Left)) {
                     log_err << cv::format("Phase one intersection check for left side failed (exposure = %i).\n", phase_one_exposure);
                     continue;
                 }
 
+                // perform intersection check for right side lines
                 if (!hough_vertical->is_lines_intersecting(HoughLinesR::Side::Right)) {
                     log_err << cv::format("Phase one intersection check for right side failed (exposure = %i).\n", phase_one_exposure);
                     continue;
                 }
 
+                // compute the border values from the lines
                 hough_vertical->compute_borders();
 
-                if (validate::validate_rect(hough_vertical->marking_rect()))
+
+                // validate the data for abnormalities
+
+                if (validate::validate_rect(hough_vertical->marking_rect())) {
                     markings.emplace_back(hough_vertical->marking_rect());
+                }
 
-                if (validate::valid_vec(hough_vertical->left_border()))
+                if (validate::valid_vec(hough_vertical->left_border())) {
                     left_borders.emplace_back(hough_vertical->left_border());
+                }
 
-                if (validate::valid_vec(hough_vertical->right_border()))
+                if (validate::valid_vec(hough_vertical->right_border())) {
                     right_borders.emplace_back(hough_vertical->right_border());
+                }
 
-                // check for fatal zero
-                //if (markings.size() + left_borders.size() + right_borders.size() != 0)
-                //    continue;
-
+                // we made it through, allow loop to exit
                 running = false;
                 break;
 
             }
 
             log_time << cv::format("Scan complete.. took %i ms.\n", tg::diff_now_ms(now));
+
+            // seems like the process went ok, do some simply avg calculations of the results.
 
             // TODO : temporary structure, vectors always have a single element in them!
             // set up the avg of the detected markings and borders.
@@ -425,8 +454,9 @@ bool Seeker::phase_one() {
             exit(-100);
         }
 
-        if (failures == 0)
+        if (failures == 0) {
             running = false;
+        }
 
     }
 
@@ -480,14 +510,13 @@ bool Seeker::phase_two_left() {
 
     // horizontal houghline extension class
     auto hough_horizontal = make_shared<HoughLinesPR>(1, calc::round(calc::DEGREES), 40, calc::round(min_line_len), false);
-
     hough_horizontal->max_line_gab(12);
-
     hough_horizontal->marking_rect(cv::Rect2d(phase_roi_[1].x, phase_roi_[1].y, phase_roi_[1].width, phase_roi_[1].height));
 
     //auto left_size = cv::Size(left_baseline.width, left_baseline.height);
     auto left_cutoff = phase_roi_[1].width / 2.0;
 
+    // prepare target element structure
     std::vector<cv::Point2f> elements;
     elements.reserve(512);
 
@@ -496,10 +525,12 @@ bool Seeker::phase_two_left() {
         phase_two_base_exposure_ = phase_one_exposure * 4;
     }
 
+    // configure exposure values for phase two
     std::vector<unsigned long> p2_exposures;
     p2_exposures.reserve(50);
-    for (ulong i = 0; i < 50; i++)
+    for (ulong i = 0; i < 50; i++) {
         p2_exposures.push_back(phase_two_base_exposure_ + exposure_levels->exposure_increment * i);
+    }
 
     auto running = true;
     auto found = false;
@@ -521,29 +552,35 @@ bool Seeker::phase_two_left() {
 
         for (const auto exp : p2_exposures) {
 
+            // adjust exposure and capture frames
             pcapture->exposure(exp);
-
             pcapture->cap(2, left_frames);
 
+            // configure structures
             org = left_frames.back().clone();
             auto h = org.clone();
             hough_horizontal->original(h);
 
+            // process matrix for line detection
             process_mat_for_line(org, hough_horizontal, pmorph.get());
 
+            // get results
             const auto& lines = hough_horizontal->all_lines(); // inner most side
 
             //log_time << __FUNCTION__ << " lines.size() : " << lines.size() << '\n';
 
-            if (lines.size() < 2)
+            // not enough lines, we are greedy
+            if (lines.size() < 2) {
                 continue;
+            }
 
+            // copy found lines to target structure
             for (auto& line : lines) {
                 //if (line.entry_[0] > left_cutoff)                
                 stl::copy_vector(line.elements_, elements);
             }
 
-
+            // check if there is enough to work with
             if (elements.size() > 3) { // && elements.front().y != elements.back().y) {
                 phase_two_base_exposure_ = exp;
                 running = false;
@@ -551,6 +588,7 @@ bool Seeker::phase_two_left() {
                 break;
             }
 
+            // whoops
             if (exp > 100'000) {
                 log_err << "left side failed to produce valid lines.";
                 return false;
@@ -604,7 +642,7 @@ bool Seeker::phase_two_left() {
     // only update region, exposure should be at desired level at this point
     pcapture->region(new_roi);
 
-    // double to exposure
+    // multiply the exposure because it's most likely pretty gloomy there
     pcapture->exposure_mul(DEF_PHASE_TWO_MULTIPLIER);
 
     running = true;
@@ -615,7 +653,7 @@ bool Seeker::phase_two_left() {
 
     //cv::namedWindow("morph");
 
-    // capture left frames for real
+    // capture left frames for real and process the result
     while (running) {
 
         left_y = 0.0;
@@ -642,8 +680,9 @@ bool Seeker::phase_two_left() {
             // grab everything, since we already have defined the roi earlier
             const auto& lines = hough_horizontal->all_lines();
 
-            for (const auto& line : lines)
+            for (const auto& line : lines) {
                 stl::copy_vector(line.elements_, elements);
+            }
 
         }
 
@@ -841,8 +880,9 @@ bool Seeker::phase_three() {
 
                 throw_assert(validate::valid_pix_vec(pdata->center_points), "Centerpoints failed validation!!!");
 
-                for (auto& centerpoint : pdata->center_points)
+                for (auto& centerpoint : pdata->center_points) {
                     results[static_cast<int>(centerpoint.x)].y += centerpoint.y;
+                }
 
             } catch (std::exception& e) {
                 log_err << e.what() << std::endl;
@@ -857,8 +897,9 @@ bool Seeker::phase_three() {
 
         for (auto& centerpoint : pdata->center_points) {
             results[static_cast<int>(centerpoint.x)].y /= frame_count;
-            if (centerpoint.x + pdata->marking_rect.x < pdata->points_start[1])
+            if (centerpoint.x + pdata->marking_rect.x < pdata->points_start[1]) {
                 pdata->points_start[1] = centerpoint.x + pdata->marking_rect.x;
+            }
         }
 
         // since theres some issues with using results vector, this works just as fine.

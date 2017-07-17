@@ -25,8 +25,7 @@ public:
           , p2(p2) {}
 
     friend bool operator==(const line_pair& lhs, const line_pair& rhs) {
-        return lhs.p1 == rhs.p1
-            && lhs.p2 == rhs.p2;
+        return lhs.p1 == rhs.p1 && lhs.p2 == rhs.p2;
     }
 
     friend bool operator!=(const line_pair& lhs, const line_pair& rhs) {

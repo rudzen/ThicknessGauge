@@ -57,11 +57,13 @@ namespace validate {
 
         auto valid_rectangle = [rect](cv::Rect_<T>& boundry)->bool {
 
-            if (!validate_rect(rect) || !validate_rect(boundry))
+            if (!validate_rect(rect) || !validate_rect(boundry)) {
                 return false;
+            }
 
-            if (!validate_rect(rect))
+            if (!validate_rect(rect)) {
                 return false;
+            }
 
             return (rect & boundry).area() == boundry.area();
 
@@ -81,8 +83,9 @@ namespace validate {
     bool valid_pix_vec(std::vector<cv::Point_<T>>& vec) {
         static_assert(std::is_fundamental<T>::value, "type is only possible for fundamental types.");
 
-        if (vec.empty())
+        if (vec.empty()) {
             return false;
+        }
 
         // could be done with checkRange too, but that would add another dependency from opencv
         auto it = find_if(vec.begin(), vec.end(), [](const cv::Point_<T>& p) {
@@ -102,9 +105,11 @@ namespace validate {
      */
     template <typename T, int cn>
     bool valid_vec(const cv::Vec<T, cn>& v) {
-        for (auto i = cn; i--;)
-            if (v[i] < 0)
+        for (auto i = cn; i--;) {
+            if (v[i] < 0) {
                 return false;
+            }
+        }
 
         return true;
     }
