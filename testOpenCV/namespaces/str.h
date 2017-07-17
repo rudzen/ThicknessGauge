@@ -63,9 +63,13 @@ namespace str {
         return str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
     }
 
+
     /**
-    * Converts arbitrary datatypes (all datatypes which support the << streamoperator) into std::string
-    */
+     * \brief Converts arbitrary datatypes (all datatypes which support the << streamoperator) into std::string
+     * \tparam T The type of value to convert
+     * \param value The value to convert
+     * \return The converted value as string
+     */
     template <typename T>
     std::string to_string(T value) {
         std::ostringstream ss;
@@ -73,7 +77,7 @@ namespace str {
         return ss.str();
     }
 
-    /**
+   /**
     * Converts strings to arbitrary datatypes (using the << stream operator)
     * @param str The std::string that should be converted
     */
@@ -93,6 +97,12 @@ namespace str {
         return parse<T>(str);
     }
 
+    /**
+     * \brief Parse a string to array using ':' as seperator
+     * \tparam T The return type of vector
+     * \param str The string to parse
+     * \return The string as array with ':' seperation
+     */
     template <typename T>
     std::vector<T> parse_array(const std::string& str) {
         std::vector<T> elems;
@@ -105,8 +115,9 @@ namespace str {
     }
 
     /**
-    * Converts null terminated std::string to upper case
-    */
+     * \brief Converts a null terminated string to upper case
+     * \param s The null terminated string to convert
+     */
     inline void to_upper(char* s) {
         for (size_t i = 0; s[i]; i++) {
             s[i] = toupper(s[i]);
@@ -114,8 +125,9 @@ namespace str {
     }
 
     /**
-    * Converts std::std::string to upper case
-    */
+     * \brief Converts a string to upper case
+     * \param str The string to convert
+     */
     inline void to_upper(std::string& str) {
         for (size_t i = 0; str[i]; i++) {
             str[i] = toupper(str[i]);
@@ -123,8 +135,9 @@ namespace str {
     }
 
     /**
-    * Converts null terminated std::string to lower case
-    */
+     * \brief Converts a null terminated string to lower case
+     * \param s The null terminated string to convert
+     */
     inline void to_lower(char* s) {
         for (size_t i = 0; s[i]; i++) {
             s[i] = tolower(s[i]);
@@ -132,8 +145,9 @@ namespace str {
     }
 
     /**
-    * Converts std::std::string to lower case
-    */
+     * \brief Converts a string to lower case
+     * \param str The string to convert
+     */
     inline void to_lower(std::string& str) {
         for (size_t i = 0; str[i]; i++) {
             str[i] = tolower(str[i]);
@@ -141,31 +155,41 @@ namespace str {
     }
 
     /**
-    * Trims from start
-    */
+     * \brief Trims empty spaces from a string from the beginning
+     * \param s The string to trim
+     * \return The trimmed string
+     */
     inline std::string& ltrim(std::string& s) {
         s.erase(s.begin(), find_if(s.begin(), s.end(), not1(std::ptr_fun<int, int>(isspace))));
         return s;
     }
 
     /**
-    * Trims from end
-    */
+     * \brief Trims empty spaces from a string from the end
+     * \param s The string to trim
+     * \return The trimmed string
+     */
     inline std::string& rtrim(std::string& s) {
         s.erase(std::find_if(s.rbegin(), s.rend(), not1(std::ptr_fun<int, int>(isspace))).base(), s.end());
         return s;
     }
 
     /**
-    * Trims from both ends
-    */
+     * \brief Trims empty spaces from a string from both ends
+     * \param s The string to trim
+     * \return The trimmed string
+     */
     inline std::string& trim(std::string& s) {
         return ltrim(rtrim(s));
     }
 
     /**
-    * Join vector
-    */
+     * \brief Joins a vector to a string with a specified delimiter
+     * \tparam T The type of vector
+     * \param v The vector to join
+     * \param token The seperator for each part of the vector
+     * \return The resulting string
+     */
     template <typename T>
     std::string join(const std::vector<T>& v, const std::string& token) {
         std::ostringstream result;
@@ -179,8 +203,11 @@ namespace str {
     }
 
     /**
-    * Split a std::string
-    */
+     * \brief Splits a string into a vector with defined delimiter
+     * \param str The string to split
+     * \param delim The delimier to split with
+     * \return The vector of the string that was split
+     */
     inline std::vector<std::string> split(const std::string& str, char delim) {
         std::vector<std::string> elems;
         elems.reserve(str.size());
@@ -198,16 +225,32 @@ namespace str {
         return elems;
     }
 
+    /**
+     * \brief Copy a string from reference to value
+     * \param str The string to copy
+     * \return The copy of the string
+     */
     template <>
     inline std::string parse(const std::string& str) {
         return str;
     }
 
+    /**
+     * \brief Copy a string to null terminated value
+     * \param str The string to copy
+     * \return The null terminated copy
+     */
     template <>
     inline const char* parse(const std::string& str) {
         return str.c_str();
     }
 
+    /**
+     * \brief Parse a boolean string to bool value
+     * \param str The string to parse
+     * \param na Not used atm
+     * \return true if string contained "on", "yes" or "true", otherwise false
+     */
     template <>
     inline bool parse(const std::string& str, bool na) {
         auto s = str;
