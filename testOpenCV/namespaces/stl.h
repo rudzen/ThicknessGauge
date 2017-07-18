@@ -5,13 +5,21 @@
 
 #pragma once
 #include <opencv2/core/types.hpp>
-#include <opencv2/shape/hist_cost.hpp>
 
 /**
  * \brief Contains STL helper functionality
+ * There is some crossover, where some functions utilize opencv types.
  */
 namespace stl {
 
+    /**
+     * \brief Appends all elements from a vector to another vector.
+     * The types do not have to be the same, but they do have to be convertible (int -> long etc)
+     * \tparam T1 The type of source vector.
+     * \tparam T2 The type of destination vector.
+     * \param source The source vector to copy elements from.
+     * \param destination The destination vector where the elementes are to be appended.
+     */
     template <typename T1, typename T2>
     void copy_vector(T1& source, T2& destination) {
         static_assert(std::is_convertible<T1, T2>::value, "Types are not convertible.");
@@ -19,6 +27,23 @@ namespace stl {
         destination.insert(destination.begin(), source.begin(), source.end());
     }
 
+    /**
+     * \brief Set all values in a simple vector to zero.
+     * \tparam T The type.
+     * \param vec The vector where all elements should be zero.
+     */
+    template <typename T>
+    void clear_vector_simple(std::vector<T>& vec) {
+        std::for_each(vec.begin(), vec.end(), [](T& value) {
+            value = static_cast<T>(0);
+        });
+    }
+
+    /**
+     * \brief Sorts a opencv contour structure in descending order
+     * \tparam T The base type of points used in the structure
+     * \param contours The contour structure to be sorted
+     */
     template <typename T>
     void sort_contours(std::vector<std::vector<cv::Point_<T>>>& contours) {
         std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point_<T>> a, std::vector<cv::Point_<T>> b) {
@@ -57,7 +82,7 @@ namespace stl {
         T zero = static_cast<T>(0);
         std::for_each(vec.begin(), vec.end(), [zero](cv::Point_<T>& p) {
                   p.y = zero;
-              });
+        });
     }
 
 #endif

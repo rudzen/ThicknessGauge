@@ -42,8 +42,10 @@ typedef unsigned long long i128;
 typedef unsigned long long i128;
 #endif
 
+/**
+ * \brief std::string extension class with more features
+ */
 class Ztring : public std::string {
-
 
 public:
     enum class HexType {
@@ -59,6 +61,36 @@ public:
         : std::string(s) { }
 
     Ztring() { }
+
+    template <class T>
+    explicit Ztring(T d, const HexType hex_type = HexType::NONE) {
+        static_assert(std::is_integral<T>::value, "Only integral types allowed.");
+        std::stringstream ss;
+        std::stringstream ss2;
+        switch (hex_type) {
+            case HexType::NONE:
+                ss << d;
+                break;
+            case HexType::HEX32:
+                ss2 << std::hex << d;
+                ss << "0x";
+                for (size_t i = 0; i < 8 - ss2.str().length(); i++) {
+                    ss << "0";
+                }
+                ss << std::hex << d;
+                break;
+            case HexType::HEX64:
+                ss2 << std::hex << d;
+                ss << "0x";
+                for (size_t i = 0; i < 16 - ss2.str().length(); i++) {
+                    ss << "0";
+                }
+                ss << std::hex << d << "ULL";
+                break;
+            default: ;
+        }
+        assign(ss.str());
+    }
 
     bool ends_with(const std::string& ending) {
         return ending.size() <= this->size() && equal(ending.rbegin(), ending.rend(), this->rbegin());
@@ -81,16 +113,19 @@ public:
     }
 
     Ztring& replace(const char c1, const char c2) {
-        for (size_t i = 0; i < size(); i++)
-            if (at(i) == c1)
+        for (size_t i = 0; i < size(); i++) {
+            if (at(i) == c1) {
                 at(i) = c2;
+            }
+        }
         return *this;
     }
 
     Ztring& replace(const std::string& s1, const std::string& s2) {
         size_t a;
-        while ((a = find(s1)) != npos)
+        while ((a = find(s1)) != npos) {
             std::string::replace(a, s1.size(), s2);
+        }
         return *this;
     }
 
@@ -114,40 +149,20 @@ public:
         return *this;
     }
 
-    template <class T>
-    explicit Ztring(T d, const HexType hex_type = HexType::NONE) {
-        static_assert(std::is_integral<T>::value, "Only integral types allowed.");
-        std::stringstream ss;
-        std::stringstream ss2;
-        switch (hex_type) {
-            case HexType::NONE:
-                ss << d;
-                break;
-            case HexType::HEX32:
-                ss2 << std::hex << d;
-                ss << "0x";
-                for (size_t i = 0; i < 8 - ss2.str().length(); i++)
-                    ss << "0";
-                ss << std::hex << d;
-                break;
-            case HexType::HEX64:
-                ss2 << std::hex << d;
-                ss << "0x";
-                for (size_t i = 0; i < 16 - ss2.str().length(); i++)
-                    ss << "0";
-                ss << std::hex << d << "ULL";
-                break;
-            default: ;
-        }
-        assign(ss.str());
-    }
-
     static int stoi(const std::string& s) {
-        if (s.empty())
+        if (s.empty()) {
             return 0;
+        }
         return std::stoi(s);
     }
 
+    /**
+     * \brief Create a hexidecimal string from parsed value
+     * \tparam T The type of the value
+     * \param d The value
+     * \param hex_type The type of hexidecimal
+     * \return newly created self object
+     */
     template <typename T>
     Ztring& to_hex(T d, const HexType hex_type = HexType::HEX64) {
         static_assert(std::is_integral<T>::value, "Only integral types allowed.");
@@ -160,15 +175,17 @@ public:
             case HexType::HEX32:
                 ss2 << std::hex << d;
                 ss << "0x";
-                for (size_t i = 0; i < 8 - ss2.str().length(); i++)
+                for (size_t i = 0; i < 8 - ss2.str().length(); i++) {
                     ss << "0";
+                }
                 ss << std::hex << d;
                 break;
             case HexType::HEX64:
                 ss2 << std::hex << d;
                 ss << "0x";
-                for (size_t i = 0; i < 16 - ss2.str().length(); i++)
+                for (size_t i = 0; i < 16 - ss2.str().length(); i++) {
                     ss << "0";
+                }
                 ss << std::hex << d << "ULL";
                 break;
             default: ;
@@ -178,60 +195,65 @@ public:
     }
 
     /**
-     * Creates a string containing spaces
-     *
-     * @param amount : how many spaces to make
-     * @return the string containing amount spaces
+     * \brief Creates a string containing spaces
+     * \param amount how many spaces to make
+     * \return the string containing amount spaces
      */
     static std::string space(size_t amount) {
         return replicate(' ', amount);
     }
 
     /**
-     * Replicate a char
-     *
-     * @param c : the char to replicate
-     * @param amount : how many time to replicate
-     * @return the string containing amount char
+     * \brief Replicate a char
+     * \param c The char to replicate
+     * \param amount The amount of times the char should be replicated
+     * \return The newly created string
      */
     static std::string replicate(char c, size_t amount) {
         return std::string(amount, c);
     }
 
     /**
-     * Replaces a piece of an existing string with another string.<br>
-     *
-     * @param into : The string to overwrite in
-     * @param toInsert : The string which is put in the into string.
-     * @param startPos : Start position where it should be inserted at.
-     * @return The resulting string.
+     * \brief Replaces a piece of an existing string with another string.
+     * \tparam T The type that defines the start pos
+     * \param into The string where the overwrite will happen
+     * \param to_insert What is going to be inserted
+     * \param start_pos The starting position of the inserted string
+     * \return The newly created string as copy
      */
     template <typename T>
-    static std::string overwrite(std::string into, std::string toInsert, T startPos) {
+    static std::string overwrite(std::string into, std::string to_insert, T start_pos) {
         static_assert(std::is_integral<T>::value, "Wrong type.");
         auto len = into.length();
 
-        if (len == 0)
-            return toInsert;
+        if (len == 0) {
+            return to_insert;
+        }
 
-        auto lenInsert = toInsert.length();
+        auto lenInsert = to_insert.length();
 
-        if (lenInsert == 0)
+        if (lenInsert == 0) {
             return into;
+        }
 
         std::ostringstream ss;
 
-        // no fault check from here!
+        auto start = static_cast<size_t>(start_pos);
 
-        auto start = static_cast<size_t>(startPos);
+        try {
+            ss << into.substr(0, start - 1);
+            ss << to_insert;
 
-        ss << into.substr(0, start - 1);
-        ss << toInsert;
+            if (start - 1 + lenInsert <= len - 1) {
+                ss << into.substr(ss.str().length(), into.length());
+            }
 
-        if (start - 1 + lenInsert <= len - 1)
-            ss << into.substr(ss.str().length(), into.length());
+            return ss.str();
+        } catch (std::exception& e) {
+            std::cerr << __FUNCTION__ << " caught exception :\n" << e.what() << '\n';
+        }
 
-        return ss.str();
+        return into;
     }
 
 };

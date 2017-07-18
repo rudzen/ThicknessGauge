@@ -477,6 +477,15 @@ bool Seeker::phase_one() {
 
     log_time << "phase two left region configured : " << phase_roi_[1] << '\n';
 
+    auto area = static_cast<unsigned long>(ceil(hough_vertical->marking_rect().x + hough_vertical->marking_rect().width)); 
+    phase_roi_[2].x = def_phase_one_roi_.width - area; 
+    phase_roi_[2].y = phase_roi_[1].y; 
+    phase_roi_[2].width = area / 2; 
+    phase_roi_[2].height = phase_roi_[1].height; 
+
+    log_time << "phase two right region configured : " << phase_roi_[2] << '\n';
+
+
     return true;
 
 }
