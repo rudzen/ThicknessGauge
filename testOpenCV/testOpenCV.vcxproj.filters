@@ -287,12 +287,6 @@
     <ClInclude Include="namespaces\tg.h">
       <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
-    <ClInclude Include="Vimba\CameraData.h">
-      <Filter>Header Files\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Vimba\CameraFrame.h">
-      <Filter>Header Files\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="Camera\CaptureInterface.h">
       <Filter>Header Files\Camera</Filter>
     </ClInclude>

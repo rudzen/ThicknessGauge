@@ -149,6 +149,11 @@ public:
         return *this;
     }
 
+    /**
+     * \brief Simple stoi() wrapper
+     * \param s The string to convert
+     * \return The value from the string if any
+     */
     static int stoi(const std::string& s) {
         if (s.empty()) {
             return 0;
