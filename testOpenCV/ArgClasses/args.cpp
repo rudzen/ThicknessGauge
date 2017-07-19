@@ -23,6 +23,8 @@ namespace args {
             // xor args
             std::vector<TCLAP::Arg*> xors;
 
+            /* begin exclusive or arguments */
+
             // add basic switches
             TCLAP::SwitchArg switch_demo("d", "demo", "runs regular demo", true, new DemoModeVisitor());
             xors.emplace_back(&switch_demo);
@@ -43,6 +45,8 @@ namespace args {
             xors.emplace_back(&switch_glob);
 
             cmd.xorAdd(xors);
+
+            /* end exclusive or arguments */
 
             /* end switches */
 

@@ -5,9 +5,14 @@
 
 class CommandLineOptions;
 
+/**
+ * \brief Handles command line argument parsing etc
+ */
 namespace args {
 
-
+    /**
+     * \brief Default camera calibration file
+     */
     const std::string default_camera_calibration_file = "C2450.json";
 
     /**
