@@ -1,7 +1,7 @@
 #include "Histogram.h"
 #include "Util/Vec.h"
 
-void Histogram::normalizeHistogramImage(const float max) {
+void Histogram::normalize_histogram_image(const float max) {
 
     //auto modifier = max * hist_w;
     for (auto i = hist_size_; i--;) {
@@ -9,22 +9,25 @@ void Histogram::normalizeHistogramImage(const float max) {
     }
 }
 
-void Histogram::populate_histogram(std::map<int, unsigned char>& intensityMap, bool createImage) {
-    if (intensityMap.empty())
+void Histogram::populate_histogram(std::map<int, unsigned char>& intensity_map, bool create_image) {
+    if (intensity_map.empty())
         return;
 
-    for (auto& i : intensityMap)
+    for (auto& i : intensity_map) {
         histogram_[i.second]++;
+    }
 
-    if (createImage)
+    if (create_image) {
         create_histogram_image();
+    }
 
 }
 
 void Histogram::populate_histogram(cv::Mat& image) {
 
-    if (image.empty())
+    if (image.empty()) {
         return;
+    }
 
     nullify();
 
@@ -83,9 +86,7 @@ void Histogram::save_simple_data(std::string& filename) {
 }
 
 void Histogram::nullify() {
-    for (auto i = hist_size_; i--;)
-        histogram_[i] = 0;
-
+    histogram_.fill(0);
     clear_histogram_image();
 }
 
@@ -93,11 +94,13 @@ void Histogram::create_histogram_image() {
 
     // get max value
     auto max = histogram_[0];
-    for (auto& i : histogram_)
-        if (max < i)
+    for (const auto& i : histogram_) {
+        if (max < i) {
             max = i;
+        }
+    }
 
-    normalizeHistogramImage(max);
+    normalize_histogram_image(max);
 
     const cv::Scalar black(0, 0, 0);
 

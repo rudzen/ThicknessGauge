@@ -19,6 +19,9 @@
   ||||  |   ||
   `+.__._._+*/
 
+/**
+ * \brief Exception intended for failed image (or other boundry definition) dimensions
+ */
 class ImageDimensionException : public std::exception {
 
     std::string message_;

@@ -7,6 +7,10 @@
 #include "../namespaces/calc.h"
 #include "Util/Vec.h"
 
+/*
+ * Deprecated class for histogram stuff..
+ * However, could still be useful for something in the future.
+ */
 class Histogram {
 
     int value_max_;
@@ -31,7 +35,7 @@ class Histogram {
 
 private:
 
-    void normalizeHistogramImage(const float max);
+    void normalize_histogram_image(const float max);
 
 public:
 
@@ -40,9 +44,9 @@ public:
 
     /**
      * \brief Populate local histogram array from external map
-     * \param intensityMap The intensity map to populate from
+     * \param intensity_map The intensity map to populate from
      */
-    void populate_histogram(std::map<int, unsigned char>& intensityMap, bool createImage);
+    void populate_histogram(std::map<int, unsigned char>& intensity_map, bool create_image);
 
     void populate_histogram(cv::Mat& image);
 

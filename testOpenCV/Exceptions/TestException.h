@@ -19,6 +19,9 @@
   ||||  |   ||
   `+.__._._+*/
 
+/**
+ * \brief Not used anymore, but was ment for seperating test logic errors from everything else
+ */
 class TestException : public std::exception {
 
     std::string message_;

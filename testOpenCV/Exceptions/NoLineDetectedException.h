@@ -19,6 +19,9 @@
   ||||  |   ||
   `+.__._._+*/
 
+/**
+ * \brief Thrown if no lines detected where they should or if they are not where they are sposed to be.
+ */
 class NoLineDetectedException : public std::exception {
 
     std::string message_;

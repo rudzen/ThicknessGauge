@@ -94,12 +94,12 @@ public:
 
     /**
      * \brief Spray some fairy dust over the field
-     * \param lowerBoundry The lower boundry
-     * \param upperBoundry The upper boundry
+     * \param lower_boundry The lower boundry
+     * \param upper_boundry The upper boundry
      * \param col The colour (scalar)
      * \return The coloured matrix
      */
-    cv::Mat colour_me_dirty(int lowerBoundry, int upperBoundry, cv::Scalar col) const;
+    cv::Mat colour_me_dirty(int lower_boundry, int upper_boundry, cv::Scalar col) const;
 
     /**
      * \brief Processes the image and converts the intensity to the histogram data structure

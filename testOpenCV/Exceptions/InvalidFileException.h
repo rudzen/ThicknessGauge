@@ -19,6 +19,9 @@
   ||||  |   ||
   `+.__._._+*/
 
+/**
+ * \brief Should be thrown if a file failes validation, such as unusable filename etc
+ */
 class InvalidFileException : public std::exception {
 
     std::string message_;

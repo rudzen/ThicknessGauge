@@ -19,6 +19,9 @@
   ||||  |   ||
   `+.__._._+*/
 
+/**
+ * \brief Exception intended for frame capturing errors
+ */
 class CaptureFailException : public std::exception {
 
     std::string message_;

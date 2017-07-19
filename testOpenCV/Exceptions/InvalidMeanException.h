@@ -19,6 +19,11 @@
   ||||  |   ||
   `+.__._._+*/
 
+/**
+ * \brief Take a guess:
+ * a) It exists because i figured the means could be controlled
+ * b) The exception is just too mean, and therefore it might not be valid :)
+ */
 class InvalidMeanException : public std::exception {
 
     std::string message_;

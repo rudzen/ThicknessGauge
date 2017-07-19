@@ -19,6 +19,10 @@
   ||||  |   ||
   `+.__._._+*/
 
+
+/**
+ * \brief Exception intended for calibration errors
+ */
 class CalibrationException : public std::exception {
 
     std::string message_;
