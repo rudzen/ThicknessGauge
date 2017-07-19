@@ -168,7 +168,7 @@ public:
     unsigned long exposure_auto_target();
 
     /**
-     * \brief Resets binning
+     * \brief Resets binning for X and Y on the camera to it's default (1)
      */
     void reset_binning() const;
 
@@ -215,18 +215,50 @@ public:
      */
     cv::Rect_<unsigned long> region() const;
 
+    /**
+     * \brief Sets the ROI x position on the camera
+     * \param new_x The new x position to apply
+     * \return true if set, false if failed
+     */
     bool region_x(unsigned new_x) const;
 
+    /**
+     * \brief Gets the ROI x position from the camera
+     * \return The x position currently used
+     */
     unsigned long region_x() const;
 
+    /**
+     * \brief Sets the ROI y position on the camera
+     * \param new_y The new y position to apply
+     * \return true if set, false if failed
+     */
     bool region_y(unsigned new_y) const;
 
+    /**
+     * \brief Gets the ROI y position from the camera
+     * \return The y position currently used
+     */
     unsigned long region_y() const;
 
+    /**
+     * \brief Sets the ROI height position on the camera
+     * \param new_height The new height position to apply
+     * \return true if set, false if failed
+     */
     bool region_height(unsigned new_height) const;
 
+    /**
+     * \brief Gets the ROI height position from the camera
+     * \return The height position currently used
+     */
     unsigned long region_height() const;
 
+    /**
+     * \brief Apply a new ROI width to the camera
+     * \param new_width The width to apply
+     * \return true if set, false if failed
+     */
     bool region_width(unsigned new_width) const;
 
     /**
