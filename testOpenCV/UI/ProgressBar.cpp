@@ -1,7 +1,15 @@
 ﻿#include <string>
 #include "ProgressBar.h"
+#include "namespaces/calc.h"
 
-ProgressBar::ProgressBar() {}
+ProgressBar::ProgressBar()
+    : n_(0)
+    , desc_width_(0)
+    , frequency_update_(0)
+    , out_(nullptr)
+    , description_(nullptr)
+    , unit_bar_(nullptr)
+    , unit_space_(nullptr) {}
 
 ProgressBar::ProgressBar(unsigned long n, const char* description, std::ostream& out) {
 
@@ -46,7 +54,7 @@ int ProgressBar::bar_length() const {
 
     // get console width and according adjust the length of the progress bar
 
-    auto bar_length = static_cast<int>((get_console_width() - desc_width_ - CHARACTER_WIDTH_PERCENTAGE) / 2.);
+    auto bar_length = calc::round((get_console_width() - desc_width_ - CHARACTER_WIDTH_PERCENTAGE) / 2.0);
 
     return bar_length;
 }
@@ -57,12 +65,14 @@ void ProgressBar::clear_bar_field() const {
 
 void ProgressBar::progressed(unsigned long idx) {
     try {
-        if (idx > n_)
+        if (idx > n_) {
             throw idx;
+        }
 
         // determines whether to update the progress bar from frequency_update
-        if ((idx != n_) && (idx % (n_ / frequency_update_) != 0))
+        if (idx != n_ && idx % (n_ / frequency_update_) != 0) {
             return;
+        }
 
         // calculate the size of the progress bar
         auto bar_size = bar_length();

@@ -13,8 +13,8 @@
 #include <iomanip>
 #include <cstring>
 
-#define TOTAL_PERCENTAGE 100.0
-#define CHARACTER_WIDTH_PERCENTAGE 4
+constexpr double TOTAL_PERCENTAGE = 100.0;
+constexpr int CHARACTER_WIDTH_PERCENTAGE = 4;
 
 class ProgressBar {
 
@@ -29,8 +29,6 @@ public:
     void set_style(const char* unit_bar, const char* unit_space);
 
     void progressed(unsigned long idx);
-
-public:
 
     unsigned long n() const;
 
