@@ -375,8 +375,9 @@ bool CapturePvApi::exposure_auto_adjust_tolerance(unsigned long new_value) const
 
     auto err_code = PvAttrUint32Set(camera_.Handle, "ExposureAutoAdjustTol", new_value);
 
-    if (err_code == ePvErrSuccess)
+    if (err_code == ePvErrSuccess) {
         return true;
+    }
 
     using namespace tg;
 
@@ -465,17 +466,21 @@ bool CapturePvApi::region(cv::Rect_<unsigned long> new_region) const {
 
     auto failures = 0;
 
-    if (!region_x(new_region.x))
+    if (!region_x(new_region.x)) {
         failures++;
+    }
 
-    if (!region_y(new_region.y))
+    if (!region_y(new_region.y)) {
         failures++;
+    }
 
-    if (!region_width(new_region.width))
+    if (!region_width(new_region.width)) {
         failures++;
+    }
 
-    if (!region_height(new_region.height))
+    if (!region_height(new_region.height)) {
         failures++;
+    }
 
     if (failures == 0) {
         log_time << "Capture roi changed to " << new_region << std::endl;
@@ -495,8 +500,9 @@ cv::Rect_<unsigned long> CapturePvApi::region() const {
 
 bool CapturePvApi::region_x(unsigned new_x) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "RegionX", new_x);
-    if (err_code == ePvErrSuccess)
+    if (err_code == ePvErrSuccess) {
         return true;
+    }
     log_err << cv::format("Error setting roi x.. %s\n", error_last(err_code));
     return false;
 }
@@ -512,8 +518,9 @@ unsigned long CapturePvApi::region_x() const {
 
 bool CapturePvApi::region_y(unsigned new_y) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "RegionY", new_y);
-    if (err_code == ePvErrSuccess)
+    if (err_code == ePvErrSuccess) {
         return true;
+    }
     log_err << cv::format("Error setting roi y.. %s\n", error_last(err_code));
     return false;
 }
@@ -529,8 +536,9 @@ unsigned long CapturePvApi::region_y() const {
 
 bool CapturePvApi::region_height(unsigned new_height) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "Height", new_height);
-    if (err_code == ePvErrSuccess)
+    if (err_code == ePvErrSuccess) {
         return true;
+    }
     log_time << cv::format("Error setting roi height.. %s\n", error_last(err_code));
     return false;
 }
@@ -546,8 +554,9 @@ unsigned long CapturePvApi::region_height() const {
 
 bool CapturePvApi::region_width(unsigned new_width) const {
     auto err_code = PvAttrUint32Set(camera_.Handle, "Width", new_width);
-    if (err_code == ePvErrSuccess)
+    if (err_code == ePvErrSuccess) {
         return true;
+    }
     log_err << cv::format("Error setting roi width.. %s\n", error_last(err_code));
     return false;
 }
@@ -575,10 +584,12 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
 
             while (true) {
                 auto err_code = PvCaptureWaitForFrameDone(camera_.Handle, &(camera_.Frame), 100);
-                if (err_code == ePvErrTimeout)
+                if (err_code == ePvErrTimeout) {
                     continue;
-                if (err_code == ePvErrSuccess)
+                }
+                if (err_code == ePvErrSuccess) {
                     break;
+                }
                 log_err << cv::format("Error while waiting for frame. %s\n", error_last(err_code));
             }
 
@@ -588,12 +599,12 @@ void CapturePvApi::cap(int frame_count, std::vector<cv::Mat>& target_vector) {
             m.data = static_cast<uchar *>(camera_.Frame.ImageBuffer);
 
             // if the calibration data has been loaded, the undistorted image is then used
-            //if (cal->loaded) {
-            //    cv::undistort(m, undistorted, cal->intrinsic, cal->dist_coeffs);
-            //    target_vector.emplace_back(undistorted);
-            //} else {
+            if (cal->loaded) {
+                cv::undistort(m, undistorted, cal->intrinsic, cal->dist_coeffs);
+                target_vector.emplace_back(undistorted);
+            } else {
                 target_vector.emplace_back(m.clone());
-            //}
+            }
 
             //cv::imwrite("ostefars.png", target_vector.back());
         }
@@ -612,10 +623,12 @@ void CapturePvApi::cap_single(cv::Mat& target) {
 
         while (true) {
             auto err_code = PvCaptureWaitForFrameDone(camera_.Handle, &(camera_.Frame), 100);
-            if (err_code == ePvErrTimeout)
+            if (err_code == ePvErrTimeout) {
                 continue;
-            if (err_code == ePvErrSuccess)
+            }
+            if (err_code == ePvErrSuccess) {
                 break;
+            }
             log_err << cv::format("Error while waiting for frame. %s\n", error_last(err_code));
         }
 
@@ -629,8 +642,9 @@ void CapturePvApi::cap_single(cv::Mat& target) {
             cv::Mat undistorted;
             cv::undistort(grabbed, undistorted, cal->intrinsic, cal->dist_coeffs);
             target = undistorted.clone();
-        } else
+        } else {
             target = grabbed.clone();
+        }
 
         //cv::imwrite("ostefars.png", target_vector.back());
     }
@@ -658,13 +672,15 @@ bool CapturePvApi::initialize() {
     if (retry) {
         while (retry--) {
             cameras = camera_count();
-            if (cameras)
+            if (cameras) {
                 break;
+            }
             std::cout << '.';
             tg::sleep(150);
         }
-    } else
+    } else {
         cameras = camera_count();
+    }
 
     std::cout << '\n';
 
@@ -801,8 +817,9 @@ void CapturePvApi::print_attr() const {
         log_err << "Unable to read attributes..\n";
     }
 
-    for (unsigned long i = 0; i < count; i++)
+    for (unsigned long i = 0; i < count; i++) {
         query_attribute(pListPtr[i]);
+    }
 }
 
 void CapturePvApi::pixel_format(const PixelFormat format) const {
@@ -856,12 +873,15 @@ CapturePvApi::PixelFormat CapturePvApi::pixel_format() const {
 
     log_time << "Pixel format : " << ret_string << '\n';
 
-    if (ret_string == "Mono8")
+    if (ret_string == "Mono8") {
         return PixelFormat::MONO8;
-    if (ret_string == "Mono12")
+    }
+    if (ret_string == "Mono12") {
         return PixelFormat::MONO12;
-    if (ret_string == "Mono12Packed")
+    }
+    if (ret_string == "Mono12Packed") {
         return PixelFormat::MONO12_PACKED;
+    }
 
     return PixelFormat::UNKNOWN;
 
