@@ -1,34 +1,34 @@
 #include "CalibrationSettings.h"
 
 CalibrationSettings::CalibrationSettings()
-    : calibration_Time(0), nrOfFrames(0), image_Width(0), image_Height(0), board_Width(0), board_Height(0), square_Size(0), FixAspectRatio(0), flagValue(0), Avg_Reprojection_Error(0) {}
+    : calibration_time_(0), no_of_frames(0), image_w_(0), image_h_(0), board_w_(0), board_h_(0), square_size_(0), fix_aspect_ratio_(0), flag_value_(0), avg_reprojection_err_(0) {}
 
 CalibrationSettings::~CalibrationSettings() {}
 
-int CalibrationSettings::readSettings(const string calibrationFile) {
+int CalibrationSettings::readSettings(const string calibration_file) {
     cv::FileStorage fs;
-    fs.open(calibrationFile, cv::FileStorage::READ);
+    fs.open(calibration_file, cv::FileStorage::READ);
 
     if (!fs.isOpened()) {
-        cerr << "Failed to open " << calibrationFile << endl;
+        cerr << "Failed to open " << calibration_file << endl;
         return -1;
     }
 
     //calibration_Time
-    fs["nrOfFrames"] >> nrOfFrames;
-    fs["image_Width"] >> image_Width;
-    fs["image_Height"] >> image_Height;
-    fs["board_Width"] >> board_Width;
-    fs["board_Height"] >> board_Height;
-    fs["square_Size"] >> square_Size;
-    fs["FixAspectRatio"] >> FixAspectRatio;
+    fs["nrOfFrames"] >> no_of_frames;
+    fs["image_Width"] >> image_w_;
+    fs["image_Height"] >> image_h_;
+    fs["board_Width"] >> board_w_;
+    fs["board_Height"] >> board_h_;
+    fs["square_Size"] >> square_size_;
+    fs["FixAspectRatio"] >> fix_aspect_ratio_;
 
-    fs["Camera_Matrix"] >> Camera_Matrix;
-    fs["Distortion_Coefficients"] >> Distortion_Coefficients;
-    fs["Avg_Reprojection_Error"] >> Avg_Reprojection_Error;
-    fs["Per_View_Reprojection_Errors"] >> Per_View_Reprojection_Errors;
-    fs["Extrinsic_Parameters"] >> Extrinsic_Parameters;
-    fs["Image_points"] >> Image_points;
+    fs["Camera_Matrix"] >> camera_matrix_;
+    fs["Distortion_Coefficients"] >> distortion_coeffs_;
+    fs["Avg_Reprojection_Error"] >> avg_reprojection_err_;
+    fs["Per_View_Reprojection_Errors"] >> per_view_reprojection_err_;
+    fs["Extrinsic_Parameters"] >> extrinsic_params_;
+    fs["Image_points"] >> image_points_;
 
     fs.release();
     return 0;

@@ -108,6 +108,17 @@ namespace tg {
     }
 
     /**
+     * \brief Flips a boolean expression
+     * \tparam T Type, must be bool
+     * \param value The value to flip
+     */
+    template <typename T>
+    void flip_bool(T& value) {
+        static_assert(std::is_same<T, bool>::value, "Wrong type.");
+        value ^= true;
+    }
+
+    /**
      * \brief Fetches the current time and date in specificed format.
      * For more information : http://www.cplusplus.com/reference/ctime/strftime/
      * \return Date and/or time related information as string
@@ -142,15 +153,32 @@ namespace tg {
 #ifndef _SYNC_OUT
 #define _SYNC_OUT
 
+    /**
+     * \brief lock, unlock enumeration definitions
+     */
     enum class SyncCout { IO_LOCK, IO_UNLOCK };
 
+    /**
+     * \brief Forced synchronized output operator overload
+     * \return The stream
+     */
     std::ostream& operator<<(std::ostream&, SyncCout);
 
+/**
+ * \brief Regular std::cout with syncout locking
+ */
 #define sync_cout std::cout << SyncCout::IO_LOCK
+
+/**
+ * \brief Regular std::cout with syncout unlocking
+ */
 #define sync_endl std::endl << SyncCout::IO_UNLOCK
 
 #endif
 
+    /**
+     * \brief Regular log output pre-fix definition
+     */
     enum class LogTime { LOG_TIME, LOG_DATE, LOG_TIME_DATE, LOG_OK_TIME, LOG_ERR_TIME };
 
 #ifndef _TIME_DATE_OUT
@@ -158,14 +186,30 @@ namespace tg {
 
     /**
      * \brief Overload of ostream to insert time and/or date beforehand
+     * Every LogTime definition is output in GREEN, except LOG_ERR_TIME which is RED
      * \return The processed ostream
      */
     std::ostream& operator<<(std::ostream&, LogTime);
 
+/**
+ * \brief std::cout overload with prefixed time and data
+ */
 #define log_timedate std::cout << LogTime::LOG_TIME_DATE
+/**
+ * \brief std::cout overload with prefixed time
+ */
 #define log_time std::cout << LogTime::LOG_TIME
+/**
+ * \brief std::cout overload with prefixed date
+ */
 #define log_date std::cout << LogTime::LOG_DATE
+/**
+ * \brief std::cout overload with prefixed time in green
+ */
 #define log_ok std::cout << LogTime::LOG_OK_TIME
+/**
+ * \brief std::cout overload with prefixed time in red
+ */
 #define log_err std::cerr << LogTime::LOG_ERR_TIME
 
 #endif
@@ -176,6 +220,11 @@ namespace tg {
     // -------------- thread related ----------------
     // ----------------------------------------------
 
+    /**
+     * \brief Sleeps for N miliseconds
+     * \tparam T Integral
+     * \param ms Amount of ms to sleep
+     */
     template <typename T>
     void sleep(T ms) {
         static_assert(std::is_integral<T>::value, "Wrong type, must be integral.");
@@ -189,26 +238,26 @@ namespace tg {
     // ----------------------------------------------
 
     /**
-     * Retrieves the current time as high resolution clock (ms)
-     * @return The current time as time_point
+     * \brief Retrieves the current time as high resolution clock (ms)
+     * \return The current time as time_point
      */
     inline long long int get_now_ms() {
         return std::chrono::high_resolution_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
     }
 
     /**
-     * Retrieves the current time as high resolution clock (ns)
-     * @return The current time as time_point
+     * \brief Retrieves the current time as high resolution clock (ns)
+     * \return The current time as time_point
      */
     inline long long int get_now_ns() {
         return std::chrono::high_resolution_clock::now().time_since_epoch() / std::chrono::nanoseconds(1);
     }
 
     /**
-     * Computes the difference in time from the parsed time and now
-     * @tparam T The time type, must be arithmetic
-     * @param t The time to substract from now
-     * @return The difference between parsed time and now in ms
+     * \brief Computes the difference in time from the parsed time and now
+     * \tparam T The time type, must be arithmetic
+     * \param t The time to substract from now
+     * \return The difference between parsed time and now in ms
      */
     template <typename T>
     long long int diff_now_ms(T& t) {
@@ -217,10 +266,10 @@ namespace tg {
     }
 
     /**
-     * Computes the difference in time from the parsed time and now in ns
-     * @tparam T The time type, must be arithmetic
-     * @param t The time to substract from now
-     * @return The difference between parsed time and now in ns
+     * \brief Computes the difference in time from the parsed time and now in ns
+     * \tparam T The time type, must be arithmetic
+     * \param t The time to substract from now
+     * \return The difference between parsed time and now in ns
      */
     template <typename T>
     long long int diff_now_ns(T& t) {
@@ -241,7 +290,8 @@ namespace tg {
      */
     template <typename T1, typename T2>
     T2 iif(T1 expression, T2 true_part, T2 false_part) {
-        static_assert(std::is_same<T1, bool>::value, "Only bool expression is accepted.");
+        static_assert(std::is_same<T1, bool>::value, "Only bool statement is accepted.");
+        static_assert(std::is_same<T2, bool>::value, "Only bool statement is accepted.");
         return expression ? true_part : false_part;
     }
 }

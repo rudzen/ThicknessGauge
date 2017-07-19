@@ -119,5 +119,5 @@ void FilterR::do_filter(int depth, cv::Mat& kernel, cv::Point& anchor, double de
 void FilterR::do_filter(int depth, cv::Mat& kernel, cv::Point& anchor, double delta, int border) {
     filter2D(image_, result_, depth, kernel, anchor, delta, border);
     if (show_windows_)
-        draw::showImage(window_name_, result_);
+        draw::show_image(window_name_, result_);
 }

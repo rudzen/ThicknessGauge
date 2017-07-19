@@ -5,7 +5,7 @@ void Calib2::show_begin() {
     
     std::cout << "Rudz calibration wizard initiated..\n";
     std::cout << "-----------------------------------\n";
-    std::cout << "At any time, press ctrl-c to abord!\n\n";
+    std::cout << "At any time, press ctrl-c to abort!\n\n";
 
 }
 
@@ -49,20 +49,24 @@ bool Calib2::init() {
     pcapture->packet_size(8228);
 
     auto ok = pcapture->frame_init();
-    if (!ok)
+    if (!ok) {
         return false;
+    }
 
     ok = pcapture->cap_init();
-    if (!ok)
+    if (!ok) {
         return false;
+    }
 
     ok = pcapture->aquisition_init();
-    if (!ok)
+    if (!ok) {
         return false;
+    }
 
     ok = pcapture->region(pcapture->default_roi_full);
-    if (!ok)
+    if (!ok) {
         return false;
+    }
 
     return true;
 
@@ -90,8 +94,9 @@ int Calib2::calib() {
     log_time << "(3 /  ) Enter number of boards to process (0 to exit) >";
     std::getline(std::cin, in);
     n_boards = Ztring::stoi(in);
-    if (n_boards == 0)
+    if (n_boards == 0) {
         return -2;
+    }
 
     auto board_n = board_w * board_h;
     auto board_sz = cv::Size(board_w, board_h);
@@ -136,8 +141,9 @@ int Calib2::calib() {
             log_time << "Collected our " << static_cast<int>(image_points.size()) << " of " << n_boards << " needed chessboard images\n" << std::endl;
         }
         cv::imshow("Calibration", image); //show in color if we did collect the image
-        if ((cv::waitKey(30) & 255) == 27)
+        if ((cv::waitKey(30) & 255) == 27) {
             return -1;
+        }
     }
     // END COLLECTION WHILE LOOP.
 
@@ -176,12 +182,14 @@ int Calib2::calib() {
     cv::Mat image, image0;
     for (;;) {
         pcapture->cap_single(image0);
-        if (image0.empty())
+        if (image0.empty()) {
             break;
+        }
         cv::remap(image0, image, map1, map2, cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar());
         cv::imshow("Undistorted", image);
-        if ((cv::waitKey(30) & 255) == 27)
+        if ((cv::waitKey(30) & 255) == 27) {
             break;
+        }
     }
 
     pcapture->close();

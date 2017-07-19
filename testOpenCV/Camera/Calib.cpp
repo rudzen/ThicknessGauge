@@ -6,7 +6,7 @@ using namespace tg;
 
 void Calib::show_begin() {
 
-    log_time << "Rudz calibration wizard initiated..\n";
+    log_time << "Rudz calibration wizard v1 initiated..\n";
 
 }
 
@@ -19,10 +19,12 @@ void Calib::save_data(std::string& filename) const {
     fs << "image_height" << image_.rows;
     fs << "horizontal_squares" << corners_horizontal_;
     fs << "vertical_squares" << corners_vertical_;
-    if (!rvecs_.empty())
+    if (!rvecs_.empty()) {
         fs << "rvecs" << rvecs_;
-    if (!tvecs_.empty())
+    }
+    if (!tvecs_.empty()) {
         fs << "tvecs" << tvecs_;
+    }
 
     fs << "intrinsic" << intrinsic_;
     fs << "dist_coeffs" << dist_coeffs_;
@@ -46,8 +48,9 @@ void Calib::run_calib() {
     log_time << "(3 /  ) Enter number of boards to process (0 to exit) >";
     std::getline(std::cin, in);
     board_count_ = Ztring::stoi(in);
-    if (board_count_ == 0)
+    if (board_count_ == 0) {
         return;
+    }
 
     auto board_sz = cv::Size(corners_horizontal_, corners_vertical_);
     auto num_squares = board_sz.area();
@@ -64,8 +67,9 @@ void Calib::run_calib() {
 
     obj_.reserve(num_squares);
 
-    for (auto j = 0; j < num_squares; j++)
+    for (auto j = 0; j < num_squares; j++) {
         obj_.emplace_back(cv::Point3f(j / static_cast<float>(corners_horizontal_), static_cast<float>(j % corners_horizontal_), 0.0f));
+    }
 
     corners_.reserve(num_squares);
     image_points_.reserve(num_squares);
@@ -86,15 +90,16 @@ void Calib::run_calib() {
         capture >> image_;
         auto key = cv::waitKey(1);
 
-        if (key == 27)
+        if (key == 27) {
             return;
-        if (key == ' ' && found != 0) {
+        } else if (key == ' ' && found != 0) {
             image_points_.emplace_back(corners_);
             object_points_.emplace_back(obj_);
             log_time << "Data stored..\n";
             successes++;
-            if (successes >= board_count_)
+            if (successes >= board_count_) {
                 break;
+            }
         }
     }
 
@@ -120,8 +125,9 @@ void Calib::run_calib() {
     log_time << "Enter filename to save calibration data to (ctrl-c to abort) >";
 
     std::getline(std::cin, in);
-    if (in.empty())
+    if (in.empty()) {
         return;
+    }
 
     save_data(in);
 

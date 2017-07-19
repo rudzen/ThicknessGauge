@@ -128,8 +128,9 @@ public:
             auto rowPtr = corner_map.ptr<uchar>(y);
             for (auto x = 0; x < corner_map.cols; x++) {
                 // if it is a feature point
-                if (rowPtr[x])
+                if (rowPtr[x]) {
                     points.emplace_back(cv::Point(x, y));
+                }
             }
         }
     }
@@ -137,8 +138,9 @@ public:
     // Draw circles at feature point locations on an image
     static void draw_on_image(cv::Mat& image, const std::vector<cv::Point_<T>>& points, cv::Scalar color = cv::Scalar(255, 255, 255), int radius = 3, int thickness = 2) {
 
-        for (const auto& p : points)
+        for (const auto& p : points) {
             cv::circle(image, p, radius, color, thickness);
+        }
 
     }
 };

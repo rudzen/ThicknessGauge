@@ -27,10 +27,20 @@ class Calib2 {
 
     static void show_begin();
 
+    /**
+     * \brief Initializes the capture unit etc
+     * \return true if everything seems ok, otherwise false
+     */
     bool init();
 
 public:
 
+    /**
+     * \brief Run the calibration.
+     * It requests several things as manuel input:
+     * Number of squares, number of corners and how many boards to process.
+     * \return 
+     */
     int calib();
 
 };

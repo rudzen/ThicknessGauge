@@ -112,8 +112,14 @@ using ulong = unsigned long;
 
 using capture_roi = cv::Rect_<ulong>;
 
+/**
+ * \brief The default near boundry extract amount
+ */
 constexpr int DEF_NEAR_EXTRACT = 20;
 
+/**
+ * \brief The default exposure multiplier for phase two
+ */
 constexpr ulong DEF_PHASE_TWO_MULTIPLIER = 3;
 
 
@@ -121,6 +127,9 @@ class Seeker : public std::enable_shared_from_this<Seeker> {
 
 public:
 
+    /**
+     * \brief Phase indicators
+     */
     enum class Phase {
         ONE, TWO_RIGHT, TWO_LEFT, THREE, DONE, NONE, FAIL
     };
@@ -141,17 +150,24 @@ private:
         const ulong exposure_increment = 1000;
     };
 
+    // pointer to exposure seek structure
     std::unique_ptr<phase_one_exp> exposure_levels = std::make_unique<phase_one_exp>();
 
+    /**
+     * \brief Phase two results (not used atm)
+     */
     using phase_two_results = struct results {
         ulong ok; // <- important.. comparison to other side
         ulong fail; // <- important.. determine high fail chance
     };
 
+    // the initial exposure level for phase one
     ulong phase_one_exposure = exposure_levels->exposure_start;
 
+    // neccesary as phase two exposure can be configured external from this class
     ulong phase_two_base_exposure_ = 0;
 
+    // pointer to the capture unit
     std::shared_ptr<CapturePvApi> pcapture = std::make_shared<CapturePvApi>();
 
     // common canny with default settings for detecting marking borders
@@ -163,6 +179,7 @@ private:
     // morph for phase two and three
     std::unique_ptr<MorphR> pmorph = std::make_unique<MorphR>(cv::MORPH_GRADIENT, 1, false);
 
+    // the data which was obtained in the entirety of the process
     std::shared_ptr<Data<double>> pdata = std::make_shared<Data<double>>();
 
 public: // data return point
@@ -177,10 +194,13 @@ public: // data return point
 
 private:
 
+    // default camera ROI
     const capture_roi def_phase_one_roi_ = capture_roi(0UL, 1006UL, 2448UL, 256UL);
 
+    // null ROI
     const capture_roi phase_roi_null_ = capture_roi(0UL, 0UL, 0UL, 0UL);
 
+    // small roi used when buffer is cleared from the camera
     const capture_roi buffer_clear_roi = capture_roi(1UL, 1UL, 1UL, 1UL);
 
     Phase current_phase_;
@@ -198,18 +218,31 @@ private:
         phase_roi_null_
     };
 
+    // base exposure ranges
     std::array<ulong, 3> exposures_ = {5000, 20000, 40000};
 
+    // string names of exposure ranges
     std::array<std::string, 3> exposures_short_ = {"_5k", "_20k", "_40k"};
 
+    // the structure where frames are captures into for all phases
     std::array<std::unique_ptr<Frames>, 4> frameset_;
 
+    // pointer to the current active frameset
     Frames* current_frameset_;
 
+    /**
+     * \brief Shuts down everything
+     * \return always true
+     */
     bool shut_down() const;
 
 private: // internal functions
 
+    /**
+     * \brief Accumulates the Y values of a set range in the ROI structure (intended to use for offset computation)
+     * \tparam upper The limit of the index
+     * \return The accumulated Y values of the ROI structure from start to upper
+     */
     template <int upper>
     ulong phase_roi_y() {
         ulong return_value = 0;
@@ -219,6 +252,13 @@ private: // internal functions
         return return_value;
     }
 
+    /**
+     * \brief Populates a specific ROI structure with a new ROI
+     * \tparam T The type of rect
+     * \tparam index The index of the ROI structure to populate
+     * \param roi The ROI to save
+     * \return true if the values were ok, otherwise false
+     */
     template <typename T, int index>
     bool phase_roi(cv::Rect_<T> roi) {
         phase_roi_[index].x = static_cast<unsigned long>(floor(roi.x));
