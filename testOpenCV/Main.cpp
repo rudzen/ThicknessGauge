@@ -35,6 +35,12 @@ int main(int argc, char** argv) {
     // jump directly into vimba testing for now!
     //return testCPP(argc, argv);
 
+    // deactivate any buffers for cin and cout
+    setvbuf(stdin, nullptr, _IONBF, 0);
+    setvbuf(stdout, nullptr, _IONBF, 0);
+    std::cout.rdbuf()->pubsetbuf(nullptr, 0);
+    std::cin.rdbuf()->pubsetbuf(nullptr, 0);
+
     auto return_value = false;
 
     auto options = std::make_shared<CommandLineOptions>();
@@ -101,9 +107,9 @@ int main(int argc, char** argv) {
                         bool ok;
 
                         if (!do_zero)
-                            ok = seeker->compute(false , zero_measure_mr, phase_two_exposure); // default
+                            ok = seeker->compute(false, zero_measure_mr, phase_two_exposure); // default
                         else
-                            ok = seeker->compute(true , zero_measure_mr, phase_two_exposure); // force feed the bastard
+                            ok = seeker->compute(true, zero_measure_mr, phase_two_exposure); // force feed the bastard
 
                         if (ok)
                             break;

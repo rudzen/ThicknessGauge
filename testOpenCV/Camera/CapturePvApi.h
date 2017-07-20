@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CaptureInterface.h"
 #include <PvApi.h>
 #include "../namespaces/validate.h"
 
