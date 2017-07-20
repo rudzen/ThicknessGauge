@@ -287,9 +287,6 @@
     <ClInclude Include="namespaces\tg.h">
       <Filter>Header Files\Namespaces</Filter>
     </ClInclude>
-    <ClInclude Include="Camera\CaptureInterface.h">
-      <Filter>Header Files\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="Exceptions\NoLineDetectedException.h">
       <Filter>Header Files\Exceptions</Filter>
     </ClInclude>

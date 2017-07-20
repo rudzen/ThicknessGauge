@@ -216,7 +216,6 @@
     <ClInclude Include="ArgClasses\args.h" />
     <ClInclude Include="namespaces\calc.h" />
     <ClInclude Include="Calc\GaugeMath.h" />
-    <ClInclude Include="Camera\CaptureInterface.h" />
     <ClInclude Include="CV\BaseR.h" />
     <ClInclude Include="ArgClasses\BuildInfoVisitor.h" />
     <ClInclude Include="CV\CannyR.h" />
