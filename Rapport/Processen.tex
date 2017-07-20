@@ -3,4 +3,40 @@
 Denne sektion omhandler den process der ligger til grund for de resultater der foreligger.
 
 \subsection{Identificering af striben}
-For at kunne måle striben, er det nødvendigt at kunne lokaliserer denne. Søgningen efter striben foregår ved at lysindtaget (eksponeringen) bliver trinvis forøget indtil striben er tilstrækkelig synlig i billedet til at kunne identificere den. Når striben er lokaliseret, bliver dette område brugt som reference til de efterfølgende processer. Striben bliver identificeret ud fra dennes sider, hvor kanterne danner linjer på billedet. For at kunne
+
+Den hertil designede algoritme, vil forsøge at lokalisere striben der skal måles, ved at overtage kontrollen med kameraet og automatisk søge efter striben.
+Dette foregår ved at den justerer eksponeringen i trin, og undersøge de informationer der findes i et billedet der er taget efter hver justering.
+Årsagen til denne fremgangsmåde er, at det sikrer den for det bedst muligt udgangspunkt i senere stadier, da det eneste der er at forholde sig til er allerede kendte data og fordi der er et sammenhæng mellem de senere faser og den eksponering striben blev lokaliseret ved.
+\\
+Stribens søgning er afhængig af forskellige parametre, hvor først og fremmest vinklen af striben i forhold til kameraet, ved aflæsningen, ikke må overstige 30 grader. Grundlaget for netop dette krav er, at der kan være for meget information der ikke er relevant hvis dette er tilfældet.
+Når det lykkedes for algoritmen at identificere noget der kunne være en stribe, bliver informationen verificeret mod sig selv for at sikre det ikke er åbenlyst irrelevante data. Kriteriet for at de fundne informationer bliver accepteret som værende tilhørende en stribe er, grundet den metode der bliver benyttet, at der kun må være to grupperinger af korrekt orienterede linjer, og at hver af linjerne i hver af samlingerne alle skær hinanden. Der ud over bør grupperingerne være tilhørende hver deres halvdel af billedet\footnote{Sikrer en mere stabil søgning af stribe under de nuværende testforhold.}.
+Dette sikrer mod flyvske informationer fra elementer der kunne ligne kanten af striben bare en lille smule, som f.eks. et græsstrå eller andet der kunne befinde sig i nærheden.
+
+Når denne del er færdig kan de informationer der er indsamlet blive brugt til at afskille de forskellige lokationer for hvor laseren befinder sig, både på striben og ved siden af den.
+
+\subsection{Lokalisering af laser}
+
+Denne sektion omhandler de to faser der lokaliserer laseren i billedet. Både der hvor den er på striben og hvor den er på jorden.
+
+\subsubsection{På jorden}
+Ud fra den information der er indsamlet omkring stribens lokalitet, kan laserens lokation udenfor striben nemmere findes.
+Algoritmen drager nytte af at laseren altid vil befinde sig på den nederste fjerdedel af billedet, og kan derfor udelukke en del fra start.
+For at laseren kan lokaliseret og at den rent faktisk er brugbar, skal den være "rimelig" vandret, dvs. den må f.eks. ikke være for bøjet.
+Eksponeringen fordobles ud fra den eksponering benyttet til at lokalisere striben, da området på forhånd forventes at være mørkere da der ikke er nogen stribe.
+Laseren findes ved først at massere data for at gøre det nemmere at lokalisere vandrette former, og derefter at lede efter linjer der har under en grads hældning.
+Hvis dette lykkedes bliver der fokuseret på området hvor der er fundet linjer, da dette er med størst sandsynlighed laserens placering i billedet.
+Grundet at laseren er sporadisk mht. dens afbildning, bliver laserens lokation i højden udregning efter dens massemidtpunkt,
+hvor dens masse rent faktisk er dens intensitet pr. kolonne. Dette sikrer en så nøjagtig lokalisering som muligt.
+
+\subsubsection{På striben}
+Da stribens lokation allerede er kendt, skal laseren nu lokaliseres oven på striben. Da der i første fase blev benyttet en så lav som mulig eksponering, betyder dette at laseren har den kraftigste intensitet i dette område. Denne information kan udnyttes til at frasorterer alt andet og derved er laserens lokation fundet. Herefter er fremgangsmåden den samme som med laseren på jorden, hvorved gennemsnittet over N antal billeder bliver trukket fra det samme form for gennemsnit fra laseren på jorden. Derved er forskellen i højden på de to steder fundet.
+
+\subsection{Begrænsninger}
+Opsætningen gør, at der er en del begrænsninger.
+\begin{itemize}
+	\item Ustabilitet, forholdet mellem kamera og laser ændrer sig meget nemt
+	\item Laseren buer. Over 400mm har den en bøjning på op til 2mm
+	\item Høj ambient lysstyrke
+	\item Vinklet måling. Ikke relevant grundet opsætningens natur ikke kan håndtere dette, da både laser og kamera skal være < 0.1mm synkront positioneret hele målingen i gennem
+\end{itemize}
+
