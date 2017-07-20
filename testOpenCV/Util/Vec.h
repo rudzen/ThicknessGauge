@@ -22,7 +22,7 @@
 * THE SOFTWARE.
 */
 //
-// Class: Full v2 & v3 classes.
+// Class: Simplistic v2 & v3 classes.
 // Description : With ..
 // - Functionality.
 // - Operational overload.

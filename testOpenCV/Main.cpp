@@ -36,10 +36,8 @@ int main(int argc, char** argv) {
     //return testCPP(argc, argv);
 
     // deactivate any buffers for cin and cout
-    setvbuf(stdin, nullptr, _IONBF, 0);
-    setvbuf(stdout, nullptr, _IONBF, 0);
-    std::cout.rdbuf()->pubsetbuf(nullptr, 0);
-    std::cin.rdbuf()->pubsetbuf(nullptr, 0);
+    tg::cin_buffer<tg::DEFAULT_IN_OUT_BUFFER>();
+    tg::cout_buffer<tg::DEFAULT_IN_OUT_BUFFER>();
 
     auto return_value = false;
 

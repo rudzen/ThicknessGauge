@@ -86,27 +86,29 @@ private:
 
     vector<xLine> lines_;
 
-    bool computeXLine();
+    bool compute_x_line();
 
-    void configureXLine(vector<cv::Point2i>& nonZeroes, vector<v3<float>>& output);
+    void configure_x_line(vector<cv::Point2i>& non_zeroes, vector<v3<float>>& output);
 
-    static void computeCut(xLine& diagonal, HoughLinesR::LineV& horizontal);
+    // TODO : do?
+    static void compute_cut(xLine& diagonal, HoughLinesR::LineV& horizontal);
 
 public:
 
-    bool doLaser();
+    bool do_laser();
 
-    bool computeIntensityWeigth(vector<v3<float>>& output);
+    bool compute_intensity_weigth(vector<v3<float>>& output);
 
 };
 
-inline bool LaserR::computeXLine() {
+inline bool LaserR::compute_x_line() {
 
     auto ok = false;
 
     for (auto& xl : lines_) {
-        if (xl.i.empty())
+        if (xl.i.empty()) {
             continue;
+        }
 
         auto sum = 0.0f;
         for (auto& intensity : xl.i) {
@@ -121,30 +123,34 @@ inline bool LaserR::computeXLine() {
 
 }
 
-inline void LaserR::configureXLine(vector<cv::Point2i>& nonZeroes, vector<v3<float>>& output) {
+inline void LaserR::configure_x_line(vector<cv::Point2i>& non_zeroes, vector<v3<float>>& output) {
 
-    if (!lines_.empty())
+    if (!lines_.empty()) {
         lines_.clear();
+    }
 
     lines_.reserve(image_.cols);
 
     // populate xLine vector
-    for (auto i = 0; i < image_.cols; i++)
+    for (auto i = 0; i < image_.cols; i++) {
         lines_.emplace_back(xLine(i));
+    }
 
     // copy the values from nonZero vector
-    for (auto& nz : nonZeroes)
+    for (auto& nz : non_zeroes) {
         lines_[nz.x].i.emplace_back(image_.at<unsigned char>(nz));
+    }
 
-    auto ok = computeXLine();
+    auto ok = compute_x_line();
 
     if (!ok) {
         log_time << "Error while calculating weighted intensity distribution.\n";
         return;
     }
 
-    for (auto& line : lines_)
+    for (auto& line : lines_) {
         output.emplace_back(v3<float>(static_cast<float>(line.x), line.y, static_cast<float>(line.i.size())));
+    }
 
 }
 

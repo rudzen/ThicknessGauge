@@ -2,18 +2,19 @@
 #include <vector>
 #include <map>
 #include <opencv2/opencv.hpp>
-
 #include <opencv2/stitching/detail/warpers.hpp>
+
 #include "namespaces/sort.h"
 
 /**
  * \brief Line class, contains information from a singular captured frame.
  * Including defined sections for 3 sides (right/center/left), frame reference and test output matrix.
+ * Considered obsolete and still here for reference as it contains some interesting differentiation functions
  */
 class Line {
 public:
     enum class Location {
-        baseOne, baseTwo, heigthOne, heigthTwo
+        base_one, base_two, heigth_one, heigth_two
     };
 
 private:
@@ -22,9 +23,9 @@ private:
         none, x, y
     };
 
-    const std::map<Location, int> locationBaseMap = {{Location::baseOne , 0}, {Location::baseTwo, 1}};
+    const std::map<Location, int> location_base_map_ = {{Location::base_one , 0}, {Location::base_two, 1}};
 
-    const std::map<Location, int> locationHeigthMap = {{Location::heigthOne , 0}, {Location::heigthTwo, 1}};
+    const std::map<Location, int> location_heigth_map_ = {{Location::heigth_one , 0}, {Location::heigth_two, 1}};
 
     std::map<int, int> intensity_;
 
@@ -56,22 +57,22 @@ private:
     /**
      * \brief All the complete work from the class. Diffirentiated Y values + differentiated intensity values.
      */
-    std::vector<cv::Point2i> allComplete_;
+    std::vector<cv::Point2i> all_complete_;
 
     /**
     * \brief All the sparse elements
     */
-    std::vector<cv::Point2i> allSparse_;
+    std::vector<cv::Point2i> all_sparse_;
 
     /**
     * \brief All the raw pixel locations from frame
     */
-    std::vector<cv::Point2i> allTotal_;
+    std::vector<cv::Point2i> all_total_;
 
     /**
      * \brief All the sparse elements differentiated
      */
-    std::vector<cv::Point2i> allDifferentiated_;
+    std::vector<cv::Point2i> all_differentiated_;
 
     // temporary bastard
     std::vector<cv::Point2i> tmp;
@@ -79,29 +80,29 @@ private:
     /**
     * \brief Left side of the elements
     */
-    std::vector<cv::Point2i> leftOne_;
+    std::vector<cv::Point2i> left_one_;
 
     /**
     * \brief Left side #2 of the elements
     */
-    std::vector<cv::Point2i> leftTwo_;
+    std::vector<cv::Point2i> left_two_;
 
     /**
     * \brief Right side #1 of the elements
     */
-    std::vector<cv::Point2i> rightOne_;
+    std::vector<cv::Point2i> right_one_;
 
     /**
     * \brief Right side #2 of the elements
     */
-    std::vector<cv::Point2i> rightTwo_;
+    std::vector<cv::Point2i> right_two_;
 
     /**
     * \brief The calculated baseline for all 3 sides
     */
-    double baseLine_[2] = {0.0, 0.0};
+    double base_line_[2] = {0.0, 0.0};
 
-    double heigthLin_[2] = {0.0, 0.0};
+    double heigth_line_[2] = {0.0, 0.0};
 
 public:
 
@@ -110,92 +111,92 @@ public:
      * \param input The vector to be differentiated
      * \param output The results
      */
-    static void differentiateY(std::vector<cv::Point2i>& input, std::vector<cv::Point2i>& output);
+    static void differentiate_y(std::vector<cv::Point2i>& input, std::vector<cv::Point2i>& output);
 
     /**
      * \brief Diffirentiates twice :>
      */
-    void differentiateY();
+    void differentiate_y();
 
-    void saveAllData(std::string& filePrefix);
+    void save_all_data(std::string& file_prefix);
 
     /**
      * \brief Differentiates the intensity levels in X direction
      */
-    void differentiateIntensity();
+    void differentiate_intensity();
 
-    bool pointSearchX(cv::Point2i i, cv::Point2i j);
+    bool point_search_x(cv::Point2i i, cv::Point2i j);
 
     /**
      * \brief Merges the differentiated values of height and intensity into Y
      */
-    void mergeIntensity();
+    void merge_intensity();
 
     /**
      * \brief Combines two vectors into a third
-     * \param sourceOne The first vector
-     * \param sourceTwo The second vector
+     * \param source_one The first vector
+     * \param source_two The second vector
      * \param target The target vector with sourceOne and sourceTwo data
-     * \param sortX Sorting method to be used when combining is done
+     * \param sort_x Sorting method to be used when combining is done
      */
-    static void combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sortX);
+    static void combine(std::vector<cv::Point2d>& source_one, std::vector<cv::Point2d>& source_two, std::vector<cv::Point2d> target, SortMethod sort_x);
 
     /**
      * \brief Get the pixel intensity of a location from the current frame
      * \param location The point location to get the intensity from
      * \return The grey scale pixel intensity
      */
-    unsigned char getPixelIntensity(cv::Point2d& location);
+    unsigned char get_pixel_intensity(cv::Point2d& location);
 
     /**
      * \brief Generates the output matrix based on the current elements
      */
-    void generateOutput();
+    void generate_output();
 
-    bool generateSparse();
+    bool generate_sparse();
 
 public:
 
     /**
      * \brief Splits the elements based on values in X,
      * <rigth> < rightX, <center> < leftX, the rest in <left>
-     * \param rightOne The right section border in X
-     * \param rightTwo The left section border in X
+     * \param right_one The right section border in X
+     * \param right_two The left section border in X
      */
-    void split(double leftOne, double leftTwo, double rightOne, double rightTwo);
+    void split(double left_one, double left_two, double right_one, double right_two);
 
-    void drawPoly();
+    void draw_poly();
 
 public: // getters and setter + minor functions
 
     /**
      * \brief Reset the default output matrix
      */
-    void resetOutput() {
-        resetOutput(frame_);
+    void reset_output() {
+        reset_output(frame_);
     }
 
     /**
      * \brief Reset the default output matrix using custom matrix as template
-     * \param templateFrame The template to base the configuration of the output matrix on
+     * \param template_frame The template to base the configuration of the output matrix on
      */
-    void resetOutput(cv::Mat& templateFrame) {
-        output_ = cv::Mat::zeros(templateFrame.rows, templateFrame.cols, templateFrame.type());
+    void reset_output(cv::Mat& template_frame) {
+        output_ = cv::Mat::zeros(template_frame.rows, template_frame.cols, template_frame.type());
     }
 
     /**
      * \brief Set the class main frame reference (no pun)
-     * \param frameToSet The frame t
+     * \param frame_to_set The frame t
      */
-    void setFrame(const cv::Mat& frameToSet) {
-        frameToSet.copyTo(frame_); // copy ref
+    void frame(const cv::Mat& frame_to_set) {
+        frame_to_set.copyTo(frame_); // copy
     }
 
     /**
      * \brief Get output matrix reference
      * \return The output matrix reference
      */
-    const cv::Mat& getOutput() const {
+    const cv::Mat& output() const {
         return output_;
     }
 
@@ -204,26 +205,27 @@ public: // getters and setter + minor functions
      * \param location For which location
      * \return The baseline (Y)
      */
-    double getLine(Location location) {
+    double line(Location location) {
         switch (location) {
-        case Location::baseOne: ;
-        case Location::baseTwo:
-            return baseLine_[locationBaseMap.at(location)];
-        case Location::heigthOne: ;
-        case Location::heigthTwo: ;
-        default: ;
-            return heigthLin_[locationHeigthMap.at(location)];
+        case Location::base_one:
+        case Location::base_two:
+            return base_line_[location_base_map_.at(location)];
+        case Location::heigth_one:
+        case Location::heigth_two:
+        default:
+            return heigth_line_[location_heigth_map_.at(location)];
         }
     }
 
 };
 
-inline void Line::differentiateY(std::vector<cv::Point2i>& input, std::vector<cv::Point2i>& output) {
+inline void Line::differentiate_y(std::vector<cv::Point2i>& input, std::vector<cv::Point2i>& output) {
 
     output.clear();
 
-    if (input.empty())
+    if (input.empty()) {
         return;
+    }
 
     auto size = input.size();
 
@@ -234,52 +236,60 @@ inline void Line::differentiateY(std::vector<cv::Point2i>& input, std::vector<cv
 
     output.reserve(input.size() - 1);
 
-    for (auto i = 1; i < size; ++i)
+    for (auto i = 1; i < size; ++i) {
         output.emplace_back(cv::Point(input[i].x, input[i].y - input[i - 1].y));
+    }
 }
 
-inline void Line::differentiateY() {
+inline void Line::differentiate_y() {
 
-    auto size = allSparse_.size();
+    auto size = all_sparse_.size();
 
     if (size == 1) {
-        allDifferentiated_.emplace_back(cv::Point(allSparse_.front().x, -allSparse_.front().y));
+        all_differentiated_.emplace_back(cv::Point(all_sparse_.front().x, -all_sparse_.front().y));
         return;
     }
 
-    tmp.reserve(allSparse_.size() - 1);
+    tmp.reserve(all_sparse_.size() - 1);
 
-    for (auto i = 1; i < size; ++i)
-        tmp.emplace_back(cv::Point(allSparse_[i].x, allSparse_[i].y - allSparse_[i - 1].y));
+    for (auto i = 1; i < size; ++i) {
+        tmp.emplace_back(cv::Point(all_sparse_[i].x, all_sparse_[i].y - all_sparse_[i - 1].y));
+    }
 
-    differentiateY(tmp, allDifferentiated_);
+    differentiate_y(tmp, all_differentiated_);
 }
 
-inline void Line::saveAllData(std::string& filePrefix) {
-    std::ofstream all(filePrefix + "_d_0_all.txt");
-    std::ofstream sparse(filePrefix + "_d_1_sparse.txt");
-    std::ofstream inten(filePrefix + "_d_2_intensity.txt");
-    std::ofstream diff1(filePrefix + "_d_3_diff1.txt");
-    std::ofstream diff2(filePrefix + "_d_4_diff2.txt");
-    std::ofstream full(filePrefix + "_d_5_full.txt");
+inline void Line::save_all_data(std::string& file_prefix) {
+    std::ofstream all(file_prefix + "_d_0_all.txt");
+    std::ofstream sparse(file_prefix + "_d_1_sparse.txt");
+    std::ofstream inten(file_prefix + "_d_2_intensity.txt");
+    std::ofstream diff1(file_prefix + "_d_3_diff1.txt");
+    std::ofstream diff2(file_prefix + "_d_4_diff2.txt");
+    std::ofstream full(file_prefix + "_d_5_full.txt");
 
-    for (auto& p : allTotal_)
+    for (auto& p : all_total_) {
         all << p << '\n';
+    }
 
-    for (auto& p : allSparse_)
+    for (auto& p : all_sparse_) {
         sparse << p << '\n';
+    }
 
-    for (auto& p : intensity_)
+    for (auto& p : intensity_) {
         inten << '[' << p.first << ", " << p.second << "]\n";
+    }
 
-    for (auto& p : tmp)
+    for (auto& p : tmp) {
         diff1 << p << '\n';
+    }
 
-    for (auto& p : allDifferentiated_)
+    for (auto& p : all_differentiated_) {
         diff2 << p << '\n';
+    }
 
-    for (auto& p : allComplete_)
+    for (auto& p : all_complete_) {
         full << p << '\n';
+    }
 
     diff2.close();
     diff1.close();
@@ -290,106 +300,118 @@ inline void Line::saveAllData(std::string& filePrefix) {
 
 }
 
-inline void Line::differentiateIntensity() {
+inline void Line::differentiate_intensity() {
 
-    if (frame_.empty())
+    if (frame_.empty()) {
         return;
+    }
 
-    if (allSparse_.empty())
+    if (all_sparse_.empty()) {
         return;
+    }
 
-    auto size = allSparse_.size();
+    auto size = all_sparse_.size();
 
     intensity_.clear();
 
     if (size == 1) {
-        auto front = allSparse_.front();
+        auto front = all_sparse_.front();
         intensity_[front.x] = frame_.at<unsigned char>(front);
     }
 
     for (auto i = 1; i < size; ++i) {
-        intensity_[allSparse_[i].x] = frame_.at<unsigned char>(allSparse_[i]) - frame_.at<unsigned char>(allSparse_[i - 1]);
+        intensity_[all_sparse_[i].x] = frame_.at<unsigned char>(all_sparse_[i]) - frame_.at<unsigned char>(all_sparse_[i - 1]);
         //auto val = intensity_[allSparse_[i].x];
         //log_time << val << endl;
     }
 
 }
 
-inline void Line::mergeIntensity() {
+inline void Line::merge_intensity() {
 
-    if (allDifferentiated_.empty())
+    if (all_differentiated_.empty()) {
         return;
-
-    if (intensity_.empty())
-        return;
-
-    for (auto& incent : allDifferentiated_) {
-        if (intensity_.count(incent.x))
-            allComplete_.emplace_back(cv::Point(incent.x, intensity_[incent.x] + incent.y));
-        else
-            allComplete_.emplace_back(incent);
     }
 
-    sorter::sort_pixels_x_ascending(allComplete_);
+    if (intensity_.empty()) {
+        return;
+    }
+
+    for (auto& incent : all_differentiated_) {
+        if (intensity_.count(incent.x)) {
+            all_complete_.emplace_back(cv::Point(incent.x, intensity_[incent.x] + incent.y));
+        } else {
+            all_complete_.emplace_back(incent);
+        }
+    }
+
+    sorter::sort_pixels_x_ascending(all_complete_);
 }
 
-inline void Line::combine(std::vector<cv::Point2d>& sourceOne, std::vector<cv::Point2d>& sourceTwo, std::vector<cv::Point2d> target, SortMethod sort) {
-    target.reserve(sourceOne.size() + sourceTwo.size());
-    target.insert(target.begin(), sourceOne.begin(), sourceOne.end());
-    target.insert(target.end(), sourceTwo.begin(), sourceTwo.end());
-    if (sort == SortMethod::x)
+inline void Line::combine(std::vector<cv::Point2d>& source_one, std::vector<cv::Point2d>& source_two, std::vector<cv::Point2d> target, SortMethod sort_x) {
+    target.reserve(source_one.size() + source_two.size());
+    target.insert(target.begin(), source_one.begin(), source_one.end());
+    target.insert(target.end(), source_two.begin(), source_two.end());
+    if (sort_x == SortMethod::x) {
         sorter::sort_pixels_x_ascending(target);
-    else if (sort == SortMethod::y)
+    } else if (sort_x == SortMethod::y) {
         sorter::sort_pixels_y_ascending(target);
+    }
 }
 
-inline unsigned char Line::getPixelIntensity(cv::Point2d& location) {
-    if (frame_.empty())
+inline unsigned char Line::get_pixel_intensity(cv::Point2d& location) {
+    if (frame_.empty()) {
         return 0;
+    }
 
-    if (frame_.cols > location.x)
+    if (frame_.cols > location.x) {
         return 0;
+    }
 
-    if (frame_.rows > location.y)
+    if (frame_.rows > location.y) {
         return 0;
+    }
 
     return frame_.at<uchar>(location);
 }
 
-inline void Line::generateOutput() {
+inline void Line::generate_output() {
     // just basic method, can be optimized.
-    for (auto& e : allSparse_)
+    for (auto& e : all_sparse_) {
         output_.at<unsigned char>(e) = 255;
+    }
 }
 
-inline bool Line::generateSparse() {
+inline bool Line::generate_sparse() {
 
-    if (!allSparse_.empty())
-        allSparse_.clear();
+    if (!all_sparse_.empty()) {
+        all_sparse_.clear();
+    }
 
-    allSparse_.reserve(frame_.cols);
+    all_sparse_.reserve(frame_.cols);
 
-    allTotal_.clear();
-    allTotal_.reserve(frame_.cols * frame_.rows);
+    all_total_.clear();
+    all_total_.reserve(frame_.cols * frame_.rows);
 
-    findNonZero(frame_, allTotal_);
+    findNonZero(frame_, all_total_);
 
-    if (allTotal_.empty())
+    if (all_total_.empty()) {
         return false;
+    }
 
     // sort the list in X
-    sorter::sort_pixels_x_ascending(allTotal_);
+    sorter::sort_pixels_x_ascending(all_total_);
 
     auto y = 0;
     auto count = 0;
     auto highest = 0;
 
-    auto x = allTotal_.front().x;
+    auto x = all_total_.front().x;
 
-    for (auto& p : allTotal_) {
+    for (auto& p : all_total_) {
         if (p.x != x) {
             if (count > 0) {
-                allSparse_.emplace_back(cv::Point(x, frame_.rows - y));
+                all_sparse_.emplace_back(cv::Point(x, frame_.rows - y));
                 count = 0;
             }
             highest = 0;
@@ -403,36 +425,38 @@ inline bool Line::generateSparse() {
         count++;
     }
 
-    return allSparse_.empty() ^ true;
+    return all_sparse_.empty() ^ true;
 
 }
 
-inline void Line::split(double leftOne, double leftTwo, double rightOne, double rightTwo) {
-    if (allSparse_.empty())
+inline void Line::split(double left_one, double left_two, double right_one, double right_two) {
+    if (all_sparse_.empty()) {
         return;
+    }
 
     // TODO : Validate input.
 
-    auto size = allSparse_.size();
+    auto size = all_sparse_.size();
 
-    rightOne_.clear();
-    leftOne_.clear();
+    right_one_.clear();
+    left_one_.clear();
 
-    rightOne_.reserve(size);
-    leftOne_.reserve(size);
+    right_one_.reserve(size);
+    left_one_.reserve(size);
 
-    for (auto& p : allSparse_) {
-        if (p.x < leftOne)
-            leftOne_.emplace_back(p);
-        else if (p.x < leftTwo)
-            leftTwo_.emplace_back(p);
-        else if (p.x < rightOne)
-            rightOne_.emplace_back(p);
-        else
-            rightTwo_.emplace_back(p);
+    for (auto& p : all_sparse_) {
+        if (p.x < left_one) {
+            left_one_.emplace_back(p);
+        } else if (p.x < left_two) {
+            left_two_.emplace_back(p);
+        } else if (p.x < right_one) {
+            right_one_.emplace_back(p);
+        } else {
+            right_two_.emplace_back(p);
+        }
     }
 }
 
-inline void Line::drawPoly() {
-    polylines(frame_, allSparse_, false, cv::Scalar(255, 255, 255));
+inline void Line::draw_poly() {
+    polylines(frame_, all_sparse_, false, cv::Scalar(255, 255, 255));
 }

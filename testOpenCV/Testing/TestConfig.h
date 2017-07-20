@@ -6,7 +6,7 @@ typedef std::pair<float, float> floatBoundry;
 typedef std::pair<int, int> intBoundry;
 
 /**
- * \brief Contains meta for a singular test.
+ * \brief Contains meta for a singular test, used early in the process.
  */
 class TestConfig {
 

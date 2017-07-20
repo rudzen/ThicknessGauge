@@ -17,6 +17,8 @@
  */
 namespace tg {
 
+    constexpr size_t DEFAULT_IN_OUT_BUFFER = 0;
+
     //    typedef std::pair<cv::Point2f, cv::Point2f> linePair;
 
     enum Side { Left = 0, Right = 1, Center = 2 };
@@ -108,6 +110,26 @@ namespace tg {
     }
 
     /**
+     * \brief Configure console input buffer size
+     * \tparam buffer The buffer size
+     */
+    template <size_t buffer>
+    void cin_buffer() {
+        setvbuf(stdin, nullptr, _IONBF, buffer);
+        std::cin.rdbuf()->pubsetbuf(nullptr, buffer);
+    }
+
+    /**
+     * \brief Configure console output buffer size
+     * \tparam buffer The buffer size
+     */
+    template <size_t buffer>
+    void cout_buffer() {
+        setvbuf(stdout, nullptr, _IONBF, buffer);
+        std::cout.rdbuf()->pubsetbuf(nullptr, buffer);
+    }
+
+    /**
      * \brief Flips a boolean expression
      * \tparam T Type, must be bool
      * \param value The value to flip
@@ -164,14 +186,14 @@ namespace tg {
      */
     std::ostream& operator<<(std::ostream&, SyncCout);
 
-/**
- * \brief Regular std::cout with syncout locking
- */
+    /**
+     * \brief Regular std::cout with syncout locking
+     */
 #define sync_cout std::cout << SyncCout::IO_LOCK
 
-/**
- * \brief Regular std::cout with syncout unlocking
- */
+    /**
+     * \brief Regular std::cout with syncout unlocking
+     */
 #define sync_endl std::endl << SyncCout::IO_UNLOCK
 
 #endif
@@ -191,25 +213,25 @@ namespace tg {
      */
     std::ostream& operator<<(std::ostream&, LogTime);
 
-/**
- * \brief std::cout overload with prefixed time and data
- */
+    /**
+     * \brief std::cout overload with prefixed time and data
+     */
 #define log_timedate std::cout << LogTime::LOG_TIME_DATE
-/**
- * \brief std::cout overload with prefixed time
- */
+    /**
+     * \brief std::cout overload with prefixed time
+     */
 #define log_time std::cout << LogTime::LOG_TIME
-/**
- * \brief std::cout overload with prefixed date
- */
+    /**
+     * \brief std::cout overload with prefixed date
+     */
 #define log_date std::cout << LogTime::LOG_DATE
-/**
- * \brief std::cout overload with prefixed time in green
- */
+    /**
+     * \brief std::cout overload with prefixed time in green
+     */
 #define log_ok std::cout << LogTime::LOG_OK_TIME
-/**
- * \brief std::cout overload with prefixed time in red
- */
+    /**
+     * \brief std::cout overload with prefixed time in red
+     */
 #define log_err std::cerr << LogTime::LOG_ERR_TIME
 
 #endif
