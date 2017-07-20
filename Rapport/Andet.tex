@@ -1,0 +1,46 @@
+\subsection{3D profil problematikken}
+
+Som tidligere nævnt (jf. sek. \ref{triangulering}), kan der udregnes en dybde ud fra pixel positionerne. Problemet her er så at jo højere oppe i billedet man forsøger at aflæse, jo større bliver distancen i mm. for hver pixel. Dette vil dog under "normale" omstændigheder ikke spille den helt store rolle, da markeringsaflæsningen ikke kommer til at ramme toppen af billedet, men det vil dog have en betydning jo tykkere markering der skal afmåles.
+
+\subsection{Reel Z-distance for kendt objekt i billedet (eksempel)}
+
+Følgende er et simpelt eksempel på en aktuel og virksom algoritme der kan bruges til uniforme elementer i billeder. Med uniforme elementer menes der elementer hvor dimensionerne er kendt på forhånd, som f.eks. en forud designet QR-kode.
+Funktionen for at kunne udregne den reelle z-akse distance er givet ved
+
+\begin{equation}
+    f = d \cdot \frac{Z}{D}
+\end{equation}
+
+Hvor
+
+\begin{itemize}
+    \item f = omdrejningspunkt bredde (focal width)
+    \item D = Reelle bredde af objekt i virkeligheden (f.eks. mm)
+    \item Z = Pixels ved den angivne afstand (f.eks. 20.0 mm)
+    \item d = Bredden af det reelle objekt i pixels på billedet
+\end{itemize}
+
+Herefter kan der så udregnes
+
+\begin{equation}
+    \frac{f}{d'} = \frac{Z'}{D} \Leftrightarrow Z' = D \cdot \frac{f}{d'}
+\end{equation}
+
+Hvor
+
+\begin{itemize}
+    \item Z' = nuværende distance i angivet enhed 
+    \item d' = den tilsyneladende bredde af objektet i pixels
+\end{itemize}
+
+Og fordi
+
+\begin{equation}
+    \frac{f}{d'} = \frac{Z'}{D} \Leftrightarrow Z' = D \cdot \frac{f}{d'}
+\end{equation}
+
+Er Z' nu den distance der er til objektet i billedet i den angive enhed.
+
+\subsection{}
+Ved at kende pixel densiteten i tilfælde ved brug af et forandret perspektiv, kan man ud fra det opbygge en tabel der indeholder differencer for hver position på et given billede. Dette gør det muligt at få fat i den faktuelle Z-akse distance (ud fra kameraet) for en given pixel ud fra et billede. Da alle faktorer omkring billedet er kendt, er det muligt at generere de informationer der skal til på forhånd, for at kunne få den bedst mulige information. Dette kan opnås ved at benytte sig af en genstand, typisk en målegenstand der vil udfylde hele billedet i Y-aksen, men som ligger fladt foran kameraet.
+Derefter kan de nødvendige data så manuelt indsættes som en simpel datastruktur der gør der simpelt at konvertere fra 2D til 3D. Denne måde er den simpleste og den bedste, da man med sikkerhed for noget pixel perfekt data. Det er dog en nødvendighed at have så mange informationer som muligt omkring laseren, da dette kan have stor betydning for hvorledes den skal behandles.

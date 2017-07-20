@@ -1,0 +1,21 @@
+\section{Teknologivalg}
+
+Denne sektion beskriver de forskellige delelementer projektet består af. Det er både med hensyn til hardware men hvilke udviklingsværktøj der blev benyttet. For at kunne danne et komplet billede, er der information medtaget omkring nogle af beslutninger og deres bevæggrunde. 
+
+\subsection{Kamera}
+Der er valgt at benytte sig af et kamera, der på baggrund af en laser der kaster en linje, kan måle forskel i højden fra hvor laserens linje kastes på en termoplastisk markering i forhold til, hvor den rammer ved siden af markeringen.
+
+\subsection{Laser}
+Laseren kaster en linje lys ned på markeringsområdet med en styrke der gør det er muligt at kunne aflæse dens lokalisation.
+
+\subsection{OpenCV}
+Til denne proces bliver Open Computer Vision benyttet, hvilket er et gratis computer vision system der gør det muligt at lave behandling på dataen for at lokalisere laserlinjen på de billeder kameraet tager.
+
+\subsection{C++}
+Udviklingen har indtil videre foregået i C++, da dette potentielt åbner op for at benytte sig af softwaren, eller dele af den, på generisk vis på tværs af platforme.
+
+\subsection{Begrundelse}
+Den eneste begrundelse til hvorfor der bliver benyttet et kamera, er prisen. Et moderne kamera med en tilstrækkelig kvalitet koster under 6.000,- DKr, og en linjelaser koster mellem 2.000,- DKr. og 3.000,- DKr.
+
+Open Computer Vision er gratis, og kan benyttes i ubegrænset omfang, også i kommercielle forbindelser.
+

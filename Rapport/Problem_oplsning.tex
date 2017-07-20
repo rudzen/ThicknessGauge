@@ -1,0 +1,39 @@
+\section{Opløsning - Problemet}
+
+Denne sektion omhandler informatik omkring problematikken der kan opstå ved kamerabrug og dens opløsning. Med udgangspunkt i at der ønskes en så præcis måling som muligt.
+
+\subsection{Kamera, brugen}
+Kameraet vil benyttes til at tage et billede fra en vinkel, af en form for lysafmærkning der går over markeringen der skal måles højde på. I tilfælde af at kameraet ikke har den tilstrækkelige opløsning i X, hvilket helst skulle kunne rækker som minimum lige over de 200mm, skal der benyttes en linse til at presse billedet i Y. Dette involverer så et problem ved at antallet af pixels i Y er mindre, vil det umiddelbart være mere besværligt at opnå en præcision ud fra det rå billede.
+
+\subsection{Potentielle løsninger}
+
+Denne undersektion beskriver de potentielle løsning der er observeret på nuværende tidspunkt.
+
+\subsubsection{Flere billeder pr. måling}
+
+Ved at tage flere billeder pr. måling kan der opnås et bedre resultat out-of-the-box. Denne måde er baseret på at et gennemsnit for de behandlede billeders data vil være mere præcist.
+
+\subsubsection{Flere kameraer}
+Formålet med at bruge flere kameraer er at kunne opnå en større bredde. Det vil betyde at der ikke vil blive brugt en linse, men at billedet er i sin fulde størrelse og derfor nemmere at finde de forskellige højder på markeringen.
+
+\subsection{Pixel vs. mm}
+Ved brug af kamera og en laser til at måle noget, er det derfor kritisk at der kan opnås en så god kvalitet som muligt, men også en så høj mængde pixels pr. mm. Jo flere pixels der befinder sig pr. mm, jo højere præcision vil der kunne opnås.
+
+\subsection{Behandlingen}
+For at kunne sikre et så optimalt resultat, er det derfor kritisk at der bliver taget højde for situationer hvor selve billedet kan være meget lyst. For at modvirke dette kan billeddataen bearbejdes med henholdsvis level filter og gennemsnits filter. Level filteret vil udjævne billedets farve niveau automatisk, og gennemsnitsfiltret vil manuelt blive brugt før selve markerings skal måles. Dette sikrer at der på basis af den farve der skal benyttes til at måle efter, vil have størst mulig succes for at få en så god detaljegrad som muligt.
+
+\subsubsection{En mulig fremgangsmåde}
+Ud fra de informationer der er til rådighed, kan processen potentielt foregå i følgende rækkefølge:
+\begin{itemize}
+    \item Billeddataen modtaget
+    \item Auto-Level filter, for at modvirke den værste lys udefra
+    \item Gennemsnits farve filter pr. pixel
+    \item Billedet bliver konverteret til binært baseret på den farve der skal måles efter
+    \item Base-punktet vil altid være det laveste, hvilket er i siden hvor den er på jorden
+    \item Det binære billede bliver konverteret til en bedre datastruktur
+    \item Højde- og lavpunkt samt gennemsnit bliver beregnet
+    \item Data, inkl. original billede, binært billede samt meta data bliver gemt
+    \item Resultatet bliver præsenteret
+\end{itemize}
+
+På under 2 sekunder.

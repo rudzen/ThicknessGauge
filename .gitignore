@@ -287,3 +287,9 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 /Doc
+*.aux
+*.lot
+*.lof
+*.toc
+*.gz
+*.out
