@@ -1064,6 +1064,9 @@ namespace calc {
     /**
      * \brief Computes the intensity centroid for each X in the Y direction.
      * This gives the weighted Y position based off the intensity levels across that single X column
+     * For more information about the algorithm used,
+     * see https://en.wikipedia.org/wiki/Image_moment
+     * or http://docs.opencv.org/2.4/modules/imgproc/doc/structural_analysis_and_shape_descriptors.html?highlight=moments#moments
      * \param image The image to perform the computation on
      * \param output The output vector of points
      * \param upper_limit The upper limit of the rectangular cut out
@@ -1116,6 +1119,9 @@ namespace calc {
      * \brief Computes the real intensity line (condensed version).
      * Each column is sliced and the weigthed mass of the intensity levels are computed
      * to a single Y value for each X value.
+     * For more information about the algorithm used,
+     * see https://en.wikipedia.org/wiki/Image_moment
+     * or http://docs.opencv.org/2.4/modules/imgproc/doc/structural_analysis_and_shape_descriptors.html?highlight=moments#moments
      * \tparam T The type The type of points to put the line into
      * \param image The image to be sliced
      * \param output The resulting points
