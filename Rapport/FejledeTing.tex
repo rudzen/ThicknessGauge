@@ -1,39 +1,53 @@
-\section{Fejlede forsg}
-Undervejs i forløbet er forskellige måder blevet afprøvet, hvoraf alle indtil den endelige endte med at blive skrottet. Denne sektion beskriver de forskellige procedurer, hvilket problem de skulle løse og hvad ideen bag dem var.
+\section{Fejlede forsøg}
+Undervejs i forløbet er forskellige metoder til stadierne i processen blevet afprøvet, hvoraf alle endte med at blive skrottet. Denne sektion beskriver de forskellige procedurer, hvilket problem de skulle løse og hvad ideen bag dem var, og hvorfor de ikke var brugbare i praksis.
 
 \subsection{Diagonal matricer}
 
-hfdjkhfjksd
+\subsubsection{Problemstilling}
+Identificering af start og slutpunkter for laseren på striben
 
+\subsubsection{Metode}
+Opdele billedet i diagonale striber for derefter at gennemløbe disse for at identificere dobbeltskæringer af laseren.
+
+\subsubsection{Resultat}
+Denne metode viste sig at være utroligt kostbar, og noget utilregnelig. Under perfekte situationer virkede det nogenlunde, og hvis der var nogen diskrepans i laseren position grundet støj eller andre elementer ville den give resultater der ikke kunne bruges.
 
 \subsection{Differentiering}
-Problemstilling : Lokalisering af laser på stribe kontra jord.
-\\\\
-Laseren kunne nemt lokaliseres som helhed i hele billedet. Dette var en meget positiv ting, og derfor var næste skridt at finde ud af hvor laseren rent faktisk var på striben og hvor den var henne på jorden.
-\\
-Metode : Ved at tage alle punkter i X-aksen, og tage forskellen på dem i stigende orden, ville det være muligt at se om et givent koordinat steg eller faldt i højde.
-Ved at gøre dette to gange, ville alle negative værdier forsvinde og der ville kun være absolutte stigningsforskelle tilbage. Ved at finde de største af disse var forhåbningen af det kunne bruges til at finde ud af hvor den stigning laseren var på striben befandt sig.
 
-I teorien var det en fantastisk ide, men det forblev også kun i teorien. Det viste sig at grundet afveksling af laserens intensitet på jorden, fra f.eks. fremmedlegemer eller mini reflekser fra f.eks. småsten eller andet, hurtigt kunne gøre det af med den metode.
+\subsubsection{Problemstilling}
+Lokalisering af laser på stribe kontra jord.
+
+\subsubsection{Metode}
+Ved at tage alle punkter i X-aksen, og tage forskellen på dem i stigende orden, ville det være muligt at se om et givent koordinat steg eller faldt i højde.
+Denne process udføres to gange, for at få absolutte værdier der indikerer udsving i højdeniveau. Ved at finde de største af disse var forhåbningen af det kunne bruges til at finde ud af hvor den stigning laseren var på striben befandt sig.
+
+I teorien var det en fantastisk ide, men det forblev også kun i teorien. Det viste sig at grundet afveksling af laserens intensitet på jorden, f.eks. fra fremmedlegemer såsom småsten eller deres refleksioner herfra, hurtigt kunne gøre det af med den metode.
 Det viste sig derfor umuligt at være sikker på om de punkter der blev lokaliseret rent faktisk var stribens position eller noget der bare havde dannet en afvigelse et helt andet sted.
 
 \subsection{Histogram}
-Problemstilling : Lokalisering af stribe
-\\\\
-Metode : Ved at opdele alle billedets elementer i et intensitets histogram kunne de forskellige intensiteter være med til at identificere hvilke der tilhørte 
+
+\subsubsection{Problemstilling}
+Lokalisering af stribe
+
+\subsubsection{Metode}
+Ved at opdele alle billedets elementer i et intensitets histogram kunne de forskellige intensiteter være med til at identificere hvilke der tilhørte 
 striben og derved lokalisere dens position.
 \\
-Nødvendigheder: Algoritmer til at identificere højde- og lavpunkter ud fra data.
-\\
+\subsubsection{Nødvendigheder}
+Algoritmer til at identificere højde- og lavpunkter ud fra data.
 I teorien skulle det være muligt, men her opstod et problem der ikke var forudset. Intensiteten for de forskellige elementer
 \begin{itemize}
 	\item Stribe med og uden laser
 	\item Jord med og uden laser
 \end{itemize}
 
-Var så tæt pakket og det meste var bare sort, dvs. hvor der ikke befandt sig noget. Det var heller ikke muligt at søge efter intensitetsgrænser da der var alt mulige problemer med både eksponering og støv på kamerachippen osv.
+var så tæt pakket og det meste var bare sort, dvs. hvor der ikke befandt sig noget. Det var heller ikke muligt at søge efter intensitetsgrænser da der var alt mulige problemer med både eksponering og støv på kamerachippen osv.
 Det havde den effekt at det var stort set umuligt at separere de forskellige elementer da overgangene var utroligt ustabile og kunne blive influeret af hvad som helst. På den lyse side blev der dog udviklet to fine algoritmer, en til at finde højdepunkter og en til at finde lavpunkter.
 
+\subsection{Nærheds højdemåling}
+\subsubsection{Problemstilling}
+Undgå indflydelse fra skæv laser ved måling af højden.
 
-
+\subsubsection{Metode}
+Grundet laserens bueform, blev to små bider af laseren udskåret, hvis disse faldt inde for samme vinkel ville betydningen af laserens bueform have minimal indflydelse. Desværre er denne metode ikke præcis nok da den ikke tager højde for bl.a. udsving i laserens intensitetsvariationer over tid eller elementer der kunne være betydningsfulde for målingen som f.eks. fremmedlegemer.
 
