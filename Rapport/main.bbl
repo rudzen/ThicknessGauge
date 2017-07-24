@@ -1,0 +1,9 @@
+\begin{thebibliography}{1}
+
+\bibitem{OpenCV}
+OpenCV.
+\newblock Open{CV} ({Open Source Computer Vision}) er et bibliotek der
+  indeholder programmerings funktioner for 'real time computer vision'.
+\newblock \\Information tilgængelig på \url{http://opencv.org/}.
+
+\end{thebibliography}

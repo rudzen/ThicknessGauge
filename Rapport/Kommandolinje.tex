@@ -1,0 +1,45 @@
+\section{Kommandolinje Interface}
+Softwares understøtter styring via et hertil designet kommandolinje interface. Denne sektion beskriver de forskellige muligheder stillet til rådighed ud fra det.
+
+Fungerer ved at starte programmet med de valgte parametrer, som f.eks.\\\\
+\texttt{\textbf{ThicknessGauge.exe -d -{}-glob\_name=camera -{}-show\_windows=0}}
+\\\\
+For en liste over de muligheder der er til rådighed, kan programmet startes med:\\\\
+\texttt{\textbf{ThicknessGauge.exe -{}-help}}\\
+
+
+\subsection{Kommandoerne}
+
+* denoterer ikke komplet understøttet, eller ikke komplet i softwarens nuværende tilstand.
+
+\begin{table}[h]
+	\centering
+	\label{kommandolinjekontakter}
+	\begin{tabular}{lll}
+	-d	& -{}-demo & Kører softwaren i dens regulære tilstand \\
+	-c	& -{}-calibrate & Kører kamera kalibrering  \\
+	-t*	& -{}-test*  &  Kører test tilstand \\
+	-g*  & -{}-save\_glob* & Kører en prædefineret opsætning og gemmer en billedserie.
+	\end{tabular}
+	\caption{Kommandolinje kontakter}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\label{kommandolinjeindstilling}
+	\begin{tabular}{ll}
+		-{}-phase\_two\_exposure* & Tvinger programmet til at bruge en eksponering i fase to. \\
+-z* & Tvinger aflæsning af område, til nulmålinger. \\
+-{}-glob\_name & Brug gemt billedserie, eller "camera" for live feed. \\
+-{}-opencv\_threads & Tvinger OpenCV til at bruge N antal tråde. \\
+-{}-calibrate\_output & Filnavn til at gemme kamera kalibrering under. \\
+-{}-camera\_settings & Kamera kalibrerings fil der skal bruges under processen. \\
+-{}-record\_video* & Opretter en video fil af processen. \\
+-{}-show\_windows & Optegner processen visuelt. (Giver ikke nøjagtige målinger.) \\
+-{}-frames* & Sætter antal frames der skal benyttes under kalkuleringerne. \\
+-{}-test\_suite* & Filnavn for at gemme test sæt under. \\
+-{}-version & Udskriver programmets version. \\
+-{}-help & Viser komplet hjælp af alle kommandolinje parametrer. \\
+	\end{tabular}
+	\caption{Kommandolinje: indstillinger}
+\end{table}
