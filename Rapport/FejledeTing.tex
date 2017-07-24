@@ -7,10 +7,10 @@ Undervejs i forløbet er forskellige metoder til stadierne i processen blevet af
 Identificering af start og slutpunkter for laseren på striben
 
 \subsubsection{Metode}
-Opdele billedet i diagonale striber for derefter at gennemløbe disse for at identificere dobbeltskæringer af laseren.
+Opdele billedet i diagonale matricer for derefter at gennemløbe disse for at identificere dobbeltskæringer af laseren. Selve billedet ville opdelt i matricer, præcist det dobbelt antal i forhold til billedets højde, på begge leder. Dette ville resulterer i et net af matricer på tværs i begge retninger, hvor pixel intensitetsforskelle for hver i forhold til dens naboer ville medføre en slags toppunkt. I tilfælde af at to var tilstede og det matchede med naboerne, kunne denne information benyttes til at søge efter intensitets variationer, der i sidste ende ville medføre at en potentiel lokation der kunne bruges var fundet.
 
 \subsubsection{Resultat}
-Denne metode viste sig at være utroligt kostbar, og noget utilregnelig. Under perfekte situationer virkede det nogenlunde, og hvis der var nogen diskrepans i laseren position grundet støj eller andre elementer ville den give resultater der ikke kunne bruges.
+Denne metode viste sig at være utroligt krævende, både med hensyn til design men også med hensyn til regnekraft samt noget utilregnelig. Under perfekte situationer virkede det nogenlunde, og hvis der var nogen diskrepans i laseren position grundet støj eller andre elementer ville den give resultater der ikke kunne bruges. Den blev derfor kasseret i et forholdsvis tidligt stadie da det ikke var rentabelt at gå videre i denne retning.
 
 \subsection{Differentiering}
 
@@ -19,7 +19,7 @@ Lokalisering af laser på stribe kontra jord.
 
 \subsubsection{Metode}
 Ved at tage alle punkter i X-aksen, og tage forskellen på dem i stigende orden, ville det være muligt at se om et givent koordinat steg eller faldt i højde.
-Denne process udføres to gange, for at få absolutte værdier der indikerer udsving i højdeniveau. Ved at finde de største af disse var forhåbningen af det kunne bruges til at finde ud af hvor den stigning laseren var på striben befandt sig.
+Denne process udføres to gange, for at få absolutte værdier der indikerer udsving i niveau. Ved at finde de største af disse var forhåbningen af det kunne bruges til at finde ud af hvor den stigning laseren var på striben befandt sig.
 
 I teorien var det en fantastisk ide, men det forblev også kun i teorien. Det viste sig at grundet afveksling af laserens intensitet på jorden, f.eks. fra fremmedlegemer såsom småsten eller deres refleksioner herfra, hurtigt kunne gøre det af med den metode.
 Det viste sig derfor umuligt at være sikker på om de punkter der blev lokaliseret rent faktisk var stribens position eller noget der bare havde dannet en afvigelse et helt andet sted.
@@ -30,19 +30,18 @@ Det viste sig derfor umuligt at være sikker på om de punkter der blev lokalise
 Lokalisering af stribe
 
 \subsubsection{Metode}
-Ved at opdele alle billedets elementer i et intensitets histogram kunne de forskellige intensiteter være med til at identificere hvilke der tilhørte 
-striben og derved lokalisere dens position.
+Ved at opdele alle billedets pixels i et intensitets histogram kunne de forskellige intensiteter være med til at identificere hvilke der tilhørte striben og derved lokalisere dens position.
 \\
 \subsubsection{Nødvendigheder}
 Algoritmer til at identificere højde- og lavpunkter ud fra data.
-I teorien skulle det være muligt, men her opstod et problem der ikke var forudset. Intensiteten for de forskellige elementer
+I teorien skulle det være muligt, men her opstod et problem der ikke var forudset. Intensiteten af pixels for
 \begin{itemize}
 	\item Stribe med og uden laser
 	\item Jord med og uden laser
 \end{itemize}
-
-var så tæt pakket og det meste var bare sort, dvs. hvor der ikke befandt sig noget. Det var heller ikke muligt at søge efter intensitetsgrænser da der var alt mulige problemer med både eksponering og støv på kamerachippen osv.
-Det havde den effekt at det var stort set umuligt at separere de forskellige elementer da overgangene var utroligt ustabile og kunne blive influeret af hvad som helst. På den lyse side blev der dog udviklet to fine algoritmer, en til at finde højdepunkter og en til at finde lavpunkter.
+befandt sig inden for et så lille område at det praktisk var umuligt at foretage udvælgelse af værdierne for videre identificering. Det viste sig også at der, på trods af udelukkelse af for mørke dele, ikke var mulighed for at garantere hvilke intensiteter der tilhørte hvad. Dette forsagede desværre også at det ikke var muligt at søge efter intensitetsgrænser.
+Derudover blev situationen heller ikke forbedret grundet eksponerings problematikker og støv på kamerachippen osv.
+Det havde den effekt at det var stort set umuligt at separere de forskellige elementer da overgangene var utroligt ustabile og kunne blive influeret af hvad som helst. På den lyse side blev der dog udviklet to algoritmer, en til at finde højdepunkter og en til at finde lavpunkter, der begge er justerbare i med forskellige parametre.
 
 \subsection{Nærheds højdemåling}
 \subsubsection{Problemstilling}
