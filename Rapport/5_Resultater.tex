@@ -28,13 +28,17 @@ Dette afgøres ved $R^2$ værdien der indikerer lineariteten, og en værdi på $
 
 Disse målinger udgør kalibreringen, dvs. reference.
 
+\newpage
+
 \subsubsection{Verificering af kalibreringen}
 
 Ved at regne baglæns med de givne informationer, er det muligt at lokalisere anormaliteter i de enkelte højder.
+Resultatet angiver hvor præcis lineariteten rent faktisk er, da resultaterne gerne skulle svare til højden i millimeter, der i dette tilfælde er.
+
 Den angivne linjeformel er
 
 \begin{equation}
-content...
+px2mm = \frac{avg - b}{a}
 \end{equation}
 
 Indsætning af de resulterede data i denne formel giver følgende
@@ -44,6 +48,9 @@ Indsætning af de resulterede data i denne formel giver følgende
 
 Diskrepansen for selve målingerne findes ved (i promille)
 
+\begin{equation}
+dev\permil =  \vert px2mm - mm \vert \cdot 1000
+\end{equation}
 (formel her)
 
 
