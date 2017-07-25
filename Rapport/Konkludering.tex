@@ -1,9 +1,9 @@
 \section{Afklaringen}
 Målet var at få afklaret, om det kan lade sig gøre at lave et produkt, der kan måle tykkelsen af en vejstribe.
-Målingen bliver foretaget ved at tage billeder med et kamera af en stribe hvor en laser kaster en linje på tværs af striben, og det er forskellen fra hvor laseren rammer striben, og hvor den ikke rammer striben, der afgør den målte tykkelse.
+Målingen bliver foretaget ved at tage billeder med et kamera af en stribe hvor en laser kaster en linje på tværs af striben, og det er forskellen fra hvor laseren rammer striben, og hvor den ikke rammer striben, der er udgangspunktet for den målte tykkelse.
 
 \subsection{Resultaterne}
-Resultaterne viser at ud fra en række målinger foretaget, fra og med 0 mm til og med 6 mm, at diskrepansen mellem de faktuelle tykkelser, der er kendt i forvejen, og de udregninger foretaget på baggrund af sammenhængen mellem resultaterne af de foretagne målinger, stiger lineært i takt med højden. Dette tyder på der er en god og stabil måde at aflæse stribetykkelsen på. De forskelle i afvigelser mellem højderne, kan der tages højde for. Til trods for at der forefindes, under de eksisterende forhold, udefrakommende faktorer, som f.eks. varieret ambient lysniveau, er resultaterne stadig gode.
+Resultaterne viser at ud fra en række målinger foretaget, fra og med 0 mm til og med 6 mm, at diskrepansen mellem de faktuelle tykkelser der er kendt i forvejen, og de udregninger foretaget på baggrund af sammenhængen mellem resultaterne af de foretagne målinger, stiger lineært i takt med højden. Dette tyder på der er en god og stabil måde at aflæse stribetykkelsen på. De afvigelser mellem højderne der fremkommer, kan der tages højde for. Til trods for at der forefindes, under de eksisterende forhold, udefrakommende faktorer, som f.eks. varieret ambient lysniveau, er resultaterne stadig gode.
 
 \section{Konklusion}
 Det er lykkedes at udvikle software der kan foretage målinger ret nøjagtigt, og holder sig inden for kravet omkring en maksimal afvigelse i resultaterne på $0.1$ millimeter. Problematikkerne omkring målingen er overkommet, og der er en solid base for videreudvikling. Ydermere er softwaren konstrueret således, at det er muligt at indstille på mange områder, hvilket vil være til stor gavn senere i projektets forløb.
@@ -24,12 +24,11 @@ Den nuværende opstilling er primitiv, dette gør den er meget usikker og følso
 
 De to hovedelementer i opstillingen, kameraet og laseren, er separere entiteter på nuværende tidspunkt. Dette gør det meget svært at lave vinklede målinger, da flytningen af den ene kræver at den anden flyttet i samme grad, hvilket er et stort problem at gøre med den påkrævede nøjagtighed individuelt. Derudover er den nuværende opstilling i særdeleshed umobil, hvilket gør den upraktisk til eventuelt tests i felten.
 
-\subsection{Kortlægning af real højde}
-
-Udregningerne af pixels til millimeter kan baseret på den information der opnås ved kalibrerings målinger, både i højden og i bredden. Dette ville sammen med information omkring kameraets specifikationer kunne danne rammen for de formler der kan drages nytte af den sammenhæng.
-
 \subsection{Kalibrering}
 
-I den på nuværende tidspunkt eksisterende software er der udviklet et kalibreringsmodul.
-Den er i stand til at kunne udregne de nødvendige data og gemme disse, og anvende dem automatisk ved indhentning af billeder.
-Dette vil resultere i at de billeder der vil blive behandlet er så lidt forvrængede som muligt, hvilket vil give en forøget nøjagtighed i målingerne.
+I den på nuværende tidspunkt eksisterende software er der udviklet et kalibreringsmodul. Modulet fungere som en separat instans og vil kunne kalibrere kameraet med selvvalgte muligheder og gemme resultatet.
+Selve hovedprogrammet kan benytte sig af de tidligere gemte kalibreringsinformationer, transparent ved indhentning af billeder via kameraet, hvilket vil give en forøget nøjagtighed i målingerne.
+
+\subsection{Real højde}
+
+Udregningerne af pixels til millimeter kan baseret på den information der opnås ved kalibrerings målinger, både i højden og i bredden. Dette ville sammen med information omkring kameraets specifikationer kunne danne rammen for de formler der kan drages nytte af den sammenhæng.
