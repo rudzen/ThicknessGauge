@@ -8,14 +8,6 @@ Kameraet er monokromatisk for at udnytte lyset bedre og har en opløsning på 5 
 \subsection{Laser}
 Laseren kaster en linje ned på markeringsområdet med en styrke der gør det er muligt at kunne aflæse dens lokalisation. Forskellen på hvor laseren rammer på striben og hvor den ikke gør udgør den højde der er interessant.
 
-\subsection{OpenCV}
-Til denne proces bliver Open Computer Vision \cite{OpenCV} benyttet, hvilket er et gratis computer vision system der gør det muligt at lave behandling på dataen for at lokalisere laserlinjen på de billeder kameraet tager.
-
-\subsection{Begrundelse}
-Valget af kamera og laser er baseret på prisen, et moderne kamera med en tilstrækkelig kvalitet koster under 6.000,- DKr, og en linjelaser koster mellem 2.000,- DKr. og 3.000,- DKr. En laser scannings enhed koster over 15.000,- Dkr. hvilket vil sætte for meget pres på budgettet.
-
-Open Computer Vision er gratis, og kan benyttes i ubegrænset omfang, også i kommercielle forbindelser.
-
 \subsection{C++}
 Udviklingen har indtil videre foregået i C$++$, da dette potentielt åbner op for at benytte sig af softwaren, eller dele af den, på generisk vis på tværs af diverse platforme, da softwaren er skrevet med udgangspunkt i standard template library.
 Softwaren kræver en compiler der understøtter C++14, for en komplet liste over understøttede compilere, se \href{http://en.cppreference.com/w/cpp/compiler_support}{her}.
@@ -23,6 +15,14 @@ Softwaren kræver en compiler der understøtter C++14, for en komplet liste over
 \subsection{Udviklingsværktøj}
 Softwaren er udviklet ved brug af Microsoft Visual Studio, Community Edition. Selve koden skulle være 100\% kompatibel med andre udviklingskæder som f.eks. GCC. Det ville dog kræve at der blev sat et projekt op der sørger for de korrekte imports.
 
+\subsection{OpenCV}
+Til denne proces bliver Open Computer Vision \cite{OpenCV} benyttet, hvilket er et gratis computer vision system der gør det muligt at lave behandling på dataen for at lokalisere laserlinjen på de billeder kameraet tager.
+
 \subsection{PvAPI}
 Kameraet bliver kontrolleret ved hjælp af PvAPI. PvAPI er ellers blevet erstattet af det nyere API fra Allied Vision, Vimba. Men dette API kunne ikke bruges til projektet da det fejler med at kunne kontrollere elementære ting som f.eks. eksponering osv.
 Dog skal Vimba's drivere til kameraet været installeret på systemet.
+
+\subsection{Begrundelse}
+Valget af kamera og laser er baseret på prisen, et moderne kamera med en tilstrækkelig kvalitet koster under 6.000,- DKr, og en linjelaser koster mellem 2.000,- DKr. og 3.000,- DKr. En laser scannings enhed koster over 15.000,- Dkr. hvilket vil sætte for meget pres på budgettet.
+
+Både udviklingsværktøjet, opencv og pvapi er gratis, og kan benyttes i ubegrænset omfang, også i kommercielle forbindelser.
