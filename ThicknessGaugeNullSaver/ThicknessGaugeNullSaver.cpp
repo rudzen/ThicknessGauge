@@ -7,6 +7,7 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/videoio/videoio_c.h>
 #include <opencv2/imgcodecs.hpp>
+#include "../testOpenCV/namespaces/tg.h"
 
 void save_null() {
 
@@ -24,6 +25,9 @@ void save_null() {
     std::cout << "Enter delay in seconds before capture to " << filename << "\n>";
     int t;
     std::cin >> t;
+    if (t > 0) {
+        tg::sleep(t * 1000);
+    }
     cv::Mat nullImage;
     cv::VideoCapture cap;
     cap.open(CV_CAP_PVAPI);
