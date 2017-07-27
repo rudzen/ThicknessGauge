@@ -247,7 +247,7 @@ bool Seeker::phase_one() {
     auto phase = frameset(current_phase_);
 
     // configure hough for this phase.. the int cast is only used for UI purpose.
-    auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, false);
+    auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, true);
     hough_vertical->angle_limit(30);
 
     pfilter->kernel(filters::kernel_line_left_to_right);
@@ -290,6 +290,9 @@ bool Seeker::phase_one() {
     auto const frames_to_capture = 3;
 
     log_time << "Running phase one.\n";
+
+    cv::namedWindow("hough");
+
 
     auto now = tg::get_now_ms();
 
@@ -397,9 +400,14 @@ bool Seeker::phase_one() {
                     right_borders.emplace_back(hough_vertical->right_border());
                 }
 
+                auto marking_test = tmp;
+                draw::rectangle(marking_test, output, cv::Scalar(128, 128, 128));
+                draw::show_image("hough", marking_test);
+                if (draw::is_escape_pressed(30))
+                    running = false;
                 // we made it through, allow loop to exit
-                running = false;
-                break;
+                //running = false;
+                //break;
 
             }
 

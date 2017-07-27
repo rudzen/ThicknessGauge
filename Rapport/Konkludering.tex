@@ -1,14 +1,22 @@
 \section{Afklaringen}
 Målet var at få afklaret, om det kan lade sig gøre at lave et produkt, der kan måle tykkelsen af en vejstribe.
-Målingen bliver foretaget ved at tage billeder med et kamera af en stribe hvor en laser kaster en linje på tværs af striben, og det er forskellen fra hvor laseren rammer striben, og hvor den ikke rammer striben, der er udgangspunktet for den målte tykkelse.
+Målingen bliver foretaget ved at tage billeder med et kamera af en stribe hvor en laser kaster en linje på tværs af striben, og det er forskellen fra hvor laseren rammer striben, og hvor den ikke rammer striben. Forskellen i niveauet for disse to lokationer udgør tykkelsen.
 
 \subsection{Resultaterne}
-Resultaterne viser at ud fra en række målinger foretaget, fra og med 0 mm til og med 6 mm, at diskrepansen mellem de faktuelle tykkelser der er kendt i forvejen, og de udregninger foretaget på baggrund af sammenhængen mellem resultaterne af de foretagne målinger, stiger lineært i takt med højden. Dette tyder på der er en god og stabil måde at aflæse stribetykkelsen på. De afvigelser mellem højderne der fremkommer, kan der tages højde for. Til trods for at der forefindes, under de eksisterende forhold, udefrakommende faktorer, som f.eks. varieret ambient lysniveau, er resultaterne stadig gode.
+Resultaterne viser at ud fra en række målinger foretaget, fra og med 0 mm til og med 6 mm, at diskrepansen mellem de faktuelle tykkelser der er kendt i forvejen, og de udregninger foretaget på baggrund af sammenhængen mellem resultaterne af de foretagne målinger, stiger lineært i takt med højden.
+Det tyder på der er en god og stabil måde at aflæse stribetykkelsen på. De afvigelser mellem højderne der fremkommer, kan der tages højde for. Til trods for at der forefindes, under de eksisterende forhold, udefrakommende faktorer, som f.eks. varieret ambient lysniveau, er resultaterne stadig gode. Alle målinger er foretaget under kontrollerede forhold med på forhånd kendte højder. Dette betyder at det var muligt nemt at se om målinger stemte overens med hinanden på tværs af de forskellige højder målingerne blev foretaget ved.
+Der er benyttet keramikplader på 1 mm i højden i stedet for alm. vejstriber. De primære årsager til valget af keramikpladerne er, at højden på disse er kendt på forhånd og at sikre stabilitet i højdemålingerne. Alm. vejstriber er meget varierende i højderne, og det ville derfor give anledning til en for stor variation i målingerne hvilket kun ville give resultater der ikke kunne sammenlignes præcist nok.
 
 \section{Konklusion}
-Det er lykkedes at udvikle software der kan foretage målinger ret nøjagtigt, og holder sig inden for kravet omkring en maksimal afvigelse i resultaterne på $0.1$ millimeter. Problematikkerne omkring målingen er overkommet, og der er en solid base for videreudvikling. Ydermere er softwaren konstrueret således, at det er muligt at indstille på mange områder, hvilket vil være til stor gavn senere i projektets forløb.
+Det er lykkedes at udvikle software der kan foretage målinger ret nøjagtigt, og holder sig inden for kravet omkring en maksimal afvigelse i resultaterne på $0.1$ millimeter. De basale problematikker omkring målingen er overkommet, og der er en solid base for videreudvikling. Ydermere er softwaren konstrueret således, at det er muligt at indstille på mange områder, hvilket vil være til stor gavn senere i projektets forløb.
 
-Det står derfor klart på baggrund af de resultater der er opnået, at dette projekt godt kan videreudvikles til et færdigt produkt. Dette vil dog kræve at opsætningen skal forbedres, for at kunne foretage mere kontrollerede målinger, og overkomme de problematikker der eksisterer på dette stadie i projektet som helhed.
+\subsection{Forhold}
+Da målingerne er foretaget ved brug af kontrollerede højder og at resultaterne er baseret på disse, er der grund til at opfatte hele processen som et rent afklaringsprojekt.
+Grundet denne klassificering er der stadig en lang vej forude, da målinger foretaget på vejstriber vil antageligvis indeholde problematikker, der ligger uden for domænet for de problemer der er løst i denne del af projektet. 
+
+Til trods for at der foreligger en del problemer der skal løses fremover, må denne del af processen betegnes som en succes.
+Der er løst nogle væsentlige problemer i forhold til om det overhovedet kan lade sig gøre. Hvis det ikke var muligt at kunne foretage målinger under disse kontrollerede forhold, ville det vise sig meget vanskeligt at foretage målinger under stærkt varierende forhold.
+Det står derfor klart, at på baggrund af de resultater der er opnået i denne tidlige fase, at dette projekt ville have stor gavn af et blive videreudviklet. De basale problematikker er blevet løst, og resultaterne under de kontrollerede forhold er gode. Det vil dog kræve at opsætningen forbedres, for at kunne foretage mere kontrollerede målinger af striber der har en større variation samt at overkomme de problematikker der eksisterer på dette stadie i projektet som helhed.
 
 \newpage
 
@@ -22,7 +30,7 @@ Den nuværende opstilling er primitiv, dette gør den er meget usikker og følso
 
 \subsection{Sammenhæng af laser og kamera}
 
-De to hovedelementer i opstillingen, kameraet og laseren, er separere entiteter på nuværende tidspunkt. Dette gør det meget svært at lave vinklede målinger, da flytningen af den ene kræver at den anden flyttet i samme grad, hvilket er et stort problem at gøre med den påkrævede nøjagtighed individuelt. Derudover er den nuværende opstilling i særdeleshed umobil, hvilket gør den upraktisk til eventuelt tests i felten.
+De to hovedelementer i opstillingen, kameraet og laseren, er separate entiteter på nuværende tidspunkt. Dette gør det meget svært at lave vinklede målinger, da flytningen af den ene kræver at den anden flyttet i samme grad, hvilket er et stort problem at gøre med den påkrævede nøjagtighed individuelt. Derudover er den nuværende opstilling i særdeleshed umobil, hvilket gør den upraktisk til eventuelt tests i felten.
 
 \subsection{Kalibrering}
 
@@ -32,3 +40,7 @@ Selve hovedprogrammet kan benytte sig af de tidligere gemte kalibreringsinformat
 \subsection{Real højde}
 
 Udregningerne af pixels til millimeter kan baseret på den information der opnås ved kalibrerings målinger, både i højden og i bredden. Dette ville sammen med information omkring kameraets specifikationer kunne danne rammen for de formler der kan drages nytte af den sammenhæng.
+
+\subsection{Lysforhold}
+
+Et af de største problemer er det udefrakommende lys, dette ligger op til at der kunne forbedres på det område, hvorledes opsætningen skal forbedres kommer an på hvilken drejning projektet tager fremover.

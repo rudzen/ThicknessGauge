@@ -3,7 +3,7 @@
 
 bool HoughLinesR::is_lines_intersecting(Side side) {
 
-    auto& lines = side == Side::Right ? right_lines_ : left_lines_;
+    const auto& lines = side == Side::Right ? right_lines_ : left_lines_;
 
     if (lines.empty())
         return false;
