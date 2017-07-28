@@ -17,6 +17,7 @@
 #include "Camera/Calib.h"
 #include "ArgClasses/args.h"
 #include "Camera/Seeker.h"
+#include "Autoexponering.h"
 
 using namespace tg;
 
@@ -31,6 +32,15 @@ using namespace tg;
 
 
 int main(int argc, char** argv) {
+
+    Autoexponering mads;
+    mads.initiate();
+
+    mads.mads();
+
+    //mads();
+    return 0;
+
 
     // jump directly into vimba testing for now!
     //return testCPP(argc, argv);

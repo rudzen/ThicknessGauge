@@ -324,6 +324,7 @@ bool Seeker::phase_one() {
                 pcapture->cap(frames_to_capture, targets);
 
                 auto current_frame = targets.back();
+
                 //cv::imwrite("exposure" + std::to_string(e) + "_1.png", current_frame);
 
                 log_time << __FUNCTION__ << " filter processing..\n";
@@ -399,15 +400,6 @@ bool Seeker::phase_one() {
                 if (validate::valid_vec(hough_vertical->right_border())) {
                     right_borders.emplace_back(hough_vertical->right_border());
                 }
-
-                auto marking_test = tmp;
-                draw::rectangle(marking_test, output, cv::Scalar(128, 128, 128));
-                draw::show_image("hough", marking_test);
-                if (draw::is_escape_pressed(30))
-                    running = false;
-                // we made it through, allow loop to exit
-                //running = false;
-                //break;
 
             }
 

@@ -21,7 +21,7 @@ namespace tg {
 
     //    typedef std::pair<cv::Point2f, cv::Point2f> linePair;
 
-    enum Side { Left = 0, Right = 1, Center = 2 };
+    //enum Side { Left = 0, Right = 1, Center = 2 };
 
     enum class TextDrawPosition { UpperLeft, UpperRight, LowerLeft, LowerRight };
 

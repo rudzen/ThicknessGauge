@@ -180,6 +180,9 @@
     <ClCompile Include="ArgClasses\args.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Autoexponering.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThicknessGauge.h">
@@ -442,6 +445,9 @@
     </ClInclude>
     <ClInclude Include="namespaces\cvr.h">
       <Filter>Header Files\Namespaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Autoexponering.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
