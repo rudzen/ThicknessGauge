@@ -1,24 +1,28 @@
 \section{Processen i detaljer}
 
-Denne sektion afdækker det flow der ligger til grunde for hvorledes det kan bevises at målinger kan foretages under kontrollerede forhold. Beskrivelserne af de individuelle faser for hvorledes billedet er behandlet, hvilken data der benyttes samt hvilke algoritmer der er i brug.
+Denne sektion afdækker det flow der ligger til grunde for hvorledes det kan bevises at målinger kan foretages under kontrollerede forhold. Beskrivelserne af de individuelle faser for hvorledes billedet er behandlet samt hvilke algoritmer der er i brug.\\Det antages at læseren har et grundlæggende kendskab til de nævnte algoritmer.
 
-Formålet er at dokumentere semantikken bag, således at det er muligt at kunne genskabe det samme resultat ud fra denne information på anden vis.
-\\
+Formålet er at dokumentere semantikken bag, således at det er muligt at kunne genskabe det samme resultat ud fra denne information på anden vis.\\
+Der er set bort fra implementeringsmæssige detaljer.
 
-Alle de følgende faser løser problematikken med skiftende ambient lysforhold ved selv at tage kontrollen over kameraets eksponering og derved finde den optimale længde.
+\subsection{Lysproblematikken}
+I den eksisterende iteration af stribemålingen bliver kameraets ekponering kontroleret i hver fase. Dette er for at sikre at målingen kan foretages under skiftende lysforhold, da selv lysforskellen fra når en sky passerer ind foran solen påvirker enten at det ikke er muligt at lokalisere vejstriben eller har indflydelse på resultatet i en sådan grad at det er umuligt at verificere dataen.
+Alle faser løser problematikken med skiftende ambient lysforhold ved selv at tage kontrollen over kameraets eksponering og derved finde den optimale længde.\\
 
-\section{Lokalisering af striben}
+\subsection{Lokalisering af striben\label{ref::stribefind}}
 Det første problem er at kunne identificere hvor i billedet vejstriben er lokaliseret. Dette er en kritisk fase og har ligget til grundlag for de fleste problematikker som helhed.
 \\
 Billedet bliver foldet med en diagonal kernel, der sørger for at fremhæve striben, da dennes kanter består af to skrå kanter.
-Derefter bliver en regulær edge detection, i dette tilfælde Canny, udført på det resulterede billede. For at finde striben på det resulterende billede, benyttes houghlines algoritmen, hvor en afgrænsning i et bestemt antal grader er fastsat. Kriterierne for hvorvidt den mener den har lokaliseret striben er sat ud fra houghline resultaterne. Houghlines lokalisere typisk en mængde liner der vil, grundet stribens kant, være lokaliseret oven i hinanden i to klumper i hver sin side af striben.
-Ved at verificere at hver første linje i hver klump skær med de andre linjer i hver klump kan der med rimelig sikkerhed siges at striben er lokaliseret.
+Derefter bliver en regulær edge detection, i dette tilfælde Canny, udført på det resulterede billede. For at finde striben på det resulterende billede, benyttes houghlines algoritmen, hvor en afgrænsning i et bestemt antal grader er fastsat. Kriterierne for hvorvidt den mener den har lokaliseret striben er sat ud fra houghline resultaterne. Houghlines lokalisere typisk en mængde linjer der vil, grundet stribens kant, være lokaliseret oven i hinanden, i to klumper, i hver sin side af striben.
+Ved at verificere at hver første linje i hver klump skær med de andre linjer i samme klump, kan der med rimelig sikkerhed siges at striben er lokaliseret.
 \\
-Ud fra lokationerne af de to sider, dannes et område der afgrænser kanterne af striben.
+Ud fra lokationerne af de to sider, dannes et område der afgrænser kanterne af striben. Dette område benyttes til at danne afgrænsninger af de tre hovedområder, hvor striben er og hvor den ikke er.
 
-\section{Laseren uden for striben}
-Ved brug af det afgrænsede område fra stribelokaliseringsfasen, antages det at laseren vil befinde sig i den nederste kvarte del af billedet. Hvis ikke dette er tilfælde, er lokationen af måleenheden i forhold til striben ikke egnet til at måle fra.
+\newpage
+
+\subsection{Laseren uden for striben}
+Ved brug af det afgrænsede område fra sektion \ref{ref::stribefind}, antages det at laseren vil befinde sig i den nederste kvarte del af billedet. Hvis ikke dette er tilfælde, er lokationen af måleenheden i forhold til striben ikke egnet til at måle fra.
 Når afgrænsningen er foretaget, bliver området filtreret på forskellig vis for at sørge for at området bliver så nøjagtigt som muligt.
 
-
-\section{Laseren på striben}
+\subsection{Laseren på striben}
+..
