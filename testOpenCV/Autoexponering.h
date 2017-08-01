@@ -25,8 +25,8 @@ public:
         RealImage.pixel_format();
         RealImage.reset_binning();
         RealImage.packet_size(9014);
-        auto def_roi = cv::Rect_<unsigned long>(0, 0, 2448, 2050);
-        //auto def_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
+        //auto def_roi = cv::Rect_<unsigned long>(0, 0, 2448, 2050);
+        auto def_roi = cv::Rect_<unsigned long>(0, 1006, 2448, 256);
         RealImage.region(def_roi);
         RealImage.frame_init();
         RealImage.cap_init();

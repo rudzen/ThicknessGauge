@@ -1,0 +1,193 @@
+%praktikrapport
+\documentclass[11pt,a4paper,danish]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[danish]{babel} % danske overskrifter
+\usepackage[T1]{fontenc} % fonte (output)
+\usepackage{graphicx} % indsættelse af billeder
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+\usepackage{gensymb}
+
+\usepackage{setspace}
+\usepackage{tocloft}
+\usepackage{parskip}
+
+% \permil
+\usepackage{wasysym}
+
+\usepackage[nottoc]{tocbibind}
+
+%\usepackage{subfig}
+%\usepackage{inconsolata}
+%\usepackage{enumitem}
+
+\titleformat{\paragraph}[runin]
+{\bfseries\scshape}{\theparagraph}{1em}{}
+
+% BEGIN JAVA CODE SECTION
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=none,
+	language=Java,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=2
+}
+% END JAVA CODE SECTION
+
+% BEGIN C++ code
+\definecolor{listinggray}{gray}{0.9}
+\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+\lstset{
+	backgroundcolor=\color{lbcolor},
+	tabsize=4,
+	%   rulecolor=,
+	language=[GNU]C++,
+	basicstyle=\scriptsize,
+	upquote=true,
+	aboveskip={1.5\baselineskip},
+	columns=fixed,
+	showstringspaces=false,
+	extendedchars=false,
+	breaklines=true,
+	prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+	frame=single,
+	numbers=left,
+	showtabs=false,
+	showspaces=false,
+	showstringspaces=false,
+	identifierstyle=\ttfamily,
+	keywordstyle=\color[rgb]{0,0,1},
+	commentstyle=\color[rgb]{0.026,0.112,0.095},
+	stringstyle=\color[rgb]{0.627,0.126,0.941},
+	numberstyle=\color[rgb]{0.205, 0.142, 0.73},
+	%        \lstdefinestyle{C++}{language=C++,style=numbers}’.
+}
+\lstset{
+	backgroundcolor=\color{lbcolor},
+	tabsize=4,
+	language=C++,
+	captionpos=b,
+	tabsize=3,
+	frame=lines,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	breaklines=true,
+	showstringspaces=false,
+	basicstyle=\footnotesize,
+	%  identifierstyle=\color{magenta},
+	keywordstyle=\color[rgb]{0,0,1},
+	commentstyle=\color{Darkgreen},
+	stringstyle=\color{red}
+}
+%END C++ code
+
+%\setcounter{secnumdepth}{3}
+
+\geometry{
+	a4paper,
+	total={210mm,297mm},
+	left=20mm,
+	right=20mm,
+	top=40mm,
+	bottom=20mm,
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Delta, \date{\today}}
+\lhead{Rudy Alex Kohn}
+\chead{Afsluttende}
+\cfoot{Side \thepage \hspace{1pt} af \pageref{LastPage}}
+
+% TOC som links
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=blue
+}
+
+\title{Stripetykkelsesmåler\\Praktikrapport}
+\author{Rudy Alex Kohn}
+\date{24. Juli 2017}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+	
+	\maketitle
+	\renewcommand{\contentsname}{Indeks}
+	\renewcommand{\listfigurename}{Figurliste}
+	\renewcommand{\figurename}{Figur}
+	\renewcommand\refname{Referencer}
+	%PWNED! :> nice!
+	
+	\begin{center}
+		Rudy Alex Kohn\\
+		ruak@force.dk\\
+		s133235@student.dtu.dk
+	\end{center}
+	
+	\vspace{25mm}
+	
+	\begin{center}
+		\includegraphics[scale=0.3]{Billeder/kunlogo.png}
+		\includegraphics[scale=0.15]{Billeder/DELTA_1024px.png}
+	\end{center}
+	
+	\newpage
+	\setlength\cftparskip{-2pt}
+	%\setlength\cftbeforechapskip{0.0pt}\singlespacing
+	\tableofcontents
+	%\singlespacing
+	
+	\listoffigures
+	\listoftables
+	
+	%1:  produktspecifikation. forudsætninger
+	%Performance  tykkelsesmålinh præsisosn +/- 0.1 mm
+	%Product cist max 25,000,- kr gerne mindre.
+	%2 teknologier og teknologi valg – begrundelse
+	%3 forsøgsopstilling – gennemgang.
+	%4 databehandling  procesdiagram.
+	%5 resulateter  - hvordan ser det ud.
+	%6 Videre arbejde- plan for den sidste del af projektet- hvor langt når vi, dokumentation etc.
+
+	\include{Praktik_Delta}
+	
+	\include{Praktik_Opgaven}
+	
+	\include{Praktik_Processen}
+	
+	\include{FejledeTing}
+	
+	
+	\bibliographystyle{unsrt}
+	\bibliography{ref}
+	
+\end{document}

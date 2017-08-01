@@ -1,0 +1,31 @@
+%PraktikOpgaven
+\section{Praktikopgaven}
+Opgaven er et afklaringsprojekt. Det går ud på hvorvidt det er muligt at kunne måle tykkelsen af en vejstribe, der typisk er af thermoplast med reflekterende elementer som f.eks. små perler.
+
+\section{Bevæggrunden}
+Virksomhederne der anlægger vejstriberne har interesse i at kunne være sikker på hvor meget de rent faktisk bruger, og at de opfylder de krav kunder har ønsket, og ikke har unødigt spild. Kunderne kan verificere den tykkelse der er ønsket, og over tid estimere stribernes levetid, da disse bliver slidt ved brug. En kunde kan derfor følge op over en længere periode hvorledes slitage påvirker striberne og hvornår det kan være nødvendigt at få dem genlagt på den givne strækning.
+
+\section{Krav for opgaven}
+Produktet det potentielt kan munde ud i, har visse krav der ikke må overskrides.
+
+\begin{itemize}
+	\item Målepræcision indenfor 0.1 mm nøjagtighed
+	\item Budgetteret til 25.000,- Dkr.
+\end{itemize}
+
+\subsection{Andre restriktioner}
+Ikke tilladt at installere proprietært software på computeren, selvom jeg havde en gyldig licens.
+
+\section{Afklaring}
+Afklaringen bestod derfor i at, via selvvalgte metoder, at måle tykkelsen af på forhånd kendte hvide keramikplader, for at fastslå om det kan lade sig gøre under kontrollerede forhold. Grundlaget for dette valg var at kunne danne et overblik over mulighederne samt at determinere om hvorvidt målinger kunne hold en linearitet der var brugbar.
+
+\section{Teknologivalg}
+For at løse opgaven valgte jeg følgende teknologier, ud fra hvad jeg mente var det rigtige, til prisen.
+
+\subsection{Kamera + Laser}
+Alm. laserscanner hoveder ville hurtigt overskride budgettet, da de billigste der ville kunne benyttes var omkring 20.000,- Dkr, derfor faldt valget på at bruge et monokromatisk IP kamera med en opløsning på min. 5mp og en laser der kaster en linje af lys. Fremgangsmåden ville så være at opstille laseren direkte over målet og kameraet i en 45 graders vinkel for at opnå den optimale synlighed af laseren.
+
+\subsection{Softwaren}
+Udviklet fra bunden i C++14, der drager nytte af OpenCV same kameraets C API til at opnå fuld kontrol ned i mindste detalje.
+Softwaren blev udviklet i Visual Studio Community Edition 2017 og kan konfigureres via kommandolinje parametre. Derudover er der udviklet to hjælpe programmer, et til at generere nulbilleder\footnote{Et billede er aldrig helt uden information, et nulbillede taget med linsens hætte på indeholder stadig information} der potentielt kan trækkes fra de billeder der skal behandles og et til at kunne kalibrere kameraet.
+

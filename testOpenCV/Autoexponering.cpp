@@ -50,7 +50,7 @@ int Autoexponering::mads() {
 
     std::string ABE = "ABE";
 
-    cv::namedWindow(ABE, cv::WINDOW_FREERATIO);
+    //cv::namedWindow(ABE, cv::WINDOW_FREERATIO);
 
     std::vector<cv::Mat> images;
 
@@ -68,25 +68,47 @@ int Autoexponering::mads() {
     cv::Mat tmp;
     cv::Mat tmp2;
 
+    auto hough_vertical = make_shared<HoughLinesR>(1, static_cast<const int>(calc::DEGREES), 40, true);
+    hough_vertical->angle_limit(30);
+    cv::Mat dst, cdst;
     while (true) {
         images.clear();
         //RealImage.cap(1, images);
         RealImage.cap_single(tmp2);
         cv::Mat& img = tmp2;
         cv::Scalar intensity = img.at<uchar>(cv::Point(1, 2));
-        
+
         log_time << "w: " << img.cols << " h: " << img.rows << '\n';
 
         log_time << std::to_string(intensity[0]) << '\n';
 
-        cv::bilateralFilter(img, tmp, 3, 20, 10);
-        cv::threshold(tmp, tmp, 100, 255, CV_THRESH_BINARY);
+
+        //cv::bilateralFilter(img, tmp, 3, 20, 10);
+        //cv::threshold(tmp, tmp, 100, 255, CV_THRESH_BINARY);
         //GaussianBlur(img, img, cv::Size(5, 5), 0, 10, cv::BORDER_DEFAULT);
+        // process edge image with houghlines
+        //tmp = img.clone();
+        //hough_vertical->original(tmp);
+        //hough_vertical->image(img);
+        //hough_vertical->hough_vertical();
+        //hough_vertical->compute_borders();
+        //tmp = hough_vertical->output();
 
-        
-        
 
-        draw::show_image(ABE, tmp);
+        cv::Mat dst, cdst;
+        cv::Canny(img, dst, 50, 200, 3);
+        cvtColor(dst, cdst, CV_GRAY2BGR);
+
+        vector<cv::Vec4i> lines;
+        HoughLinesP(dst, lines, 1, CV_PI / 180, 50, 50, 10);
+        for (size_t i = 0; i < lines.size(); i++) {
+            cv::Vec4i l = lines[i];
+            cv::line(cdst, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0, 0, 255), 3, CV_AA);
+        }
+        cv::imshow("source", img);
+        cv::imshow("detected lines", cdst);
+
+        //draw::show_image(ABE, tmp);
         if (draw::is_escape_pressed(30)) {
             break;
         }
