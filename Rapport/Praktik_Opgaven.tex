@@ -22,10 +22,12 @@ Afklaringen bestod derfor i at, via selvvalgte metoder, at måle tykkelsen af p�
 \section{Teknologivalg}
 For at løse opgaven valgte jeg følgende teknologier, ud fra hvad jeg mente var det rigtige, til prisen.
 
-\subsection{Kamera + Laser}
-Alm. laserscanner hoveder ville hurtigt overskride budgettet, da de billigste der ville kunne benyttes var omkring 20.000,- Dkr, derfor faldt valget på at bruge et monokromatisk IP kamera med en opløsning på min. 5mp og en laser der kaster en linje af lys. Fremgangsmåden ville så være at opstille laseren direkte over målet og kameraet i en 45 graders vinkel for at opnå den optimale synlighed af laseren.
+\newpage
+
+\subsection{Kamera og Laser}
+Ved begyndelsen af projektet var situationen, at der ikke var noget som helst information omkring hvilken måde opgaven skulle løses, og hvordan processen skulle foregå. Det var en tiltænkt del af opgaven, at indhente informationer, priser, finde kriterier for hvorledes og på hvilken måde opgaven skulle løses. Dette indebar en del research indenfor området, bl.a. profil laserskannere, linje lasere samt kameraer. Efterfølgende skulle budgettet tages i betragtning, hvilket inkluderede en del kontakt med mange forskellige sælgere verden rundt. Det resulterede i at den løsning der kunne bæres af budgettet samt kunne, i teorien, opfylde præcisionskravet, var et monokromatisk kamera på min. 5MP og en laser der kastede sit lys som en linje. Det var derfor ganske klart at der skulle foregå en del billedbehandling og manipulation af data for at opnå kravet, hvilket var evident da 5 pixels svarede til 1 mm og kravet var på en præcision på 0.1mm.
+Den basale årsag til at benytte sig af kamera og linjelaser var prisen. En profil laserscanner kunne billigst fås for ca. 20.000,- Dkr, hvilket efterlod meget lidt råderum til alt andet, hvorimod et fornuftigt mono kamera til opgaven kunne erhverves for under 6.000,- Dkr, og en linje laser for under 2.500,- Dkr. Til alt held havde DELTA en samling kameraer, dog lidt ældre modeller og med en anelse ringere specs, dog stadig inden for de krav jeg havde opsat, og hvis projektet kunne gøres med et af disse, ville resultaterne blive bedre ved en opgradering af kameraet.
+Fremgangsmåden ville så være at opstille laseren direkte over målet og kameraet i en 45 graders vinkel for at opnå den optimale synlighed af laseren.
 
 \subsection{Softwaren}
-Udviklet fra bunden i C++14, der drager nytte af OpenCV same kameraets C API til at opnå fuld kontrol ned i mindste detalje.
-Softwaren blev udviklet i Visual Studio Community Edition 2017 og kan konfigureres via kommandolinje parametre. Derudover er der udviklet to hjælpe programmer, et til at generere nulbilleder\footnote{Et billede er aldrig helt uden information, et nulbillede taget med linsens hætte på indeholder stadig information} der potentielt kan trækkes fra de billeder der skal behandles og et til at kunne kalibrere kameraet.
-
+Udviklet fra bunden i C\texttt{++}14, hvor der drages nytte af OpenCVs enorme samling af algoritmer samt kameraets C API til at opnå fuld kontrol af enheden. Softwaren blev udviklet i Visual Studio Community Edition 2017 og kan konfigureres via kommandolinje parametre. Derudover er der udviklet to hjælpe programmer, et til at generere nulbilleder\footnote{Et billede er aldrig helt uden information, et nulbillede taget med linsens hætte på indeholder stadig information} der potentielt kan trækkes fra de billeder der skal behandles og et til at kunne kalibrere kameraet.
