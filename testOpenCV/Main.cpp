@@ -33,13 +33,13 @@ using namespace tg;
 
 int main(int argc, char** argv) {
 
-    Autoexponering mads;
-    mads.initiate();
+    //Autoexponering mads;
+    //mads.initiate();
 
-    mads.mads();
+    //mads.mads();
 
-    //mads();
-    return 0;
+    ////mads();
+    //return 0;
 
 
     // jump directly into vimba testing for now!
