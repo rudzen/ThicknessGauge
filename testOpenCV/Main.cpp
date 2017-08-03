@@ -112,15 +112,11 @@ int main(int argc, char** argv) {
 
                 while (true) {
                     try {
-                        bool ok;
+                        bool ok = seeker->compute(do_zero, zero_measure_mr, phase_two_exposure); // default
 
-                        if (!do_zero)
-                            ok = seeker->compute(false, zero_measure_mr, phase_two_exposure); // default
-                        else
-                            ok = seeker->compute(true, zero_measure_mr, phase_two_exposure); // force feed the bastard
-
-                        if (ok)
+                        if (ok) {
                             break;
+                        }
 
                         log_err << cv::format("Unable to initialize....\n");
                         log_err << cv::format("Retrying in a moment [press ctrl-c to abort].\n");
