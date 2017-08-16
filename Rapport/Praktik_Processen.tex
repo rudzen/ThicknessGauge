@@ -17,8 +17,6 @@ Billedet bliver foldet med en diagonal kernel, der sørger for at fremhæve stri
 Derefter bliver en regulær edge detection, i dette tilfælde Canny, udført på det resulterede billede. For at finde striben på det resulterende billede, benyttes houghlines algoritmen, hvor en afgrænsning i et bestemt antal grader er fastsat. Kriterierne for hvorvidt den mener den har lokaliseret striben er sat ud fra houghlines resultaterne. Houghlines lokaliserer typisk en mængde linjer der vil, grundet stribens kant, være lokaliseret oven i hinanden, i to klumper, i hver sin side af striben.
 Ved at verificere at hver første linje i hver klump skærer med de andre linjer i samme klump, kan der med rimelig sikkerhed konstateres at striben er lokaliseret.
 \\
-Ud fra lokationerne af de to sider, dannes et område der afgrænser kanterne af striben. Området benyttes til at danne afgrænsninger af de tre hovedområder, hvor striben er og hvor den ikke er.
-
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.8\linewidth]{Billeder/_1_normal}
@@ -26,10 +24,13 @@ Ud fra lokationerne af de to sider, dannes et område der afgrænser kanterne af
 	\label{fig:1normal}
 \end{figure}
 
+Ud fra lokationerne af de to sider, dannes et område der afgrænser kanterne af striben. Området benyttes til at danne afgrænsninger af de tre hovedområder, hvor striben er og hvor den ikke er.
+
 \newpage
 
 \subsection{Laseren uden for striben}
 
+Ved brug af det afgrænsede område fra sektion \ref{ref::stribefind}, antages det at laseren vil befinde sig i den nederste kvarte del af billedet. Hvis det ikke er tilfældet, er lokationen af måleenheden i forhold til striben ikke egnet til at måle fra.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.7\linewidth]{Billeder/base_1_filter}
@@ -37,7 +38,6 @@ Ud fra lokationerne af de to sider, dannes et område der afgrænser kanterne af
 	\label{fig:base_1_filter}
 \end{figure}
 
-Ved brug af det afgrænsede område fra sektion \ref{ref::stribefind}, antages det at laseren vil befinde sig i den nederste kvarte del af billedet. Hvis det ikke er tilfældet, er lokationen af måleenheden i forhold til striben ikke egnet til at måle fra.
 Når afgrænsningen er foretaget, bliver området filtreret med et filter der hjælper med at lokalisere laseren via en hertil valgt kernel. Her illustreret af figur \ref{fig:base_1_filter}.
 
 \begin{figure}[h]
