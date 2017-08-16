@@ -7,7 +7,7 @@ Undervejs i forløbet er forskellige metoder til stadierne i processen blevet af
 Identificering af start og slutpunkter for laseren på striben
 
 \subsubsection{Metode}
-Metoden er, at opdele billedet i diagonale matricer for derefter at gennemløbe disse for at identificere dobbeltskæringer af laseren. Selve billedet ville blive opdelt i matricer,  i samme antal, som det dobbelte af billedets højde, på begge leder. Det ville resultere i et net af matricer på tværs i begge retninger, hvor pixel intensitetsforskelle for hver i forhold til dens naboer ville medføre et slags toppunkt. I tilfælde af at to var tilstede og de matchede med naboerne, kunne denne information benyttes til at søge efter intensitets variationer, der i sidste ende ville medføre at en potentiel lokation, der kunne bruges, var fundet.
+Metoden er, at opdele billedet i diagonale matricer for derefter at gennemløbe disse for at identificere dobbeltskæringer af laseren. Selve billedet ville blive opdelt i matricer, i samme antal, som det dobbelte af billedets højde, på begge leder. Det ville resultere i et net af matricer på tværs i begge retninger, hvor pixel intensitetsforskelle for hver i forhold til dens naboer ville medføre et slags toppunkt. I tilfælde af at to var tilstede og de matchede med naboerne, kunne denne information benyttes til at søge efter intensitets variationer, der i sidste ende ville medføre at en potentiel lokation, der kunne bruges, var fundet.
 
 \subsubsection{Resultat}
 Metoden viste sig at være utroligt krævende, både med hensyn til design og regnekraft samt noget utilregnelig. Under perfekte situationer virkede det nogenlunde, og hvis der var nogen diskrepans i laserens position grundet støj eller andre elementer ville den give resultater der ikke kunne bruges. Den blev derfor kasseret i et forholdsvis tidligt stadie da det ikke var rentabelt at gå videre i denne retning.
@@ -19,7 +19,7 @@ Lokalisering af laser på stribe kontra jord.
 
 \subsubsection{Metode}
 Ved at tage alle punkter i X-aksen, og tage forskellen på dem i stigende orden, ville det være muligt at se om et givent koordinat steg eller faldt i højde.
-Denne process udføres to gange, for at få absolutte værdier der indikerer udsving i niveau. Ved at finde de største af disse var forhåbningen af det kunne bruges til at finde ud af hvor den stigning laseren var på striben befandt sig.
+Denne process udføres to gange, for at få værdier der indikerer udsving i niveau. Ved at finde de største af disse var forhåbningen af det kunne bruges til at finde ud af hvor den stigning laseren var på striben befandt sig.
 
 \subsubsection{Resultat}
 I teorien var det en fantastisk ide, men det forblev også kun i teorien. I praksis viste metoden sig at være ubrugelig, fordi afveksling af laserens intensitet på jorden, f.eks. fra fremmedlegemer såsom småsten eller deres refleksioner herfra gjorde det umuligt, at være sikker på om de punkter, der blev lokaliseret rent faktisk var stribens position, eller noget der var en afvigelse fra et helt andet sted.
@@ -42,7 +42,7 @@ I teorien skulle metoden være mulig, men her opstod et problem der ikke var for
 	\item Stribe med og uden laser
 	\item Jord med og uden laser
 \end{itemize}
-befandt sig inden for et så lille område at det praktisk var umuligt at foretage udvælgelse af værdierne for videre identificering. Det fremgik også at der, på trods af udelukkelse af for mørke dele, ikke var mulighed for at garantere hvilke intensiteter der tilhørte hvad. Dette forsagede desværre også at det ikke var muligt at søge efter intensitetsgrænser.
+befandt sig inden for et så lille område, at det praktisk var umuligt at foretage udvælgelse af værdierne for videre identificering. Det fremgik også at der, på trods af udelukkelse af for mørke dele, ikke var mulighed for at garantere hvilke intensiteter der tilhørte hvad. Dette forsagede desværre at det ikke var muligt at søge efter intensitetsgrænser der var til at stole på.
 Derudover blev situationen heller ikke forbedret af eksponerings problematikker og støv på kamerachippen osv.
 Det havde den effekt at det var stort set umuligt at separere de forskellige elementer da overgangene var utroligt ustabile og kunne blive influeret af hvad som helst. På den lyse side blev der dog udviklet to algoritmer, en til at finde højdepunkter og en til at finde lavpunkter, der begge er justerbare med forskellige parametre.
 \newpage
@@ -51,7 +51,7 @@ Det havde den effekt at det var stort set umuligt at separere de forskellige ele
 Undgå indflydelse fra skæv laser ved måling af højden.
 
 \subsubsection{Metode}
-Grundet laserens bueform, blev to små bider af laseren udskåret. Hvis disse faldt inde for samme vinkel ville betydningen af laserens bueform have minimal indflydelse. Desværre er denne metode ikke præcis nok da den ikke tager højde for bl.a. udsving i laserens intensitetsvariationer over tid eller elementer der kunne være betydningsfulde for målingen som f.eks. fremmedlegemer.
+Grundet laserens bueform, blev to små bider af laseren udskåret. Hvis disse faldt inde for samme vinkel ville betydningen af laserens bueform have minimal indflydelse. Desværre er denne metode ikke nøjagtig nok, da den ikke tager højde for bl.a. udsving i laserens intensitetsvariationer over tid eller elementer der kunne være betydningsfulde for målingen som f.eks. fremmedlegemer.
 
 \subsubsection{Resultat}
 Målinger foretaget ved denne metode viser markant andre værdier, og er temmelig svingene i resultater.
