@@ -1,9 +1,9 @@
 %PraktikOpgaven
 \section{Praktikopgaven}
-Opgaven er et afklaringsprojekt. Det går ud på hvorvidt det er muligt at kunne måle tykkelsen af en vejstribe, der typisk består af termoplast med reflekterende elementer som f.eks. små perler.
+Opgaven er et afklaringsprojekt. Det går ud på hvorvidt det ville være muligt at kunne måle tykkelsen af en vejstribe. I virkeligheden består vejstriber typisk af termoplast og indeholder reflekterende elementer som f.eks. små perler. For at kunne fastslå om det overhovedet var muligt, skulle der først determineres hvorvidt det var muligt at kunne foretage målinger under kontrollerede forhold. Målingerne blev derfor foretaget på keramikplader der havde en kendt tykkelse.
 
 \section{Bevæggrunden}
-Virksomhederne der anlægger vejstriberne har interesse i at kunne være sikker på hvor meget termoplast de rent faktisk bruger. De skal opfylde de krav kunden har ønsket, og ikke har unødigt spild. Kunderne kan verificere den tykkelse der er ønsket, og over tid estimere stribernes levetid, da disse bliver slidt ved brug. En kunde kan derfor følge op over en længere periode hvorledes slitage påvirker striberne og hvornår det kan være nødvendigt at få dem genlagt på den givne strækning.
+Virksomhederne der anlægger vejstriberne har interesse i, at kunne være sikker på hvor meget termoplast de rent faktisk bruger. De skal opfylde de krav kunden har ønsket, og ikke har unødigt spild. Kunderne kan verificere den tykkelse der er ønsket, og over tid estimere stribernes levetid, da disse bliver slidt ved brug. En kunde kan derfor følge op over en længere periode hvorledes slitage påvirker striberne, og hvornår det kan være nødvendigt at få dem genlagt på den givne strækning.
 
 \section{Krav for opgaven}
 Produktet det potentielt kan munde ud i, har visse krav der ikke må overskrides.
@@ -17,17 +17,17 @@ Produktet det potentielt kan munde ud i, har visse krav der ikke må overskrides
 Det var ikke tilladt at installere proprietært software på computeren, selvom jeg havde en gyldig licens.
 
 \section{Afklaring}
-Afklaringen bestod derfor i at, via selvvalgte metoder, måle tykkelsen af på forhånd kendte hvide keramikplader, for at fastslå om måling kan lade sig gøre under kontrollerede forhold. Grundlaget for dette valg var at kunne danne et overblik over mulighederne samt at determinere om hvorvidt målinger TJEK!!!! kunne hold en linearitet der var brugbar.
+Afklaringen bestod derfor i at, via selvvalgte metoder, måle tykkelsen af på forhånd kendte hvide keramikplader, for at fastslå om måling kan lade sig gøre under kontrollerede forhold.
+
+\newpage
 
 \section{Teknologivalg}
 For at løse opgaven valgte jeg følgende teknologier, ud fra hvad jeg mente var de rigtige, til prisen.
 
-\newpage
-
 \subsection{Kamera og Laser}
-Ved begyndelsen af projektet fandtes der ingen information omkring hvilken måde opgaven skulle løses, og hvordan processen skulle foregå. Det var en tiltænkt del af opgaven, at indhente informationer, priser, finde kriterier for hvorledes og på hvilken måde opgaven skulle løses. Det indebar en del research indenfor området, bl.a. profil laserskannere, linje lasere samt kameraer. Efterfølgende skulle budgettet tages i betragtning, hvilket inkluderede en del kontakt med mange forskellige sælgere verden rundt. Det resulterede i at den løsning der kunne bæres af budgettet samt kunne, i teorien, opfylde præcisionskravet, var et monokromatisk kamera på min. 5MP og en laser der kastede sit lys som en linje. Det var derfor ganske klart at der skulle foregå en del billedbehandling og manipulation af data for at opnå kravet, hvilket var evident da 5 pixels svarede til 1 mm og kravet var på en præcision på 0.1 mm.\\\\
-Den basale årsag til at benytte sig af kamera og linjelaser var prisen. En profil laserscanner kunne billigst fås for ca. 20.000,- DKK, hvilket efterlod meget lidt råderum til alt andet, hvorimod et fornuftigt monokromatisk kamera kunne erhverves for under 6.000,- DKK, og en linjelaser for under 2.500,- DKK. Til alt held havde DELTA en samling kameraer, dog lidt ældre modeller og med en anelse ringere specifikationer, men stadig inden for de krav jeg havde opsat. Hvis projektet kunne gøres med et af disse, ville resultaterne blive bedre ved en opgradering af kameraet.
-Fremgangsmåden ville så være at opstille laseren direkte over målet og kameraet i en 45 graders vinkel for at opnå den optimale synlighed af laseren.
+Ved begyndelsen af projektet, fandtes der ingen information omkring hvilken måde opgaven skulle løses, eller hvordan processen skulle foregå. Det var en tiltænkt del af opgaven, at indhente informationer, priser samt finde kriterier for hvorledes og på hvilken måde opgaven skulle løses. Det indebar en del research indenfor området, bl.a. profil laserskannere, linje lasere samt kameraer. Efterfølgende skulle budgettet tages i betragtning, hvilket inkluderede en del kontakt med mange forskellige sælgere verden rundt. Det resulterede i at den løsning der kunne bæres af budgettet samt kunne, i teorien, opfylde præcisionskravet, var et monokromatisk kamera på minimum 5MP og en laser der kastede sit lys som en linje. Det var derfor ganske klart at der skulle foregå en del billedbehandling og manipulation af data, for at opnå kravet, hvilket var evident da 5 pixels svarede til 1 mm og kravet var på en præcision på 0.1 mm.\\\\
+Den basale årsag til at benytte sig af kamera og linjelaser var prisen. En profil laserscanner kunne billigst fås for ca. 20.000,- DKK, hvilket efterlod meget lidt råderum til alt andet, hvorimod et fornuftigt monokromatisk kamera kunne erhverves for under 6.000,- DKK, og en linjelaser for under 2.500,- DKK. Til alt held havde DELTA en samling kameraer, hvoraf et af dem godt kunne benyttes til projektet, dog af lidt ældre model og med en anelse ringere specifikationer, men stadig inden for de krav jeg havde opsat. Hvis projektet kunne gøres med et af disse, ville resultaterne blive bedre ved en opgradering af kameraet.
+Fremgangsmåden ville så være at opstille laseren direkte over målet, og kameraet i en 45 graders vinkel for at opnå den optimale synlighed af laseren.
 
 \subsection{Softwaren}
 Softwaren er udviklet fra bunden af i C\texttt{++}14, hvor der drages nytte af OpenCVs enorme samling af algoritmer samt kameraets C API for at opnå fuld kontrol af enheden. Softwaren er desuden udviklet i Visual Studio Community Edition 2017 og kan konfigureres via kommandolinjeparametre. Derudover er der udviklet to hjælpeprogrammer. Et til at generere nulbilleder\footnote{Et billede er aldrig helt uden information, et nulbillede taget med linsens hætte på indeholder stadig information} der potentielt kan trækkes fra de billeder der skal behandles og et til at kunne kalibrere kameraet.
