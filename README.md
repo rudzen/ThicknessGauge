@@ -10,4 +10,4 @@ Furthermore, it was a feasability study.
 
 Several interesting problems were overcome (to an acceptable degree) and it was necessary to include a lot of utility functionality.
 
-It is released under the BOOST license (see license file) in the hopes that others could benifit from it in some way :).
+It is released under the BOOST license (see license file) in the hopes that others will find it useful in some way :).
