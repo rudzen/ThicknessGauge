@@ -4,7 +4,7 @@ This project was my internship project which is able to measure the height of an
 It was achieved using a GC-2450 camera and a laser.
 The target was to be able to detect a high differential of just 0.1mm, which is a fraction of a pixel size.
 
-It was developed using C++ and OpenCV.
+It was developed using C++ and OpenCV (w. PvAPI to connecto to camera).
 
 Furthermore, it was a feasability study.
 
